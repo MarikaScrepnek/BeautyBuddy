@@ -1,6 +1,6 @@
 INSERT INTO brand(name) VALUES
 ('loreal')
-ON CONFLICT (brand_id) DO NOTHING;
+ON CONFLICT (name) DO NOTHING;
 
 INSERT INTO category (category_id, name, parent_category_id) VALUES
 (1, 'makeup', NULL),
