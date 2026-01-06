@@ -1,15 +1,15 @@
-CREATE TABLE brand (
+CREATE TABLE IF NOT EXISTS brand (
     brand_id SERIAL PRIMARY KEY,
     name TEXT NOT NULL
 );
 
-CREATE TABLE category (
+CREATE TABLE IF NOT EXISTS category (
     category_id SERIAL PRIMARY KEY,
     name TEXT NOT NULL,
     parent_category_id INT
 );
 
-CREATE TABLE product (
+CREATE TABLE IF NOT EXISTS product (
     product_id SERIAL PRIMARY KEY,
     name TEXT NOT NULL,
     brand_id INT REFERENCES brand(brand_id),
