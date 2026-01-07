@@ -1,6 +1,4 @@
 import ProductList from './components/ProductList';
-import BrandList from './components/BrandList';
-import CategoryList from './components/CategoryList';
 
 function App() {
   return (
