@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { getProducts } from "../api/productApi";
 
+import './ProductList.css';
+
 export default function ProductList() {
   const [products, setProducts] = useState([]);
 
@@ -9,21 +11,17 @@ export default function ProductList() {
   }, []);
 
   return (
-    <div>
+    <div className="product-grid">
       {products.map(p => (
-        <div key={p.product_id} style={{ marginBottom: "20px" }}>
-          <h3>{p.name}</h3>
-          
-          {/* Display image if it exists */}
+        <div className="product-card" key={p.product_id}>
           {p.image_link && (
-            <img 
-              src={p.image_link} 
-              alt={p.name} 
-              style={{ width: "150px", height: "150px", objectFit: "contain" }}
-            />
+            <img src={p.image_link} alt={p.name} className="product-image" />
           )}
-
-          <p>Price: ${p.price ?? "N/A"}</p>
+          <h3>{p.name}</h3>
+          <p>Price: {p.price ? `$${p.price}` : "N/A"}</p>
+          <a href={p.product_link} target="_blank" rel="noopener noreferrer">
+            View Product
+          </a>
         </div>
       ))}
     </div>
