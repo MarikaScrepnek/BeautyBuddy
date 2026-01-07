@@ -16,12 +16,3 @@ h2 {
   margin-bottom: 30px;
   font-size: 48px;
 }
-
-.product-container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-
-  max-width: 1024px;
-  margin: 0 auto;
-}
