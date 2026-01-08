@@ -41,6 +41,20 @@
   border-color: rgb(231, 155, 219);
 }
 
+.login-button {
+    background-color: rgb(231, 155, 219);
+    color: #ffffff;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.login-button:hover {
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+}
+
 .user-settings-icon {
     width: 40px;
     height: 40px;

@@ -22,6 +22,10 @@ function App() {
           placeholder="Search products..."
         />
 
+        <nav className='login-button'>
+          <span>Login</span>
+        </nav>
+
         <img
           className="user-settings-icon"
           src={userSettingsIcon}
@@ -30,7 +34,7 @@ function App() {
       </header>
 
       <ProductList />
-      
+
     </div>
   );
 }
