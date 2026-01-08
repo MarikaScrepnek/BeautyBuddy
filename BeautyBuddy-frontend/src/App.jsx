@@ -28,7 +28,9 @@ function App() {
           alt="User settings"
         />
       </header>
+
       <ProductList />
+      
     </div>
   );
 }
