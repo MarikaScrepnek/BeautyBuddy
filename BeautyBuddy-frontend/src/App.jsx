@@ -8,7 +8,6 @@ function App() {
       <header className="navigation-bar">
         <h1>BeautyBuddy</h1>
       </header>
-      <h2>Products</h2>
       <ProductList />
     </div>
   );
