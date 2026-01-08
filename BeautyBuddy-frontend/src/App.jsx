@@ -8,32 +8,36 @@ function App() {
   return (
     <div>
       <header className="navigation-bar">
-        <h1 className='logo'>BeautyBuddy</h1>
+        <div className='page-container nav-container'>
+          <h1 className='logo'>BeautyBuddy</h1>
 
-        <nav className='nav-bar-links'>
-          <span>Home</span>
-          <span>My Routines</span>
-          <span>Community</span>
-        </nav>
+          <nav className='nav-bar-links'>
+            <span>Home</span>
+            <span>My Routines</span>
+            <span>Community</span>
+          </nav>
 
-        <input
-          type="text"
-          className="search-bar"
-          placeholder="Search products..."
-        />
+          <input
+            type="text"
+            className="search-bar"
+            placeholder="Search products..."
+          />
 
-        <nav className='login-button'>
-          <span>Login</span>
-        </nav>
-
-        <img
-          className="user-settings-icon"
-          src={userSettingsIcon}
-          alt="User settings"
-        />
+          <nav className='login-button'>
+            <span>Login</span>
+          </nav>
+          
+          <img
+            className="user-settings-icon"
+            src={userSettingsIcon}
+            alt="User settings"
+          />
+        </div>
       </header>
 
-      <ProductList />
+      <div className='page-container'>
+        <ProductList />
+      </div>
 
     </div>
   );

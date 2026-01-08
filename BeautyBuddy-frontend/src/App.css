@@ -1,10 +1,17 @@
 .navigation-bar {
+    background-color: white;
+    width: 100%;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    padding: 10px 0;
+}
+
+.nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-
-    background-color: #ffffff;
-    padding: 15px 20px;
 }
 
 .logo {
@@ -31,7 +38,7 @@
 }
 
 .search-bar {
-    padding: 8px 12px;
+    padding: 3px 12px;
     font-size: 1rem;
     border: 1px solid #333131;
     border-radius: 4px;
@@ -60,6 +67,7 @@
     height: 40px;
     border-radius: 25%;
     cursor: pointer;
+    padding: 5px;
 }
 
 .user-settings-icon:hover {

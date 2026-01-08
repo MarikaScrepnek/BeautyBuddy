@@ -5,22 +5,13 @@
 }
 
 body {
-  padding: 0;
   background-color: #f0cef0;
   font-family: "Franklin Gothic Medium", Arial;
-  display: flex;
-  justify-content: center; /* center content horizontally */
 }
 
-#root {
+.page-container {
   width: 100%;
-  max-width: 1200px;  /* optional: keeps page from being too wide on big screens */
-  padding: 0 20px;    /* horizontal spacing from edges */
-}
-
-h2 {
-  color: #f3f3f3;
-  text-align: center;
-  margin-bottom: 30px;
-  font-size: 48px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
 }
