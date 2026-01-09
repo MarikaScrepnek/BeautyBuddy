@@ -15,6 +15,7 @@ function App() {
             <span>Home</span>
             <span>My Routines</span>
             <span>Community</span>
+            <span>Discussions</span>
           </nav>
 
           <input
@@ -27,11 +28,13 @@ function App() {
             <span>Login</span>
           </nav>
           
+          {/* page will either show login button or this if user is logged in, with users username to the left
           <img
             className="user-settings-icon"
             src={userSettingsIcon}
             alt="User settings"
           />
+          */}
         </div>
       </header>
 
