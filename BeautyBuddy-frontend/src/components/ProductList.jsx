@@ -18,6 +18,7 @@ export default function ProductList() {
             <img src={p.image_link} alt={p.name} className="product-image" />
           )}
           <h3>{p.name}</h3>
+          <p>Rating: {p.rating ? `${p.rating}/5` : "N/A"}</p>
           <p>Price: {p.price ? `$${p.price}` : "N/A"}</p>
           <a href={p.product_link} target="_blank" rel="noopener noreferrer">
             View Product
