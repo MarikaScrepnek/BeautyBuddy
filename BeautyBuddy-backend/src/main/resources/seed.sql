@@ -2,26 +2,36 @@ INSERT INTO brand(name) VALUES
 ('L''Oréal Paris')
 ON CONFLICT (name) DO NOTHING;
 
-INSERT INTO category (category_id, name, parent_category_id) VALUES
-(1, 'makeup', NULL),
-(2, 'skincare', NULL),
-(3, 'haircare', NULL),
-(4, 'bodycare', NULL),
-(5, 'primer', 1),
-(6, 'foundation', 1),
-(7, 'concealer', 1),
-(8, 'contour', 1),
-(9, 'blush', 1),
-(10, 'bronzer', 1),
-(11, 'highlighter', 1),
-(13, 'powder', 1),
-(14, 'eyebrow product', 1),
-(15, 'eyebrow gel', 1),
-(16, 'eyeshadow', 1),
-(17, 'eyeliner', 1),
-(18, 'mascara', 1),
-(19, 'setting spray', 1)
-ON CONFLICT (category_id) DO NOTHING;
+INSERT INTO category (name, parent_category_id) VALUES
+('makeup', NULL),
+('skincare', NULL),
+('haircare', NULL),
+('bodycare', NULL),
+('primer', 'makeup'),
+('foundation', 'makeup'),
+('concealer', 'makeup'),
+('contour', 'makeup'),
+('blush', 'makeup'),
+('bronzer', 'makeup'),
+('highlighter', 'makeup'),
+('powder', 'makeup'),
+('eyebrow product', 'makeup'),
+('eyebrow gel', 'eyebrow product'),
+('eyeshadow', 'makeup'),
+('foundation', 'makeup'),
+('concealer', 'makeup'),
+('contour', 'makeup'),
+('blush', 'makeup'),
+('bronzer', 'makeup'),
+('highlighter', 'makeup'),
+('powder', 'makeup'),
+('eyebrow product', 'makeup'),
+('eyebrow gel', 'eyebrow product'),
+('eyeshadow', 'makeup'),
+('eyeliner', 'makeup'),
+('mascara', 'makeup'),
+('setting spray', 'makeup')
+ON CONFLICT (name) DO NOTHING;
 
 INSERT INTO product (name, brand_id, category_id, price, image_link, product_link, description, rating) VALUES
 ('Telescopic Original Mascara', 
@@ -33,4 +43,4 @@ INSERT INTO product (name, brand_id, category_id, price, image_link, product_lin
  NULL,
  NULL
 )
-ON CONFLICT (product_id) DO NOTHING;
+ON CONFLICT (name, brand_id) DO NOTHING;
