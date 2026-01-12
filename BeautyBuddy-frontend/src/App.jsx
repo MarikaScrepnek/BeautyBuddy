@@ -1,10 +1,14 @@
 import ProductList from './components/ProductList';
 
+import { useEffect, useState } from "react";
+
 import userSettingsIcon from './assets/images/user-settings-icon.png';
 
 import './App.css';
 
 function App() {
+  const [searchQuery, setSearchQuery] = useState("");
+
   return (
     <div>
       <header className="navigation-bar">
@@ -22,6 +26,8 @@ function App() {
             type="text"
             className="search-bar"
             placeholder="Search products..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
 
           <nav className='login-button'>
@@ -39,7 +45,7 @@ function App() {
       </header>
 
       <div className='page-container'>
-        <ProductList />
+        <ProductList searchQuery={searchQuery} />
       </div>
 
       <div className="product-not-found">

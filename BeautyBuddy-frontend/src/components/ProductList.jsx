@@ -1,14 +1,17 @@
 import { useEffect, useState } from "react";
-import { getProducts } from "../api/productApi";
 
 import './ProductList.css';
 
-export default function ProductList() {
+export default function ProductList({ searchQuery }) {
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
-    getProducts().then(setProducts);
-  }, []);
+    const query = searchQuery || "";
+    fetch(`http://localhost:8080/api/products/search?q=${query}`)
+      .then(res => res.json())
+      .then(setProducts)
+      .catch(console.error);
+  }, [searchQuery]);
 
   return (
     <div className="product-grid">
