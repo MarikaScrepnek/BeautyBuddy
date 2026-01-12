@@ -42,6 +42,13 @@ function App() {
         <ProductList />
       </div>
 
+      <div className="product-not-found">
+        <p>Don't see the product you're looking for? Send us a request!</p>
+        <nav className='request-product-button'>
+          <span>Request Product</span>
+        </nav>
+      </div>
+
     </div>
   );
 }

@@ -73,3 +73,26 @@
 .user-settings-icon:hover {
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
 }
+
+.product-not-found {
+    text-align: center;
+    margin: 30px 0;
+    font-size: 0.75rem;
+    color: #333;
+}
+
+.request-product-button {
+    display: inline-block;
+    margin-top: 5px;
+    padding: 5px 20px;
+    background-color: rgb(231, 155, 219);
+    color: #fff;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.75rem;
+    text-decoration: none;
+}
+
+.request-product-button:hover {
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+}
