@@ -23,9 +23,8 @@ INSERT INTO category (category_id, name, parent_category_id) VALUES
 (19, 'setting spray', 1)
 ON CONFLICT (category_id) DO NOTHING;
 
-INSERT INTO product (product_id, name, brand_id, category_id, price, image_link, product_link, description, rating) VALUES
-(1, 
- 'Telescopic Original Mascara', 
+INSERT INTO product (name, brand_id, category_id, price, image_link, product_link, description, rating) VALUES
+('Telescopic Original Mascara', 
  1, 
  18, 
  NULL, 
