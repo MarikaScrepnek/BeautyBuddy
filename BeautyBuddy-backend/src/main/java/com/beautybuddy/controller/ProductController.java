@@ -28,6 +28,6 @@ public class ProductController {
 
   @GetMapping("/search")
   public List<Product> searchProducts(@RequestParam("q") String query) {
-    return productRepository.findByNameContainingIgnoreCase(query);
+    return productRepository.searchByProductOrBrand(query);
   }
 }

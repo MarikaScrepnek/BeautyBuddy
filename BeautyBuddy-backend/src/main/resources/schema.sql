@@ -21,3 +21,5 @@ CREATE TABLE IF NOT EXISTS product (
     rating NUMERIC(3, 2),
     CONSTRAINT unique_product_name_brand UNIQUE(name, brand_id)
 );
+
+CREATE EXTENSION IF NOT EXISTS unaccent;
