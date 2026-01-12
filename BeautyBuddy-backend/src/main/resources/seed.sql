@@ -1,5 +1,5 @@
 INSERT INTO brand(name) VALUES
-('loreal')
+('L''Oréal Paris')
 ON CONFLICT (name) DO NOTHING;
 
 INSERT INTO category (category_id, name, parent_category_id) VALUES
@@ -25,7 +25,7 @@ ON CONFLICT (category_id) DO NOTHING;
 
 INSERT INTO product (product_id, name, brand_id, category_id, price, image_link, product_link, description, rating) VALUES
 (1, 
- 'loreal telescopic original mascara', 
+ 'Telescopic Original Mascara', 
  1, 
  18, 
  NULL, 
