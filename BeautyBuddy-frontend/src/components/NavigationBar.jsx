@@ -1,6 +1,7 @@
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { FaSearch } from "react-icons/fa";
 import { NavLink } from 'react-router-dom';
+import { useState } from 'react';
 
 import userSettingsIcon from '../assets/images/user-settings-icon.png';
 
@@ -9,6 +10,8 @@ import './NavigationBar.css';
 export default function NavigationBar({ searchQuery, setSearchQuery }) {
   const navigate = useNavigate();
   const location = useLocation();
+
+  const [showLogin, setShowLogin] = useState(false);
 
   const handleChange = (e) => {
     const value = e.target.value;
@@ -62,9 +65,12 @@ export default function NavigationBar({ searchQuery, setSearchQuery }) {
             </button>
           </div>
 
-          <nav className='login-button'>
-            <span>Login</span>
-          </nav>
+          <button
+            className="login-button"
+            onClick={() => setShowLogin(true)}
+          >
+            Login
+          </button>
 
           {/* optional user settings image
           <img
@@ -80,6 +86,35 @@ export default function NavigationBar({ searchQuery, setSearchQuery }) {
       <main className='page-container'>
         <Outlet />
       </main>
+
+      {showLogin && (
+        <div className="modal-overlay" onClick={() => setShowLogin(false)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <h2>Login</h2>
+
+            <input type="email" placeholder="Email" />
+            <input type="password" placeholder="Password" />
+
+            <button className="modal-login-button">Log In</button>
+
+            <NavLink className='modal-forgot-password-link'>Forgot Password?</NavLink>
+
+            <div className='modal-signup'>
+              <h2 className='modal-signup-prompt'>Don't have an account?</h2>
+              <NavLink className="modal-signup-link">Sign Up</NavLink>
+            </div>
+
+            <button
+              className="modal-close"
+              onClick={() => setShowLogin(false)}
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      )}
+
+
     </div>
   );
 }
