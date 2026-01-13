@@ -1,0 +1,75 @@
+.navigation-bar {
+    background-color: white;
+    width: 100%;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    padding: 10px 0;
+}
+
+.nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    color: rgb(231, 155, 219);
+    font-size: 2rem;
+    margin: 0;
+    cursor: pointer;
+}
+
+.nav-bar-links {
+    display: flex;
+    gap: 20px;
+    font-size: 1rem;
+
+    color: rgb(0, 0, 0);
+}
+
+.nav-bar-links span {
+  cursor: pointer;
+}
+
+.nav-bar-links span:hover {
+  text-decoration: underline;
+}
+
+.search-bar {
+    padding: 3px 12px;
+    font-size: 1rem;
+    border: 1px solid #333131;
+    border-radius: 4px;
+}
+
+.search-bar:focus {
+  border-color: rgb(231, 155, 219);
+}
+
+.login-button {
+    background-color: rgb(231, 155, 219);
+    color: #ffffff;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.login-button:hover {
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+}
+
+.user-settings-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 25%;
+    cursor: pointer;
+    padding: 5px;
+}
+
+.user-settings-icon:hover {
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+}
