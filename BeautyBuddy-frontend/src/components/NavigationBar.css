@@ -110,6 +110,10 @@
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
 }
 
+.login-button:active {
+    scale: 0.98;
+}
+
 .user-settings-icon {
     width: 40px;
     height: 40px;
