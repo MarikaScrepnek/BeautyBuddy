@@ -50,6 +50,11 @@
     border-radius: 4px;
 }
 
+.search-bar:focus {
+  outline: none;
+  border-color: rgb(231, 155, 219);
+}
+
 .search-button {
   position: absolute;
   right: 6px;
