@@ -1,4 +1,5 @@
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
+import { FaSearch } from "react-icons/fa";
 
 import userSettingsIcon from '../assets/images/user-settings-icon.png';
 
@@ -23,6 +24,10 @@ export default function NavigationBar({ searchQuery, setSearchQuery }) {
     }
   };
 
+  const handleSearch = () => {
+    navigate(`/?q=${encodeURIComponent(searchQuery)}`);
+  };
+
   return (
     <div>
       <header className="navigation-bar">
@@ -36,14 +41,25 @@ export default function NavigationBar({ searchQuery, setSearchQuery }) {
             <Link to="/discussions">Discussions</Link>
           </nav>
 
-          <input
-            type="text"
-            className="search-bar"
-            placeholder="Search products..."
-            value={searchQuery}
-            onChange={handleChange}
-            onKeyDown={handleKeyDown}
-          />
+          <div className="search-container">
+            <input
+              type="text"
+              className="search-bar"
+              placeholder="Search products..."
+              value={searchQuery}
+              onChange={handleChange}
+              onKeyDown={handleKeyDown}
+            />
+
+            <button
+              type="button"
+              className="search-button"
+              onClick={handleSearch}
+              aria-label="Search"
+            >
+              <FaSearch />
+            </button>
+          </div>
 
           <nav className='login-button'>
             <span>Login</span>
