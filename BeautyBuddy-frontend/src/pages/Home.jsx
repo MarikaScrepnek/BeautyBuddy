@@ -1,11 +1,16 @@
 import ProductList from '../components/ProductList';
 import { useSearchParams } from 'react-router-dom';
+import { useState } from 'react';
 
 import './Home.css';
+
+import RequestModal from '../components/RequestModal';
 
 export default function Home() {
   const [params] = useSearchParams();
   const searchQuery = params.get("q") || "";
+
+  const [showRequest, setShowRequest] = useState(false);
 
   return (
     <div>
@@ -13,10 +18,17 @@ export default function Home() {
 
       <div className="product-not-found">
         <p>Don't see the product you're looking for? Send us a request!</p>
-        <nav className="request-product-button">
-          <span>Request Product</span>
-        </nav>
+        <button
+        className="request-product-button"
+        onClick={() => setShowRequest(true)}
+        >
+          Request Product
+        </button>
       </div>
+      {showRequest && (
+        <RequestModal onClose={() => setShowRequest(false)} />
+      )}
+
     </div>
   );
 }

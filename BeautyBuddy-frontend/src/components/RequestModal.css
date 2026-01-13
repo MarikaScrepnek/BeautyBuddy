@@ -1,0 +1,26 @@
+.modal-request-button {
+    background-color: rgb(231, 155, 219);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 12pt;
+    margin-top: 15px;
+}
+
+.modal-request-button:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.modal-request-button:active {
+    scale: 0.99;
+}
+
+.request-product-info {
+    font-size: 10pt;
+    font-weight: normal;
+    justify-content: center;
+    text-align: center;
+    margin-top: 10px;
+}
