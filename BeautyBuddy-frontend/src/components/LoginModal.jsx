@@ -5,6 +5,7 @@ import { NavLink } from "react-router-dom";
 
 export default function LoginModal({ onClose }) {
   useEffect(() => {
+    document.documentElement.style.overflow = "hidden";
     document.body.style.overflow = "hidden";
 
     const handleEsc = (e) => {
@@ -14,6 +15,7 @@ export default function LoginModal({ onClose }) {
     window.addEventListener("keydown", handleEsc);
 
     return () => {
+      document.documentElement.style.overflow = "";
       document.body.style.overflow = "";
       window.removeEventListener("keydown", handleEsc);
     };
