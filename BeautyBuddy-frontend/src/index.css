@@ -7,6 +7,7 @@
 body {
   background-color: #f0cef0;
   font-family: "Franklin Gothic Medium", Arial;
+  overflow-x: hidden;
 }
 
 .page-container {
@@ -14,8 +15,4 @@ body {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
-}
-
-html {
-  overflow-y: scroll;
 }
