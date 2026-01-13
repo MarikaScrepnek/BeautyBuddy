@@ -17,5 +17,5 @@ body {
 }
 
 html {
-  overflow-y: scroll; /* always reserve scrollbar space */
+  overflow-y: scroll;
 }
