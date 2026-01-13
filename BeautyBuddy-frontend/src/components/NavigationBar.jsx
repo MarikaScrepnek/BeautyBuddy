@@ -88,7 +88,7 @@ export default function NavigationBar({ searchQuery, setSearchQuery }) {
       </main>
 
       {showLogin && (
-        <div className="modal-overlay" onClick={() => setShowLogin(false)}>
+        <div className="modal-overlay">
           <div className="modal" onClick={(e) => e.stopPropagation()}>
             <h2>Login</h2>
 
