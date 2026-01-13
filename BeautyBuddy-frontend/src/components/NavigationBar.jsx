@@ -7,6 +7,8 @@ import userSettingsIcon from '../assets/images/user-settings-icon.png';
 
 import './NavigationBar.css';
 
+import LoginModal from './LoginModal';
+
 export default function NavigationBar({ searchQuery, setSearchQuery }) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -88,32 +90,8 @@ export default function NavigationBar({ searchQuery, setSearchQuery }) {
       </main>
 
       {showLogin && (
-        <div className="modal-overlay">
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <h2>Login</h2>
-
-            <input type="email" placeholder="Email" />
-            <input type="password" placeholder="Password" />
-
-            <button className="modal-login-button">Log In</button>
-
-            <NavLink className='modal-forgot-password-link'>Forgot Password?</NavLink>
-
-            <div className='modal-signup'>
-              <h2 className='modal-signup-prompt'>Don't have an account?</h2>
-              <NavLink className="modal-signup-link">Sign Up</NavLink>
-            </div>
-
-            <button
-              className="modal-close"
-              onClick={() => setShowLogin(false)}
-            >
-              ✕
-            </button>
-          </div>
-        </div>
+        <LoginModal onClose={() => setShowLogin(false)} />
       )}
-
 
     </div>
   );
