@@ -74,6 +74,10 @@ export default function NavigationBar({ searchQuery, setSearchQuery }) {
             Login
           </button>
 
+          {showLogin && (
+            <LoginModal onClose={() => setShowLogin(false)} />
+          )}
+
           {/* optional user settings image
           <img
             className="user-settings-icon"
@@ -88,10 +92,6 @@ export default function NavigationBar({ searchQuery, setSearchQuery }) {
       <main className='page-container'>
         <Outlet />
       </main>
-
-      {showLogin && (
-        <LoginModal onClose={() => setShowLogin(false)} />
-      )}
 
     </div>
   );
