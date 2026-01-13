@@ -8,6 +8,15 @@ export default function NavigationBar({ searchQuery, setSearchQuery }) {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const handleChange = (e) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+
+    if (location.pathname === "/") {
+      navigate(`/?q=${encodeURIComponent(value)}`, { replace: true });
+    }
+  }
+
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
       navigate(`/?q=${encodeURIComponent(searchQuery)}`);
@@ -32,7 +41,7 @@ export default function NavigationBar({ searchQuery, setSearchQuery }) {
             className="search-bar"
             placeholder="Search products..."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={handleChange}
             onKeyDown={handleKeyDown}
           />
 
