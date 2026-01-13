@@ -15,3 +15,7 @@ body {
   margin: 0 auto;
   padding: 0 20px;
 }
+
+html {
+  overflow-y: scroll; /* always reserve scrollbar space */
+}
