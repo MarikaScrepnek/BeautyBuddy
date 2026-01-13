@@ -1,5 +1,6 @@
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { FaSearch } from "react-icons/fa";
+import { NavLink } from 'react-router-dom';
 
 import userSettingsIcon from '../assets/images/user-settings-icon.png';
 
@@ -35,10 +36,10 @@ export default function NavigationBar({ searchQuery, setSearchQuery }) {
           <h1 className='logo'>BeautyBuddy</h1>
 
           <nav className='nav-bar-links'>
-            <Link to="/">Home</Link>
-            <Link to="/myroutines">My Routines</Link>
-            <Link to="/community">Community</Link>
-            <Link to="/discussions">Discussions</Link>
+            <NavLink to="/" className={({ isActive }) => isActive ? 'active-link' : undefined}>Home</NavLink>
+            <NavLink to="/myroutines" className={({ isActive }) => isActive ? 'active-link' : undefined}>My Routines</NavLink>
+            <NavLink to="/community" className={({ isActive }) => isActive ? 'active-link' : undefined}>Community</NavLink>
+            <NavLink to="/discussions" className={({ isActive }) => isActive ? 'active-link' : undefined}>Discussions</NavLink>
           </nav>
 
           <div className="search-container">
