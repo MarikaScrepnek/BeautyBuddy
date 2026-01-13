@@ -1,21 +1,22 @@
 import ProductList from '../components/ProductList';
-import { useState } from "react";
+import { useSearchParams } from 'react-router-dom';
 
 import './Home.css';
 
 export default function Home() {
-  const [searchQuery, setSearchQuery] = useState("");
+  const [params] = useSearchParams();
+  const searchQuery = params.get("q") || "";
 
   return (
     <div>
-        <ProductList searchQuery={searchQuery} />
+      <ProductList searchQuery={searchQuery} />
 
-        <div className="product-not-found">
+      <div className="product-not-found">
         <p>Don't see the product you're looking for? Send us a request!</p>
-        <nav className='request-product-button'>
-            <span>Request Product</span>
+        <nav className="request-product-button">
+          <span>Request Product</span>
         </nav>
-        </div>
+      </div>
     </div>
   );
 }

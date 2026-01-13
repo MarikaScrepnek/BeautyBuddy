@@ -1,10 +1,19 @@
-import { Outlet, Link } from 'react-router-dom';
+import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 
 import userSettingsIcon from '../assets/images/user-settings-icon.png';
 
 import './NavigationBar.css';
 
 export default function NavigationBar({ searchQuery, setSearchQuery }) {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      navigate(`/?q=${encodeURIComponent(searchQuery)}`);
+    }
+  };
+
   return (
     <div>
       <header className="navigation-bar">
@@ -24,6 +33,7 @@ export default function NavigationBar({ searchQuery, setSearchQuery }) {
             placeholder="Search products..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={handleKeyDown}
           />
 
           <nav className='login-button'>
