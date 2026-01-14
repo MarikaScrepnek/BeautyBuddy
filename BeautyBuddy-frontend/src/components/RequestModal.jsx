@@ -3,21 +3,16 @@ import './RequestModal.css';
 
 export default function RequestModal({ onClose }) {
     useEffect(() => {
-        document.documentElement.style.overflow = "hidden";
-        document.body.style.overflow = "hidden";
-    
         const handleEsc = (e) => {
-          if (e.key === "Escape") onClose();
+            if (e.key === "Escape") onClose();
         };
-    
+
         window.addEventListener("keydown", handleEsc);
-    
+
         return () => {
-          document.documentElement.style.overflow = "";
-          document.body.style.overflow = "";
-          window.removeEventListener("keydown", handleEsc);
+            window.removeEventListener("keydown", handleEsc);
         };
-      }, [onClose]);
+    }, [onClose]);
 
       return (
         <div className="modal-overlay">
