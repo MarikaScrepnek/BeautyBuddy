@@ -22,4 +22,12 @@ CREATE TABLE IF NOT EXISTS product (
     CONSTRAINT unique_product_name_brand UNIQUE(name, brand_id)
 );
 
+CREATE TABLE IF NOT EXISTS users (
+    user_id SERIAL PRIMARY KEY,
+    username TEXT UNIQUE NOT NULL,
+    email TEXT UNIQUE NOT NULL,
+    password_hash TEXT NOT NULL,
+    date_joined TIMESTAMP DEFAULT NOW()
+);
+
 CREATE EXTENSION IF NOT EXISTS unaccent;
