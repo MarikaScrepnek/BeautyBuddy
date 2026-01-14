@@ -71,7 +71,7 @@ export default function NavigationBar({ searchQuery, setSearchQuery }) {
             className="login-button"
             onClick={() => setShowLogin(true)}
           >
-            Login
+            Login / Sign Up
           </button>
 
           {showLogin && (
