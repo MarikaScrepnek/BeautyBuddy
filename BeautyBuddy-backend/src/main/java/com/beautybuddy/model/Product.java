@@ -1,5 +1,6 @@
 package com.beautybuddy.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -14,20 +15,30 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY) // ensure DB auto-increments
     private int product_id;
 
+    @Column(nullable = false)
     private String name;
 
     @ManyToOne
-    @JoinColumn(name = "brand_id")
+    @JoinColumn(name = "brand_id", nullable = false)
     private Brand brand;
 
     @ManyToOne
-    @JoinColumn(name = "category_id")
+    @JoinColumn(name = "category_id", nullable = false)
     private Category category;
-
+    
+    @Column
     private Float price;
+
+    @Column
     private String image_link;
+
+    @Column
     private String product_link;
+
+    @Column
     private String description;
+
+    @Column
     private Float rating;
 
     public Product() {}
