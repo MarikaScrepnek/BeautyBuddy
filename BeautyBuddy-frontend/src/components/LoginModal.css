@@ -83,6 +83,8 @@ h2 {
 }
 
 .modal-close {
+  color: dimgrey;
+
   position: absolute;
   top: 10px;
   right: 10px;
@@ -90,6 +92,10 @@ h2 {
   border: none;
   font-size: 1.2rem;
   cursor: pointer;
+}
+
+.modal-close:hover {
+  color: black;
 }
 
 .modal-close:active {
