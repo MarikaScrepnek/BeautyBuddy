@@ -12,8 +12,8 @@ CREATE TABLE IF NOT EXISTS category (
 CREATE TABLE IF NOT EXISTS product (
     product_id SERIAL PRIMARY KEY,
     name TEXT NOT NULL,
-    brand_id INT REFERENCES brand(brand_id),
-    category_id INT REFERENCES category(category_id),
+    brand_id INT REFERENCES brand(brand_id) NOT NULL,
+    category_id INT REFERENCES category(category_id) NOT NULL,
     price NUMERIC(5, 2),
     image_link TEXT,
     product_link TEXT,
