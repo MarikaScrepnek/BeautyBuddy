@@ -1,8 +1,6 @@
 import { useEffect } from "react";
 import "./LoginModal.css";
 
-import { NavLink } from "react-router-dom";
-
 export default function LoginModal({ onClose, onSwitchToSignup }) {
   useEffect(() => {
     const handleEsc = (e) => {
@@ -26,11 +24,11 @@ export default function LoginModal({ onClose, onSwitchToSignup }) {
 
         <button className="modal-login-button">Log In</button>
 
-        <NavLink className='modal-forgot-password-link'>Forgot Password?</NavLink>
+        <button className='modal-forgot-password-link'>Forgot Password?</button>
 
         <div className='modal-signup'>
             <h2 className='modal-signup-prompt'>Don't have an account?</h2>
-            <button className="modal-signup-link" onClick={onSwitchToSignup}>Sign Up</button>
+            <button type="button" className="modal-signup-link" onClick={onSwitchToSignup}>Sign Up</button>
         </div>
 
         <button

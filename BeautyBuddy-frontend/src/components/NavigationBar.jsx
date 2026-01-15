@@ -7,13 +7,13 @@ import userSettingsIcon from '../assets/images/user-settings-icon.png';
 
 import './NavigationBar.css';
 
-import LoginModal from './LoginModal';
+import AuthModal from './AuthModal';
 
 export default function NavigationBar({ searchQuery, setSearchQuery }) {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [showLogin, setShowLogin] = useState(false);
+  const [showAuth, setShowAuth] = useState(false);
 
   const handleChange = (e) => {
     const value = e.target.value;
@@ -69,14 +69,12 @@ export default function NavigationBar({ searchQuery, setSearchQuery }) {
 
           <button
             className="login-button"
-            onClick={() => setShowLogin(true)}
+            onClick={() => setShowAuth(true)}
           >
             Login / Sign Up
           </button>
 
-          {showLogin && (
-            <LoginModal onClose={() => setShowLogin(false)} />
-          )}
+          {showAuth && <AuthModal onClose={() => setShowAuth(false)} />}
 
           {/* optional user settings image
           <img

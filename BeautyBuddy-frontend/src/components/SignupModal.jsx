@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import "./SignupModal.css";
 
-export default function SignupModal({ onClose }) {
+export default function SignupModal({ onClose, onSwitchToLogin}) {
   useEffect(() => {
     const handleEsc = (e) => {
       if (e.key === "Escape") onClose();
@@ -17,7 +17,7 @@ export default function SignupModal({ onClose }) {
   return (
     <div className="modal-overlay">
         <div className="modal" onClick={(e) => e.stopPropagation()}>
-        <h2>Login</h2>
+        <h2>Sign Up</h2>
 
         <input type="email" placeholder="Email" />
         <input type="text" placeholder="Username" />
