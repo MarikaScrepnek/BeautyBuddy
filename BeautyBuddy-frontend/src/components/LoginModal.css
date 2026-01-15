@@ -55,7 +55,7 @@ h2 {
 }
 
 .modal-forgot-password-link:active {
-    transform: scale(0.98);
+    transform: scale(0.99);
     opacity: 0.7;
 }
 
@@ -74,7 +74,11 @@ h2 {
 
 .modal-signup-link {
   font-size: 0.9rem;
-    color: blue;
+  color: blue;
+  border: none;
+  background: none;
+  text-decoration: underline;
+  cursor: pointer;
 }
 
 .modal-signup-link:active {

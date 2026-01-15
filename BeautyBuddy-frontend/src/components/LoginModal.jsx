@@ -3,7 +3,7 @@ import "./LoginModal.css";
 
 import { NavLink } from "react-router-dom";
 
-export default function LoginModal({ onClose }) {
+export default function LoginModal({ onClose, onSwitchToSignup }) {
   useEffect(() => {
     const handleEsc = (e) => {
       if (e.key === "Escape") onClose();
@@ -30,7 +30,7 @@ export default function LoginModal({ onClose }) {
 
         <div className='modal-signup'>
             <h2 className='modal-signup-prompt'>Don't have an account?</h2>
-            <NavLink className="modal-signup-link">Sign Up</NavLink>
+            <button className="modal-signup-link" onClick={onSwitchToSignup}>Sign Up</button>
         </div>
 
         <button
