@@ -85,8 +85,7 @@ h2 {
 }
 
 .modal-signup-link:active {
-    transform: scale(0.98);
-    opacity: 0.7;
+    transform: scale(0.99);
 }
 
 .modal-close {

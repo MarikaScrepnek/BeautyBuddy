@@ -25,8 +25,8 @@ export default function SignupModal({ onClose, onSwitchToLogin}) {
 
         <button className="modal-signup-button">Sign Up</button>
 
-        <div className="login-prompt">
-            <span>Already have an account?</span>
+        <div className="modal-login">
+            <span className="modal-login-prompt">Already have an account?</span>
             <button
                 className="modal-login-link"
                 onClick={() => {

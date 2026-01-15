@@ -14,3 +14,29 @@
 .modal-signup-button:active {
     transform: scale(0.99);
 }
+
+.modal-login {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 5px;
+}
+
+.modal-login-prompt {
+  font-size: 0.9rem;
+  font-weight: normal;
+  cursor: default;
+}
+
+.modal-login-link {
+  font-size: 0.9rem;
+  color: blue;
+  border: none;
+  background: none;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.modal-login-link:active {
+    transform: scale(0.99);
+}
