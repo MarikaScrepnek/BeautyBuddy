@@ -25,6 +25,18 @@ export default function SignupModal({ onClose, onSwitchToLogin}) {
 
         <button className="modal-signup-button">Sign Up</button>
 
+        <div className="login-prompt">
+            <span>Already have an account?</span>
+            <button
+                className="modal-login-link"
+                onClick={() => {
+                    onSwitchToLogin();
+                }}
+            >
+                Log In
+            </button>
+        </div>
+
         <button
             className="modal-close"
             onClick={() => onClose()}
