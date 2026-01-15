@@ -1,5 +1,6 @@
 package com.beautybuddy.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -12,6 +13,7 @@ public class Brand {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int brand_id;
 
+    @Column(unique = true, nullable = false)
     private String name;
 
     public Brand() {}
