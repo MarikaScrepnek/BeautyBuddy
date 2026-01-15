@@ -52,11 +52,14 @@ h2 {
   font-size: 0.9rem;
   text-align: center;
   color: blue;
+  border: none;
+  background: none;
+  text-decoration: underline;
+  cursor: pointer;
 }
 
 .modal-forgot-password-link:active {
     transform: scale(0.99);
-    opacity: 0.7;
 }
 
 .modal-signup {
