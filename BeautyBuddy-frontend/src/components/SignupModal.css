@@ -1,0 +1,16 @@
+.modal-signup-button {
+  background-color: rgb(231, 155, 219);
+  color: white;
+  border: none;
+  padding: 8px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.modal-signup-button:hover {
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+}
+
+.modal-signup-button:active {
+    transform: scale(0.99);
+}
