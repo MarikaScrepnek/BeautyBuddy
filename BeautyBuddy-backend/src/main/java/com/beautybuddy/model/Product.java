@@ -30,10 +30,8 @@ public class Product {
     private String description;
     private Float rating;
 
-    // Empty constructor required by JPA
     public Product() {}
 
-    // Getters and setters
     public int getProduct_id() { return product_id; }
     public void setProduct_id(int product_id) { this.product_id = product_id; }
 

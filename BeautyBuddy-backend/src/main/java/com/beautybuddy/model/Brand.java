@@ -14,10 +14,8 @@ public class Brand {
 
     private String name;
 
-    // Empty constructor required by JPA
     public Brand() {}
 
-    // Getters and setters
     public int getBrand_id() { return brand_id; }
     public void setBrand_id(int brand_id) { this.brand_id = brand_id; }
 
