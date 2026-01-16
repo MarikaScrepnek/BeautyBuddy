@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import "./SignupModal.css";
+import "./ResetPassModal.css";
 
 export default function ResetPassModal({ onClose }) {
   useEffect(() => {
@@ -18,6 +18,8 @@ export default function ResetPassModal({ onClose }) {
     <div className="modal-overlay">
         <div className="modal" onClick={(e) => e.stopPropagation()}>
         <h2>Reset Password</h2>
+
+        <h3 className="modal-reset-instructions">Enter your email below and if there is a corresponding account, we will send you a message with your username and a link to reset your password.</h3>
 
         <input type="email" placeholder="Email" />
 

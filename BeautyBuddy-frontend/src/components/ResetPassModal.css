@@ -1,0 +1,30 @@
+h2 {
+    text-align: center;
+}
+
+.modal-reset-instructions {
+    font-size: 14px;
+    color: #000000;
+    justify-content: center;
+    text-align: center;
+    font-weight: normal;
+    cursor: default;
+    margin-bottom: 15px;
+}
+
+.modal-resetpass-button {
+  background-color: rgb(231, 155, 219);
+  color: white;
+  border: none;
+  padding: 8px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.modal-resetpass-button:hover {
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+}
+
+.modal-resetpass-button:active {
+    transform: scale(0.99);
+}
