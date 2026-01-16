@@ -15,7 +15,7 @@ function App() {
       <Routes>
         <Route element={<NavigationBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />}>
           <Route path="/" element={<Home />} />
-          <Route path="/myroutines" element={<MyRoutines />} />
+          <Route path="/my-routines" element={<MyRoutines />} />
           <Route path="/community" element={<Community />} />
           <Route path="/discussions" element={<Discussions />} />
         </Route>

@@ -42,7 +42,7 @@ export default function NavigationBar({ searchQuery, setSearchQuery }) {
 
           <nav className='nav-bar-links'>
             <NavLink to="/" className={({ isActive }) => isActive ? 'active-link' : undefined}>Home</NavLink>
-            <NavLink to="/myroutines" className={({ isActive }) => isActive ? 'active-link' : undefined}>My Routines</NavLink>
+            <NavLink to="/my-routines" className={({ isActive }) => isActive ? 'active-link' : undefined}>My Routines</NavLink>
             <NavLink to="/community" className={({ isActive }) => isActive ? 'active-link' : undefined}>Community</NavLink>
             <NavLink to="/discussions" className={({ isActive }) => isActive ? 'active-link' : undefined}>Discussions</NavLink>
           </nav>
