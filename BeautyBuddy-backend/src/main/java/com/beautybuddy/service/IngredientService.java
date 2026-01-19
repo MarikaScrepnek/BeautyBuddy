@@ -28,38 +28,52 @@ public class IngredientService {
         this.productIngredientRepository = productIngredientRepository;
     }
 
+    public Ingredient getCanonicalIngredient(String name) {
+        Ingredient ingredient = ingredientRepository.findByName(name) //find ingredient in ingredient table
+            .orElseGet(() -> { //if not found, create a new ingredient and return it
+                Ingredient newIng = new Ingredient();
+                newIng.setName(name);
+                newIng.setCanonicalId(null);
+                return ingredientRepository.save(newIng);
+            });;
+
+        if (ingredient.getCanonicalId() != null) { //if ingredient has a canonical id, return the canonical ingredient
+            ingredient = ingredientRepository.findById(ingredient.getCanonicalId()).orElse(ingredient);
+        }
+        return ingredient; //else return the ingredient itself
+    }
+
     @Transactional
     public void parseIngredientsForAllProducts() {
-        // get all products with raw ingredients
         for (Product product : productRepository.findAll()) {
             String raw = product.getRawIngredients();
             if (raw == null || raw.isEmpty()) continue;
+            
+            raw = raw.replaceAll("\\([^)]*\\)", ""); //remove parentheses and its conent
+            raw = raw.replace("/", ","); //replace slashes with commas
+            String[] ingredients = raw.split(","); //split by commas
 
-            String[] ingredients = raw.split(","); // split by comma
-            for (String ing : ingredients) {
-                String normalized = ing.trim().toLowerCase(Locale.ROOT);
+            Set<Long> addedCanonicals = new HashSet<>();
 
-                // check if ingredient already exists
-                Ingredient ingredient = ingredientRepository.findByNormalizedName(normalized)
-                        .orElseGet(() -> {
-                            Ingredient newIng = new Ingredient();
-                            newIng.setName(normalized); // use normalized as name
-                            newIng.setNormalizedName(normalized);
-                            return ingredientRepository.save(newIng);
-                        });
+            for (String ing : ingredients) { //look at each ingredient individually
+                String normalized = ing.trim().toLowerCase(Locale.ROOT); //normalize by trimming whitespace and converting to lowercase
 
-                // create join if not exists
-                boolean exists = productIngredientRepository.existsByProductAndIngredient(product, ingredient);
-                if (!exists) {
+                Ingredient ingredient = getCanonicalIngredient(normalized);
+
+                int canonicalId = (ingredient.getCanonicalId() != null) ? ingredient.getCanonicalId() : ingredient.getId();
+                if (!addedCanonicals.contains(canonicalId)) {
                     ProductIngredient pi = new ProductIngredient();
                     pi.setProduct(product);
-                    pi.setIngredient(ingredient);
+
+                    Ingredient canonicalIngredient = ingredientRepository.findById(canonicalId)
+                        .orElse(ingredient); // fallback to the ingredient itself if canonical not found
+
+                    pi.setIngredient(canonicalIngredient);
                     productIngredientRepository.save(pi);
                 }
             }
 
-            // optionally clear raw_ingredients
-            product.setRawIngredients(null);
+            //product.setRawIngredients(null);
             productRepository.save(product);
         }
     }

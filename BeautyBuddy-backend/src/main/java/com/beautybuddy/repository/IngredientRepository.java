@@ -4,5 +4,5 @@ import com.beautybuddy.model.Ingredient;
 import java.util.Optional;
 
 public interface IngredientRepository extends JpaRepository<Ingredient, Integer> {
-    Optional<Ingredient> findByNormalizedName(String normalizedName);
+    Optional<Ingredient> findByName(String name);
 }

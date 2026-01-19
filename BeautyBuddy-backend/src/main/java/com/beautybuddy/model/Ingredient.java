@@ -13,11 +13,11 @@ public class Ingredient {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int ingredient_id;
 
-    @Column(name = "name", nullable = false)
+    @Column(name = "name", nullable = false, unique = true)
     private String name;
 
-    @Column(name = "normalized_name", unique = true, nullable = false)
-    private String normalizedName;
+    @Column(name = "canonical_id")
+    private int canonicalId;
 
     public Ingredient() {}
 
