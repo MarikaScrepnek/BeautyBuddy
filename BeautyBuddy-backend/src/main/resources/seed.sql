@@ -45,3 +45,16 @@ INSERT INTO product (name, brand_id, category_id, price, image_link, product_lin
 'CI 77492, CI 77499, CI 77491 / IRON OXIDES , CI 77266 / BLACK 2 , CI 77007 / ULTRAMARINES , CI 77288 / CHROMIUM OXIDE GREENS , CI 77289 / CHROMIUM HYDROXIDE GREEN , MICA , CI 77891 / TITANIUM DIOXIDE , CI 75470 / CARMINE , CI 77510 / FERRIC FERROCYANIDE'
 )
 ON CONFLICT (name, brand_id) DO NOTHING;
+
+INSERT INTO ingredient (name, canonical_id) VALUES
+('water', NULL),
+('aqua', SELECT ingredient_id FROM ingredient WHERE name='water'),
+('eau', SELECT ingredient_id FROM ingredient WHERE name='water'),
+('cera alba', NULL),
+('beeswax', SELECT ingredient_id FROM ingredient WHERE name='cera alba'),
+('cire d''abeille', SELECT ingredient_id FROM ingredient WHERE name='cera alba'),
+('cera carnauba', NULL),
+('carnauba wax', SELECT ingredient_id FROM ingredient WHERE name='cera carnauba'),
+('cire de carnauba', SELECT ingredient_id FROM ingredient WHERE name='cera carnauba'),
+('acacia senegal', NULL),
+('acacia senegal gum', SELECT ingredient_id FROM ingredient WHERE name='acacia senegal')
