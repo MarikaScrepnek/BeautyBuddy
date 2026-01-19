@@ -14,13 +14,13 @@ import java.util.Arrays;
 import java.util.Locale;
 
 @Service
-public class IngredientService {
+public class ProductIngredientService {
 
     private final ProductRepository productRepository;
     private final IngredientRepository ingredientRepository;
     private final ProductIngredientRepository productIngredientRepository;
 
-    public IngredientService(ProductRepository productRepository,
+    public ProductIngredientService(ProductRepository productRepository,
                              IngredientRepository ingredientRepository,
                              ProductIngredientRepository productIngredientRepository) {
         this.productRepository = productRepository;
@@ -53,12 +53,13 @@ public class IngredientService {
             raw = raw.replace("/", ","); //replace slashes with commas
             String[] ingredients = raw.split(","); //split by commas
 
-            Set<Long> addedCanonicals = new HashSet<>();
+            Set<Integer> addedCanonicals = new HashSet<>();
 
             int order = 1;
 
             for (String ing : ingredients) { //look at each ingredient individually
                 String normalized = ing.trim().toLowerCase(Locale.ROOT); //normalize by trimming whitespace and converting to lowercase
+                if (normalized.isEmpty()) continue;
 
                 Ingredient ingredient = getCanonicalIngredient(normalized);
 
