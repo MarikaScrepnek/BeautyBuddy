@@ -1,3 +1,8 @@
+import jakarta.persistence.*;
+import java.io.Serializable;
+import com.beautybuddy.model.Product;
+import com.beautybuddy.model.Ingredient;
+
 @Entity
 @Table (name = "product_ingredient"
     UniqueConstraints = @UniqueConstraint(columnNames = {"product_id", "ingredient_id"})
