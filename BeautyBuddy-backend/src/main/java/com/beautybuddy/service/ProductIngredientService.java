@@ -82,7 +82,7 @@ public class ProductIngredientService {
             }
 
             //product.setRawIngredients(null);
-            productRepository.save(product);
+            //productRepository.save(product);
         }
     }
 }
