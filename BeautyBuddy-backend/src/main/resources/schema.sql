@@ -17,9 +17,9 @@ CREATE TABLE IF NOT EXISTS product (
     price NUMERIC(5, 2),
     image_link TEXT,
     product_link TEXT,
-    description TEXT,
     rating NUMERIC(3, 2),
     raw_ingredients TEXT,
+    may_contain_raw_ingredients TEXT,
     CONSTRAINT unique_product_name_brand UNIQUE(name, brand_id)
 );
 
