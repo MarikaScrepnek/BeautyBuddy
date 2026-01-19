@@ -25,8 +25,8 @@ CREATE TABLE IF NOT EXISTS product (
 
 CREATE TABLE IF NOT EXISTS ingredient (
     ingredient_id SERIAL PRIMARY KEY,
-    name TEXT NOT NULL,
-    normalized_name TEXT UNIQUE NOT NULL
+    name TEXT UNIQUE NOT NULL,
+    canonical_id INT REFERENCES ingredient(ingredient_id)
 );
 
 CREATE TABLE IF NOT EXISTS product_ingredient (
