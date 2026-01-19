@@ -16,6 +16,9 @@ public class ProductIngredient {
     @JoinColumn(name = "ingredient_id", nullable = false)
     private Ingredient ingredient;
 
+    @Column(name = "position", nullable = false)
+    private int position;
+
     public ProductIngredient() {}
 
     public int getProduct_ingredient_id() { return product_ingredient_id; }
@@ -26,4 +29,7 @@ public class ProductIngredient {
 
     public Ingredient getIngredient() { return ingredient; }
     public void setIngredient(Ingredient ingredient) { this.ingredient = ingredient; }
+
+    public int getPosition() { return position; }
+    public void setPosition(int position) { this.position = position; }
 }

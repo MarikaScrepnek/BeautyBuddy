@@ -55,12 +55,15 @@ public class IngredientService {
 
             Set<Long> addedCanonicals = new HashSet<>();
 
+            int order = 1;
+
             for (String ing : ingredients) { //look at each ingredient individually
                 String normalized = ing.trim().toLowerCase(Locale.ROOT); //normalize by trimming whitespace and converting to lowercase
 
                 Ingredient ingredient = getCanonicalIngredient(normalized);
 
                 int canonicalId = (ingredient.getCanonicalId() != null) ? ingredient.getCanonicalId() : ingredient.getId();
+
                 if (!addedCanonicals.contains(canonicalId)) {
                     ProductIngredient pi = new ProductIngredient();
                     pi.setProduct(product);
@@ -69,6 +72,10 @@ public class IngredientService {
                         .orElse(ingredient); // fallback to the ingredient itself if canonical not found
 
                     pi.setIngredient(canonicalIngredient);
+                    pi.setPosition(order);
+                    order++;
+
+                    addedCanonicals.add(canonicalId);
                     productIngredientRepository.save(pi);
                 }
             }
