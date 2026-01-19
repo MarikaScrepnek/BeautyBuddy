@@ -48,6 +48,12 @@ public class Product {
 
     @Column
     private Float rating;
+
+    @Column(name = "raw_ingredients", columnDefinition = "TEXT")
+    private String rawIngredients;
+
+    @Column(name = "raw_may_contain_ingredients", columnDefinition = "TEXT")
+    private String rawMayContainIngredients;
     
     @OneToMany(
         mappedBy = "product",
@@ -55,6 +61,13 @@ public class Product {
         orphanRemoval = true
     )
     private Set<ProductIngredient> productIngredients = new HashSet<>();
+
+    @OneToMany(
+    mappedBy = "product",
+    cascade = CascadeType.ALL,
+    orphanRemoval = true
+    )
+    private Set<MayContainIngredient> mayContainIngredients = new HashSet<>();
 
 
     public Product() {}
@@ -85,5 +98,11 @@ public class Product {
 
     public Float getRating() { return rating; }
     public void setRating(float rating) { this.rating = rating; }
+
+    public String getRawIngredients() { return rawIngredients; }
+    public void setRawIngredients(String rawIngredients) { this.rawIngredients = rawIngredients; }
+
+    public String getRawMayContainIngredients() { return rawMayContainIngredients; }
+    public void setRawMayContainIngredients(String rawMayContainIngredients) { this.rawMayContainIngredients = rawMayContainIngredients; }
 }
 
