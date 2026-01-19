@@ -2,7 +2,9 @@
 
 package com.beautybuddy.controller;
 
-import com.beautybuddy.service.IngredientService;
+import com.beautybuddy.service.ProductIngredientService;
+import com.beautybuddy.service.MayContainIngredientService;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -10,15 +12,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/ingredients")
 public class IngredientController {
 
-    private final IngredientService ingredientService;
+    private final ProductIngredientService productIngredientService;
+    private final MayContainIngredientService mayContainIngredientService;
 
-    public IngredientController(IngredientService ingredientService) {
-        this.ingredientService = ingredientService;
+    public IngredientController(ProductIngredientService productIngredientService, MayContainIngredientService mayContainIngredientService) {
+        this.productIngredientService = productIngredientService;
+        this.mayContainIngredientService = mayContainIngredientService;
     }
 
     @GetMapping("/parse")
     public String parseIngredients() {
-        ingredientService.parseIngredientsForAllProducts();
+        productIngredientService.parseIngredientsForAllProducts();
+        mayContainIngredientService.parseIngredientsForAllProducts();
         return "Ingredients parsed!";
     }
 }
