@@ -7,6 +7,14 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.CascadeType;
+import java.util.HashSet;
+import java.util.Set;
+
+import com.beautybuddy.model.Brand;
+import com.beautybuddy.model.Category;
+import com.beautybuddy.model.ProductIngredient;
 
 @Entity
 public class Product {
@@ -40,6 +48,14 @@ public class Product {
 
     @Column
     private Float rating;
+    
+    @OneToMany(
+        mappedBy = "product",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true
+    )
+    private Set<ProductIngredient> productIngredients = new HashSet<>();
+
 
     public Product() {}
 
