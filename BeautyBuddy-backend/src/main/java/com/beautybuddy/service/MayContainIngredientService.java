@@ -52,6 +52,10 @@ public class MayContainIngredientService {
     @Transactional
     public void parseIngredientsForAllProducts() {
         for (Product product : productRepository.findAll()) {
+            if (mayContainIngredientRepository.existsByProduct(product)) {
+                continue;
+            }
+
             String raw = product.getRawMayContainIngredients();
             if (raw == null || raw.isEmpty()) continue;
 

@@ -52,6 +52,10 @@ public class ProductIngredientService {
     @Transactional
     public void parseIngredientsForAllProducts() {
         for (Product product : productRepository.findAll()) {
+            if (productIngredientRepository.existsByProduct(product)) {
+                continue;
+            }
+
             String raw = product.getRawIngredients();
             if (raw == null || raw.isEmpty()) continue;
 

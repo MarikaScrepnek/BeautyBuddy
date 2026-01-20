@@ -1,11 +1,10 @@
 package com.beautybuddy.repository;
 
-import com.beautybuddy.model.Ingredient;
 import com.beautybuddy.model.Product;
 import com.beautybuddy.model.MayContainIngredient;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface MayContainIngredientRepository extends JpaRepository<MayContainIngredient, Integer> {
-    boolean existsByProductAndIngredient(Product product, Ingredient ingredient);
+    boolean existsByProduct(Product product);
 }
