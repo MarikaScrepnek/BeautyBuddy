@@ -35,16 +35,17 @@ ON CONFLICT (name) DO NOTHING;
 
 INSERT INTO ingredient (name, canonical_id) VALUES
 ('water', NULL),
-('aqua', SELECT ingredient_id FROM ingredient WHERE name='water'),
-('eau', SELECT ingredient_id FROM ingredient WHERE name='water'),
+('aqua', (SELECT ingredient_id FROM ingredient WHERE name='water')),
+('eau', (SELECT ingredient_id FROM ingredient WHERE name='water')),
 ('cera alba', NULL),
-('beeswax', SELECT ingredient_id FROM ingredient WHERE name='cera alba'),
-('cire d''abeille', SELECT ingredient_id FROM ingredient WHERE name='cera alba'),
+('beeswax', (SELECT ingredient_id FROM ingredient WHERE name='cera alba')),
+('cire d''abeille', (SELECT ingredient_id FROM ingredient WHERE name='cera alba')),
 ('cera carnauba', NULL),
-('carnauba wax', SELECT ingredient_id FROM ingredient WHERE name='cera carnauba'),
-('cire de carnauba', SELECT ingredient_id FROM ingredient WHERE name='cera carnauba'),
+('carnauba wax', (SELECT ingredient_id FROM ingredient WHERE name='cera carnauba')),
+('cire de carnauba', (SELECT ingredient_id FROM ingredient WHERE name='cera carnauba')),
 ('acacia senegal', NULL),
-('acacia senegal gum', SELECT ingredient_id FROM ingredient WHERE name='acacia senegal');
+('acacia senegal gum', (SELECT ingredient_id FROM ingredient WHERE name='acacia senegal'))
+ON CONFLICT (name) DO NOTHING;
 
 INSERT INTO product (name, brand_id, category_id, price, image_link, product_link, rating, raw_ingredients, may_contain_raw_ingredients) VALUES
 ('Telescopic Original Mascara', 

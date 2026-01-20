@@ -12,10 +12,6 @@ import jakarta.persistence.CascadeType;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.beautybuddy.model.Brand;
-import com.beautybuddy.model.Category;
-import com.beautybuddy.model.ProductIngredient;
-
 @Entity
 public class Product {
 
@@ -44,15 +40,12 @@ public class Product {
     private String product_link;
 
     @Column
-    private String description;
-
-    @Column
     private Float rating;
 
     @Column(name = "raw_ingredients", columnDefinition = "TEXT")
     private String rawIngredients;
 
-    @Column(name = "raw_may_contain_ingredients", columnDefinition = "TEXT")
+    @Column(name = "may_contain_raw_ingredients", columnDefinition = "TEXT")
     private String rawMayContainIngredients;
     
     @OneToMany(
@@ -92,9 +85,6 @@ public class Product {
 
     public String getProduct_link() { return product_link; }
     public void setProduct_link(String product_link) { this.product_link = product_link; }
-
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
 
     public Float getRating() { return rating; }
     public void setRating(float rating) { this.rating = rating; }

@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS product_ingredient (
     PRIMARY KEY (product_id, ingredient_id)
 );
 
-CREATE TABLE IF NOT EXISTS may_contain_ingredient (
+CREATE TABLE IF NOT EXISTS may_contain_raw_ingredient (
     product_id INT REFERENCES product(product_id) ON DELETE CASCADE,
     ingredient_id INT REFERENCES ingredient(ingredient_id) ON DELETE CASCADE,
     PRIMARY KEY (product_id, ingredient_id)

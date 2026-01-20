@@ -1,11 +1,10 @@
 package com.beautybuddy.model;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
+
+import jakarta.persistence.*;
 
 @Entity
 @Table (name = "ingredient",
-    UniqueConstraints = @UniqueConstraint(columnNames = "normalized_name")
+    uniqueConstraints = @UniqueConstraint(columnNames = "normalized_name")
 )
 public class Ingredient {
 
@@ -17,7 +16,7 @@ public class Ingredient {
     private String name;
 
     @Column(name = "canonical_id")
-    private int canonicalId;
+    private Integer canonicalId;
 
     public Ingredient() {}
 
@@ -27,6 +26,6 @@ public class Ingredient {
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
 
-    public String getNormalizedName() { return normalizedName; }
-    public void setNormalizedName(String normalizedName) { this.normalizedName = normalizedName; }
+    public Integer getCanonicalId() { return canonicalId; }
+    public void setCanonicalId(Integer canonicalId) { this.canonicalId = canonicalId; }
 }

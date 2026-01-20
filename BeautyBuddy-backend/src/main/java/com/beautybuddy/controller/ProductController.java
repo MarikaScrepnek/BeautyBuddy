@@ -16,11 +16,9 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 @CrossOrigin("http://localhost:5173")
 public class ProductController {
   private final ProductRepository productRepository;
-  private final ProductService productService;
 
-  public ProductController(ProductRepository productRepository, ProductService productService) {
+  public ProductController(ProductRepository productRepository) {
     this.productRepository = productRepository;
-    this.productService = productService;
   }
 
   @GetMapping
@@ -31,10 +29,5 @@ public class ProductController {
   @GetMapping("/search")
   public List<Product> searchProducts(@RequestParam("q") String query) {
     return productRepository.searchByProductOrBrand(query);
-  }
-
-  @PostMapping
-  public Product addProduct(@RequestBody ProductCreateRequest request) {
-    return productService.createProduct(request);
   }
 }

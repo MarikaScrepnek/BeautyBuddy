@@ -1,16 +1,15 @@
 package com.beautybuddy.service;
 
 import com.beautybuddy.model.Ingredient;
+import com.beautybuddy.model.MayContainIngredient;
 import com.beautybuddy.model.Product;
-import com.beautybuddy.model.ProductIngredient;
 import com.beautybuddy.repository.IngredientRepository;
-import com.beautybuddy.repository.ProductIngredientRepository;
 import com.beautybuddy.repository.ProductRepository;
+import com.beautybuddy.repository.MayContainIngredientRepository;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
 import java.util.Locale;
 
 import java.util.HashSet;
@@ -32,18 +31,22 @@ public class MayContainIngredientService {
     }
 
     public Ingredient getCanonicalIngredient(String name) {
-        Ingredient ingredient = ingredientRepository.findByName(name) //find ingredient in ingredient table
-            .orElseGet(() -> { //if not found, create a new ingredient and return it
+        // Find ingredient by name, or create a new one if it doesn't exist
+        Ingredient ingredient = ingredientRepository.findByName(name)
+            .orElseGet(() -> {
                 Ingredient newIng = new Ingredient();
                 newIng.setName(name);
                 newIng.setCanonicalId(null);
                 return ingredientRepository.save(newIng);
-            });;
+            });
 
-        if (ingredient.getCanonicalId() != null) { //if ingredient has a canonical id, return the canonical ingredient
-            ingredient = ingredientRepository.findById(ingredient.getCanonicalId()).orElse(ingredient);
+        // Safely resolve canonical ingredient if canonicalId is not null
+        Integer canonicalIdValue = ingredient.getCanonicalId();
+        if (canonicalIdValue != null) {
+            ingredient = ingredientRepository.findById(canonicalIdValue).orElse(ingredient);
         }
-        return ingredient; //else return the ingredient itself
+
+        return ingredient; // return either the canonical ingredient or itself
     }
 
     @Transactional
@@ -51,37 +54,45 @@ public class MayContainIngredientService {
         for (Product product : productRepository.findAll()) {
             String raw = product.getRawMayContainIngredients();
             if (raw == null || raw.isEmpty()) continue;
-            
-            raw = raw.replaceAll("\\([^)]*\\)", ""); //remove parentheses and its conent
-            raw = raw.replace("/", ","); //replace slashes with commas
-            String[] ingredients = raw.split(","); //split by commas
+
+            // Clean up ingredient string
+            raw = raw.replaceAll("\\([^)]*\\)", ""); // remove parentheses
+            raw = raw.replace("/", ",");             // replace slashes
+            String[] ingredients = raw.split(",");
 
             Set<Integer> addedCanonicals = new HashSet<>();
 
-            for (String ing : ingredients) { //look at each ingredient individually
-                String normalized = ing.trim().toLowerCase(Locale.ROOT); //normalize by trimming whitespace and converting to lowercase
+            for (String ing : ingredients) {
+                String normalized = ing.trim().toLowerCase(Locale.ROOT);
                 if (normalized.isEmpty()) continue;
 
+                // Get or create ingredient
                 Ingredient ingredient = getCanonicalIngredient(normalized);
 
-                int canonicalId = (ingredient.getCanonicalId() != null) ? ingredient.getCanonicalId() : ingredient.getId();
+                // Resolve canonical ingredient safely
+                Integer canonicalIdValue = ingredient.getCanonicalId();
+                Ingredient canonicalIngredient;
+                if (canonicalIdValue != null) {
+                    canonicalIngredient = ingredientRepository.findById(canonicalIdValue).orElse(ingredient);
+                } else {
+                    canonicalIngredient = ingredient;
+                }
 
-                if (!addedCanonicals.contains(canonicalId)) {
+                // Determine which ID to use for tracking duplicates
+                Integer canonicalIdToAdd = (canonicalIngredient.getCanonicalId() != null)
+                        ? canonicalIngredient.getCanonicalId()
+                        : Integer.valueOf(canonicalIngredient.getIngredient_id());
+
+                // Skip if already added
+                if (!addedCanonicals.contains(canonicalIdToAdd)) {
                     MayContainIngredient mci = new MayContainIngredient();
                     mci.setProduct(product);
-
-                    Ingredient canonicalIngredient = ingredientRepository.findById(canonicalId)
-                        .orElse(ingredient); // fallback to the ingredient itself if canonical not found
-
                     mci.setIngredient(canonicalIngredient);
 
-                    addedCanonicals.add(canonicalId);
+                    addedCanonicals.add(canonicalIdToAdd);
                     mayContainIngredientRepository.save(mci);
                 }
             }
-
-            //product.setMayContainIngredients(null);
-            //productRepository.save(product);
         }
     }
 }

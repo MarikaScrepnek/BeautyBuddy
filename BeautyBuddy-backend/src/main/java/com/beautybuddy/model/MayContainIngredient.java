@@ -1,11 +1,10 @@
+package com.beautybuddy.model;
+
 import jakarta.persistence.*;
-import java.io.Serializable;
-import com.beautybuddy.model.Product;
-import com.beautybuddy.model.Ingredient;
 
 @Entity
-@Table (name = "may_contain_ingredient"
-    UniqueConstraints = @UniqueConstraint(columnNames = {"product_id", "ingredient_id"})
+@Table (name = "may_contain_ingredient",
+    uniqueConstraints = @UniqueConstraint(columnNames = {"product_id", "ingredient_id"})
 )
 public class MayContainIngredient {
 
@@ -13,11 +12,11 @@ public class MayContainIngredient {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int may_contain_ingredient_id;
 
-    @ManyToOne(nullable = false)
+    @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
-    @ManyToOne(nullable = false)
+    @ManyToOne
     @JoinColumn(name = "ingredient_id", nullable = false)
     private Ingredient ingredient;
 

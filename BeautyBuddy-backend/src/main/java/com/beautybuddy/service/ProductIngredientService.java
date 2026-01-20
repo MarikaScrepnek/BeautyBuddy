@@ -10,8 +10,9 @@ import com.beautybuddy.repository.ProductRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
 import java.util.Locale;
+import java.util.HashSet;
+import java.util.Set;
 
 @Service
 public class ProductIngredientService {
@@ -21,26 +22,31 @@ public class ProductIngredientService {
     private final ProductIngredientRepository productIngredientRepository;
 
     public ProductIngredientService(ProductRepository productRepository,
-                             IngredientRepository ingredientRepository,
-                             ProductIngredientRepository productIngredientRepository) {
+                                    IngredientRepository ingredientRepository,
+                                    ProductIngredientRepository productIngredientRepository) {
         this.productRepository = productRepository;
         this.ingredientRepository = ingredientRepository;
         this.productIngredientRepository = productIngredientRepository;
     }
 
+    // Return the canonical Ingredient object directly
     public Ingredient getCanonicalIngredient(String name) {
-        Ingredient ingredient = ingredientRepository.findByName(name) //find ingredient in ingredient table
-            .orElseGet(() -> { //if not found, create a new ingredient and return it
+        Ingredient ingredient = ingredientRepository.findByName(name)
+            .orElseGet(() -> {
                 Ingredient newIng = new Ingredient();
                 newIng.setName(name);
                 newIng.setCanonicalId(null);
                 return ingredientRepository.save(newIng);
-            });;
+            });
 
-        if (ingredient.getCanonicalId() != null) { //if ingredient has a canonical id, return the canonical ingredient
-            ingredient = ingredientRepository.findById(ingredient.getCanonicalId()).orElse(ingredient);
+        // If it has a canonicalId, fetch the canonical ingredient object
+        Integer canonicalIdValue = ingredient.getCanonicalId();
+        if (canonicalIdValue != null) {
+            ingredient = ingredientRepository.findById(canonicalIdValue)
+                                           .orElse(ingredient);
         }
-        return ingredient; //else return the ingredient itself
+
+        return ingredient;
     }
 
     @Transactional
@@ -48,41 +54,32 @@ public class ProductIngredientService {
         for (Product product : productRepository.findAll()) {
             String raw = product.getRawIngredients();
             if (raw == null || raw.isEmpty()) continue;
-            
-            raw = raw.replaceAll("\\([^)]*\\)", ""); //remove parentheses and its conent
-            raw = raw.replace("/", ","); //replace slashes with commas
-            String[] ingredients = raw.split(","); //split by commas
+
+            raw = raw.replaceAll("\\([^)]*\\)", ""); // remove parentheses
+            raw = raw.replace("/", ",");             // replace slashes
+            String[] ingredients = raw.split(",");
 
             Set<Integer> addedCanonicals = new HashSet<>();
-
             int order = 1;
 
-            for (String ing : ingredients) { //look at each ingredient individually
-                String normalized = ing.trim().toLowerCase(Locale.ROOT); //normalize by trimming whitespace and converting to lowercase
+            for (String ing : ingredients) {
+                String normalized = ing.trim().toLowerCase(Locale.ROOT);
                 if (normalized.isEmpty()) continue;
 
-                Ingredient ingredient = getCanonicalIngredient(normalized);
-
-                int canonicalId = (ingredient.getCanonicalId() != null) ? ingredient.getCanonicalId() : ingredient.getId();
+                // get canonical Ingredient directly
+                Ingredient canonicalIngredient = getCanonicalIngredient(normalized);
+                int canonicalId = canonicalIngredient.getIngredient_id();
 
                 if (!addedCanonicals.contains(canonicalId)) {
                     ProductIngredient pi = new ProductIngredient();
                     pi.setProduct(product);
-
-                    Ingredient canonicalIngredient = ingredientRepository.findById(canonicalId)
-                        .orElse(ingredient); // fallback to the ingredient itself if canonical not found
-
                     pi.setIngredient(canonicalIngredient);
-                    pi.setPosition(order);
-                    order++;
-
+                    pi.setPosition(order++);
                     addedCanonicals.add(canonicalId);
+
                     productIngredientRepository.save(pi);
                 }
             }
-
-            //product.setRawIngredients(null);
-            //productRepository.save(product);
         }
     }
 }
