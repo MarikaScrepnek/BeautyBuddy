@@ -94,5 +94,13 @@ public class Product {
 
     public String getRawMayContainIngredients() { return rawMayContainIngredients; }
     public void setRawMayContainIngredients(String rawMayContainIngredients) { this.rawMayContainIngredients = rawMayContainIngredients; }
+
+    public Set<ProductIngredient> getProductIngredients() {
+        return productIngredients;
+    }
+
+    public Set<MayContainIngredient> getMayContainIngredients() {
+        return mayContainIngredients;
+    }
 }
 

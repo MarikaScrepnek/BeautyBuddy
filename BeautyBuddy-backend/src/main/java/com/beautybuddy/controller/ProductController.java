@@ -1,7 +1,10 @@
 package com.beautybuddy.controller;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
+import com.beautybuddy.dto.MayContainIngredientDTO;
+import com.beautybuddy.dto.ProductIngredientDTO;
 import com.beautybuddy.model.Product;
 import com.beautybuddy.repository.ProductRepository;
 
@@ -9,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
 @RestController
@@ -29,5 +33,33 @@ public class ProductController {
   @GetMapping("/search")
   public List<Product> searchProducts(@RequestParam("q") String query) {
     return productRepository.searchByProductOrBrand(query);
+  }
+
+  @GetMapping("/{productId}/ingredients")
+  public List<ProductIngredientDTO> getIngredients(@PathVariable int id) {
+    Product product = productRepository.findById(id)
+        .orElseThrow(() -> new RuntimeException("Product not found"));
+
+      return product.getProductIngredients().stream()
+              .map(ProductIngredient -> new ProductIngredientDTO(
+                      ProductIngredient.getIngredient().getIngredient_id(),
+                      ProductIngredient.getIngredient().getName(),
+                      ProductIngredient.getIngredient().getCanonicalId()
+              ))
+              .collect(Collectors.toList());
+  }
+
+  @GetMapping("/{id}/maycontain")
+    public List<MayContainIngredientDTO> getMayContainIngredients(@PathVariable int id) {
+        Product product = productRepository.findById(id)
+          .orElseThrow(() -> new RuntimeException("Product not found"));
+
+        return product.getMayContainIngredients().stream()
+                .map(MayContainIngredient -> new MayContainIngredientDTO(
+                        MayContainIngredient.getIngredient().getIngredient_id(),
+                        MayContainIngredient.getIngredient().getName(),
+                        MayContainIngredient.getIngredient().getCanonicalId()
+                ))
+                .collect(Collectors.toList());
   }
 }
