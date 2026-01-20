@@ -8,10 +8,6 @@ import jakarta.persistence.*;
 )
 public class MayContainIngredient {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int may_contain_ingredient_id;
-
     @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
@@ -21,9 +17,6 @@ public class MayContainIngredient {
     private Ingredient ingredient;
 
     public MayContainIngredient() {}
-
-    public int getMay_contain_ingredient_id() { return may_contain_ingredient_id; }
-    public void setMay_contain_ingredient_id(int may_contain_ingredient_id) { this.may_contain_ingredient_id = may_contain_ingredient_id; }
 
     public Product getProduct() { return product; }
     public void setProduct(Product product) { this.product = product; }
