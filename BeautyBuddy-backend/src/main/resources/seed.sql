@@ -6,7 +6,10 @@ INSERT INTO category (name, parent_category_id) VALUES
 ('makeup', NULL),
 ('skincare', NULL),
 ('haircare', NULL),
-('bodycare', NULL),
+('bodycare', NULL)
+ON CONFLICT (name) DO NOTHING;
+
+INSERT INTO category (name, parent_category_id) VALUES
 ('primer', (SELECT category_id FROM category WHERE name='makeup')),
 ('foundation', (SELECT category_id FROM category WHERE name='makeup')),
 ('concealer', (SELECT category_id FROM category WHERE name='makeup')),
@@ -15,22 +18,16 @@ INSERT INTO category (name, parent_category_id) VALUES
 ('bronzer', (SELECT category_id FROM category WHERE name='makeup')),
 ('highlighter', (SELECT category_id FROM category WHERE name='makeup')),
 ('powder', (SELECT category_id FROM category WHERE name='makeup')),
-('eyebrow product', (SELECT category_id FROM category WHERE name='makeup')),
-('eyebrow gel', (SELECT category_id FROM category WHERE name='eyebrow product')),
-('eyeshadow', (SELECT category_id FROM category WHERE name='makeup')),
-('foundation', (SELECT category_id FROM category WHERE name='makeup')),
-('concealer', (SELECT category_id FROM category WHERE name='makeup')),
-('contour', (SELECT category_id FROM category WHERE name='makeup')),
-('blush', (SELECT category_id FROM category WHERE name='makeup')),
-('bronzer', (SELECT category_id FROM category WHERE name='makeup')),
-('highlighter', (SELECT category_id FROM category WHERE name='makeup')),
-('powder', (SELECT category_id FROM category WHERE name='makeup')),
-('eyebrow product', (SELECT category_id FROM category WHERE name='makeup')),
-('eyebrow gel', (SELECT category_id FROM category WHERE name='eyebrow product')),
+('eyebrow pencil', (SELECT category_id FROM category WHERE name='makeup')),
+('eyebrow gel', (SELECT category_id FROM category WHERE name='makeup')),
 ('eyeshadow', (SELECT category_id FROM category WHERE name='makeup')),
 ('eyeliner', (SELECT category_id FROM category WHERE name='makeup')),
-('mascara', (SELECT category_id FROM category WHERE name='makeup')),
-('setting spray', (SELECT category_id FROM category WHERE name='makeup'))
+('lip liner', (SELECT category_id FROM category WHERE name='makeup')),
+('lipstick', (SELECT category_id FROM category WHERE name='makeup')),
+('lip gloss', (SELECT category_id FROM category WHERE name='makeup')),
+('lip balm', (SELECT category_id FROM category WHERE name='makeup')),
+('setting spray', (SELECT category_id FROM category WHERE name='makeup')),
+('mascara', (SELECT category_id FROM category WHERE name='makeup'))
 ON CONFLICT (name) DO NOTHING;
 
 INSERT INTO ingredient (name, canonical_id) VALUES
