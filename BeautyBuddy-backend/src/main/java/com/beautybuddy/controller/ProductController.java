@@ -35,9 +35,9 @@ public class ProductController {
     return productRepository.searchByProductOrBrand(query);
   }
 
-  @GetMapping("/{productId}/ingredients")
-  public List<ProductIngredientDTO> getIngredients(@PathVariable int id) {
-    Product product = productRepository.findById(id)
+  @GetMapping("/{product_id}/ingredients")
+  public List<ProductIngredientDTO> getIngredients(@PathVariable int product_id) {
+    Product product = productRepository.findById(product_id)
         .orElseThrow(() -> new RuntimeException("Product not found"));
 
       return product.getProductIngredients().stream()
@@ -49,9 +49,9 @@ public class ProductController {
               .collect(Collectors.toList());
   }
 
-  @GetMapping("/{id}/maycontain")
-    public List<MayContainIngredientDTO> getMayContainIngredients(@PathVariable int id) {
-        Product product = productRepository.findById(id)
+  @GetMapping("/{product_id}/maycontain")
+    public List<MayContainIngredientDTO> getMayContainIngredients(@PathVariable int product_id) {
+        Product product = productRepository.findById(product_id)
           .orElseThrow(() -> new RuntimeException("Product not found"));
 
         return product.getMayContainIngredients().stream()
