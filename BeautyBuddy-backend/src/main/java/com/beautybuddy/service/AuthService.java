@@ -1,4 +1,4 @@
-package com.beautybuddy;
+package com.beautybuddy.service;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
