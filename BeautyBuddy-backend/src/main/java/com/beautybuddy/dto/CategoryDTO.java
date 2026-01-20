@@ -1,5 +1,5 @@
 package com.beautybuddy.dto;
 
-public class CategoryDTO {
+public record CategoryDTO (int id, String name) {
     
 }
