@@ -30,16 +30,18 @@ CREATE TABLE IF NOT EXISTS ingredient (
 );
 
 CREATE TABLE IF NOT EXISTS product_ingredient (
+    product_ingredient_id SERIAL PRIMARY KEY,
     product_id INT REFERENCES product(product_id) ON DELETE CASCADE,
     ingredient_id INT REFERENCES ingredient(ingredient_id) ON DELETE CASCADE,
     position INT,
-    PRIMARY KEY (product_id, ingredient_id)
+    UNIQUE (product_id, ingredient_id)
 );
 
-CREATE TABLE IF NOT EXISTS may_contain_raw_ingredient (
+CREATE TABLE IF NOT EXISTS may_contain_ingredient (
+    may_contain_ingredient_id SERIAL PRIMARY KEY,
     product_id INT REFERENCES product(product_id) ON DELETE CASCADE,
     ingredient_id INT REFERENCES ingredient(ingredient_id) ON DELETE CASCADE,
-    PRIMARY KEY (product_id, ingredient_id)
+    UNIQUE (product_id, ingredient_id)
 );
 
 CREATE TABLE IF NOT EXISTS users (

@@ -8,6 +8,10 @@ import jakarta.persistence.*;
 )
 public class MayContainIngredient {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int may_contain_ingredient_id;
+
     @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
