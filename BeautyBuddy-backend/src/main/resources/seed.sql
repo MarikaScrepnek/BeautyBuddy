@@ -35,15 +35,18 @@ ON CONFLICT (name) DO NOTHING;
 
 INSERT INTO ingredient (name, canonical_id) VALUES
 ('water', NULL),
+('cera alba', NULL),
+('cera carnauba', NULL),
+('acacia senegal', NULL)
+ON CONFLICT (name) DO NOTHING;
+
+INSERT INTO ingredient (name, canonical_id) VALUES
 ('aqua', (SELECT ingredient_id FROM ingredient WHERE name='water')),
 ('eau', (SELECT ingredient_id FROM ingredient WHERE name='water')),
-('cera alba', NULL),
 ('beeswax', (SELECT ingredient_id FROM ingredient WHERE name='cera alba')),
 ('cire d''abeille', (SELECT ingredient_id FROM ingredient WHERE name='cera alba')),
-('cera carnauba', NULL),
 ('carnauba wax', (SELECT ingredient_id FROM ingredient WHERE name='cera carnauba')),
 ('cire de carnauba', (SELECT ingredient_id FROM ingredient WHERE name='cera carnauba')),
-('acacia senegal', NULL),
 ('acacia senegal gum', (SELECT ingredient_id FROM ingredient WHERE name='acacia senegal'))
 ON CONFLICT (name) DO NOTHING;
 
