@@ -1,4 +1,4 @@
-package com.beautybuddy;
+package com.beautybuddy.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
