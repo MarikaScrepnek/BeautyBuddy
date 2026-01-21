@@ -13,7 +13,7 @@ public record ProductDTO (
     Float rating,
     List<IngredientDTO> ingredients,
     List<IngredientDTO> mayContainIngredients,
-    List<ProductShadeDTO> productShades
+    List<ProductShadeDTO> shades
 ) {
     
 }
