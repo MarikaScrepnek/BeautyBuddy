@@ -3,7 +3,8 @@
 package com.beautybuddy.controller;
 
 import com.beautybuddy.service.ProductIngredientService;
-import com.beautybuddy.model.Ingredient;
+import com.beautybuddy.dto.DTOMapper;
+import com.beautybuddy.dto.IngredientDTO;
 import com.beautybuddy.service.MayContainIngredientService;
 import com.beautybuddy.repository.IngredientRepository;
 
@@ -29,8 +30,10 @@ public class IngredientController {
     }
 
     @GetMapping
-    public List<Ingredient> getAllIngredients() {
-        return ingredientRepository.findAll();
+    public List<IngredientDTO> getAllIngredients() {
+        return ingredientRepository.findAll().stream()
+                .map(DTOMapper::toIngredientDTO)
+                .toList();
     }
 
     @GetMapping("/parse")

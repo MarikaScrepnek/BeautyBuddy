@@ -1,15 +1,17 @@
 package com.beautybuddy.controller;
 
-import com.beautybuddy.model.Category;
+import com.beautybuddy.dto.CategoryDTO;
 import com.beautybuddy.repository.CategoryRepository;
+import com.beautybuddy.dto.DTOMapper;
+
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.util.List;
 
 @RestController
-@CrossOrigin("http://localhost:5173")
+@RequestMapping("/api/categories")
 public class CategoryController {
 
     private final CategoryRepository categoryRepository;
@@ -19,7 +21,9 @@ public class CategoryController {
     }
 
     @GetMapping("/api/categories")
-    public List<Category> getAllCategories() {
-        return categoryRepository.findAll();
+    public List<CategoryDTO> getAllCategories() {
+        return categoryRepository.findAll().stream()
+                .map(DTOMapper::toCategoryDTO)
+                .toList();
     }
 }

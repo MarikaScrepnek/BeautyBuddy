@@ -1,15 +1,17 @@
 package com.beautybuddy.controller;
 
-import com.beautybuddy.model.Brand;
+import com.beautybuddy.dto.BrandDTO;
 import com.beautybuddy.repository.BrandRepository;
+import com.beautybuddy.dto.DTOMapper;
+
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.util.List;
 
 @RestController
-@CrossOrigin("http://localhost:5173")
+@RequestMapping("/api/brands")
 public class BrandController {
 
     private final BrandRepository brandRepository;
@@ -18,8 +20,10 @@ public class BrandController {
         this.brandRepository = brandRepository;
     }
 
-    @GetMapping("/api/brands")
-    public List<Brand> getAllBrands() {
-        return brandRepository.findAll();
+    @GetMapping
+    public List<BrandDTO> getAllBrands() {
+        return brandRepository.findAll().stream()
+                .map(DTOMapper::toBrandDTO)
+                .toList();
     }
 }
