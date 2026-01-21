@@ -16,10 +16,10 @@ function App() {
       <Routes>
         <Route element={<NavigationBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />}>
           <Route path="/" element={<Home />} />
-          <Route path='/:productID' element={<ProductDetails />} />
           <Route path="/my-routines" element={<MyRoutines />} />
           <Route path="/community" element={<Community />} />
           <Route path="/discussions" element={<Discussions />} />
+          <Route path='/:productId' element={<ProductDetails />} />
         </Route>
       </Routes>
     </>
