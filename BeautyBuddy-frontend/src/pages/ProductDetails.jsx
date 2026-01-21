@@ -62,7 +62,7 @@ export default function ProductDetails() {
 
                         <div className="action-icon">
                         <span className="icon">+</span>
-                        <span className="tooltip">Add to {data.category.name} Routine</span>
+                        <span className="tooltip">Add to Makeup Routine</span>
                         </div>
                     </div>
                     
