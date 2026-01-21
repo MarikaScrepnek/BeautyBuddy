@@ -19,9 +19,9 @@ export default function ProductList({ searchQuery }) {
   return (
     <div className="product-grid">
       {products.map(p => (
-        <div className="product-card" key={p.id} onClick={() => navigate(`/${p.id}`)}>
+        <div className="product-card-home" key={p.id} onClick={() => navigate(`/${p.id}`)}>
           {p.image_link && (
-            <img src={p.image_link} alt={p.name} className="product-image" />
+            <img src={p.image_link} alt={p.name} className="product-image-home" />
           )}
           <h3>{p.name} by {p.brand?.name}</h3>
           <p>Rating: {p.rating ? `${p.rating}/5` : "N/A"}</p>

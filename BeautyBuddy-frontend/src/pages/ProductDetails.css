@@ -1,19 +1,132 @@
+.product-details-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  width: 100%;
+}
+
+.product-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 2rem;
+  max-width: 700px;
+  width: 100%;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.product-card:hover {
+  transform: none;
+  box-shadow: none;
+  cursor: default;
+}
+
+/* Header: Name + Brand + Category */
+.product-header {
+  text-align: center;
+}
+
 .product-name {
     font-size: 2rem;
-    text-align: center;
+    font-weight: 700;
+    margin: 0.2rem 0;
+    color: #222;
+    cursor: default
+}
 
-    margin-top: 1rem;
-    margin-bottom: 1rem;
+.product-brand-and-link {
+    position: relative;
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    align-items: center;
+    margin-top: 0.5rem;
+}
+
+.product-brand {
+    position:absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 1rem;
+    color: #777;
+    margin: 0;
+    cursor: default;
+}
+
+.product-link {
+    margin-left: 16rem;
+    font-size: 0.875rem;
+    color: #1e88e5;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+
+/* Main section: Image left, Meta right */
+.product-main {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
 }
 
 .product-image {
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-    max-width: 150px;
-    height: auto;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    margin-bottom: 1.5rem;
-    background-color: white;
+  width: 180px;
+  height: 180px;
+  object-fit: contain;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.product-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 1rem;
+  color: #444;
+}
+
+/* Ingredients & May Contain Tags */
+.ingredients-section {
+  margin-top: 1rem;
+}
+
+.ingredients-section h2 {
+  font-size: 1.2rem;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.tag {
+  background: #e0f7fa;
+  color: #00796b;
+  padding: 0.3rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.9rem;
+}
+
+.tag.may-contain {
+  background: #ffe0b2;
+  color: #e65100;
+}
+
+/* Reviews / Q&A */
+.reviews-section,
+.questions-section {
+  margin-top: 1.5rem;
+}
+
+.reviews-section h2,
+.questions-section h2 {
+  font-size: 1.2rem;
+  color: #333;
+  margin-bottom: 0.5rem;
 }
