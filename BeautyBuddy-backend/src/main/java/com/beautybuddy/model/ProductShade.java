@@ -21,6 +21,9 @@ public class ProductShade {
     @Column (name = "shade_hex_code")
     private String shadeHexCode;
 
+    @Column (name = "shade_number")
+    private int shadeNumber;
+
     @Column (name = "image_link")
     private String imageLink;
 
@@ -52,6 +55,15 @@ public class ProductShade {
     public void setShadeHexCode(String shadeHexCode) {
         this.shadeHexCode = shadeHexCode;
     }
+
+    public int getShadeNumber() {
+        return shadeNumber;
+    }
+
+    public void setShadeNumber(int shadeNumber) {
+        this.shadeNumber = shadeNumber;
+    }
+
     public String getImageLink() {
         return imageLink;
     }
