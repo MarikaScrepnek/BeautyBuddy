@@ -1,5 +1,3 @@
-// this should be changed before release as its not the most secure way to do this
-
 package com.beautybuddy.controller;
 
 import com.beautybuddy.service.ProductIngredientService;
@@ -36,6 +34,7 @@ public class IngredientController {
                 .toList();
     }
 
+    // this should be changed before release as its not the most secure way to do this
     @GetMapping("/parse")
     public String parseIngredients() {
         productIngredientService.parseIngredientsForAllProducts();
