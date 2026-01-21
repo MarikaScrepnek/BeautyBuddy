@@ -44,6 +44,16 @@ CREATE TABLE IF NOT EXISTS may_contain_ingredient (
     UNIQUE (product_id, ingredient_id)
 );
 
+CREATE TABLE IF NOT EXISTS product_shade (
+    product_shade_id SERIAL PRIMARY KEY,
+    product_id INT REFERENCES product(product_id) ON DELETE CASCADE,
+    shade_name TEXT NOT NULL,
+    shade_hex_code TEXT,
+    image_link TEXT,
+    product_link TEXT,
+    UNIQUE (product_id, shade_name)
+);
+
 CREATE TABLE IF NOT EXISTS users (
     user_id SERIAL PRIMARY KEY,
     username TEXT UNIQUE NOT NULL,
