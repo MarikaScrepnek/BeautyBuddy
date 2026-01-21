@@ -60,32 +60,36 @@ INSERT INTO product (name, brand_id, category_id, price, image_link, product_lin
 )
 ON CONFLICT (name, brand_id) DO NOTHING;
 
-INSERT INTO product_shade (product_id, shade_name, shade_hex_code, image_link, product_link) VALUES
+INSERT INTO product_shade (product_id, shade_name, shade_hex_code, shade_number, image_link, product_link) VALUES
 (
 (SELECT product_id FROM product WHERE name='Telescopic Original Mascara' AND brand_id=(SELECT brand_id FROM brand WHERE name='L''Oréal Paris')),
 'Blackest Black',
 '#000000',
+1,
 (SELECT image_link FROM product WHERE name='Telescopic Original Mascara' AND brand_id=(SELECT brand_id FROM brand WHERE name='L''Oréal Paris')),
 (SELECT product_link FROM product WHERE name='Telescopic Original Mascara' AND brand_id=(SELECT brand_id FROM brand WHERE name='L''Oréal Paris'))
 ),
 (
 (SELECT product_id FROM product WHERE name='Telescopic Original Mascara' AND brand_id=(SELECT brand_id FROM brand WHERE name='L''Oréal Paris')),
 'Carbon Black',
-NULL,
+'#000000',
+2,
 'https://www.lorealparis.ca/-/media/project/loreal/brand-sites/oap/americas/ca/products/makeup/eyes/telescopic-original/carbon-black/071249137093_01.png',
 'https://www.lorealparis.ca/en-ca/telescopic-eye-collection/telescopic-original-mascara-carbon-black'
 ),
 (
 (SELECT product_id FROM product WHERE name='Telescopic Original Mascara' AND brand_id=(SELECT brand_id FROM brand WHERE name='L''Oréal Paris')),
 'Black',
-NULL,
+'#000000',
+3,
 'https://www.lorealparis.ca/-/media/project/loreal/brand-sites/oap/americas/ca/products/makeup/eyes/telescopic-original/black/071249104729_01.png',
 'https://www.lorealparis.ca/en-ca/telescopic-eye-collection/telescopic-original-mascara-black'
 ),
 (
 (SELECT product_id FROM product WHERE name='Telescopic Original Mascara' AND brand_id=(SELECT brand_id FROM brand WHERE name='L''Oréal Paris')),
 'Waterproof Black',
-NULL,
+'#000000',
+4,
 'https://www.lorealparis.ca/-/media/project/loreal/brand-sites/oap/americas/ca/products/makeup/eyes/telescopic-original/waterproof-black/071249390740_01.png',
 'https://www.lorealparis.ca/en-ca/telescopic-eye-collection/telescopic-original-mascara-waterproof-black'
 )

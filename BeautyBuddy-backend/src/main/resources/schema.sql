@@ -49,6 +49,7 @@ CREATE TABLE IF NOT EXISTS product_shade (
     product_id INT REFERENCES product(product_id) ON DELETE CASCADE,
     shade_name TEXT NOT NULL,
     shade_hex_code TEXT,
+    shade_number INT,
     image_link TEXT,
     product_link TEXT,
     UNIQUE (product_id, shade_name)
