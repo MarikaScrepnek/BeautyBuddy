@@ -42,18 +42,19 @@ public class DTOMapper {
 
     public static ProductDTO toProductDTO(Product product) {
         List<IngredientDTO> ingredients = product.getProductIngredients().stream()
-                .sorted(Comparator.comparingInt(ProductIngredient::getPosition))
-                .map(pi -> toIngredientDTO(pi.getIngredient()))
-                .toList();
+            .sorted(Comparator.comparingInt(ProductIngredient::getPosition))
+            .map(pi -> toIngredientDTO(pi.getIngredient()))
+            .toList();
 
         List<IngredientDTO> mayContain = product.getMayContainIngredients().stream()
-                .map(mci -> toIngredientDTO(mci.getIngredient()))
-                .sorted(Comparator.comparing(IngredientDTO::name))
-                .toList();
+            .map(mci -> toIngredientDTO(mci.getIngredient()))
+            .sorted(Comparator.comparing(IngredientDTO::name))
+            .toList();
 
         List<ProductShadeDTO> shades = product.getProductShades().stream()
-                .map(DTOMapper::toProductShadeDTO)
-                .toList();
+            .sorted(Comparator.comparing(ProductShade::getShadeNumber))
+            .map(DTOMapper::toProductShadeDTO)
+            .toList();
 
         return new ProductDTO(
                 product.getProduct_id(),
