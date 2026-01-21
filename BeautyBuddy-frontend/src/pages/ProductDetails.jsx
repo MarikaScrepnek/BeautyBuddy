@@ -1,6 +1,8 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 
+import './ProductDetails.css';
+
 export default function ProductDetails() {
   const { productId } = useParams();
   const [data, setData] = useState(null);
@@ -18,11 +20,15 @@ export default function ProductDetails() {
 
   return (
     <div>
-        <h1>{data.name}</h1>
+        <h1 className="product-name">{data.name}</h1>
+
+        {data.image_link && (
+            <img src={data.image_link} alt={data.name} className="product-image" />
+        )}
 
         <section>
             <h2>Ingredients</h2>
-            {/* list */}
+            {/* ingredients list */}
         </section>
 
         <section>
