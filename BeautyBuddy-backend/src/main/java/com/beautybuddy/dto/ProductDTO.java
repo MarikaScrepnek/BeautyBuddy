@@ -12,7 +12,8 @@ public record ProductDTO (
     Float price,
     Float rating,
     List<IngredientDTO> ingredients,
-    List<IngredientDTO> mayContainIngredients
+    List<IngredientDTO> mayContainIngredients,
+    List<ProductShadeDTO> productShades
 ) {
     
 }
