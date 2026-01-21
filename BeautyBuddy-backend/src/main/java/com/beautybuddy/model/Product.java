@@ -100,5 +100,9 @@ public class Product {
     public Set<MayContainIngredient> getMayContainIngredients() {
         return mayContainIngredients;
     }
+
+    public Set<ProductShade> getProductShades() {
+        return productShades;
+    }
 }
 

@@ -32,28 +32,41 @@ public class DTOMapper {
         );
     }
 
+    public static ProductShadeDTO toProductShadeDTO(ProductShade ps) {
+        return new ProductShadeDTO(
+                ps.getShadeName(),
+                ps.getImageLink(),
+                ps.getProductLink()
+        );
+    }
+
     public static ProductDTO toProductDTO(Product product) {
-        List<IngredientDTO> sortedIngredients = product.getProductIngredients().stream()
-        .sorted(Comparator.comparingInt(ProductIngredient::getPosition))
-        .map(pi -> new IngredientDTO(pi.getIngredient().getName()))
-        .toList();
+        List<IngredientDTO> ingredients = product.getProductIngredients().stream()
+                .sorted(Comparator.comparingInt(ProductIngredient::getPosition))
+                .map(pi -> toIngredientDTO(pi.getIngredient()))
+                .toList();
 
         List<IngredientDTO> mayContain = product.getMayContainIngredients().stream()
-        .map(mci -> new IngredientDTO(mci.getIngredient().getName()))
-        .sorted(Comparator.comparing(IngredientDTO::name))
-        .toList();
+                .map(mci -> toIngredientDTO(mci.getIngredient()))
+                .sorted(Comparator.comparing(IngredientDTO::name))
+                .toList();
+
+        List<ProductShadeDTO> shades = product.getProductShades().stream()
+                .map(DTOMapper::toProductShadeDTO)
+                .toList();
 
         return new ProductDTO(
-            product.getProduct_id(),
-            product.getName(),
-            DTOMapper.toBrandDTO(product.getBrand()),
-            DTOMapper.toCategoryDTO(product.getCategory()),
-            product.getImage_link(),
-            product.getProduct_link(),
-            product.getPrice(),
-            product.getRating(),
-            sortedIngredients,
-            mayContain
+                product.getProduct_id(),
+                product.getName(),
+                toBrandDTO(product.getBrand()),
+                toCategoryDTO(product.getCategory()),
+                product.getImage_link(),
+                product.getProduct_link(),
+                product.getPrice(),
+                product.getRating(),
+                ingredients,
+                mayContain,
+                shades
         );
     }
 }
