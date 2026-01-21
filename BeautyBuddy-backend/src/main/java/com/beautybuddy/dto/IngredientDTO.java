@@ -1,5 +1,5 @@
 package com.beautybuddy.dto;
 
-public record IngredientDTO (int id, String name, Integer canonicalId) {
+public record IngredientDTO (int id, String name) {
     
 }

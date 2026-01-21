@@ -28,6 +28,9 @@ public class ProductIngredient {
 
     public ProductIngredient() {}
 
+    public int getProduct_ingredient_id() { return product_ingredient_id; }
+    public void setProduct_ingredient_id(int product_ingredient_id) { this.product_ingredient_id = product_ingredient_id; }
+
     public Product getProduct() { return product; }
     public void setProduct(Product product) { this.product = product; }
 
