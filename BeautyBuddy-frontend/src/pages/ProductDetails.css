@@ -2,7 +2,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 2rem;
+  padding: 15px;
   width: 100%;
 }
 
@@ -16,12 +16,6 @@
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
-}
-
-.product-card:hover {
-  transform: none;
-  box-shadow: none;
-  cursor: default;
 }
 
 /* Header: Name + Brand + Category */
@@ -64,20 +58,24 @@
     cursor: pointer;
 }
 
+.product-link:active {
+    transform: scale(0.99);
+}
+
 
 /* Main section: Image left, Meta right */
 .product-main {
-  display: flex;
-  align-items: center;
-  gap: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
 }
 
 .product-image {
-  width: 180px;
-  height: 180px;
+  width: 200px;
+  height: 200px;
   object-fit: contain;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
 .product-meta {
@@ -87,6 +85,53 @@
   font-size: 1rem;
   color: #444;
 }
+
+.product-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.action-icon {
+  position: relative;
+  cursor: pointer;
+  font-size: 1.25rem;
+  display: flex;
+  align-items: center;
+  transition: transform 0.2s ease;
+}
+
+.action-icon:hover {
+  transform: scale(1.2); /* small pop on hover */
+}
+
+.action-icon:active {
+  transform: scale(0.99);
+}
+
+/* Tooltip */
+.tooltip {
+  position: absolute;
+  bottom: 125%; /* above the icon */
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #333;
+  color: #fff;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+/* Show tooltip on hover */
+.action-icon:hover .tooltip {
+  opacity: 1;
+  transform: translateX(-50%) translateY(-5px);
+}
+
 
 /* Ingredients & May Contain Tags */
 .ingredients-section {

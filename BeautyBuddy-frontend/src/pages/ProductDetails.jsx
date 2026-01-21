@@ -35,16 +35,38 @@ export default function ProductDetails() {
 
             {/* Main section: Image on left, Price + Rating on right */}
             <div className="product-main">
-            <img src={data.image_link} alt={data.name} className="product-image" />
+                <img src={data.image_link} alt={data.name} className="product-image" />
 
-            <div className="product-meta">
-                <p className="price">
-                <strong>Price:</strong> {data.price ? `$${data.price}` : "N/A"}
-                </p>
-                <p className="rating">
-                <strong>Rating:</strong> {data.rating ? `${data.rating}/5` : "No rating yet"}
-                </p>
-            </div>
+                <div className="product-meta">
+                    <p className="price">
+                        <span>Price:</span> {data.price ? `$${data.price}` : "N/A"}
+                    </p>
+                    <p className="rating">
+                        <span>Rating:</span> {data.rating ? `${data.rating}/5` : "Be the first to review!"}
+                    </p>
+
+                    <div className="shade-selector">
+                        <label htmlFor="shade">Shade:</label>
+                        <select id="shade" name="shade">
+                        {data.shades?.map((shade, idx) => (
+                            <option key={idx} value={shade}>{shade}</option>
+                        ))}
+                        </select>
+                    </div>
+
+                    <div className="product-actions">
+                        <div className="action-icon">
+                        <span className="icon">♥</span>
+                        <span className="tooltip">Add to Wishlist</span>
+                        </div>
+
+                        <div className="action-icon">
+                        <span className="icon">+</span>
+                        <span className="tooltip">Add to {data.category.name} Routine</span>
+                        </div>
+                    </div>
+                    
+                </div>
             </div>
 
             {/* Ingredients */}
