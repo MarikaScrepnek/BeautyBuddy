@@ -7,12 +7,12 @@ public record ProductDTO (
     String name,
     BrandDTO brand,
     CategoryDTO category,
-    Float price,
     String image_link,
     String product_link,
+    Float price,
     Float rating,
-    List<ProductIngredientDTO> ingredients,
-    List<MayContainIngredientDTO> mayContainIngredients
+    List<IngredientDTO> ingredients,
+    List<IngredientDTO> mayContainIngredients
 ) {
     
 }

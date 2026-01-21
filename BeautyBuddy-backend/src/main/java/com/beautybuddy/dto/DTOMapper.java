@@ -2,6 +2,9 @@ package com.beautybuddy.dto;
 
 import com.beautybuddy.model.*;
 
+import java.util.Comparator;
+import java.util.List;
+
 public class DTOMapper {
 
     public static BrandDTO toBrandDTO(Brand brand) {
@@ -13,7 +16,7 @@ public class DTOMapper {
     }
 
     public static IngredientDTO toIngredientDTO(Ingredient ingredient) {
-        return new IngredientDTO(ingredient.getIngredient_id(), ingredient.getName());
+        return new IngredientDTO(ingredient.getName());
     }
 
     public static ProductIngredientDTO toProductIngredientDTO(ProductIngredient pi) {
@@ -30,21 +33,26 @@ public class DTOMapper {
     }
 
     public static ProductDTO toProductDTO(Product product) {
+        List<IngredientDTO> sortedIngredients = product.getProductIngredients().stream()
+        .sorted(Comparator.comparingInt(ProductIngredient::getPosition))
+        .map(pi -> new IngredientDTO(pi.getIngredient().getName()))
+        .toList();
+
+        List<IngredientDTO> mayContain = product.getMayContainIngredients().stream()
+            .map(mci -> new IngredientDTO(mci.getIngredient().getName()))
+            .toList();
+
         return new ProductDTO(
-                product.getProduct_id(),
-                product.getName(),
-                toBrandDTO(product.getBrand()),
-                toCategoryDTO(product.getCategory()),
-                product.getPrice(),
-                product.getImage_link(),
-                product.getProduct_link(),
-                product.getRating(),
-                product.getProductIngredients().stream()
-                        .map(DTOMapper::toProductIngredientDTO)
-                        .toList(),
-                product.getMayContainIngredients().stream()
-                        .map(DTOMapper::toMayContainIngredientDTO)
-                        .toList()
+            product.getProduct_id(),
+            product.getName(),
+            DTOMapper.toBrandDTO(product.getBrand()),
+            DTOMapper.toCategoryDTO(product.getCategory()),
+            product.getImage_link(),
+            product.getProduct_link(),
+            product.getPrice(),
+            product.getRating(),
+            sortedIngredients,
+            mayContain
         );
     }
 }
