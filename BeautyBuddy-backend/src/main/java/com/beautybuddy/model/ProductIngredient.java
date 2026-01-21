@@ -1,7 +1,5 @@
 package com.beautybuddy.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import jakarta.persistence.*;
 
 @Entity
@@ -16,7 +14,6 @@ public class ProductIngredient {
 
     @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)
-    @JsonIgnore
     private Product product;
 
     @ManyToOne
