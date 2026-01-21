@@ -38,7 +38,7 @@ export default function NavigationBar({ searchQuery, setSearchQuery }) {
     <div>
       <header className="navigation-bar">
         <div className='page-container nav-container'>
-          <h1 className='logo'>BeautyBuddy</h1>
+          <h1 className='logo' onClick={() => navigate('/')}>BeautyBuddy</h1>
 
           <nav className='nav-bar-links'>
             <NavLink to="/" className={({ isActive }) => isActive ? 'active-link' : undefined}>Home</NavLink>
