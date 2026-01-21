@@ -5,8 +5,10 @@ import './ProductDetails.css';
 
 export default function ProductDetails() {
   const { productId } = useParams();
+
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [selectedShade, setSelectedShade] = useState(null);
 
   const navigate = useNavigate();
 
@@ -17,6 +19,12 @@ export default function ProductDetails() {
       .catch(console.error)
       .finally(() => setLoading(false));
   }, [productId]);
+
+    useEffect(() => {
+    if (data?.shades?.length) {
+        setSelectedShade(data.shades[0]);
+    }
+    }, [data]);
 
   if (loading) return <p className="loading">Loading product details...</p>;
   if (!data) return <p className="error">Product not found</p>;
@@ -29,13 +37,26 @@ export default function ProductDetails() {
                 <h1 className="product-name">{data.name}</h1>
                 <div className="product-brand-and-link">
                     <span className="product-brand">by {data.brand.name}</span>
-                    <span className="product-link" onClick={() => window.open(data.product_link)}>view product on site</span>
+                    <span
+                        className="product-link"
+                        onClick={() =>
+                            window.open(
+                            selectedShade?.productLink ?? data.product_link
+                            )
+                        }
+                        >
+                        view product on site
+                    </span>
                 </div>
             </div>
 
             {/* Main section: Image on left, Price + Rating on right */}
             <div className="product-main">
-                <img src={data.image_link} alt={data.name} className="product-image" />
+                <img
+                    src={selectedShade?.imageLink ?? data.image_link}
+                    alt={data.name}
+                    className="product-image"
+                />
 
                 <div className="product-meta">
                     <p className="price">
@@ -47,10 +68,21 @@ export default function ProductDetails() {
 
                     <div className="shade-selector">
                         <label htmlFor="shade">Shade:</label>
-                        <select id="shade" name="shade">
-                        {data.shades?.map((shade, idx) => (
-                            <option key={idx} value={shade}>{shade}</option>
-                        ))}
+                        <select
+                            id="shade"
+                            value={selectedShade?.shadeName ?? ""}
+                            onChange={(e) => {
+                            const shade = data.shades.find(
+                                s => s.shadeName === e.target.value
+                            );
+                            setSelectedShade(shade);
+                            }}
+                        >
+                            {data.shades?.map(shade => (
+                            <option key={shade.shadeName} value={shade.shadeName}>
+                                {shade.shadeName}
+                            </option>
+                            ))}
                         </select>
                     </div>
 
