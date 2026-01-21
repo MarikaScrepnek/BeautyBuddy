@@ -1,4 +1,4 @@
 package com.beautybuddy.dto;
 
-public record ProductIngredientDTO (int id, IngredientDTO ingredient, int number) {
+public record ProductIngredientDTO (IngredientDTO ingredient, int number) {
 }

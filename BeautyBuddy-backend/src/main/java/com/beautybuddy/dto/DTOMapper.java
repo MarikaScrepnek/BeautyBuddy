@@ -18,7 +18,6 @@ public class DTOMapper {
 
     public static ProductIngredientDTO toProductIngredientDTO(ProductIngredient pi) {
         return new ProductIngredientDTO(
-                pi.getProduct_ingredient_id(),
                 toIngredientDTO(pi.getIngredient()),
                 pi.getPosition()
         );
@@ -26,7 +25,6 @@ public class DTOMapper {
 
     public static MayContainIngredientDTO toMayContainIngredientDTO(MayContainIngredient mci) {
         return new MayContainIngredientDTO(
-                mci.getMay_contain_ingredient_id(),
                 toIngredientDTO(mci.getIngredient())
         );
     }
