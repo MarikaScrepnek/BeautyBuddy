@@ -5,6 +5,8 @@ import './ProductList.css';
 export default function ProductList({ searchQuery }) {
   const [products, setProducts] = useState([]);
 
+  const navigate = useNavigate();
+
   useEffect(() => {
     const query = searchQuery || "";
     fetch(`http://localhost:8080/api/products/search?q=${query}`)
@@ -16,7 +18,7 @@ export default function ProductList({ searchQuery }) {
   return (
     <div className="product-grid">
       {products.map(p => (
-        <div className="product-card" key={p.id}>
+        <div className="product-card" key={p.id} onClick={() => navigate(`/${p.id}`)}>
           {p.image_link && (
             <img src={p.image_link} alt={p.name} className="product-image" />
           )}
