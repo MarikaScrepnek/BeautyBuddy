@@ -16,7 +16,7 @@ export default function ProductList({ searchQuery }) {
   return (
     <div className="product-grid">
       {products.map(p => (
-        <div className="product-card" key={p.product_id}>
+        <div className="product-card" key={p.id}>
           {p.image_link && (
             <img src={p.image_link} alt={p.name} className="product-image" />
           )}
