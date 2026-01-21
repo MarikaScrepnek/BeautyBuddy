@@ -39,8 +39,9 @@ public class DTOMapper {
         .toList();
 
         List<IngredientDTO> mayContain = product.getMayContainIngredients().stream()
-            .map(mci -> new IngredientDTO(mci.getIngredient().getName()))
-            .toList();
+        .map(mci -> new IngredientDTO(mci.getIngredient().getName()))
+        .sorted(Comparator.comparing(IngredientDTO::name))
+        .toList();
 
         return new ProductDTO(
             product.getProduct_id(),
