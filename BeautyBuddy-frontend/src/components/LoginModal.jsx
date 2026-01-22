@@ -13,11 +13,30 @@ export default function LoginModal({ onClose, onSwitchToSignup, onSwitchToResetP
     };
 
     window.addEventListener("keydown", handleEsc);
-
     return () => {
       window.removeEventListener("keydown", handleEsc);
     };
   }, [onClose]);
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+
+    try {
+      const result = await loginUser(email, password);
+      if (result.error) {
+        setError(result.error);
+      } else {
+        localStorage.setItem("user", email);
+        onClose();
+      }
+    } catch (err) {
+      setError("An unexpected error occurred. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="modal-overlay">
