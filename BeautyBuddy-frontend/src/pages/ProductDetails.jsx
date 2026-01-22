@@ -72,16 +72,21 @@ export default function ProductDetails() {
                             id="shade"
                             value={selectedShade?.shadeName ?? ""}
                             onChange={(e) => {
-                            const shade = data.shades.find(
-                                s => s.shadeName === e.target.value
-                            );
+                            const shade = data.shades.find(s => s.shadeName === e.target.value);
                             setSelectedShade(shade);
                             }}
                         >
-                            {data.shades?.map(shade => (
-                            <option key={shade.shadeName} value={shade.shadeName}>
-                                {shade.shadeName}
+                            {selectedShade && (
+                            <option key={selectedShade.shadeName} value={selectedShade.shadeName}>
+                                {selectedShade.shadeName}
                             </option>
+                            )}
+                            {data.shades
+                            .filter(s => s.shadeName !== selectedShade?.shadeName) // exclude already selected
+                            .map(shade => (
+                                <option key={shade.shadeName} value={shade.shadeName}>
+                                {shade.shadeName}
+                                </option>
                             ))}
                         </select>
                     </div>
