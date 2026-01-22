@@ -31,19 +31,8 @@
     cursor: default
 }
 
-.product-brand-and-link {
-    position: relative;
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-    align-items: center;
-    margin-top: 0.5rem;
-}
-
 .product-brand {
-    position:absolute;
-    left: 50%;
-    transform: translateX(-50%);
+    text-align: center;
     font-size: 1rem;
     color: #777;
     margin: 0;
@@ -51,7 +40,7 @@
 }
 
 .product-link {
-    margin-left: 16rem;
+    text-align: center;
     font-size: 0.875rem;
     color: #1e88e5;
     text-decoration: underline;

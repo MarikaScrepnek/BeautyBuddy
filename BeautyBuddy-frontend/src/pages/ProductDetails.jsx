@@ -36,19 +36,17 @@ export default function ProductDetails() {
             {/* Header: Name + Brand + Category */}
             <div className="product-header">
                 <h1 className="product-name">{data.name}</h1>
-                <div className="product-brand-and-link">
-                    <span className="product-brand">by {data.brand.name}</span>
-                    <span
-                        className="product-link"
-                        onClick={() =>
-                            window.open(
-                            selectedShade?.productLink ?? data.product_link
-                            )
-                        }
-                        >
-                        view product on site
-                    </span>
-                </div>
+                <p className="product-brand">by {data.brand.name}</p>
+                <p
+                    className="product-link"
+                    onClick={() =>
+                        window.open(
+                        selectedShade?.productLink ?? data.product_link
+                        )
+                    }
+                    >
+                    view product on site
+                </p>
             </div>
 
             {/* Main section: Image on left, Price + Rating on right */}
