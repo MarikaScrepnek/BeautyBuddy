@@ -9,6 +9,7 @@ export default function ProductDetails() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedShade, setSelectedShade] = useState(null);
+  const [ingredientsOpen, setIngredientsOpen] = useState(false);
 
   const navigate = useNavigate();
 
@@ -103,20 +104,31 @@ export default function ProductDetails() {
 
             {/* Ingredients */}
             <section className="ingredients-section">
-            <h2>Ingredients</h2>
-            <div className="tags">
-                {data.ingredients.map((i, idx) => (
-                <span key={idx} className="tag">{i.name}</span>
-                ))}
-            </div>
+                <h2
+                    onClick={() => setIngredientsOpen(!ingredientsOpen)}
+                    className="ingredient-dropdown-header"
+                >
+                    Ingredients {ingredientsOpen ? "▲" : "▼"}
+                </h2>
 
-            <h2>May Contain</h2>
-            <div className="tags">
-                {data.mayContainIngredients.map((i, idx) => (
-                <span key={idx} className="tag may-contain">{i.name}</span>
-                ))}
-            </div>
+                {ingredientsOpen && (
+                    <>
+                    <div className="tags">
+                        {data.ingredients.map((i, idx) => (
+                        <span key={idx} className="tag">{i.name}</span>
+                        ))}
+                    </div>
+
+                    <h3 className="may-contain-header">May Contain</h3>
+                    <div className="tags">
+                        {data.mayContainIngredients.map((i, idx) => (
+                        <span key={idx} className="tag may-contain">{i.name}</span>
+                        ))}
+                    </div>
+                    </>
+                )}
             </section>
+
 
             {/* Reviews / Questions */}
             <section className="reviews-section">
