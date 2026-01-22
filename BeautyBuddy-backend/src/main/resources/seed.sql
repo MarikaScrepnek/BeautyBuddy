@@ -50,7 +50,7 @@ ON CONFLICT (name) DO NOTHING;
 INSERT INTO product (name, brand_id, category_id, price, image_link, product_link, rating, raw_ingredients, may_contain_raw_ingredients) VALUES
 ('Telescopic Original Mascara', 
  (SELECT brand_id FROM brand WHERE name='L''Oréal Paris'),
- (SELECT category_id FROM category WHERE name='mascara'),
+ (SELECT category_id FROM category WHERE name='Mascara'),
  NULL, 
  'https://www.lorealparis.ca/-/media/project/loreal/brand-sites/oap/americas/ca/products/makeup/eyes/telescopic-original/blackest-black/071249104743_01.png',
  'https://www.lorealparis.ca/en-ca/telescopic-eye-collection/telescopic-original-mascara-blackest-black',
