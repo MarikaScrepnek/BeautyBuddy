@@ -67,29 +67,24 @@ export default function ProductDetails() {
                     </p>
 
                     <div className="shade-selector">
-                        <label htmlFor="shade">Shade:</label>
-                        <select
-                            id="shade"
-                            value={selectedShade?.shadeName ?? ""}
+                        <label htmlFor={`shade-${data.id}`}>Shade:</label>
+                        <div className="custom-select">
+                            <select
+                            id={`shade-${data.id}`}
+                            value={selectedShade?.shadeName ?? data.shades[0]?.shadeName}
                             onChange={(e) => {
-                            const shade = data.shades.find(s => s.shadeName === e.target.value);
-                            setSelectedShade(shade);
+                                const shade = data.shades.find(s => s.shadeName === e.target.value);
+                                setSelectedShade(shade);
                             }}
-                        >
-                            {selectedShade && (
-                            <option key={selectedShade.shadeName} value={selectedShade.shadeName}>
-                                {selectedShade.shadeName}
-                            </option>
-                            )}
-                            {data.shades
-                            .filter(s => s.shadeName !== selectedShade?.shadeName) // exclude already selected
-                            .map(shade => (
-                                <option key={shade.shadeName} value={shade.shadeName}>
-                                {shade.shadeName}
+                            >
+                            {data.shades.map((s) => (
+                                <option key={s.shadeName} value={s.shadeName}>
+                                {s.shadeName}
                                 </option>
                             ))}
-                        </select>
-                    </div>
+                            </select>
+                        </div>
+                        </div>
 
                     <div className="product-actions">
                         <div className="action-icon">
