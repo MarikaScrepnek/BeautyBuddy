@@ -56,7 +56,7 @@ export default function ProductDetails() {
                     </p>
 
                     <div className="shade-selector">
-                        <label htmlFor={`shade-${data.id}`}>Shade:</label>
+                        <p htmlFor={`shade-${data.id}`}>Shade:</p>
                         <div className="custom-select">
                             <select
                             id={`shade-${data.id}`}
@@ -73,7 +73,7 @@ export default function ProductDetails() {
                             ))}
                             </select>
                         </div>
-                        </div>
+                    </div>
 
                     <div className="product-actions">
                         <div className="action-icon">
