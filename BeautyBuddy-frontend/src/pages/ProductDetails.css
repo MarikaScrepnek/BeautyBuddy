@@ -39,19 +39,6 @@
     cursor: default;
 }
 
-.product-link {
-    text-align: center;
-    font-size: 0.875rem;
-    color: #1e88e5;
-    text-decoration: underline;
-    cursor: pointer;
-}
-
-.product-link:active {
-    transform: scale(0.99);
-}
-
-
 /* Main section: Image left, Meta right */
 .product-main {
     display: flex;
@@ -119,6 +106,18 @@
 .action-icon:hover .tooltip {
   opacity: 1;
   transform: translateX(-50%) translateY(-5px);
+}
+
+.product-link {
+    text-align: left;
+    font-size: 0.875rem;
+    color: #1e88e5;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.product-link:active {
+    transform: scale(0.99);
 }
 
 

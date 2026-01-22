@@ -37,16 +37,6 @@ export default function ProductDetails() {
             <div className="product-header">
                 <h1 className="product-name">{data.name}</h1>
                 <p className="product-brand">by {data.brand.name}</p>
-                <p
-                    className="product-link"
-                    onClick={() =>
-                        window.open(
-                        selectedShade?.productLink ?? data.product_link
-                        )
-                    }
-                    >
-                    view product on site
-                </p>
             </div>
 
             {/* Main section: Image on left, Price + Rating on right */}
@@ -96,6 +86,17 @@ export default function ProductDetails() {
                         <span className="tooltip">Add to Makeup Routine</span>
                         </div>
                     </div>
+
+                    <p
+                        className="product-link"
+                        onClick={() =>
+                            window.open(
+                            selectedShade?.productLink ?? data.product_link
+                            )
+                        }
+                        >
+                        view product on site
+                    </p>
                     
                 </div>
             </div>
