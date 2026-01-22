@@ -24,11 +24,11 @@ export default function ProductList({ searchQuery }) {
             <img src={p.image_link} alt={p.name} className="product-image-home" />
           )}
           <h3>{p.name} by {p.brand?.name}</h3>
+          <p className="shade-count">
+            {p.shades?.length > 1 ? `${p.shades.length} shades` : "\u00A0"}
+          </p>
           <p>Rating: {p.rating ? `${p.rating}/5` : "N/A"}</p>
           <p>Price: {p.price ? `$${p.price}` : "N/A"}</p>
-          <a href={p.product_link} target="_blank" rel="noopener noreferrer">
-            View Product
-          </a>
         </div>
       ))}
     </div>
