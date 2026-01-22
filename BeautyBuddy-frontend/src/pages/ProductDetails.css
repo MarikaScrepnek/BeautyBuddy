@@ -179,19 +179,6 @@
   cursor: default;
 }
 
-/* Reviews / Q&A */
-.reviews-section,
-.questions-section {
-  margin-top: 1.5rem;
-}
-
-.reviews-section h2,
-.questions-section h2 {
-  font-size: 1.2rem;
-  color: #333;
-  margin-bottom: 0.5rem;
-}
-
 .shade-selector {
   display: flex;
   align-items: center;
@@ -256,4 +243,52 @@
 /* Optional: smaller font for options */
 .custom-select select option {
   padding: 0.5rem;
+}
+
+/* Reviews / Q&A */
+.reviews-and-questions-section {
+  display: flex;
+  flex-direction: column; /* stack header + search */
+  gap: 0.75rem;
+}
+
+.reviews-and-questions-header-section {
+  display:flex;
+  justify-content: center;
+  margin-top: 0rem;
+  gap: 15rem;
+}
+
+.reviews-and-questions-header {
+  font-size: 1.2rem;
+  color: #333;
+  margin-bottom: 0rem;
+  font-weight: 600;
+}
+
+.reviews-search-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+
+}
+
+.reviews-search-bar {
+  width: 100%;         /* ← fills container */
+  padding: 6px 36px 6px 12px; /* room for icon */
+  font-size: 1rem;
+  border-radius: 4px;
+  border: 1px solid #333131;
+}
+
+.reviews-search-button {
+  position: absolute;
+  right: 6px;
+  top: 8px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #777;
+  font-size: 0.9rem;
 }

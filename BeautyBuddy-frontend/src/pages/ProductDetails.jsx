@@ -1,6 +1,8 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 
+import { FaSearch } from 'react-icons/fa';
+
 import './ProductDetails.css';
 
 export default function ProductDetails() {
@@ -136,12 +138,27 @@ export default function ProductDetails() {
                 
 
             {/* Reviews / Questions */}
-            <section className="reviews-section">
-            <h2>Reviews</h2>
-            </section>
+            <section className="reviews-and-questions-section">
+                <section className="reviews-and-questions-header-section">
+                        <span className="reviews-and-questions-header">Reviews</span>
+                        <span className="reviews-and-questions-header">Q&A</span>
+                </section>
 
-            <section className="questions-section">
-            <h2>Q&A</h2>
+                <div className="reviews-search-container">
+                    <input
+                        type="text"
+                        className="reviews-search-bar"
+                        placeholder="Search reviews and questions..."
+                    />
+        
+                    <button
+                        type="button"
+                        className="reviews-search-button"
+                        aria-label="Search"
+                    >
+                        <FaSearch />
+                    </button>
+                </div>
             </section>
         </div>
     </div>
