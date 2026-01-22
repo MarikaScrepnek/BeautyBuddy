@@ -37,7 +37,7 @@ export default function NavigationBar({ searchQuery, setSearchQuery }) {
   return (
     <div>
       <header className="navigation-bar">
-        <div className='page-container nav-container'>
+        <div className='nav-container'>
           <h1 className='logo' onClick={() => navigate('/')}>BeautyBuddy</h1>
 
           <nav className='nav-bar-links'>
