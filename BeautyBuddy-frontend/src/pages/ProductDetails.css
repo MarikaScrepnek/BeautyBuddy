@@ -132,6 +132,22 @@
   margin-bottom: 0.5rem;
 }
 
+.ingredient-dropdown-header {
+  cursor: default; /* normal text cursor */
+}
+
+.ingredients-toggle {
+  display: inline-block;          /* required */
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.08s ease;
+  transform-origin: center;
+}
+
+.ingredients-toggle:active {
+  transform: scale(0.92);
+}
+
 .tags {
   display: flex;
   flex-wrap: wrap;
@@ -160,6 +176,7 @@
   margin: 0;
   font-weight: 600;
   color: #333;
+  cursor: default;
 }
 
 /* Reviews / Q&A */

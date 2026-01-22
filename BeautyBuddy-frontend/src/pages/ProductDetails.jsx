@@ -103,11 +103,14 @@ export default function ProductDetails() {
 
             {/* Ingredients */}
             <section className="ingredients-section">
-                <h2
-                    onClick={() => setIngredientsOpen(!ingredientsOpen)}
-                    className="ingredient-dropdown-header"
-                >
-                    Ingredients {ingredientsOpen ? "▲" : "▼"}
+                <h2 className="ingredient-dropdown-header">
+                    Ingredients{" "}
+                    <span
+                        className="ingredients-toggle"
+                        onClick={() => setIngredientsOpen(!ingredientsOpen)}
+                    >
+                        {ingredientsOpen ? "▲" : "▼"}
+                    </span>
                 </h2>
 
                 {ingredientsOpen && (
@@ -119,7 +122,7 @@ export default function ProductDetails() {
                     </div>
 
                     <div className="may-contain-list">
-                        <div className="may-contain-header">May Contain:</div>
+                        <div className="may-contain-header">May Contain</div>
                         {data.mayContainIngredients.map((i, idx) => (
                         <span key={i.name}>
                             {i.name}
