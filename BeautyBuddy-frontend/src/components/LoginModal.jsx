@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import "./LoginModal.css";
+import { loginUser } from "../api/authApi";
 
 export default function LoginModal({ onClose, onSwitchToSignup, onSwitchToResetPass }) {
   const [email, setEmail] = useState("");
@@ -43,10 +44,28 @@ export default function LoginModal({ onClose, onSwitchToSignup, onSwitchToResetP
         <div className="modal" onClick={(e) => e.stopPropagation()}>
         <h2>Login</h2>
 
-        <input type="email" placeholder="Email" />
-        <input type="password" placeholder="Password" />
+        {error && <p style={{ color: "red" }}>{error}</p>}
 
-        <button className="modal-login-button">Log In</button>
+        <form onSubmit={handleLogin} className="modal-form">
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+
+          <button type="submit" className="modal-login-button" disabled={loading}>
+            {loading ? "Logging in..." : "Log In"}
+          </button>
+        </form>
 
         <button className='modal-forgot-password-link' onClick={onSwitchToResetPass}>Forgot Password?</button>
 
