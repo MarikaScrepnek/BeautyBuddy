@@ -118,16 +118,19 @@ export default function ProductDetails() {
                         ))}
                     </div>
 
-                    <h3 className="may-contain-header">May Contain</h3>
-                    <div className="tags">
+                    <div className="may-contain-list">
+                        <div className="may-contain-header">May Contain:</div>
                         {data.mayContainIngredients.map((i, idx) => (
-                        <span key={idx} className="tag may-contain">{i.name}</span>
+                        <span key={i.name}>
+                            {i.name}
+                            {idx < data.mayContainIngredients.length - 1 && ", "}
+                        </span>
                         ))}
                     </div>
                     </>
                 )}
             </section>
-
+                
 
             {/* Reviews / Questions */}
             <section className="reviews-section">

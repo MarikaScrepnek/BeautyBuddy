@@ -136,6 +136,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
+  justify-content: center;
 }
 
 .tag {
@@ -146,9 +147,19 @@
   font-size: 0.9rem;
 }
 
-.tag.may-contain {
-  background: #ffe0b2;
-  color: #e65100;
+.may-contain-list {
+  margin-top: 1rem;
+  font-size: 0.8rem;
+  color: #555;
+  text-align: center;
+  justify-content: left;
+}
+
+.may-contain-header {
+  font-size: 0.8rem;
+  margin: 0;
+  font-weight: 600;
+  color: #333;
 }
 
 /* Reviews / Q&A */
