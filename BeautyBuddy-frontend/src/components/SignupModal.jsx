@@ -2,6 +2,12 @@ import { useEffect } from "react";
 import "./SignupModal.css";
 
 export default function SignupModal({ onClose, onSwitchToLogin}) {
+  const[email, setEmail] = useState("");
+  const[username, setUsername] = useState("");
+  const[password, setPassword] = useState("");
+  const[error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
     const handleEsc = (e) => {
       if (e.key === "Escape") onClose();
