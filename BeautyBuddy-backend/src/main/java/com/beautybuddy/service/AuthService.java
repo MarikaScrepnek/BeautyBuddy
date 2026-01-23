@@ -27,8 +27,8 @@ public class AuthService {
         userRepo.save(user);
     }
 
-    public boolean login(String username, String rawPassword) {
-        User user = userRepo.findByUsername(username)
+    public boolean login(String email, String rawPassword) {
+        User user = userRepo.findByEmail(email)
             .orElseThrow(() -> new RuntimeException("Invalid credentials"));
 
         return encoder.matches(rawPassword, user.getPasswordHash());
