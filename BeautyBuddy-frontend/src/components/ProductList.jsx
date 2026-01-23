@@ -3,18 +3,34 @@ import { useNavigate } from "react-router-dom";
 
 import './ProductList.css';
 
-export default function ProductList({ searchQuery }) {
+export default function ProductList({ searchQuery, onLoadingChange }) {
   const [products, setProducts] = useState([]);
+
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
 
   useEffect(() => {
     const query = searchQuery || "";
+    setLoading(true);
+    onLoadingChange?.(true);
     fetch(`http://localhost:8080/api/products/search?q=${query}`)
       .then(res => res.json())
-      .then(setProducts)
-      .catch(console.error);
+      .then(data => {
+          setProducts(data);
+          setLoading(false);
+          onLoadingChange?.(false);
+      })
+      .catch(err => {
+        console.error(err);
+        setLoading(false);
+        onLoadingChange?.(false);
+      });
   }, [searchQuery]);
+
+  if (loading) {
+    return <div className="loading">Loading products...</div>;
+  }
 
   return (
     <div className="product-grid">

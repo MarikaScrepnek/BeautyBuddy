@@ -11,11 +11,13 @@ export default function Home() {
   const searchQuery = params.get("q") || "";
 
   const [showRequest, setShowRequest] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   return (
     <div>
-      <ProductList searchQuery={searchQuery} />
+      <ProductList searchQuery={searchQuery} onLoadingChange={setIsLoading} />
 
+      {!isLoading && (
       <div className="product-not-found">
         <p>Don't see the product you're looking for? Send us a request!</p>
         <button
@@ -25,6 +27,7 @@ export default function Home() {
           Request Product
         </button>
       </div>
+      )}
       {showRequest && (
         <RequestModal onClose={() => setShowRequest(false)} />
       )}
