@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import "./LoginModal.css";
 import { loginUser } from "../api/authApi";
 
-export default function LoginModal({ onClose, onSwitchToSignup, onSwitchToResetPass }) {
+export default function LoginModal({ onClose, onSwitchToSignup, onSwitchToResetPass, onLoginSuccess }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -30,6 +30,7 @@ export default function LoginModal({ onClose, onSwitchToSignup, onSwitchToResetP
         setError(result.error);
       } else {
         localStorage.setItem("user", email);
+        onLoginSuccess?.();
         onClose();
       }
     } catch (err) {

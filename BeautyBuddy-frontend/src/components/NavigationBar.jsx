@@ -1,7 +1,7 @@
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { FaSearch } from "react-icons/fa";
 import { NavLink } from 'react-router-dom';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import userSettingsIcon from '../assets/images/user-settings-icon.png';
 
@@ -14,6 +14,8 @@ export default function NavigationBar({ searchQuery, setSearchQuery }) {
   const location = useLocation();
 
   const [showAuth, setShowAuth] = useState(false);
+
+  const[isLoggedIn, setIsLoggedIn] = useState(false);
 
   const handleChange = (e) => {
     const value = e.target.value;
@@ -33,6 +35,28 @@ export default function NavigationBar({ searchQuery, setSearchQuery }) {
   const handleSearch = () => {
     navigate(`/?q=${encodeURIComponent(searchQuery)}`);
   };
+
+  
+  useEffect(() => {
+    const user = localStorage.getItem('user');
+    if (user) {
+      setIsLoggedIn(!!user);
+    }
+
+  const handleStorageChange = () => {
+    const user = localStorage.getItem('user');
+    if (user) {
+      setIsLoggedIn(true);
+    } else {
+      setIsLoggedIn(false);
+    }
+  };
+  
+  window.addEventListener('storage', handleStorageChange);
+  return () => window.removeEventListener('storage', handleStorageChange);
+}, []);
+
+
 
   return (
     <div>
@@ -67,14 +91,36 @@ export default function NavigationBar({ searchQuery, setSearchQuery }) {
             </button>
           </div>
 
-          <button
-            className="login-button"
-            onClick={() => setShowAuth(true)}
-          >
-            Login / Sign Up
-          </button>
+          {isLoggedIn ? (
+            <div className="user-section">
+              <button
+                className="logout-button"
+                onClick={() => {
+                  localStorage.removeItem("user");
+                  setIsLoggedIn(false);
+                  navigate("/");
+                }}
+              >
+                Logout
+              </button>
+            </div>
+          ) : (
+            <button
+              className="login-button"
+              onClick={() => setShowAuth(true)}
+            >
+              Login / Sign Up
+            </button>
+          )}
 
-          {showAuth && <AuthModal onClose={() => setShowAuth(false)} />}
+          {showAuth && (
+            <AuthModal
+             onClose={() => setShowAuth(false)}
+             onLoginSuccess={() => {
+               setIsLoggedIn(true);
+               setShowAuth(false);
+             }}
+              />)}
 
           {/* optional user settings image
           <img

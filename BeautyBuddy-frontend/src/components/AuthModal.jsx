@@ -3,7 +3,7 @@ import LoginModal from "./LoginModal";
 import SignupModal from "./SignupModal";
 import ResetPasswordModal from "./ResetPassModal";
 
-export default function AuthModal({ onClose }) {
+export default function AuthModal({ onClose, onLoginSuccess }) {
   const [mode, setMode] = useState("login");
 
   return mode === "login" ? (
@@ -11,6 +11,7 @@ export default function AuthModal({ onClose }) {
       onClose={onClose}
       onSwitchToSignup={() => setMode("signup")}
       onSwitchToResetPass={() => setMode("reset")}
+      onLoginSuccess={onLoginSuccess}
     />
   ) : mode === "signup" ? (
     <SignupModal

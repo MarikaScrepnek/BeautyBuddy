@@ -130,3 +130,24 @@
 .user-settings-icon:hover {
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
 }
+
+.user-section {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.logout-button {
+  background-color: #e8b4e0;
+  color: #333;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.logout-button:hover {
+  background-color: rgb(231, 155, 219);
+  color: white;
+}
