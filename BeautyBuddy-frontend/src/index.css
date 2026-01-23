@@ -15,6 +15,7 @@ body {
   max-width: 1200px;
   padding: 0 20px;
   margin: 0 auto;
+  padding-top: 60px;
   box-sizing: border-box;
   overflow-x: hidden;
 }
