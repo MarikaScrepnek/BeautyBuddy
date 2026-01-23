@@ -48,7 +48,7 @@ export default function LoginModal({ onClose, onSwitchToSignup, onSwitchToResetP
 
         <form onSubmit={handleLogin} className="modal-form">
           <input
-            className="modal-input"
+            className="input"
             type="email"
             placeholder="Email"
             value={email}
@@ -56,7 +56,7 @@ export default function LoginModal({ onClose, onSwitchToSignup, onSwitchToResetP
             required
           />
           <input
-            className="modal-input"
+            className="input"
             type="password"
             placeholder="Password"
             value={password}

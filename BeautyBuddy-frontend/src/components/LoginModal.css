@@ -24,7 +24,7 @@ h2 {
   gap: 12px;
 }
 
-.modal-input {
+.modal input {
   padding: 10px;
   font-size: 1rem;
   border-radius: 6px;
@@ -33,7 +33,7 @@ h2 {
   box-sizing: border-box;
 }
 
-.modal-input:focus {
+.modal input:focus {
   outline: none;
   border-color: rgb(231, 155, 219);
   box-shadow: 0 0 0 2px rgba(231, 155, 219, 0.3);
