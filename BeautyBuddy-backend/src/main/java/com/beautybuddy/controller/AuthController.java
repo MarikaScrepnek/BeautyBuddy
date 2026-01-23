@@ -39,7 +39,7 @@ public class AuthController {
     public ResponseEntity<Map<String, String>> login(@RequestBody Map<String, String> request) {
         try {
             boolean success = authService.login(
-                request.get("username"),
+                request.get("email"),
                 request.get("password") 
             );
             if (success) {
