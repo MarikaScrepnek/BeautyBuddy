@@ -285,10 +285,14 @@
 .reviews-search-button {
   position: absolute;
   right: 6px;
-  top: 8px;
+  top: 9px;
   background: none;
   border: none;
   cursor: pointer;
   color: #777;
   font-size: 0.9rem;
+}
+
+.reviews-search-button:hover {
+  color: #444;
 }
