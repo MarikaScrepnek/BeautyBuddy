@@ -70,7 +70,7 @@ export default function LoginModal({ onClose, onSwitchToSignup, onSwitchToResetP
             />
             <button
               type="button"
-              className="toggle-password"
+              className="toggle-password-button"
               onClick={() => setShowPassword(!showPassword)}
             >
               {showPassword ? <FaEyeSlash /> : <FaEye />}

@@ -127,3 +127,32 @@ h2 {
 .modal-close:active {
     transform: scale(0.99);
 }
+
+.password-box {
+  position: relative;
+}
+
+.toggle-password-button {
+  position: absolute;
+  top: 30px;
+  right: 8px;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #888;
+  font-size: 1.1rem;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+}
+
+.toggle-password-button:hover {
+  color: rgb(231, 155, 219);
+}
+
+.toggle-password-button:active {
+  transform: translateY(-50%) scale(0.95);
+}
