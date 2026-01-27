@@ -34,6 +34,7 @@ export default function LoginModal({ onClose, onSwitchToSignup, onSwitchToResetP
         localStorage.setItem("user", email);
         onLoginSuccess?.();
         onClose();
+        window.location.reload();
       }
     } catch (err) {
       setError("An unexpected error occurred. Please try again.");
