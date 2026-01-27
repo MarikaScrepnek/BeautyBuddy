@@ -103,6 +103,12 @@ export default function NavigationBar({ searchQuery, setSearchQuery }) {
               >
                 Logout
               </button>
+
+              <img
+                className="user-settings-icon"
+                src={userSettingsIcon}
+                alt="User settings"
+              /> 
             </div>
           ) : (
             <button
@@ -121,14 +127,6 @@ export default function NavigationBar({ searchQuery, setSearchQuery }) {
                setShowAuth(false);
              }}
               />)}
-
-          {/* optional user settings image
-          <img
-            className="user-settings-icon"
-            src={userSettingsIcon}
-            alt="User settings"
-          /> 
-          */}
           
         </div>
       </header>
