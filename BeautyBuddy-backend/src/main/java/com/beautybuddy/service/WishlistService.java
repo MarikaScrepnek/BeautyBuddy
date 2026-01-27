@@ -19,6 +19,12 @@ public class WishlistService {
     private final ProductRepository productRepository;
     private final ShadeRepository shadeRepository;
 
+    public WishlistService(UserRepository userRepository, ProductRepository productRepository, ShadeRepository shadeRepository) {
+        this.userRepository = userRepository;
+        this.productRepository = productRepository;
+        this.shadeRepository = shadeRepository;
+    }
+
     public void addToWishlist(String username, AddToWishlistRequestDTO request) {
         User user = userRepository.findByUsername(username)
             .orElseThrow(() -> new RuntimeException("User not found"));
