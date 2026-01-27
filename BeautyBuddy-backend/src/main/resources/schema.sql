@@ -55,12 +55,26 @@ CREATE TABLE IF NOT EXISTS product_shade (
     UNIQUE (product_id, shade_name)
 );
 
-CREATE TABLE IF NOT EXISTS users (
+CREATE TABLE IF NOT EXISTS user (
     user_id SERIAL PRIMARY KEY,
     username TEXT UNIQUE NOT NULL,
     email TEXT UNIQUE NOT NULL,
     password_hash TEXT NOT NULL,
     date_joined TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS wishlist (
+    wishlist_id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES user(user_id) ON DELETE CASCADE,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS wishlist_item (
+    wishlist_item_id SERIAL PRIMARY KEY,
+    wishlist_id INT REFERENCES wishlist(wishlist_id) ON DELETE CASCADE,
+    product_id INT REFERENCES product(product_id) ON DELETE CASCADE,
+    priority INT,
+    UNIQUE (wishlist_id, product_id)
 );
 
 CREATE EXTENSION IF NOT EXISTS unaccent;
