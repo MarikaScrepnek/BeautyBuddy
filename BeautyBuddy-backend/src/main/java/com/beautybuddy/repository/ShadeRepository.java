@@ -7,5 +7,5 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ShadeRepository extends JpaRepository<ProductShade, Integer> {
-    Optional<ProductShade> findByProductAndName(Product product, String shadeName);
+    Optional<ProductShade> findByProductAndShadeName(Product product, String shadeName);
 }

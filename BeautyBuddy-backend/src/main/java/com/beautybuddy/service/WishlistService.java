@@ -40,7 +40,7 @@ public class WishlistService {
         Product product = productRepository.findById(request.productId())
             .orElseThrow(() -> new RuntimeException("Product not found"));
 
-        ProductShade shade = shadeRepository.findByProductAndName(product, request.shadeName())
+        ProductShade shade = shadeRepository.findByProductAndShadeName(product, request.shadeName())
             .orElseThrow(() -> new RuntimeException("Shade not found"));
 
         Wishlist wishlist = user.getWishlist();
