@@ -7,7 +7,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.CascadeType;
 
 
 @Entity
@@ -30,6 +32,9 @@ public class User {
     @Column(nullable = false)
     private LocalDateTime dateJoined = LocalDateTime.now();
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Wishlist wishlist;
+
     public User() {}
 
     public int getUser_id() { return user_id; }
@@ -46,4 +51,8 @@ public class User {
 
     public LocalDateTime getDateJoined() { return dateJoined; }
     public void setDateJoined(LocalDateTime dateJoined) { this.dateJoined = dateJoined; }
+
+    public Wishlist getWishlist() { return wishlist; }
+
+    public void setWishlist(Wishlist wishlist) { this.wishlist = wishlist; }
 }

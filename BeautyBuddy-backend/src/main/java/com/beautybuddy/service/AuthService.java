@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import com.beautybuddy.repository.UserRepository;
 import com.beautybuddy.model.User;
+import com.beautybuddy.model.Wishlist;
 
 @Service
 public class AuthService {
@@ -23,6 +24,10 @@ public class AuthService {
         user.setUsername(username);
         user.setEmail(email);
         user.setPasswordHash(hash);
+
+        Wishlist wishlist = new Wishlist();
+        wishlist.setUser(user);
+        user.setWishlist(wishlist);
 
         userRepo.save(user);
     }

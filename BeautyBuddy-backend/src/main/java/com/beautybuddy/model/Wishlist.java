@@ -38,12 +38,7 @@ public class Wishlist {
     @Column(name = "created_at", nullable = false)
     private Timestamp created_at;
 
-    public Wishlist(int wishlist_id, User user, Set<WishlistItem> wishlist_items, Timestamp created_at) {
-        this.wishlist_id = wishlist_id;
-        this.user = user;
-        this.wishlist_items = wishlist_items;
-        this.created_at = created_at;
-    }
+    public Wishlist() {}
 
     public int getWishlistId() {
         return wishlist_id;
