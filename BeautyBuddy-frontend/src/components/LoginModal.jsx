@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import "./LoginModal.css";
 import { loginUser } from "../api/authApi";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 export default function LoginModal({ onClose, onSwitchToSignup, onSwitchToResetPass, onLoginSuccess }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   
   useEffect(() => {
     const handleEsc = (e) => {
@@ -56,14 +58,24 @@ export default function LoginModal({ onClose, onSwitchToSignup, onSwitchToResetP
             onChange={(e) => setEmail(e.target.value)}
             required
           />
-          <input
-            className="input"
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
+
+          <div className="password-box">
+            <input
+              className="input"
+              type={showPassword ? "text" : "password"}
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+            <button
+              type="button"
+              className="toggle-password"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? <FaEyeSlash /> : <FaEye />}
+            </button>
+          </div>
 
           <button type="submit" className="modal-login-button" disabled={loading}>
             {loading ? "Logging in..." : "Log In"}
