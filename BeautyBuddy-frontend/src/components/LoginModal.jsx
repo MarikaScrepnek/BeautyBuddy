@@ -59,7 +59,7 @@ export default function LoginModal({ onClose, onSwitchToSignup, onSwitchToResetP
             required
           />
 
-          <div className="password-box">
+          <div className="password-input-container">
             <input
               className="input"
               type={showPassword ? "text" : "password"}

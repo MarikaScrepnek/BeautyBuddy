@@ -3,11 +3,13 @@ import "./SignupModal.css";
 
 import { useState } from "react";
 import { registerUser } from "../api/authApi";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 export default function SignupModal({ onClose, onSwitchToLogin}) {
   const[email, setEmail] = useState("");
   const[username, setUsername] = useState("");
   const[password, setPassword] = useState("");
+  const[showPassword, setShowPassword] = useState(false);
   const[error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -61,13 +63,23 @@ export default function SignupModal({ onClose, onSwitchToLogin}) {
             onChange={(e) => setUsername(e.target.value)}
             required
           />
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
+
+          <div className="password-input-container">
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+            <button
+                type="button"
+                className="toggle-password-button"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+            </button>
+          </div>
 
           <button type="submit" className="modal-signup-button" disabled={loading}>
             {loading ? "Signing up..." : "Sign Up"}

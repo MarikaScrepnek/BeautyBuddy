@@ -128,7 +128,7 @@ h2 {
     transform: scale(0.99);
 }
 
-.password-box {
+.password-input-container {
   position: relative;
 }
 
