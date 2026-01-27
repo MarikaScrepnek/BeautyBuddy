@@ -25,7 +25,7 @@ public class WishlistController {
 
     @PostMapping("/add")
     public ResponseEntity<Void> addToWishlist(@RequestBody AddToWishlistRequestDTO request) {
-        wishlistService.addToWishlist(request.username(), request);
+        wishlistService.addToWishlist(request);
         return ResponseEntity.ok().build();
     }
 
