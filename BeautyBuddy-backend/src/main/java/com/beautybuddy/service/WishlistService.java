@@ -13,7 +13,9 @@ import com.beautybuddy.model.Wishlist;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.stereotype.Service;
 
+@Service
 public class WishlistService {
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
