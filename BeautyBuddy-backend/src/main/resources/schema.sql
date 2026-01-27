@@ -74,7 +74,9 @@ CREATE TABLE IF NOT EXISTS wishlist_item (
     wishlist_item_id SERIAL PRIMARY KEY,
     wishlist_id INT REFERENCES wishlist(wishlist_id) ON DELETE CASCADE,
     product_id INT REFERENCES product(product_id) ON DELETE CASCADE,
-    UNIQUE (wishlist_id, product_id)
+    shade_id INT REFERENCES product_shade(product_shade_id) ON DELETE SET NULL,
+    added_at TIMESTAMP DEFAULT NOW(),
+    UNIQUE (wishlist_id, product_id, shade_id)
 );
 
 CREATE EXTENSION IF NOT EXISTS unaccent;

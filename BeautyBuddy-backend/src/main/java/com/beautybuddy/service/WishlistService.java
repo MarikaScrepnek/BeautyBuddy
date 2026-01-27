@@ -7,6 +7,9 @@ import com.beautybuddy.repository.ProductRepository;
 import com.beautybuddy.model.User;
 import com.beautybuddy.model.WishlistItem;
 import com.beautybuddy.model.Product;
+import com.beautybuddy.model.ProductShade;
+import com.beautybuddy.repository.ShadeRepository;
+import com.beautybuddy.model.Wishlist;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +18,6 @@ public class WishlistService {
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
     private final ShadeRepository shadeRepository;
-    private final WishlistItemRepository wishlistItemRepository;
 
     public void addToWishlist(String username, AddToWishlistRequestDTO request) {
         User user = userRepository.findByUsername(username)
@@ -37,7 +39,6 @@ public class WishlistService {
         }
 
         wishlist.getItems().add(item);
-        wishlistItemRepository.save(item);
     }
 
     public List<WishlistItemDTO> getWishlistItems(String username) {
