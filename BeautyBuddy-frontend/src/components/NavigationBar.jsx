@@ -115,7 +115,7 @@ export default function NavigationBar({ searchQuery, setSearchQuery }) {
               className="login-button"
               onClick={() => setShowAuth(true)}
             >
-              Login / Sign Up
+              Login / Create Account
             </button>
           )}
 
