@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { FaSearch } from 'react-icons/fa';
 
 import AuthModal from "../components/AuthModal";
+import { addToWishlist } from "../api/wishlistApi";
 
 import './ProductDetails.css';
 
@@ -36,15 +37,20 @@ export default function ProductDetails() {
     return Boolean(localStorage.getItem("user"));
   }
 
-  const handleAddToWishlist = () => {
+  const handleAddToWishlist = async () => {
     if (!isLoggedIn()) {
         setShowLoginModal(true);
         return;
     }
-    // Logic to add to wishlist
-    };
+    const success = await addToWishlist(data.id, selectedShade?.id);
+    if (success) {
+        alert("Added to wishlist!");
+    } else {
+        alert("Failed to add to wishlist.");
+    }
+  };
 
-    const handleAddToRoutine = () => {
+    const handleAddToRoutine = async () => {
     if (!isLoggedIn()) {
         setShowLoginModal(true);
         return;
