@@ -3,6 +3,7 @@ package com.beautybuddy.service;
 import com.beautybuddy.dto.AddToWishlistRequestDTO;
 import com.beautybuddy.dto.WishlistItemDTO;
 import com.beautybuddy.repository.UserRepository;
+
 import com.beautybuddy.repository.ProductRepository;
 import com.beautybuddy.model.User;
 import com.beautybuddy.model.WishlistItem;
@@ -10,23 +11,28 @@ import com.beautybuddy.model.Product;
 import com.beautybuddy.model.ProductShade;
 import com.beautybuddy.repository.ShadeRepository;
 import com.beautybuddy.model.Wishlist;
+import com.beautybuddy.repository.WishlistItemRepository;
 
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class WishlistService {
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
     private final ShadeRepository shadeRepository;
+    private final WishlistItemRepository wishlistItemRepository;
 
-    public WishlistService(UserRepository userRepository, ProductRepository productRepository, ShadeRepository shadeRepository) {
+    public WishlistService(UserRepository userRepository, ProductRepository productRepository, ShadeRepository shadeRepository, WishlistItemRepository wishlistItemRepository) {
         this.userRepository = userRepository;
         this.productRepository = productRepository;
         this.shadeRepository = shadeRepository;
+        this.wishlistItemRepository = wishlistItemRepository;
     }
 
+    @Transactional
     public void addToWishlist(String username, AddToWishlistRequestDTO request) {
         User user = userRepository.findByUsername(username)
             .orElseThrow(() -> new RuntimeException("User not found"));
@@ -46,7 +52,7 @@ public class WishlistService {
             item.setShade(shade);
         }
 
-        wishlist.getItems().add(item);
+        wishlistItemRepository.save(item);
     }
 
     public List<WishlistItemDTO> getWishlistItems(String username) {
