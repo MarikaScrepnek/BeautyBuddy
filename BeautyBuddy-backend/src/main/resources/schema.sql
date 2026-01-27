@@ -74,7 +74,6 @@ CREATE TABLE IF NOT EXISTS wishlist_item (
     wishlist_item_id SERIAL PRIMARY KEY,
     wishlist_id INT REFERENCES wishlist(wishlist_id) ON DELETE CASCADE,
     product_id INT REFERENCES product(product_id) ON DELETE CASCADE,
-    priority INT,
     UNIQUE (wishlist_id, product_id)
 );
 
