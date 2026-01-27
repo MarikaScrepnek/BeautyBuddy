@@ -25,6 +25,10 @@ public class WishlistItem {
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
+    @ManyToOne
+    @JoinColumn(name = "shade_id")
+    private ProductShade shade;
+
     public int getWishlist_item_id() {
         return wishlist_item_id;
     }
@@ -47,5 +51,12 @@ public class WishlistItem {
 
     public void setProduct(Product product) {
         this.product = product;
+    }
+
+    public ProductShade getShade() {
+        return shade;
+    }
+    public void setShade(ProductShade shade) {
+        this.shade = shade;
     }
 }
