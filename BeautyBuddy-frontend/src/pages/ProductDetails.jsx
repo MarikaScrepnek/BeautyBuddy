@@ -1,7 +1,8 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-
 import { FaSearch } from 'react-icons/fa';
+
+import AuthModal from "../components/AuthModal";
 
 import './ProductDetails.css';
 
@@ -12,6 +13,8 @@ export default function ProductDetails() {
   const [loading, setLoading] = useState(true);
   const [selectedShade, setSelectedShade] = useState(null);
   const [ingredientsOpen, setIngredientsOpen] = useState(false);
+
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   const navigate = useNavigate();
 
@@ -29,11 +32,39 @@ export default function ProductDetails() {
     }
     }, [data]);
 
+    const isLoggedIn = () => {
+    return Boolean(localStorage.getItem("user"));
+  }
+
+  const handleAddToWishlist = () => {
+    if (!isLoggedIn()) {
+        setShowLoginModal(true);
+        return;
+    }
+    // Logic to add to wishlist
+    };
+
+    const handleAddToRoutine = () => {
+    if (!isLoggedIn()) {
+        setShowLoginModal(true);
+        return;
+    }
+    // Logic to add to routine
+    };
+
   if (loading) return <p className="loading">Loading product details...</p>;
   if (!data) return <p className="error">Product not found</p>;
 
   return (
     <div className="product-details-container">
+        {showLoginModal && (
+        <AuthModal
+            onClose={() => setShowLoginModal(false)}
+            onLoginSuccess={() => {
+                setShowLoginModal(false);
+            }}
+        />
+        )}
         <div className="product-card">
             {/* Header: Name + Brand + Category */}
             <div className="product-header">
@@ -78,14 +109,14 @@ export default function ProductDetails() {
                     </div>
 
                     <div className="product-actions">
-                        <div className="action-icon">
-                        <span className="icon">♥</span>
-                        <span className="tooltip">Add to Wishlist</span>
+                        <div className="action-icon" onClick={handleAddToWishlist}>
+                            <span className="icon">♥</span>
+                            <span className="tooltip">Add to Wishlist</span>
                         </div>
 
-                        <div className="action-icon">
-                        <span className="icon">+</span>
-                        <span className="tooltip">Add to Makeup Routine</span>
+                        <div className="action-icon" onClick={handleAddToRoutine}>
+                            <span className="icon">+</span>
+                            <span className="tooltip">Add to Makeup Routine</span>
                         </div>
                     </div>
 
