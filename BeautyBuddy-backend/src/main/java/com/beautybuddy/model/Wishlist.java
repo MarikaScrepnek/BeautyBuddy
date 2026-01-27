@@ -6,10 +6,13 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.CascadeType;
 
 import java.util.Set;
+import java.sql.Timestamp;
 
 
 @Table(name = "wishlist",
@@ -21,8 +24,9 @@ public class Wishlist {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int wishlist_id;
 
-    @Column(name = "user_id", nullable = false)
-    private int user_id;
+    @OneToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @OneToMany(
         mappedBy = "wishlist",
@@ -32,11 +36,11 @@ public class Wishlist {
     private Set<WishlistItem> wishlist_items;
 
     @Column(name = "created_at", nullable = false)
-    private String created_at;
+    private Timestamp created_at;
 
-    public Wishlist(int wishlist_id, int user_id, Set<WishlistItem> wishlist_items, String created_at) {
+    public Wishlist(int wishlist_id, User user, Set<WishlistItem> wishlist_items, Timestamp created_at) {
         this.wishlist_id = wishlist_id;
-        this.user_id = user_id;
+        this.user = user;
         this.wishlist_items = wishlist_items;
         this.created_at = created_at;
     }
@@ -49,12 +53,12 @@ public class Wishlist {
         this.wishlist_id = wishlist_id;
     }
 
-    public int getUserId() {
-        return user_id;
+    public User getUser() {
+        return user;
     }
 
-    public void setUserId(int user_id) {
-        this.user_id = user_id;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public Set<WishlistItem> getItems() {
@@ -65,11 +69,11 @@ public class Wishlist {
         this.wishlist_items = wishlist_items;
     }
 
-    public String getCreatedAt() {
+    public Timestamp getCreatedAt() {
         return created_at;
     }
 
-    public void setCreatedAt(String createdAt) {
+    public void setCreatedAt(Timestamp createdAt) {
         this.created_at = createdAt;
     }
 
