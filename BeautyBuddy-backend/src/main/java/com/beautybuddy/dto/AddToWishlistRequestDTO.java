@@ -1,3 +1,3 @@
 package com.beautybuddy.dto;
 
-public record AddToWishlistRequestDTO(int productId, String shadeName) {}
+public record AddToWishlistRequestDTO(String username, int productId, String shadeName) {}
