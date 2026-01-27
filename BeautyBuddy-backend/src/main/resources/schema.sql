@@ -66,7 +66,8 @@ CREATE TABLE IF NOT EXISTS user (
 CREATE TABLE IF NOT EXISTS wishlist (
     wishlist_id SERIAL PRIMARY KEY,
     user_id INT REFERENCES user(user_id) ON DELETE CASCADE,
-    created_at TIMESTAMP DEFAULT NOW()
+    created_at TIMESTAMP DEFAULT NOW(),
+    UNIQUE (user_id)
 );
 
 CREATE TABLE IF NOT EXISTS wishlist_item (
