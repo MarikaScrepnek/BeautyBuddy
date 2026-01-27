@@ -42,7 +42,7 @@ export default function ProductDetails() {
         setShowLoginModal(true);
         return;
     }
-    const success = await addToWishlist(data.id, selectedShade?.id);
+    const success = await addToWishlist(data.id, selectedShade?.shadeName);
     if (success) {
         alert("Added to wishlist!");
     } else {
