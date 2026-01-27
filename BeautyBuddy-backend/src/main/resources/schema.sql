@@ -55,7 +55,7 @@ CREATE TABLE IF NOT EXISTS product_shade (
     UNIQUE (product_id, shade_name)
 );
 
-CREATE TABLE IF NOT EXISTS user (
+CREATE TABLE IF NOT EXISTS users (
     user_id SERIAL PRIMARY KEY,
     username TEXT UNIQUE NOT NULL,
     email TEXT UNIQUE NOT NULL,
@@ -65,7 +65,7 @@ CREATE TABLE IF NOT EXISTS user (
 
 CREATE TABLE IF NOT EXISTS wishlist (
     wishlist_id SERIAL PRIMARY KEY,
-    user_id INT REFERENCES user(user_id) ON DELETE CASCADE,
+    user_id INT REFERENCES users(user_id) ON DELETE CASCADE,
     created_at TIMESTAMP DEFAULT NOW(),
     UNIQUE (user_id)
 );
