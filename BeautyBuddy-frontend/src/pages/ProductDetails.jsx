@@ -6,6 +6,7 @@ import AuthModal from "../components/AuthModal";
 import { addToWishlist } from "../api/wishlistApi";
 
 import './ProductDetails.css';
+import { getCurrentUser } from "../api/authApi";
 
 export default function ProductDetails() {
   const { productId } = useParams();
@@ -15,9 +16,17 @@ export default function ProductDetails() {
   const [selectedShade, setSelectedShade] = useState(null);
   const [ingredientsOpen, setIngredientsOpen] = useState(false);
 
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
   const [showLoginModal, setShowLoginModal] = useState(false);
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    getCurrentUser()
+      .then(() => setIsLoggedIn(true))
+      .catch(() => setIsLoggedIn(false));
+  }, []);
 
   useEffect(() => {
     fetch(`http://localhost:8080/api/products/${productId}`)
@@ -33,12 +42,8 @@ export default function ProductDetails() {
     }
     }, [data]);
 
-    const isLoggedIn = () => {
-    return Boolean(localStorage.getItem("user"));
-  }
-
   const handleAddToWishlist = async () => {
-    if (!isLoggedIn()) {
+    if (!isLoggedIn) {
         setShowLoginModal(true);
         return;
     }
@@ -51,7 +56,7 @@ export default function ProductDetails() {
   };
 
     const handleAddToRoutine = async () => {
-    if (!isLoggedIn()) {
+    if (!isLoggedin) {
         setShowLoginModal(true);
         return;
     }

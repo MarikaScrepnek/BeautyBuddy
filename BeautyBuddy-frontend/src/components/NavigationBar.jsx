@@ -8,6 +8,7 @@ import userSettingsIcon from '../assets/images/user-settings-icon.png';
 import './NavigationBar.css';
 
 import AuthModal from './AuthModal';
+import { getCurrentUser } from '../api/authApi';
 
 export default function NavigationBar({ searchQuery, setSearchQuery }) {
   const navigate = useNavigate();
@@ -38,25 +39,10 @@ export default function NavigationBar({ searchQuery, setSearchQuery }) {
 
   
   useEffect(() => {
-    const user = localStorage.getItem('user');
-    if (user) {
-      setIsLoggedIn(!!user);
-    }
-
-  const handleStorageChange = () => {
-    const user = localStorage.getItem('user');
-    if (user) {
-      setIsLoggedIn(true);
-    } else {
-      setIsLoggedIn(false);
-    }
-  };
-  
-  window.addEventListener('storage', handleStorageChange);
-  return () => window.removeEventListener('storage', handleStorageChange);
+    getCurrentUser()
+      .then(() => setIsLoggedIn(true))
+      .catch(() => setIsLoggedIn(false));
 }, []);
-
-
 
   return (
     <div>

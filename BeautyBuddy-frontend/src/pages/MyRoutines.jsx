@@ -1,16 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { getCurrentUser } from '../api/authApi';
 
 export default function MyRoutines() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    const user = localStorage.getItem('user');
-    if (user) {
-      setIsLoggedIn(true);
-    }
-    else {
-      setIsLoggedIn(false);
-    }
+    getCurrentUser()
+      .then(() => setIsLoggedIn(true))
+      .catch(() => setIsLoggedIn(false));
   }, []);
 
   return (
