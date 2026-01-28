@@ -6,13 +6,15 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
-
-import java.util.Map;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
-import com.beautybuddy.util.JwtUtil;
+import org.springframework.security.core.Authentication;
 
+import java.util.Map;
+
+import com.beautybuddy.util.JwtUtil;
 import com.beautybuddy.service.AuthService;
+import com.beautybuddy.dto.UserDTO;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -68,5 +70,17 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(Map.of("error", "Invalid credentials"));
         }
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<UserDTO> getCurrentUser(Authentication authentication) {
+        if (jwt == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        UserDTO userDTO = new UserDTO(userDetails.getUsername(), userDetails.getEmail());
+
+        return ResponseEntity.ok(userDTO);
     }
 }
