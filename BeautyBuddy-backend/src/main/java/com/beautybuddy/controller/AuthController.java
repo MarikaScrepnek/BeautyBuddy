@@ -6,7 +6,11 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
+
 import java.util.Map;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
+import com.beautybuddy.util.JwtUtil;
 
 import com.beautybuddy.service.AuthService;
 
@@ -43,7 +47,19 @@ public class AuthController {
                 request.get("password") 
             );
             if (success) {
-                return ResponseEntity.ok(Map.of("message", "Login successful"));
+                String jwt = JwtUtil.generateToken(request.get("email"));
+
+                ResponseCookie cookie = ResponseCookie.from("jwt", jwt)
+                    .httpOnly(true)
+                    .secure(true)
+                    .sameSite("Strict")
+                    .path("/")
+                    .maxAge(24 * 60 * 60)
+                    .build();
+
+                return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .body(Map.of("message", "Login successful"));
             } else {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("error", "Invalid credentials"));
