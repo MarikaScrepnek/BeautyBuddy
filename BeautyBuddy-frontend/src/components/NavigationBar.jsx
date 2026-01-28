@@ -8,7 +8,7 @@ import userSettingsIcon from '../assets/images/user-settings-icon.png';
 import './NavigationBar.css';
 
 import AuthModal from './AuthModal';
-import { getCurrentUser } from '../api/authApi';
+import { getCurrentUser, logoutUser } from '../api/authApi';
 
 export default function NavigationBar({ searchQuery, setSearchQuery }) {
   const navigate = useNavigate();
@@ -43,6 +43,12 @@ export default function NavigationBar({ searchQuery, setSearchQuery }) {
       .then(() => setIsLoggedIn(true))
       .catch(() => setIsLoggedIn(false));
 }, []);
+
+  useEffect(() => {
+    logoutUser()
+      .then(() => setIsLoggedIn(false))
+      .catch((error) => console.error("Logout failed:", error));
+  }, []);
 
   return (
     <div>
@@ -82,9 +88,12 @@ export default function NavigationBar({ searchQuery, setSearchQuery }) {
               <button
                 className="logout-button"
                 onClick={() => {
-                  localStorage.removeItem("user");
-                  setIsLoggedIn(false);
-                  navigate("/");
+                  logoutUser()
+                    .then(() => {
+                      setIsLoggedIn(false);
+                      navigate("/");
+                    })
+                    .catch((error) => console.error("Logout failed:", error));
                 }}
               >
                 Logout
