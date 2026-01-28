@@ -34,3 +34,11 @@ export async function getCurrentUser() {
     }
     return res.json();
 }
+
+export async function logoutUser() {
+    const res = await fetch(`${API_BASE_URL}/logout`, {
+        method: 'POST',
+        credentials: 'include',
+    });
+    return res.ok;
+}
