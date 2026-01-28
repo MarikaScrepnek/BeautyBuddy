@@ -1,5 +1,6 @@
 package com.beautybuddy.controller;
 
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,6 +16,7 @@ import java.util.Map;
 import com.beautybuddy.util.JwtUtil;
 import com.beautybuddy.service.AuthService;
 import com.beautybuddy.dto.UserDTO;
+import com.beautybuddy.security.CustomUserDetails;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -74,7 +76,7 @@ public class AuthController {
 
     @GetMapping("/me")
     public ResponseEntity<UserDTO> getCurrentUser(Authentication authentication) {
-        if (jwt == null || !authentication.isAuthenticated()) {
+        if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
