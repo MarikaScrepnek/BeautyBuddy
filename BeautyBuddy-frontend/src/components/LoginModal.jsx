@@ -31,7 +31,6 @@ export default function LoginModal({ onClose, onSwitchToSignup, onSwitchToResetP
       if (result.error) {
         setError(result.error);
       } else {
-        localStorage.setItem("user", email);
         onLoginSuccess?.();
         onClose();
         window.location.reload();
