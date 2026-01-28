@@ -33,7 +33,6 @@ export default function LoginModal({ onClose, onSwitchToSignup, onSwitchToResetP
       } else {
         onLoginSuccess?.();
         onClose();
-        window.location.reload();
       }
     } catch (err) {
       setError("An unexpected error occurred. Please try again.");
