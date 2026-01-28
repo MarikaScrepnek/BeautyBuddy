@@ -44,12 +44,6 @@ export default function NavigationBar({ searchQuery, setSearchQuery }) {
       .catch(() => setIsLoggedIn(false));
 }, []);
 
-  useEffect(() => {
-    logoutUser()
-      .then(() => setIsLoggedIn(false))
-      .catch((error) => console.error("Logout failed:", error));
-  }, []);
-
   return (
     <div>
       <header className="navigation-bar">
@@ -117,11 +111,17 @@ export default function NavigationBar({ searchQuery, setSearchQuery }) {
           {showAuth && (
             <AuthModal
              onClose={() => setShowAuth(false)}
-             onLoginSuccess={() => {
-               setIsLoggedIn(true);
-               setShowAuth(false);
+             onLoginSuccess={async () => {
+              try {
+                await getCurrentUser();
+                setIsLoggedIn(true);
+              } catch {
+                setIsLoggedIn(false);
+              }
+              setShowAuth(false);
              }}
-              />)}
+            />
+          )}
           
         </div>
       </header>
