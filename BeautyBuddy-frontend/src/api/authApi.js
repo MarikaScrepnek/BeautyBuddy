@@ -23,3 +23,14 @@ export async function loginUser(email, password) {
     const data = await res.json();
     return { status: res.status, data };
 }
+
+export async function getCurrentUser() {
+    const res = await fetch(`${API_BASE_URL}/me`, {
+        method: 'GET',
+        credentials: 'include',
+    });
+    if (!res.ok) {
+        throw new Error('Failed to fetch current user');
+    }
+    return res.json();
+}
