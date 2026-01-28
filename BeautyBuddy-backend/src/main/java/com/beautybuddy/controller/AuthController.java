@@ -11,12 +11,16 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.Cookie;
+
 import java.util.Map;
 
-import com.beautybuddy.util.JwtUtil;
 import com.beautybuddy.service.AuthService;
 import com.beautybuddy.dto.UserDTO;
 import com.beautybuddy.security.CustomUserDetails;
+import com.beautybuddy.util.JwtUtil;
+
 
 @RestController
 @RequestMapping("/api/auth")
@@ -84,5 +88,17 @@ public class AuthController {
         UserDTO userDTO = new UserDTO(userDetails.getUsername(), userDetails.getEmail());
 
         return ResponseEntity.ok(userDTO);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(HttpServletResponse response) {
+        Cookie cookie = new Cookie("jwt", "");
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(0);
+
+        response.addCookie(cookie);
+        return ResponseEntity.ok().build();
     }
 }
