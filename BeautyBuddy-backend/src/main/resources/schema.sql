@@ -84,7 +84,7 @@ CREATE TABLE IF NOT EXISTS review (
     user_id INT REFERENCES users(user_id) ON DELETE SET NULL,
     product_id INT REFERENCES product(product_id) ON DELETE CASCADE,
     product_shade_id INT REFERENCES product_shade(product_shade_id) ON DELETE SET NULL,
-    rating NUMERIC(3, 2) CHECK (rating >= 0 AND rating <= 5),
+    rating NUMERIC(2, 1) CHECK (rating >= 0 AND rating <= 5),
     review_text TEXT,
     helpful_count INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT NOW(),
