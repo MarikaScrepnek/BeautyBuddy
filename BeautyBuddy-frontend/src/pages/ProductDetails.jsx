@@ -56,11 +56,11 @@ export default function ProductDetails() {
   };
 
     const handleAddToRoutine = async () => {
-    if (!isLoggedin) {
-        setShowLoginModal(true);
-        return;
-    }
-    // Logic to add to routine
+        if (!isLoggedIn) {
+            setShowLoginModal(true);
+            return;
+        }
+        // Logic to add to routine
     };
 
   if (loading) return <p className="loading">Loading product details...</p>;
@@ -69,12 +69,13 @@ export default function ProductDetails() {
   return (
     <div className="product-details-container">
         {showLoginModal && (
-        <AuthModal
-            onClose={() => setShowLoginModal(false)}
-            onLoginSuccess={() => {
-                setShowLoginModal(false);
-            }}
-        />
+                <AuthModal
+                    onClose={() => setShowLoginModal(false)}
+                    onLoginSuccess={() => {
+                        setIsLoggedIn(true);
+                        setShowLoginModal(false);
+                    }}
+                />
         )}
         <div className="product-card">
             {/* Header: Name + Brand + Category */}

@@ -32,6 +32,7 @@ export default function LoginModal({ onClose, onSwitchToSignup, onSwitchToResetP
         setError(result.error);
       } else {
         onLoginSuccess?.();
+        window.dispatchEvent(new Event("auth:login"));
         onClose();
       }
     } catch (err) {

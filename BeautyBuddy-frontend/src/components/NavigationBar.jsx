@@ -42,7 +42,18 @@ export default function NavigationBar({ searchQuery, setSearchQuery }) {
     getCurrentUser()
       .then(() => setIsLoggedIn(true))
       .catch(() => setIsLoggedIn(false));
-}, []);
+    const handleAuthLogin = () => {
+      getCurrentUser()
+        .then(() => setIsLoggedIn(true))
+        .catch(() => setIsLoggedIn(false));
+    };
+
+    window.addEventListener("auth:login", handleAuthLogin);
+
+    return () => {
+      window.removeEventListener("auth:login", handleAuthLogin);
+    };
+  }, []);
 
   return (
     <div>
