@@ -120,6 +120,14 @@ CREATE TABLE IF NOT EXISTS question (
     deleted_at TIMESTAMP NULL
 );
 
+CREATE TABLE IF NOT EXISTS question_upvote (
+    question_upvote_id SERIAL PRIMARY KEY,
+    question_id INT REFERENCES question(question_id) ON DELETE CASCADE,
+    user_id INT REFERENCES users(user_id) ON DELETE CASCADE,
+    created_at TIMESTAMP DEFAULT NOW(),
+    UNIQUE (question_id, user_id)
+);
+
 CREATE TABLE IF NOT EXISTS answer (
     answer_id SERIAL PRIMARY KEY,
     question_id INT REFERENCES question(question_id) ON DELETE CASCADE,
