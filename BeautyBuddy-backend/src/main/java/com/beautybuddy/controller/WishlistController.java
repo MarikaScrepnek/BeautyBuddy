@@ -34,6 +34,16 @@ public class WishlistController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/remove")
+    public ResponseEntity<Void> removeFromWishlist(@RequestBody AddToWishlistRequestDTO request, Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(401).build();
+        }
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        wishlistService.removeFromWishlist(userDetails.getEmail(), request);
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping
     public ResponseEntity<List<WishlistItemDTO>> getWishlist(Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
