@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { FaSearch } from 'react-icons/fa';
 
 import AuthModal from "../components/AuthModal";
-import { addToWishlist, getWishlist } from "../api/wishlistApi";
+import { addToWishlist, removeFromWishlist, getWishlist } from "../api/wishlistApi";
 
 import './ProductDetails.css';
 import { getCurrentUser } from "../api/authApi";
@@ -17,11 +17,10 @@ export default function ProductDetails() {
   const [ingredientsOpen, setIngredientsOpen] = useState(false);
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [wishlistItems, setWishlistItems] = useState([]);
+  const [wishlistItems, setWishlistItems] = useState([]);
+  const [isTogglingWishlist, setIsTogglingWishlist] = useState(false);
 
   const [showLoginModal, setShowLoginModal] = useState(false);
-
-  const navigate = useNavigate();
 
   useEffect(() => {
     getCurrentUser()
@@ -60,20 +59,6 @@ export default function ProductDetails() {
     }
     }, [data]);
 
-  const handleAddToWishlist = async () => {
-    if (!isLoggedIn) {
-        setShowLoginModal(true);
-        return;
-    }
-    const success = await addToWishlist(data.id, selectedShade?.shadeName);
-    if (success) {
-                await loadWishlist();
-        alert("Added to wishlist!");
-    } else {
-        alert("Failed to add to wishlist.");
-    }
-  };
-
     const isInWishlist = Boolean(
         data && wishlistItems.some((item) => {
             if (item.productId !== data.id) return false;
@@ -81,6 +66,37 @@ export default function ProductDetails() {
             return (item.shadeName ?? null) === shadeName;
         })
     );
+
+    const handleToggleWishlist = async () => {
+        if (!isLoggedIn) {
+            setShowLoginModal(true);
+            return;
+        }
+        if (!data) return;
+
+        const shadeName = selectedShade?.shadeName ?? null;
+        const productKeyMatches = (item) => item.productId === data.id && (item.shadeName ?? null) === shadeName;
+
+        if (isTogglingWishlist) return; // Prevent multiple clicks
+        setIsTogglingWishlist(true);
+
+        if (isInWishlist) {
+            setWishlistItems((items) => items.filter(item => !productKeyMatches(item)));
+            const success = await removeFromWishlist(data.id, shadeName);
+            if (!success) {
+                alert("Failed to remove from wishlist.");
+                await loadWishlist();
+            }
+        } else {
+            setWishlistItems((items) => [...items, { productId: data.id, shadeName }]);
+            const success = await addToWishlist(data.id, shadeName);
+            if (!success) {
+                alert("Failed to add to wishlist.");
+                await loadWishlist();
+            }
+        }
+        setIsTogglingWishlist(false);
+    };
 
     const handleAddToRoutine = async () => {
         if (!isLoggedIn) {
@@ -149,7 +165,7 @@ export default function ProductDetails() {
                     </div>
 
                     <div className="product-actions">
-                        <div className="action-icon" onClick={handleAddToWishlist}>
+                        <div className="action-icon" onClick={handleToggleWishlist}>
                             <span className={`icon ${isInWishlist ? "icon--active" : ""}`}>♥</span>
                             <span className="tooltip">
                               {isInWishlist ? "Remove from Wishlist" : "Add to Wishlist"}
