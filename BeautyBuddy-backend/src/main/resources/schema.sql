@@ -81,7 +81,7 @@ CREATE TABLE IF NOT EXISTS wishlist_item (
 
 CREATE TABLE IF NOT EXISTS review (
     review_id SERIAL PRIMARY KEY,
-    user_id INT REFERENCES users(user_id) ON DELETE CASCADE,
+    user_id INT REFERENCES users(user_id) ON DELETE SET NULL,
     product_id INT REFERENCES product(product_id) ON DELETE CASCADE,
     product_shade_id INT REFERENCES product_shade(product_shade_id) ON DELETE SET NULL,
     rating NUMERIC(3, 2) CHECK (rating >= 0 AND rating <= 5),
@@ -105,14 +105,14 @@ CREATE TABLE IF NOT EXISTS review_image (
 CREATE TABLE IF NOT EXISTS review_helpful_vote (
     review_helpful_vote_id SERIAL PRIMARY KEY,
     review_id INT REFERENCES review(review_id) ON DELETE CASCADE,
-    user_id INT REFERENCES users(user_id) ON DELETE CASCADE,
+    user_id INT REFERENCES users(user_id) ON DELETE SET NULL,
     created_at TIMESTAMP DEFAULT NOW(),
     UNIQUE (review_id, user_id)
 );
 
 CREATE TABLE IF NOT EXISTS question (
     question_id SERIAL PRIMARY KEY,
-    user_id INT REFERENCES users(user_id) ON DELETE CASCADE,
+    user_id INT REFERENCES users(user_id) ON DELETE SET NULL,
     product_id INT REFERENCES product(product_id) ON DELETE CASCADE,
     question_text TEXT NOT NULL,
     answered BOOLEAN DEFAULT FALSE,
@@ -127,7 +127,7 @@ CREATE TABLE IF NOT EXISTS question (
 CREATE TABLE IF NOT EXISTS question_upvote (
     question_upvote_id SERIAL PRIMARY KEY,
     question_id INT REFERENCES question(question_id) ON DELETE CASCADE,
-    user_id INT REFERENCES users(user_id) ON DELETE CASCADE,
+    user_id INT REFERENCES users(user_id) ON DELETE SET NULL,
     created_at TIMESTAMP DEFAULT NOW(),
     UNIQUE (question_id, user_id)
 );
@@ -135,7 +135,7 @@ CREATE TABLE IF NOT EXISTS question_upvote (
 CREATE TABLE IF NOT EXISTS answer (
     answer_id SERIAL PRIMARY KEY,
     question_id INT REFERENCES question(question_id) ON DELETE CASCADE,
-    user_id INT REFERENCES users(user_id) ON DELETE CASCADE,
+    user_id INT REFERENCES users(user_id) ON DELETE SET NULL,
     answer_text TEXT NOT NULL,
     helpful_count INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT NOW(),
@@ -148,7 +148,7 @@ CREATE TABLE IF NOT EXISTS answer (
 CREATE TABLE IF NOT EXISTS answer_helpful_vote (
     answer_helpful_vote_id SERIAL PRIMARY KEY,
     answer_id INT REFERENCES answer(answer_id) ON DELETE CASCADE,
-    user_id INT REFERENCES users(user_id) ON DELETE CASCADE,
+    user_id INT REFERENCES users(user_id) ON DELETE SET NULL,
     created_at TIMESTAMP DEFAULT NOW(),
     UNIQUE (answer_id, user_id)
 );
@@ -156,7 +156,7 @@ CREATE TABLE IF NOT EXISTS answer_helpful_vote (
 CREATE TABLE IF NOT EXISTS review_report (
     review_report_id SERIAL PRIMARY KEY,
     review_id INT REFERENCES review(review_id) ON DELETE CASCADE,
-    user_id INT REFERENCES users(user_id) ON DELETE CASCADE,
+    user_id INT REFERENCES users(user_id) ON DELETE SET NULL,
     reason TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT NOW(),
     UNIQUE (review_id, user_id)
@@ -165,7 +165,7 @@ CREATE TABLE IF NOT EXISTS review_report (
 CREATE TABLE IF NOT EXISTS question_report (
     question_report_id SERIAL PRIMARY KEY,
     question_id INT REFERENCES question(question_id) ON DELETE CASCADE,
-    user_id INT REFERENCES users(user_id) ON DELETE CASCADE,
+    user_id INT REFERENCES users(user_id) ON DELETE SET NULL,
     reason TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT NOW(),
     UNIQUE (question_id, user_id)
@@ -174,7 +174,7 @@ CREATE TABLE IF NOT EXISTS question_report (
 CREATE TABLE IF NOT EXISTS answer_report (
     answer_report_id SERIAL PRIMARY KEY,
     answer_id INT REFERENCES answer(answer_id) ON DELETE CASCADE,
-    user_id INT REFERENCES users(user_id) ON DELETE CASCADE,
+    user_id INT REFERENCES users(user_id) ON DELETE SET NULL,
     reason TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT NOW(),
     UNIQUE (answer_id, user_id)
