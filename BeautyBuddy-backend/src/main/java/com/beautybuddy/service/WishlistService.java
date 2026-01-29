@@ -78,4 +78,26 @@ public class WishlistService {
 
         return result;
     }
+
+    @Transactional
+    public void removeFromWishlist(String email, AddToWishlistRequestDTO request) {
+        List<WishlistItem> items = wishlistItemRepository.findByWishlist_User_Email(email);
+        WishlistItem target = null;
+        for (WishlistItem item : items) {
+            if (item.getProduct().getProduct_id() == request.productId()) {
+                if (request.shadeName() == null && item.getShade() == null) {
+                    target = item;
+                    break;
+                } else if (item.getShade() != null && item.getShade().getShadeName().equals(request.shadeName())) {
+                    target = item;
+                    break;
+                }
+            }
+        }
+        if (target != null) {
+            wishlistItemRepository.delete(target);
+        } else {
+            throw new RuntimeException("Wishlist item not found");
+        }
+    }
 }
