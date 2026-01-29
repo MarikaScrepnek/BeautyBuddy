@@ -108,4 +108,16 @@ CREATE TABLE IF NOT EXISTS review_helpful_vote (
     UNIQUE (review_id, user_id)
 );
 
+CREATE TABLE IF NOT EXISTS question (
+    question_id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES users(user_id) ON DELETE CASCADE,
+    product_id INT REFERENCES product(product_id) ON DELETE CASCADE,
+    question_text TEXT NOT NULL,
+    answered BOOLEAN DEFAULT FALSE,
+    upvote_count INT DEFAULT 0,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW(),
+    deleted_at TIMESTAMP NULL
+);
+
 CREATE EXTENSION IF NOT EXISTS unaccent;
