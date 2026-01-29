@@ -1,6 +1,7 @@
 package com.beautybuddy.dto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public record ReviewDTO(
     int reviewId,
