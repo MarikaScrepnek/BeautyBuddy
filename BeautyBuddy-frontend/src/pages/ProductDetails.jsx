@@ -152,7 +152,7 @@ export default function ProductDetails() {
                         <div className="action-icon" onClick={handleAddToWishlist}>
                             <span className={`icon ${isInWishlist ? "icon--active" : ""}`}>♥</span>
                             <span className="tooltip">
-                              {isInWishlist ? "In Wishlist" : "Add to Wishlist"}
+                              {isInWishlist ? "Remove from Wishlist" : "Add to Wishlist"}
                             </span>
                         </div>
 
