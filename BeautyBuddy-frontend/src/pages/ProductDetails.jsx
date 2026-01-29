@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { FaSearch } from 'react-icons/fa';
 
@@ -7,6 +7,7 @@ import { addToWishlist, removeFromWishlist, getWishlist } from "../api/wishlistA
 
 import './ProductDetails.css';
 import { getCurrentUser } from "../api/authApi";
+import Toast from "../components/Toast";
 
 export default function ProductDetails() {
   const { productId } = useParams();
@@ -21,6 +22,12 @@ export default function ProductDetails() {
   const [isTogglingWishlist, setIsTogglingWishlist] = useState(false);
 
   const [showLoginModal, setShowLoginModal] = useState(false);
+
+  const [toast, setToast] = useState(null);
+
+  const showToast = (message, type = "success") => {
+    setToast({ message, type});
+  }
 
   useEffect(() => {
     getCurrentUser()
@@ -83,15 +90,19 @@ export default function ProductDetails() {
         if (isInWishlist) {
             setWishlistItems((items) => items.filter(item => !productKeyMatches(item)));
             const success = await removeFromWishlist(data.id, shadeName);
-            if (!success) {
-                alert("Failed to remove from wishlist.");
+            if (success) {
+                showToast("Removed from wishlist", "info");
+            } else {
+                showToast("Failed to remove from wishlist", "error");
                 await loadWishlist();
             }
         } else {
             setWishlistItems((items) => [...items, { productId: data.id, shadeName }]);
             const success = await addToWishlist(data.id, shadeName);
-            if (!success) {
-                alert("Failed to add to wishlist.");
+            if (success) {
+                showToast("Added to wishlist", "success");
+            } else {
+                showToast("Failed to add to wishlist", "error");
                 await loadWishlist();
             }
         }
@@ -249,6 +260,14 @@ export default function ProductDetails() {
                     </button>
                 </div>
             </section>
+            {toast && (
+                <Toast
+                    message={toast.message}
+                    type={toast.type}
+                    duration={2200}
+                    onClose={() => setToast(null)}
+                />
+            )}
         </div>
     </div>
   );
