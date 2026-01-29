@@ -264,7 +264,7 @@ export default function ProductDetails() {
                 <Toast
                     message={toast.message}
                     type={toast.type}
-                    duration={2200}
+                    duration={750}
                     onClose={() => setToast(null)}
                 />
             )}
