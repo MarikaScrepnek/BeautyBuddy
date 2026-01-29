@@ -56,7 +56,26 @@ public class WishlistService {
     }
 
     public List<WishlistItemDTO> getWishlistItems(String username) {
-        // Implementation for retrieving wishlist items
-        return new ArrayList<>();
+        List<WishlistItem> items = wishlistItemRepository.findByWishlist_User_Email(username);
+        List<WishlistItemDTO> result = new ArrayList<>();
+
+        for (WishlistItem item : items) {
+            Product product = item.getProduct();
+            ProductShade shade = item.getShade();
+            String shadeName = shade != null ? shade.getShadeName() : null;
+            String imageLink = shade != null && shade.getImageLink() != null
+                ? shade.getImageLink()
+                : product.getImage_link();
+
+            result.add(new WishlistItemDTO(
+                item.getWishlist_item_id(),
+                product.getProduct_id(),
+                product.getName(),
+                shadeName,
+                imageLink
+            ));
+        }
+
+        return result;
     }
 }
