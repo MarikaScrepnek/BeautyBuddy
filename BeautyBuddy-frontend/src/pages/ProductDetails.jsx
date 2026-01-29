@@ -121,11 +121,11 @@ export default function ProductDetails() {
                 />
 
                 <div className="product-meta">
-                    <p className="price">
-                        <span>Price:</span> {data.price ? `$${data.price}` : "N/A"}
-                    </p>
                     <p className="rating">
                         <span>Rating:</span> {data.rating ? `${data.rating}/5` : "Be the first to review!"}
+                    </p>
+                    <p className="price">
+                        <span>Price:</span> {data.price ? `$${data.price}` : "N/A"}
                     </p>
 
                     <div className="shade-selector">
