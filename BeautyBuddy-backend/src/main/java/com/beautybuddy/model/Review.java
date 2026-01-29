@@ -1,0 +1,150 @@
+package com.beautybuddy.model;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "review",
+    uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"user_id", "product_id"})
+    }
+)
+public class Review {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int review_id;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "product_id", nullable = false)
+    private Product product;
+
+    @ManyToOne
+    @JoinColumn(name = "product_shade_id", nullable = true)
+    private ProductShade productShade;
+
+    @Column(name = "rating", nullable = false)
+    private float rating;
+
+    @Column(name = "review_text", nullable = true)
+    private String reviewText;
+
+    @Column(name = "helpful_count", nullable = false)
+    private int helpfulCount;
+
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime updatedAt;
+
+    @Column(name = "deleted_at", nullable = true)
+    private LocalDateTime deletedAt;
+
+    @Column(name = "reported_count", nullable = false)
+    private int reportedCount;
+
+    @Column(name = "approved", nullable = false)
+    private boolean approved;
+
+    public Review() {
+    }
+
+    // Getters and Setters
+    public int getReview_id() {
+        return review_id;
+    }
+    public void setReview_id(int review_id) {
+        this.review_id = review_id;
+    }
+
+    public User getUser() {
+        return user;
+    }
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public Product getProduct() {
+        return product;
+    }
+    public void setProduct(Product product) {
+        this.product = product;
+    }
+
+    public ProductShade getProductShade() {
+        return productShade;
+    }
+    public void setProductShade(ProductShade productShade) {
+        this.productShade = productShade;
+    }
+
+    public float getRating() {
+        return rating;
+    }
+    public void setRating(float rating) {
+        this.rating = rating;
+    }
+
+    public String getReviewText() {
+        return reviewText;
+    }
+    public void setReviewText(String reviewText) {
+        this.reviewText = reviewText;
+    }
+
+    public int getHelpfulCount() {
+        return helpfulCount;
+    }
+    public void setHelpfulCount(int helpfulCount) {
+        this.helpfulCount = helpfulCount;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public LocalDateTime getDeletedAt() {
+        return deletedAt;
+    }
+    public void setDeletedAt(LocalDateTime deletedAt) {
+        this.deletedAt = deletedAt;
+    }
+
+    public int getReportedCount() {
+        return reportedCount;
+    }
+    public void setReportedCount(int reportedCount) {
+        this.reportedCount = reportedCount;
+    }
+
+    public boolean isApproved() {
+        return approved;
+    }
+    public void setApproved(boolean approved) {
+        this.approved = approved;
+    }
+}
