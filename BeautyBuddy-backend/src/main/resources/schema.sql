@@ -93,4 +93,11 @@ CREATE TABLE IF NOT EXISTS review (
     UNIQUE (user_id, product_id)
 );
 
+CREATE TABLE IF NOT EXISTS review_image (
+    review_image_id SERIAL PRIMARY KEY,
+    review_id INT REFERENCES review(review_id) ON DELETE CASCADE,
+    image_link TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
 CREATE EXTENSION IF NOT EXISTS unaccent;
