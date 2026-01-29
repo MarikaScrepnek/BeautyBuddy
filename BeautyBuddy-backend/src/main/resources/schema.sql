@@ -131,4 +131,12 @@ CREATE TABLE IF NOT EXISTS answer (
     deleted_at TIMESTAMP NULL
 );
 
+CREATE TABLE IF NOT EXISTS answer_helpful_vote (
+    answer_helpful_vote_id SERIAL PRIMARY KEY,
+    answer_id INT REFERENCES answer(answer_id) ON DELETE CASCADE,
+    user_id INT REFERENCES users(user_id) ON DELETE CASCADE,
+    created_at TIMESTAMP DEFAULT NOW(),
+    UNIQUE (answer_id, user_id)
+);
+
 CREATE EXTENSION IF NOT EXISTS unaccent;
