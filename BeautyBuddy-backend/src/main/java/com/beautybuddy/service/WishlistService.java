@@ -33,8 +33,8 @@ public class WishlistService {
     }
 
     @Transactional
-    public void addToWishlist(AddToWishlistRequestDTO request) {
-        User user = userRepository.findByEmail(request.email())
+    public void addToWishlist(String email, AddToWishlistRequestDTO request) {
+        User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new RuntimeException("User not found"));
         
         Product product = productRepository.findById(request.productId())
