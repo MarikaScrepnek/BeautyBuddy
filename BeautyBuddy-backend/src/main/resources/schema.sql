@@ -99,7 +99,7 @@ CREATE TABLE IF NOT EXISTS review_image (
     review_image_id SERIAL PRIMARY KEY,
     review_id INT REFERENCES review(review_id) ON DELETE CASCADE,
     image_link TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT NOW()
+    uploaded_at TIMESTAMP DEFAULT NOW()
 );
 
 CREATE TABLE IF NOT EXISTS review_helpful_vote (
