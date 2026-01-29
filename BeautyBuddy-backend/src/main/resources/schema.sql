@@ -153,4 +153,31 @@ CREATE TABLE IF NOT EXISTS answer_helpful_vote (
     UNIQUE (answer_id, user_id)
 );
 
+CREATE TABLE IF NOT EXISTS review_report (
+    review_report_id SERIAL PRIMARY KEY,
+    review_id INT REFERENCES review(review_id) ON DELETE CASCADE,
+    user_id INT REFERENCES users(user_id) ON DELETE CASCADE,
+    reason TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+    UNIQUE (review_id, user_id)
+);
+
+CREATE TABLE IF NOT EXISTS question_report (
+    question_report_id SERIAL PRIMARY KEY,
+    question_id INT REFERENCES question(question_id) ON DELETE CASCADE,
+    user_id INT REFERENCES users(user_id) ON DELETE CASCADE,
+    reason TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+    UNIQUE (question_id, user_id)
+);
+
+CREATE TABLE IF NOT EXISTS answer_report (
+    answer_report_id SERIAL PRIMARY KEY,
+    answer_id INT REFERENCES answer(answer_id) ON DELETE CASCADE,
+    user_id INT REFERENCES users(user_id) ON DELETE CASCADE,
+    reason TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+    UNIQUE (answer_id, user_id)
+);
+
 CREATE EXTENSION IF NOT EXISTS unaccent;
