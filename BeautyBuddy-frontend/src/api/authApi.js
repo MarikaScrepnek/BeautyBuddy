@@ -20,8 +20,10 @@ export async function loginUser(email, password) {
         credentials: 'include',
         body: JSON.stringify({ email, password }),
     });
-    const data = await res.json();
-    return { status: res.status, data };
+    const data = await res.json().catch(() => ({}));
+
+    if (!res.ok) return { error: data?.error ?? "Invalid credentials" };
+    return { data };
 }
 
 export async function getCurrentUser() {

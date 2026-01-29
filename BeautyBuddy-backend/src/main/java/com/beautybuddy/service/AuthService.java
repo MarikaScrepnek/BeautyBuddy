@@ -19,6 +19,7 @@ public class AuthService {
     }
 
     public void register(String username, String email, String rawPassword) {
+        email = email.trim().toLowerCase();
         String hash = encoder.encode(rawPassword);
 
         User user = new User();
@@ -35,6 +36,7 @@ public class AuthService {
     }
 
     public boolean login(String email, String rawPassword) {
+        email = email.trim().toLowerCase();
         User user = userRepo.findByEmail(email)
             .orElseThrow(() -> new RuntimeException("Invalid credentials"));
 
