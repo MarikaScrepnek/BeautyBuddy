@@ -100,4 +100,12 @@ CREATE TABLE IF NOT EXISTS review_image (
     created_at TIMESTAMP DEFAULT NOW()
 );
 
+CREATE TABLE IF NOT EXISTS review_helpful_vote (
+    review_helpful_vote_id SERIAL PRIMARY KEY,
+    review_id INT REFERENCES review(review_id) ON DELETE CASCADE,
+    user_id INT REFERENCES users(user_id) ON DELETE CASCADE,
+    created_at TIMESTAMP DEFAULT NOW(),
+    UNIQUE (review_id, user_id)
+);
+
 CREATE EXTENSION IF NOT EXISTS unaccent;
