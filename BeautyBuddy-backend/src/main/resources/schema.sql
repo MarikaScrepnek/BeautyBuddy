@@ -90,6 +90,8 @@ CREATE TABLE IF NOT EXISTS review (
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW(),
     deleted_at TIMESTAMP NULL,
+    reported_count INT DEFAULT 0,
+    approved BOOLEAN DEFAULT TRUE,
     UNIQUE (user_id, product_id)
 );
 
@@ -117,7 +119,9 @@ CREATE TABLE IF NOT EXISTS question (
     upvote_count INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW(),
-    deleted_at TIMESTAMP NULL
+    deleted_at TIMESTAMP NULL,
+    reported_count INT DEFAULT 0,
+    approved BOOLEAN DEFAULT TRUE
 );
 
 CREATE TABLE IF NOT EXISTS question_upvote (
@@ -136,7 +140,9 @@ CREATE TABLE IF NOT EXISTS answer (
     helpful_count INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW(),
-    deleted_at TIMESTAMP NULL
+    deleted_at TIMESTAMP NULL,
+    reported_count INT DEFAULT 0,
+    approved BOOLEAN DEFAULT TRUE
 );
 
 CREATE TABLE IF NOT EXISTS answer_helpful_vote (
