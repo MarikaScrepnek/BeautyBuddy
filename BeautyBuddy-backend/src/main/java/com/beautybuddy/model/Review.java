@@ -9,8 +9,13 @@ import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.OrderBy;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "review",
@@ -59,6 +64,13 @@ public class Review {
 
     @Column(name = "approved", nullable = false)
     private boolean approved;
+
+    @OneToMany(
+        mappedBy = "review",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true)
+    @OrderBy("createdAt ASC")
+    private List<ReviewImage> images = new ArrayList<>();
 
     public Review() {
     }
@@ -146,5 +158,12 @@ public class Review {
     }
     public void setApproved(boolean approved) {
         this.approved = approved;
+    }
+
+    public List<ReviewImage> getImages() {
+        return images;
+    }
+    public void setImages(List<ReviewImage> images) {
+        this.images = images;
     }
 }
