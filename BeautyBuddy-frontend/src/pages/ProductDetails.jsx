@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { FaSearch } from 'react-icons/fa';
 
 import AuthModal from "../components/AuthModal";
-import { addToWishlist } from "../api/wishlistApi";
+import { addToWishlist, getWishlist } from "../api/wishlistApi";
 
 import './ProductDetails.css';
 import { getCurrentUser } from "../api/authApi";
@@ -17,6 +17,7 @@ export default function ProductDetails() {
   const [ingredientsOpen, setIngredientsOpen] = useState(false);
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [wishlistItems, setWishlistItems] = useState([]);
 
   const [showLoginModal, setShowLoginModal] = useState(false);
 
@@ -27,6 +28,23 @@ export default function ProductDetails() {
       .then(() => setIsLoggedIn(true))
       .catch(() => setIsLoggedIn(false));
   }, []);
+
+    const loadWishlist = async () => {
+        try {
+            const items = await getWishlist();
+            setWishlistItems(items);
+        } catch {
+            setWishlistItems([]);
+        }
+    };
+
+    useEffect(() => {
+        if (isLoggedIn) {
+            loadWishlist();
+        } else {
+            setWishlistItems([]);
+        }
+    }, [isLoggedIn]);
 
   useEffect(() => {
     fetch(`http://localhost:8080/api/products/${productId}`)
@@ -49,11 +67,20 @@ export default function ProductDetails() {
     }
     const success = await addToWishlist(data.id, selectedShade?.shadeName);
     if (success) {
+                await loadWishlist();
         alert("Added to wishlist!");
     } else {
         alert("Failed to add to wishlist.");
     }
   };
+
+    const isInWishlist = Boolean(
+        data && wishlistItems.some((item) => {
+            if (item.productId !== data.id) return false;
+            const shadeName = selectedShade?.shadeName ?? null;
+            return (item.shadeName ?? null) === shadeName;
+        })
+    );
 
     const handleAddToRoutine = async () => {
         if (!isLoggedIn) {
@@ -73,6 +100,7 @@ export default function ProductDetails() {
                     onClose={() => setShowLoginModal(false)}
                     onLoginSuccess={() => {
                         setIsLoggedIn(true);
+                        loadWishlist();
                         setShowLoginModal(false);
                     }}
                 />
@@ -122,8 +150,10 @@ export default function ProductDetails() {
 
                     <div className="product-actions">
                         <div className="action-icon" onClick={handleAddToWishlist}>
-                            <span className="icon">♥</span>
-                            <span className="tooltip">Add to Wishlist</span>
+                            <span className={`icon ${isInWishlist ? "icon--active" : ""}`}>♥</span>
+                            <span className="tooltip">
+                              {isInWishlist ? "In Wishlist" : "Add to Wishlist"}
+                            </span>
                         </div>
 
                         <div className="action-icon" onClick={handleAddToRoutine}>

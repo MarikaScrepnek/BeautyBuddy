@@ -77,6 +77,15 @@
   transition: transform 0.2s ease;
 }
 
+.icon {
+  color: #444;
+  transition: color 0.2s ease;
+}
+
+.icon--active {
+  color: rgb(231, 155, 219);
+}
+
 .action-icon:hover {
   transform: scale(1.2); /* small pop on hover */
 }
