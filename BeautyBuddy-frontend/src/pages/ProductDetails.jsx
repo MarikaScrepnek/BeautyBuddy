@@ -15,7 +15,10 @@ export default function ProductDetails() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedShade, setSelectedShade] = useState(null);
+
   const [ingredientsOpen, setIngredientsOpen] = useState(false);
+  const [reviewsOpen, setReviewsOpen] = useState(true);
+  const [questionsOpen, setQuestionsOpen] = useState(true);
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [wishlistItems, setWishlistItems] = useState([]);
@@ -235,16 +238,8 @@ export default function ProductDetails() {
                     </>
                 )}
             </section>
-                
 
-            {/* Reviews / Questions */}
-            <section className="reviews-and-questions-section">
-                <section className="reviews-and-questions-header-section">
-                        <span className="reviews-and-questions-header">Reviews</span>
-                        <span className="reviews-and-questions-header">Q&A</span>
-                </section>
-
-                <div className="reviews-search-container">
+            <div className="reviews-search-container">
                     <input
                         type="text"
                         className="reviews-search-bar"
@@ -259,7 +254,45 @@ export default function ProductDetails() {
                         <FaSearch />
                     </button>
                 </div>
+                
+
+            {/* Reviews / Questions */}
+            <section className="questions-section">
+                <h2 className="questions-dropdown-header">
+                    Questions{" "}
+                    <span
+                        className="questions-toggle"
+                        onClick={() => setQuestionsOpen(!questionsOpen)}
+                    >
+                        {questionsOpen ? "▲" : "▼"}
+                    </span>
+                </h2>
+                {questionsOpen && (
+                    <div className="questions-content">
+                        {/* Questions content goes here */}
+                        <p>No questions available.</p>
+                    </div>
+                )}
             </section>
+
+            <section className="reviews-section">
+                <h2 className="reviews-dropdown-header">
+                    Reviews{" "}
+                    <span
+                        className="reviews-toggle"
+                        onClick={() => setReviewsOpen(!reviewsOpen)}
+                    >
+                        {reviewsOpen ? "▲" : "▼"}
+                    </span>
+                </h2>
+                {reviewsOpen && (
+                    <div className="reviews-content">
+                        {/* Reviews content goes here */}
+                        <p>No reviews available.</p>
+                    </div>
+                )}
+            </section>
+
             {toast && (
                 <Toast
                     message={toast.message}
