@@ -353,3 +353,47 @@
 .reviews-toggle:active {
   transform: scale(0.92);
 }
+
+.questions-empty-state {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 0.75rem;
+}
+
+.ask-question-icon-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+
+  background: rgba(231, 155, 219, 0.12);
+  color: rgb(231, 155, 219);
+
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ask-question-icon-button:hover {
+  background: rgb(231, 155, 219);
+  color: white;
+  transform: scale(1.05);
+}
+
+.ask-question-icon-button:active {
+  transform: scale(0.95);
+}
+
+.ask-question-icon-button svg {
+  font-size: 1.2rem;
+}
+
+.no-questions {
+  margin-top: 0.75rem;
+  font-size: 0.9rem;
+  color: #777;
+}

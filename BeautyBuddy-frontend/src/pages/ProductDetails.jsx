@@ -9,6 +9,8 @@ import './ProductDetails.css';
 import { getCurrentUser } from "../api/authApi";
 import Toast from "../components/Toast";
 
+import { RiQuestionnaireLine } from "react-icons/ri";
+
 export default function ProductDetails() {
   const { productId } = useParams();
 
@@ -267,12 +269,24 @@ export default function ProductDetails() {
                         {questionsOpen ? "▲" : "▼"}
                     </span>
                 </h2>
-                {questionsOpen && (
-                    <div className="questions-content">
-                        {/* Questions content goes here */}
-                        <p>No questions available.</p>
-                    </div>
-                )}
+                    {questionsOpen && (
+                        <div className="questions-content">
+                        <div className="questions-empty-state">
+                            <p>Have a question about this product?</p>
+
+                            <button
+                            className="ask-question-icon-button"
+                            aria-label="Ask a question"
+                            >
+                            <RiQuestionnaireLine />
+                            </button>
+                        </div>
+
+                        <p className="no-questions">
+                            No questions have been asked yet.
+                        </p>
+                        </div>
+                    )}
             </section>
 
             <section className="reviews-section">
@@ -288,7 +302,7 @@ export default function ProductDetails() {
                 {reviewsOpen && (
                     <div className="reviews-content">
                         {/* Reviews content goes here */}
-                        <p>No reviews available.</p>
+                        <p>No reviews have been submitted about this product yet.</p>
                     </div>
                 )}
             </section>
