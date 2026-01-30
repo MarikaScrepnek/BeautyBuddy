@@ -259,7 +259,7 @@ export default function ProductDetails() {
             {/* Reviews / Questions */}
             <section className="questions-section">
                 <h2 className="questions-dropdown-header">
-                    Questions{" "}
+                    Q&A{" "}
                     <span
                         className="questions-toggle"
                         onClick={() => setQuestionsOpen(!questionsOpen)}
