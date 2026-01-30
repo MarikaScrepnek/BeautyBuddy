@@ -305,3 +305,51 @@
 .reviews-search-button:hover {
   color: #444;
 }
+
+.questions-section h2 {
+  font-size: 1.2rem;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.questions-section {
+  margin-top: 1rem;
+}
+
+.questions-dropdown-header {
+  cursor: default; /* normal text cursor */
+}
+
+.questions-toggle {
+  display: inline-block;          /* required */
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.08s ease;
+  transform-origin: center;
+}
+
+.questions-toggle:active {
+  transform: scale(0.92);
+}
+
+.reviews-section h2 {
+  font-size: 1.2rem;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.reviews-dropdown-header {
+  cursor: default; /* normal text cursor */
+}
+
+.reviews-toggle {
+  display: inline-block;          /* required */
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.08s ease;
+  transform-origin: center;
+}
+
+.reviews-toggle:active {
+  transform: scale(0.92);
+}
