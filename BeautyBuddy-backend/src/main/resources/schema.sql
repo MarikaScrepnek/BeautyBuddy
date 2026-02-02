@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS brand (
 CREATE TABLE IF NOT EXISTS category (
     category_id SERIAL PRIMARY KEY,
     name TEXT UNIQUE NOT NULL,
-    parent_category_id INT
+    parent_category_id INT REFERENCES category(category_id)
 );
 
 CREATE TABLE IF NOT EXISTS product (
@@ -58,10 +58,11 @@ CREATE TABLE IF NOT EXISTS product_shade (
 CREATE TABLE IF NOT EXISTS users (
     user_id SERIAL PRIMARY KEY,
     username TEXT UNIQUE NOT NULL,
-    email TEXT UNIQUE NOT NULL,
+    email TEXT NOT NULL,
     password_hash TEXT NOT NULL,
     date_joined TIMESTAMP DEFAULT NOW()
 );
+CREATE UNIQUE INDEX IF NOT EXISTS idx_users_lower_email ON users ((lower(email)));
 
 CREATE TABLE IF NOT EXISTS wishlist (
     wishlist_id SERIAL PRIMARY KEY,
@@ -178,6 +179,66 @@ CREATE TABLE IF NOT EXISTS answer_report (
     reason TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT NOW(),
     UNIQUE (answer_id, user_id)
+);
+
+CREATE TABLE IF NOT EXISTS discussion (
+    discussion_id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES users(user_id) ON DELETE SET NULL,
+    title TEXT NOT NULL,
+    content TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW(),
+    deleted_at TIMESTAMP NULL,
+    reported_count INT DEFAULT 0,
+    approved BOOLEAN DEFAULT TRUE
+);
+
+CREATE TABLE IF NOT EXISTS discussion_answer (
+    discussion_answer_id SERIAL PRIMARY KEY,
+    discussion_id INT REFERENCES discussion(discussion_id) ON DELETE CASCADE,
+    user_id INT REFERENCES users(user_id) ON DELETE SET NULL,
+    parent_discussion_answer_id INT REFERENCES discussion_answer(discussion_answer_id) ON DELETE CASCADE,
+    content TEXT NOT NULL,
+    helpful_count INT DEFAULT 0,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW(),
+    deleted_at TIMESTAMP NULL,
+    reported_count INT DEFAULT 0,
+    approved BOOLEAN DEFAULT TRUE
+);
+
+CREATE TABLE IF NOT EXISTS discussion_answer_helpful_vote (
+    discussion_answer_helpful_vote_id SERIAL PRIMARY KEY,
+    discussion_answer_id INT REFERENCES discussion_answer(discussion_answer_id) ON DELETE CASCADE,
+    user_id INT REFERENCES users(user_id) ON DELETE SET NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+    UNIQUE (discussion_answer_id, user_id)
+);
+
+CREATE TABLE IF NOT EXISTS discussion_report (
+    discussion_report_id SERIAL PRIMARY KEY,
+    discussion_id INT REFERENCES discussion(discussion_id) ON DELETE CASCADE,
+    user_id INT REFERENCES users(user_id) ON DELETE SET NULL,
+    reason TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+    UNIQUE (discussion_id, user_id)
+);
+
+CREATE TABLE IF NOT EXISTS discussion_answer_report (
+    discussion_answer_report_id SERIAL PRIMARY KEY,
+    discussion_answer_id INT REFERENCES discussion_answer(discussion_answer_id) ON DELETE CASCADE,
+    user_id INT REFERENCES users(user_id) ON DELETE SET NULL,
+    reason TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+    UNIQUE (discussion_answer_id, user_id)
+);
+
+CREATE TABLE IF NOT EXISTS user_discussion_pin (
+  user_discussion_pin_id SERIAL PRIMARY KEY,
+  discussion_id INT REFERENCES discussion(discussion_id) ON DELETE CASCADE,
+  user_id INT REFERENCES users(user_id) ON DELETE CASCADE,
+  pinned_at TIMESTAMP DEFAULT NOW(),
+  UNIQUE (discussion_id, user_id)
 );
 
 CREATE EXTENSION IF NOT EXISTS unaccent;
