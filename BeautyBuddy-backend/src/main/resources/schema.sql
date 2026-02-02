@@ -253,7 +253,7 @@ CREATE TABLE IF NOT EXISTS user_follow (
     CHECK (follower_id <> following_id)
 );
 
-CREATE TABLE notification (
+CREATE TABLE IF NOT EXISTS notifications (
   notification_id SERIAL PRIMARY KEY,
   recipient_id INT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
   actor_id INT NULL REFERENCES users(user_id),
@@ -264,7 +264,7 @@ CREATE TABLE notification (
   created_at TIMESTAMP DEFAULT NOW()
 );
 
-CREATE TABLE user_notification_pref (
+CREATE TABLE IF NOT EXISTS user_notification_pref (
   user_id INT PRIMARY KEY REFERENCES users(user_id) ON DELETE CASCADE,
   pref JSONB DEFAULT '{}'::jsonb
 );
