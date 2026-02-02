@@ -60,7 +60,9 @@ CREATE TABLE IF NOT EXISTS users (
     username TEXT UNIQUE NOT NULL,
     email TEXT NOT NULL,
     password_hash TEXT NOT NULL,
-    date_joined TIMESTAMP DEFAULT NOW()
+    date_joined TIMESTAMP DEFAULT NOW(),
+    followers_count INT DEFAULT 0,
+    following_count INT DEFAULT 0
 );
 CREATE UNIQUE INDEX IF NOT EXISTS idx_users_lower_email ON users ((lower(email)));
 
@@ -239,6 +241,15 @@ CREATE TABLE IF NOT EXISTS user_discussion_pin (
   user_id INT REFERENCES users(user_id) ON DELETE CASCADE,
   pinned_at TIMESTAMP DEFAULT NOW(),
   UNIQUE (discussion_id, user_id)
+);
+
+CREATE TABLE IF NOT EXISTS user_follow (
+    user_follow_id SERIAL PRIMARY KEY,
+    follower_id INT REFERENCES users(user_id) ON DELETE CASCADE,
+    following_id INT REFERENCES users(user_id) ON DELETE CASCADE,
+    followed_at TIMESTAMP DEFAULT NOW(),
+    UNIQUE (follower_id, following_id),
+    CHECK (follower_id <> following_id)
 );
 
 CREATE EXTENSION IF NOT EXISTS unaccent;
