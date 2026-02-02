@@ -269,4 +269,14 @@ CREATE TABLE IF NOT EXISTS user_notification_pref (
   pref JSONB DEFAULT '{}'::jsonb
 );
 
+CREATE TABLE IF NOT EXISTS public_community_post (
+    public_community_post_id SERIAL PRIMARY KEY,
+    title TEXT NOT NULL,
+    content TEXT NOT NULL,
+    media JSONB,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW(),
+    deleted_at TIMESTAMP NULL
+);
+
 CREATE EXTENSION IF NOT EXISTS unaccent;
