@@ -62,7 +62,8 @@ CREATE TABLE IF NOT EXISTS users (
     password_hash TEXT NOT NULL,
     date_joined TIMESTAMP DEFAULT NOW(),
     followers_count INT DEFAULT 0,
-    following_count INT DEFAULT 0
+    following_count INT DEFAULT 0,
+    unread_notifications_count INT DEFAULT 0
 );
 CREATE UNIQUE INDEX IF NOT EXISTS idx_users_lower_email ON users ((lower(email)));
 
@@ -250,6 +251,22 @@ CREATE TABLE IF NOT EXISTS user_follow (
     followed_at TIMESTAMP DEFAULT NOW(),
     UNIQUE (follower_id, following_id),
     CHECK (follower_id <> following_id)
+);
+
+CREATE TABLE notification (
+  notification_id SERIAL PRIMARY KEY,
+  recipient_id INT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+  actor_id INT NULL REFERENCES users(user_id),
+  type TEXT NOT NULL,            -- e.g. 'review.created','wishlist.added','product.question'
+  object_type TEXT,              -- e.g. 'product','review','question'
+  object_id INT,                 -- id of the object
+  is_read BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE user_notification_pref (
+  user_id INT PRIMARY KEY REFERENCES users(user_id) ON DELETE CASCADE,
+  pref JSONB DEFAULT '{}'::jsonb
 );
 
 CREATE EXTENSION IF NOT EXISTS unaccent;
