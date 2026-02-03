@@ -1,4 +1,4 @@
-package com.beautybuddy.controller;
+package com.beautybuddy.wishlists;
 
 import java.util.List;
 
@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import com.beautybuddy.dto.AddToWishlistRequestDTO;
 import com.beautybuddy.dto.WishlistItemDTO;
 import com.beautybuddy.security.CustomUserDetails;
-import com.beautybuddy.wishlists.WishlistService;
 
 @RestController
 @RequestMapping("/api/wishlist")
