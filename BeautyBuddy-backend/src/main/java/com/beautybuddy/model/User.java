@@ -2,6 +2,8 @@ package com.beautybuddy.model;
 
 import java.time.LocalDateTime;
 
+import com.beautybuddy.wishlists.Wishlist;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

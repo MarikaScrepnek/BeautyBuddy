@@ -1,4 +1,4 @@
-package com.beautybuddy.service;
+package com.beautybuddy.wishlists;
 
 import com.beautybuddy.dto.AddToWishlistRequestDTO;
 import com.beautybuddy.dto.WishlistItemDTO;
@@ -6,11 +6,9 @@ import com.beautybuddy.repository.UserRepository;
 
 import com.beautybuddy.repository.ProductRepository;
 import com.beautybuddy.model.User;
-import com.beautybuddy.model.WishlistItem;
 import com.beautybuddy.model.Product;
 import com.beautybuddy.model.ProductShade;
 import com.beautybuddy.repository.ShadeRepository;
-import com.beautybuddy.model.Wishlist;
 import com.beautybuddy.repository.WishlistItemRepository;
 
 import java.util.ArrayList;

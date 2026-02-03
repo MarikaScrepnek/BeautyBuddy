@@ -5,8 +5,8 @@ import org.springframework.stereotype.Service;
 import java.sql.Timestamp;
 
 import com.beautybuddy.repository.UserRepository;
+import com.beautybuddy.wishlists.Wishlist;
 import com.beautybuddy.model.User;
-import com.beautybuddy.model.Wishlist;
 
 @Service
 public class AuthService {

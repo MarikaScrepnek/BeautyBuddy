@@ -1,4 +1,7 @@
-package com.beautybuddy.model;
+package com.beautybuddy.wishlists;
+
+import com.beautybuddy.model.Product;
+import com.beautybuddy.model.ProductShade;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

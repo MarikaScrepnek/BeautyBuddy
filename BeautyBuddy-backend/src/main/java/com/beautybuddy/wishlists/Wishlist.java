@@ -1,4 +1,4 @@
-package com.beautybuddy.model;
+package com.beautybuddy.wishlists;
 
 import jakarta.persistence.Table;
 import jakarta.persistence.Column;
@@ -12,6 +12,9 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.CascadeType;
 
 import java.util.Set;
+
+import com.beautybuddy.model.User;
+
 import java.sql.Timestamp;
 
 
