@@ -6,10 +6,10 @@ import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.beautybuddy.ingredients.MayContainIngredient;
+import com.beautybuddy.ingredients.ProductIngredient;
 import com.beautybuddy.model.Brand;
 import com.beautybuddy.model.Category;
-import com.beautybuddy.model.MayContainIngredient;
-import com.beautybuddy.model.ProductIngredient;
 
 @Entity
 public class Product {

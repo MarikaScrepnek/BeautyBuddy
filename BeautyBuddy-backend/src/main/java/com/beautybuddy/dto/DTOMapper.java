@@ -1,8 +1,14 @@
 package com.beautybuddy.dto;
 
+import com.beautybuddy.ingredients.Ingredient;
+import com.beautybuddy.ingredients.MayContainIngredient;
+import com.beautybuddy.ingredients.ProductIngredient;
 import com.beautybuddy.model.*;
+import com.beautybuddy.products.IngredientDTO;
+import com.beautybuddy.products.MayContainIngredientDTO;
 import com.beautybuddy.products.Product;
 import com.beautybuddy.products.ProductDTO;
+import com.beautybuddy.products.ProductIngredientDTO;
 import com.beautybuddy.products.ProductShade;
 import com.beautybuddy.products.ProductShadeDTO;
 

@@ -2,7 +2,6 @@ package com.beautybuddy.products;
 
 import java.util.List;
 
-import com.beautybuddy.dto.*;
 import com.beautybuddy.repository.ProductRepository;
 import com.beautybuddy.dto.DTOMapper;
 

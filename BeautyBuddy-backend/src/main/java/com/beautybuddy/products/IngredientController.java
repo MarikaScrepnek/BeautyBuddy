@@ -1,9 +1,6 @@
-package com.beautybuddy.controller;
+package com.beautybuddy.products;
 
-import com.beautybuddy.service.ProductIngredientService;
 import com.beautybuddy.dto.DTOMapper;
-import com.beautybuddy.dto.IngredientDTO;
-import com.beautybuddy.service.MayContainIngredientService;
 import com.beautybuddy.repository.IngredientRepository;
 
 import org.springframework.web.bind.annotation.GetMapping;

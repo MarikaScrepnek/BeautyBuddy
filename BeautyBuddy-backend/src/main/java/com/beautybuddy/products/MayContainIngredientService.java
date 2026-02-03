@@ -1,8 +1,7 @@
-package com.beautybuddy.service;
+package com.beautybuddy.products;
 
-import com.beautybuddy.model.Ingredient;
-import com.beautybuddy.model.MayContainIngredient;
-import com.beautybuddy.products.Product;
+import com.beautybuddy.ingredients.Ingredient;
+import com.beautybuddy.ingredients.MayContainIngredient;
 import com.beautybuddy.repository.IngredientRepository;
 import com.beautybuddy.repository.ProductRepository;
 import com.beautybuddy.repository.MayContainIngredientRepository;

@@ -1,4 +1,4 @@
-package com.beautybuddy.dto;
+package com.beautybuddy.products;
 
 public record IngredientDTO (String name) {
     

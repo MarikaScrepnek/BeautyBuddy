@@ -1,18 +1,18 @@
-package com.beautybuddy.model;
+package com.beautybuddy.ingredients;
 
 import com.beautybuddy.products.Product;
 
 import jakarta.persistence.*;
 
 @Entity
-@Table (name = "may_contain_ingredient",
+@Table (name = "product_ingredient",
     uniqueConstraints = @UniqueConstraint(columnNames = {"product_id", "ingredient_id"})
 )
-public class MayContainIngredient {
+public class ProductIngredient {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int may_contain_ingredient_id;
+    private int product_ingredient_id;
 
     @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)
@@ -22,18 +22,20 @@ public class MayContainIngredient {
     @JoinColumn(name = "ingredient_id", nullable = false)
     private Ingredient ingredient;
 
-    public MayContainIngredient() {}
+    @Column(name = "position", nullable = false)
+    private int position;
 
-    public int getMay_contain_ingredient_id() {
-        return may_contain_ingredient_id;
-    }
-    public void setMay_contain_ingredient_id(int may_contain_ingredient_id) {
-        this.may_contain_ingredient_id = may_contain_ingredient_id;
-    }
+    public ProductIngredient() {}
+
+    public int getProduct_ingredient_id() { return product_ingredient_id; }
+    public void setProduct_ingredient_id(int product_ingredient_id) { this.product_ingredient_id = product_ingredient_id; }
 
     public Product getProduct() { return product; }
     public void setProduct(Product product) { this.product = product; }
 
     public Ingredient getIngredient() { return ingredient; }
     public void setIngredient(Ingredient ingredient) { this.ingredient = ingredient; }
+
+    public int getPosition() { return position; }
+    public void setPosition(int position) { this.position = position; }
 }
