@@ -202,4 +202,13 @@ CREATE TABLE IF NOT EXISTS public_community_post (
     deleted_at TIMESTAMP NULL
 );
 
+CREATE TABLE IF NOT EXISTS upvote (
+    upvote_id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES users(user_id) ON DELETE CASCADE,
+    target_type TEXT NOT NULL,  -- e.g. 'discussion', 'discussion_answer', 'question', 'answer', 'review'
+    target_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+    UNIQUE (user_id, target_type, target_id)
+);
+
 CREATE EXTENSION IF NOT EXISTS unaccent;
