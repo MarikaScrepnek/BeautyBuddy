@@ -1,4 +1,4 @@
-package com.beautybuddy.dto;
+package com.beautybuddy.reviews;
 
 import java.time.LocalDateTime;
 

@@ -1,8 +1,9 @@
-package com.beautybuddy.dto;
+package com.beautybuddy.reviews;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.beautybuddy.dto.UserDTO;
 import com.beautybuddy.products.ProductDTO;
 import com.beautybuddy.products.ProductShadeDTO;
 
