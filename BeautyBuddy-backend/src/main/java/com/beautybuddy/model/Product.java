@@ -1,6 +1,8 @@
 package com.beautybuddy.model;
 
 import jakarta.persistence.*;
+
+import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -23,7 +25,7 @@ public class Product {
     private Category category;
     
     @Column
-    private Float price;
+    private BigDecimal price;
 
     @Column
     private String image_link;
@@ -32,7 +34,7 @@ public class Product {
     private String product_link;
 
     @Column
-    private Float rating;
+    private BigDecimal rating;
 
     @Column(name = "raw_ingredients", columnDefinition = "TEXT")
     private String rawIngredients;
@@ -75,8 +77,8 @@ public class Product {
     public Category getCategory() { return category; }
     public void setCategory(Category category) { this.category = category; }
 
-    public Float getPrice() { return price; }
-    public void setPrice(float price) { this.price = price; }
+    public BigDecimal getPrice() { return price; }
+    public void setPrice(BigDecimal price) { this.price = price; }
 
     public String getImage_link() { return image_link; }
     public void setImage_link(String image_link) { this.image_link = image_link; }
@@ -84,8 +86,8 @@ public class Product {
     public String getProduct_link() { return product_link; }
     public void setProduct_link(String product_link) { this.product_link = product_link; }
 
-    public Float getRating() { return rating; }
-    public void setRating(float rating) { this.rating = rating; }
+    public BigDecimal getRating() { return rating; }
+    public void setRating(BigDecimal rating) { this.rating = rating; }
 
     public String getRawIngredients() { return rawIngredients; }
     public void setRawIngredients(String rawIngredients) { this.rawIngredients = rawIngredients; }

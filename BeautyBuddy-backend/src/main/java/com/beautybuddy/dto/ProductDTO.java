@@ -1,5 +1,6 @@
 package com.beautybuddy.dto;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public record ProductDTO (
@@ -9,8 +10,8 @@ public record ProductDTO (
     CategoryDTO category,
     String image_link,
     String product_link,
-    Float price,
-    Float rating,
+    BigDecimal price,
+    BigDecimal rating,
     List<IngredientDTO> ingredients,
     List<IngredientDTO> mayContainIngredients,
     List<ProductShadeDTO> shades
