@@ -1,8 +1,8 @@
 package com.beautybuddy.controller;
 
+import com.beautybuddy.common.DTOMapper;
 import com.beautybuddy.dto.CategoryDTO;
 import com.beautybuddy.repository.CategoryRepository;
-import com.beautybuddy.dto.DTOMapper;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

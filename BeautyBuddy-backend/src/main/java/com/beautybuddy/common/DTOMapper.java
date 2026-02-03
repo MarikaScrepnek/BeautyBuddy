@@ -1,5 +1,7 @@
-package com.beautybuddy.dto;
+package com.beautybuddy.common;
 
+import com.beautybuddy.dto.BrandDTO;
+import com.beautybuddy.dto.CategoryDTO;
 import com.beautybuddy.ingredients.Ingredient;
 import com.beautybuddy.ingredients.MayContainIngredient;
 import com.beautybuddy.ingredients.ProductIngredient;

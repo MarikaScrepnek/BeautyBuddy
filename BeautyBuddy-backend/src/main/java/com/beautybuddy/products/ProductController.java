@@ -2,8 +2,8 @@ package com.beautybuddy.products;
 
 import java.util.List;
 
+import com.beautybuddy.common.DTOMapper;
 import com.beautybuddy.repository.ProductRepository;
-import com.beautybuddy.dto.DTOMapper;
 
 import org.springframework.web.bind.annotation.*;
 
