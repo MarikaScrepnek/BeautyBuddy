@@ -106,14 +106,6 @@ CREATE TABLE IF NOT EXISTS review_image (
     uploaded_at TIMESTAMP DEFAULT NOW()
 );
 
-CREATE TABLE IF NOT EXISTS review_helpful_vote (
-    review_helpful_vote_id SERIAL PRIMARY KEY,
-    review_id INT REFERENCES review(review_id) ON DELETE CASCADE,
-    user_id INT REFERENCES users(user_id) ON DELETE SET NULL,
-    created_at TIMESTAMP DEFAULT NOW(),
-    UNIQUE (review_id, user_id)
-);
-
 CREATE TABLE IF NOT EXISTS question (
     question_id SERIAL PRIMARY KEY,
     user_id INT REFERENCES users(user_id) ON DELETE SET NULL,
@@ -128,14 +120,6 @@ CREATE TABLE IF NOT EXISTS question (
     approved BOOLEAN DEFAULT TRUE
 );
 
-CREATE TABLE IF NOT EXISTS question_upvote (
-    question_upvote_id SERIAL PRIMARY KEY,
-    question_id INT REFERENCES question(question_id) ON DELETE CASCADE,
-    user_id INT REFERENCES users(user_id) ON DELETE SET NULL,
-    created_at TIMESTAMP DEFAULT NOW(),
-    UNIQUE (question_id, user_id)
-);
-
 CREATE TABLE IF NOT EXISTS answer (
     answer_id SERIAL PRIMARY KEY,
     question_id INT REFERENCES question(question_id) ON DELETE CASCADE,
@@ -147,41 +131,6 @@ CREATE TABLE IF NOT EXISTS answer (
     deleted_at TIMESTAMP NULL,
     reported_count INT DEFAULT 0,
     approved BOOLEAN DEFAULT TRUE
-);
-
-CREATE TABLE IF NOT EXISTS answer_helpful_vote (
-    answer_helpful_vote_id SERIAL PRIMARY KEY,
-    answer_id INT REFERENCES answer(answer_id) ON DELETE CASCADE,
-    user_id INT REFERENCES users(user_id) ON DELETE SET NULL,
-    created_at TIMESTAMP DEFAULT NOW(),
-    UNIQUE (answer_id, user_id)
-);
-
-CREATE TABLE IF NOT EXISTS review_report (
-    review_report_id SERIAL PRIMARY KEY,
-    review_id INT REFERENCES review(review_id) ON DELETE CASCADE,
-    user_id INT REFERENCES users(user_id) ON DELETE SET NULL,
-    reason TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT NOW(),
-    UNIQUE (review_id, user_id)
-);
-
-CREATE TABLE IF NOT EXISTS question_report (
-    question_report_id SERIAL PRIMARY KEY,
-    question_id INT REFERENCES question(question_id) ON DELETE CASCADE,
-    user_id INT REFERENCES users(user_id) ON DELETE SET NULL,
-    reason TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT NOW(),
-    UNIQUE (question_id, user_id)
-);
-
-CREATE TABLE IF NOT EXISTS answer_report (
-    answer_report_id SERIAL PRIMARY KEY,
-    answer_id INT REFERENCES answer(answer_id) ON DELETE CASCADE,
-    user_id INT REFERENCES users(user_id) ON DELETE SET NULL,
-    reason TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT NOW(),
-    UNIQUE (answer_id, user_id)
 );
 
 CREATE TABLE IF NOT EXISTS discussion (
@@ -208,32 +157,6 @@ CREATE TABLE IF NOT EXISTS discussion_answer (
     deleted_at TIMESTAMP NULL,
     reported_count INT DEFAULT 0,
     approved BOOLEAN DEFAULT TRUE
-);
-
-CREATE TABLE IF NOT EXISTS discussion_answer_helpful_vote (
-    discussion_answer_helpful_vote_id SERIAL PRIMARY KEY,
-    discussion_answer_id INT REFERENCES discussion_answer(discussion_answer_id) ON DELETE CASCADE,
-    user_id INT REFERENCES users(user_id) ON DELETE SET NULL,
-    created_at TIMESTAMP DEFAULT NOW(),
-    UNIQUE (discussion_answer_id, user_id)
-);
-
-CREATE TABLE IF NOT EXISTS discussion_report (
-    discussion_report_id SERIAL PRIMARY KEY,
-    discussion_id INT REFERENCES discussion(discussion_id) ON DELETE CASCADE,
-    user_id INT REFERENCES users(user_id) ON DELETE SET NULL,
-    reason TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT NOW(),
-    UNIQUE (discussion_id, user_id)
-);
-
-CREATE TABLE IF NOT EXISTS discussion_answer_report (
-    discussion_answer_report_id SERIAL PRIMARY KEY,
-    discussion_answer_id INT REFERENCES discussion_answer(discussion_answer_id) ON DELETE CASCADE,
-    user_id INT REFERENCES users(user_id) ON DELETE SET NULL,
-    reason TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT NOW(),
-    UNIQUE (discussion_answer_id, user_id)
 );
 
 CREATE TABLE IF NOT EXISTS user_discussion_pin (
