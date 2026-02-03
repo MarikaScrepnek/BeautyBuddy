@@ -10,8 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import com.beautybuddy.dto.AddToWishlistRequestDTO;
-import com.beautybuddy.dto.WishlistItemDTO;
 import com.beautybuddy.security.CustomUserDetails;
 
 @RestController

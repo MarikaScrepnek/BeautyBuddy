@@ -1,4 +1,4 @@
-package com.beautybuddy.dto;
+package com.beautybuddy.wishlists;
 
 public record WishlistItemDTO (
     int id,
