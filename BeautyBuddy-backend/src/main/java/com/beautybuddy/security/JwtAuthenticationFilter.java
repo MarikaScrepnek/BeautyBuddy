@@ -7,7 +7,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.beautybuddy.repository.UserRepository;
-import com.beautybuddy.util.JwtUtil;
 import com.beautybuddy.model.User;
 
 import jakarta.servlet.ServletException;

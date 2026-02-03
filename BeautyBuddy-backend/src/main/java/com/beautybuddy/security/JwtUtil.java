@@ -1,4 +1,4 @@
-package com.beautybuddy.util;
+package com.beautybuddy.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

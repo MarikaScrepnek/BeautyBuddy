@@ -19,7 +19,7 @@ import java.util.Map;
 import com.beautybuddy.service.AuthService;
 import com.beautybuddy.dto.UserDTO;
 import com.beautybuddy.security.CustomUserDetails;
-import com.beautybuddy.util.JwtUtil;
+import com.beautybuddy.security.JwtUtil;
 
 
 @RestController
