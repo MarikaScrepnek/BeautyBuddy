@@ -1,4 +1,4 @@
-package com.beautybuddy.products;
+package com.beautybuddy.ingredients;
 
 import com.beautybuddy.common.DTOMapper;
 import com.beautybuddy.repository.IngredientRepository;

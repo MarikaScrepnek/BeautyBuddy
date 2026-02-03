@@ -3,14 +3,14 @@ package com.beautybuddy.common;
 import com.beautybuddy.dto.BrandDTO;
 import com.beautybuddy.dto.CategoryDTO;
 import com.beautybuddy.ingredients.Ingredient;
+import com.beautybuddy.ingredients.IngredientDTO;
 import com.beautybuddy.ingredients.MayContainIngredient;
+import com.beautybuddy.ingredients.MayContainIngredientDTO;
 import com.beautybuddy.ingredients.ProductIngredient;
+import com.beautybuddy.ingredients.ProductIngredientDTO;
 import com.beautybuddy.model.*;
-import com.beautybuddy.products.IngredientDTO;
-import com.beautybuddy.products.MayContainIngredientDTO;
 import com.beautybuddy.products.Product;
 import com.beautybuddy.products.ProductDTO;
-import com.beautybuddy.products.ProductIngredientDTO;
 import com.beautybuddy.products.ProductShade;
 import com.beautybuddy.products.ProductShadeDTO;
 

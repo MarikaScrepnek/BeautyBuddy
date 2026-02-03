@@ -1,7 +1,6 @@
-package com.beautybuddy.products;
+package com.beautybuddy.ingredients;
 
-import com.beautybuddy.ingredients.Ingredient;
-import com.beautybuddy.ingredients.ProductIngredient;
+import com.beautybuddy.products.Product;
 import com.beautybuddy.repository.IngredientRepository;
 import com.beautybuddy.repository.ProductIngredientRepository;
 import com.beautybuddy.repository.ProductRepository;

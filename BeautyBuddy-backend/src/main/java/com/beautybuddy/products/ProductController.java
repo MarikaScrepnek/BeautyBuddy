@@ -3,6 +3,8 @@ package com.beautybuddy.products;
 import java.util.List;
 
 import com.beautybuddy.common.DTOMapper;
+import com.beautybuddy.ingredients.MayContainIngredientDTO;
+import com.beautybuddy.ingredients.ProductIngredientDTO;
 import com.beautybuddy.repository.ProductRepository;
 
 import org.springframework.web.bind.annotation.*;
