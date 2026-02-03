@@ -11,16 +11,16 @@ public class Brand {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int brand_id;
+    private int brandId;
 
     @Column(unique = true, nullable = false)
     private String name;
 
     public Brand() {}
 
-    public int getBrand_id() { return brand_id; }
-    public void setBrand_id(int brand_id) { this.brand_id = brand_id; }
-
+    public int getBrandId() { return brandId; }
+    public void setBrandId(int brandId) { this.brandId = brandId; }
+    
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
 }
