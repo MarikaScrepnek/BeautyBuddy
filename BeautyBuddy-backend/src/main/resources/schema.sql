@@ -202,10 +202,12 @@ CREATE TABLE IF NOT EXISTS public_community_post (
     deleted_at TIMESTAMP NULL
 );
 
+CREATE TYPE target_type_enum AS ENUM ('review', 'question', 'answer', 'discussion', 'discussion_answer');
+
 CREATE TABLE IF NOT EXISTS upvote (
     upvote_id SERIAL PRIMARY KEY,
     user_id INT REFERENCES users(user_id) ON DELETE CASCADE,
-    target_type TEXT NOT NULL,  -- e.g. 'discussion', 'discussion_answer', 'question', 'answer', 'review'
+    target_type target_type_enum NOT NULL,
     target_id INT NOT NULL,
     created_at TIMESTAMP DEFAULT NOW(),
     UNIQUE (user_id, target_type, target_id)
@@ -214,10 +216,11 @@ CREATE TABLE IF NOT EXISTS upvote (
 CREATE TABLE IF NOT EXISTS report (
     report_id SERIAL PRIMARY KEY,
     user_id INT REFERENCES users(user_id) ON DELETE CASCADE,
-    target_type TEXT NOT NULL,  -- e.g. 'discussion', 'discussion_answer', 'question', 'answer', 'review'
+    target_type target_type_enum NOT NULL,
     target_id INT NOT NULL,
     reason TEXT,
     created_at TIMESTAMP DEFAULT NOW(),
+    resolved_at TIMESTAMP NULL,
     UNIQUE (user_id, target_type, target_id)
 );
 
