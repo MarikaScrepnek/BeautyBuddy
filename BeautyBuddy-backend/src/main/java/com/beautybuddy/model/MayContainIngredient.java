@@ -1,5 +1,7 @@
 package com.beautybuddy.model;
 
+import com.beautybuddy.products.Product;
+
 import jakarta.persistence.*;
 
 @Entity

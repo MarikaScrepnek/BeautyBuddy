@@ -1,10 +1,15 @@
-package com.beautybuddy.model;
+package com.beautybuddy.products;
 
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
+
+import com.beautybuddy.model.Brand;
+import com.beautybuddy.model.Category;
+import com.beautybuddy.model.MayContainIngredient;
+import com.beautybuddy.model.ProductIngredient;
 
 @Entity
 public class Product {

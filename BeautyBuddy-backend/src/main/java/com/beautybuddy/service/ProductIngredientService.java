@@ -1,8 +1,8 @@
 package com.beautybuddy.service;
 
 import com.beautybuddy.model.Ingredient;
-import com.beautybuddy.model.Product;
 import com.beautybuddy.model.ProductIngredient;
+import com.beautybuddy.products.Product;
 import com.beautybuddy.repository.IngredientRepository;
 import com.beautybuddy.repository.ProductIngredientRepository;
 import com.beautybuddy.repository.ProductRepository;

@@ -1,7 +1,7 @@
 package com.beautybuddy.repository;
 
-import com.beautybuddy.model.Product;
-import com.beautybuddy.model.ProductShade;
+import com.beautybuddy.products.Product;
+import com.beautybuddy.products.ProductShade;
 
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;

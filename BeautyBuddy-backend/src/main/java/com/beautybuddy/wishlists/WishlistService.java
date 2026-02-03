@@ -6,8 +6,8 @@ import com.beautybuddy.repository.UserRepository;
 
 import com.beautybuddy.repository.ProductRepository;
 import com.beautybuddy.model.User;
-import com.beautybuddy.model.Product;
-import com.beautybuddy.model.ProductShade;
+import com.beautybuddy.products.Product;
+import com.beautybuddy.products.ProductShade;
 import com.beautybuddy.repository.ShadeRepository;
 import com.beautybuddy.repository.WishlistItemRepository;
 

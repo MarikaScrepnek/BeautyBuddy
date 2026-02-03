@@ -2,7 +2,7 @@ package com.beautybuddy.service;
 
 import com.beautybuddy.model.Ingredient;
 import com.beautybuddy.model.MayContainIngredient;
-import com.beautybuddy.model.Product;
+import com.beautybuddy.products.Product;
 import com.beautybuddy.repository.IngredientRepository;
 import com.beautybuddy.repository.ProductRepository;
 import com.beautybuddy.repository.MayContainIngredientRepository;

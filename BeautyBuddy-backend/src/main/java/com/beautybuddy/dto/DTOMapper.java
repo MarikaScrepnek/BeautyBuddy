@@ -1,6 +1,10 @@
 package com.beautybuddy.dto;
 
 import com.beautybuddy.model.*;
+import com.beautybuddy.products.Product;
+import com.beautybuddy.products.ProductDTO;
+import com.beautybuddy.products.ProductShade;
+import com.beautybuddy.products.ProductShadeDTO;
 
 import java.util.Comparator;
 import java.util.List;

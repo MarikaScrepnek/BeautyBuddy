@@ -18,9 +18,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.beautybuddy.model.Product;
-import com.beautybuddy.model.ProductShade;
 import com.beautybuddy.model.User;
+import com.beautybuddy.products.Product;
+import com.beautybuddy.products.ProductShade;
 
 @Entity
 @Table(name = "review",
