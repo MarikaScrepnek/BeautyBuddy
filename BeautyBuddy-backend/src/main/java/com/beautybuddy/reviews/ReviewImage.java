@@ -1,4 +1,4 @@
-package com.beautybuddy.model;
+package com.beautybuddy.reviews;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

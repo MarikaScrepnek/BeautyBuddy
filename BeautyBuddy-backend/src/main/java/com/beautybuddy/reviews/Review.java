@@ -1,4 +1,4 @@
-package com.beautybuddy.model;
+package com.beautybuddy.reviews;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -16,6 +16,10 @@ import jakarta.persistence.OrderBy;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.beautybuddy.model.Product;
+import com.beautybuddy.model.ProductShade;
+import com.beautybuddy.model.User;
 
 @Entity
 @Table(name = "review",
