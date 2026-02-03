@@ -1,3 +1,7 @@
+CREATE EXTENSION unaccent;
+
+CREATE TYPE target_type_enum AS ENUM ('review', 'question', 'answer', 'discussion', 'discussion_answer');
+
 CREATE TABLE brand (
     brand_id SERIAL PRIMARY KEY,
     name TEXT UNIQUE NOT NULL
@@ -202,8 +206,6 @@ CREATE TABLE public_community_post (
     deleted_at TIMESTAMP NULL
 );
 
-CREATE TYPE target_type_enum AS ENUM ('review', 'question', 'answer', 'discussion', 'discussion_answer');
-
 CREATE TABLE upvote (
     upvote_id SERIAL PRIMARY KEY,
     user_id INT REFERENCES users(user_id) ON DELETE CASCADE,
@@ -223,5 +225,3 @@ CREATE TABLE report (
     resolved_at TIMESTAMP NULL,
     UNIQUE (user_id, target_type, target_id)
 );
-
-CREATE EXTENSION unaccent;
