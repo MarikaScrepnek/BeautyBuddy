@@ -211,4 +211,14 @@ CREATE TABLE IF NOT EXISTS upvote (
     UNIQUE (user_id, target_type, target_id)
 );
 
+CREATE TABLE IF NOT EXISTS report (
+    report_id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES users(user_id) ON DELETE CASCADE,
+    target_type TEXT NOT NULL,  -- e.g. 'discussion', 'discussion_answer', 'question', 'answer', 'review'
+    target_id INT NOT NULL,
+    reason TEXT,
+    created_at TIMESTAMP DEFAULT NOW(),
+    UNIQUE (user_id, target_type, target_id)
+);
+
 CREATE EXTENSION IF NOT EXISTS unaccent;
