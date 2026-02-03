@@ -13,6 +13,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.OrderBy;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +47,7 @@ public class Review {
     private ProductShade productShade;
 
     @Column(name = "rating", nullable = false)
-    private float rating;
+    private BigDecimal rating;
 
     @Column(name = "review_text", nullable = true)
     private String reviewText;
@@ -108,10 +109,10 @@ public class Review {
         this.productShade = productShade;
     }
 
-    public float getRating() {
+    public BigDecimal getRating() {
         return rating;
     }
-    public void setRating(float rating) {
+    public void setRating(BigDecimal rating) {
         this.rating = rating;
     }
 
