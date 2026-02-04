@@ -415,9 +415,8 @@ CREATE TABLE discussion_answer_report (
     UNIQUE (account_id, discussion_answer_id)
 );
 
---triggers for updated_at fields and other automatic updates
---other triggers?
 --constraints for data integrity
 --foreign key on delete behaviors review user product?
 
+--triggers for updating fields
 --indexes for performance optimization
