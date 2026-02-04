@@ -210,13 +210,39 @@ CREATE TABLE public_community_post (
     deleted_at TIMESTAMPTZ NULL
 );
 
-CREATE TABLE upvote (
-    upvote_id SERIAL PRIMARY KEY,
-    account_id INT REFERENCES account(account_id) ON DELETE CASCADE,
-    target_type target_type_enum NOT NULL,
-    target_id INT NOT NULL,
-    created_at TIMESTAMPTZ DEFAULT NOW(),
-    UNIQUE (account_id, target_type, target_id)
+CREATE TABLE review_upvote (
+  user_id INT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+  review_id INT NOT NULL REFERENCES review(review_id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  PRIMARY KEY (user_id, review_id)
+);
+
+CREATE TABLE question_upvote (
+  user_id INT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+  question_id INT NOT NULL REFERENCES question(question_id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  PRIMARY KEY (user_id, question_id)
+);
+
+CREATE TABLE answer_upvote (
+  user_id INT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+  answer_id INT NOT NULL REFERENCES answer(answer_id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  PRIMARY KEY (user_id, answer_id)
+);
+
+CREATE TABLE discussion_upvote (
+  user_id INT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+  discussion_id INT NOT NULL REFERENCES discussion(discussion_id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  PRIMARY KEY (user_id, discussion_id)
+);
+
+CREATE TABLE discussion_answer_upvote (
+  user_id INT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+  discussion_answer_id INT NOT NULL REFERENCES discussion_answer(discussion_answer_id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  PRIMARY KEY (user_id, discussion_answer_id)
 );
 
 CREATE TABLE report (
@@ -235,7 +261,8 @@ CREATE TABLE report (
 --constraints for data integrity
 --foreign key on delete behaviors review user product?
 
---name account user? and notifactions notification?
 --upvote, report, notifcation polymorphic or not?
 --handle reviews with shades and not shades
+
+
 --indexes for performance optimization
