@@ -90,6 +90,53 @@ CREATE TABLE wishlist_item (
     UNIQUE (wishlist_id, product_id, shade_id)
 );
 
+CREATE TYPE routine_category_enum AS ENUM ('skincare', 'makeup', 'haircare', 'bodycare', 'other');
+
+CREATE TABLE routine (
+    routine_id SERIAL PRIMARY KEY,
+    account_id INT REFERENCES account(account_id) NOT NULL ON DELETE CASCADE,
+    name TEXT NOT NULL,
+    notes TEXT,
+    category routine_category_enum NOT NULL DEFAULT 'other',
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+
+    UNIQUE (account_id, name)
+);
+
+CREATE TABLE routine_item (
+    routine_item_id BIGSERIAL PRIMARY KEY,
+    routine_id INT NOT NULL REFERENCES routine(routine_id) ON DELETE CASCADE,
+
+    product_id INT NOT NULL REFERENCES product(product_id) ON DELETE CASCADE,
+    shade_id INT REFERENCES product_shade(product_shade_id) ON DELETE SET NULL,
+
+    step_order INT NOT NULL,
+    notes TEXT,
+
+    valid_from TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    valid_to   TIMESTAMPTZ NULL, -- NULL = current version
+
+    created_by INT REFERENCES account(account_id) ON DELETE SET NULL,
+
+    CHECK (step_order >= 1),
+    CHECK (valid_to IS NULL OR valid_to > valid_from)
+);
+CREATE UNIQUE INDEX uniq_current_step_per_routine
+  ON routine_item (routine_id, step_order)
+  WHERE valid_to IS NULL;
+--When someone “removes” an item: you just set valid_to = now() (no special removed_at column needed)
+--When they “add” it again later: you insert a new row with a new valid_from
+
+CREATE TABLE routine_image (
+    routine_image_id SERIAL PRIMARY KEY,
+    routine_id INT REFERENCES routine(routine_id) NOT NULL ON DELETE CASCADE,
+    image_link TEXT NOT NULL,
+    uploaded_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+--add routine item schedules later
+
 CREATE TABLE review (
     review_id SERIAL PRIMARY KEY,
     account_id INT REFERENCES account(account_id) ON DELETE SET NULL,
