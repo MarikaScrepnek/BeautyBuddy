@@ -235,16 +235,61 @@ CREATE TABLE notification (
   notification_id SERIAL PRIMARY KEY,
   recipient_id INT NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
   actor_id INT NULL REFERENCES account(account_id) ON DELETE SET NULL,
-  type TEXT NOT NULL,            -- e.g. 'review.created','wishlist.added','product.question'
-  object_type TEXT,              -- e.g. 'product','review','question'
-  object_id INT,                 -- id of the object
-  is_read BOOLEAN DEFAULT FALSE,
-  created_at TIMESTAMPTZ DEFAULT NOW()
+  type TEXT NOT NULL,
+  is_read BOOLEAN NOT NULL DEFAULT FALSE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  payload JSONB NOT NULL DEFAULT '{}'::jsonb
+);
+
+CREATE TABLE product_question_notification (
+    notifcation_id INT PRIMARY KEY REFERENCES notification(notification_id) ON DELETE CASCADE,
+    product_id INT NOT NULL REFERENCES product(product_id) ON DELETE CASCADE,
+    question_id INT NOT NULL REFERENCES question(question_id) ON DELETE CASCADE
+);
+
+CREATE TABLE question_answered_notification (
+    notification_id INT PRIMARY KEY REFERENCES notification(notification_id) ON DELETE CASCADE,
+    question_id INT NOT NULL REFERENCES question(question_id) ON DELETE CASCADE,
+    answer_id INT NOT NULL REFERENCES answer(answer_id) ON DELETE CASCADE
+);
+
+CREATE TABLE discussion_answered_notification (
+    notification_id INT PRIMARY KEY REFERENCES notification(notification_id) ON DELETE CASCADE,
+    discussion_id INT NOT NULL REFERENCES discussion(discussion_id) ON DELETE CASCADE,
+    discussion_answer_id INT NOT NULL REFERENCES discussion_answer(discussion_answer_id) ON DELETE CASCADE
+);
+
+CREATE TABLE review_upvoted_notification (
+    notification_id BIGINT PRIMARY KEY REFERENCES notification(notification_id) ON DELETE CASCADE,
+    review_id INT NOT NULL REFERENCES review(review_id) ON DELETE CASCADE
+);
+
+CREATE TABLE question_upvoted_notification (
+    notification_id BIGINT PRIMARY KEY REFERENCES notification(notification_id) ON DELETE CASCADE,
+    question_id INT NOT NULL REFERENCES question(question_id) ON DELETE CASCADE
+);
+
+CREATE TABLE answer_upvoted_notification (
+    notification_id BIGINT PRIMARY KEY REFERENCES notification(notification_id) ON DELETE CASCADE,
+    answer_id INT NOT NULL REFERENCES answer(answer_id) ON DELETE CASCADE
+);
+
+CREATE TABLE discussion_upvoted_notification (
+    notification_id BIGINT PRIMARY KEY REFERENCES notification(notification_id) ON DELETE CASCADE,
+    discussion_id INT NOT NULL REFERENCES discussion(discussion_id) ON DELETE CASCADE
+);
+
+CREATE TABLE discussion_answer_upvoted_notification (
+    notification_id BIGINT PRIMARY KEY REFERENCES notification(notification_id) ON DELETE CASCADE,
+    discussion_answer_id INT NOT NULL REFERENCES discussion_answer(discussion_answer_id) ON DELETE CASCADE
 );
 
 CREATE TABLE user_notification_pref (
-  account_id INT PRIMARY KEY REFERENCES account(account_id) ON DELETE CASCADE,
-  pref JSONB DEFAULT '{}'::jsonb
+    account_id INT PRIMARY KEY REFERENCES account(account_id) ON DELETE CASCADE,
+    question_on_routine_product BOOLEAN NOT NULL DEFAULT TRUE,
+    answer_on_your_question BOOLEAN NOT NULL DEFAULT TRUE,
+    discussion_answer_on_your_discussion BOOLEAN NOT NULL DEFAULT TRUE,
+    upvotes BOOLEAN NOT NULL DEFAULT TRUE
 );
 
 CREATE TABLE public_community_post (
@@ -252,41 +297,41 @@ CREATE TABLE public_community_post (
     title TEXT NOT NULL,
     content TEXT NOT NULL,
     media JSONB,
-    created_at TIMESTAMPTZ DEFAULT NOW(),
-    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     deleted_at TIMESTAMPTZ NULL
 );
 
 CREATE TABLE review_upvote (
-  account_id INT NOT NULL REFERENCES users(account_id) ON DELETE CASCADE,
+  account_id INT NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
   review_id INT NOT NULL REFERENCES review(review_id) ON DELETE CASCADE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   PRIMARY KEY (account_id, review_id)
 );
 
 CREATE TABLE question_upvote (
-  account_id INT NOT NULL REFERENCES users(account_id) ON DELETE CASCADE,
+  account_id INT NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
   question_id INT NOT NULL REFERENCES question(question_id) ON DELETE CASCADE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   PRIMARY KEY (account_id, question_id)
 );
 
 CREATE TABLE answer_upvote (
-  account_id INT NOT NULL REFERENCES users(account_id) ON DELETE CASCADE,
+  account_id INT NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
   answer_id INT NOT NULL REFERENCES answer(answer_id) ON DELETE CASCADE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   PRIMARY KEY (account_id, answer_id)
 );
 
 CREATE TABLE discussion_upvote (
-  account_id INT NOT NULL REFERENCES users(account_id) ON DELETE CASCADE,
+  account_id INT NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
   discussion_id INT NOT NULL REFERENCES discussion(discussion_id) ON DELETE CASCADE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   PRIMARY KEY (account_id, discussion_id)
 );
 
 CREATE TABLE discussion_answer_upvote (
-  account_id INT NOT NULL REFERENCES users(account_id) ON DELETE CASCADE,
+  account_id INT NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
   discussion_answer_id INT NOT NULL REFERENCES discussion_answer(discussion_answer_id) ON DELETE CASCADE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   PRIMARY KEY (account_id, discussion_answer_id)
