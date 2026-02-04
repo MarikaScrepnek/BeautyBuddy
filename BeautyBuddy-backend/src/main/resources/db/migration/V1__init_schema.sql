@@ -1,16 +1,14 @@
 CREATE EXTENSION unaccent;
 
-CREATE TYPE target_type_enum AS ENUM ('review', 'question', 'answer', 'discussion', 'discussion_answer');
-
-CREATE TABLE brand (
-    brand_id SERIAL PRIMARY KEY,
-    name TEXT UNIQUE NOT NULL
-);
-
 CREATE TABLE category (
     category_id SERIAL PRIMARY KEY,
     name TEXT UNIQUE NOT NULL,
     parent_category_id INT REFERENCES category(category_id) DEFAULT NULL
+);
+
+CREATE TABLE brand (
+    brand_id SERIAL PRIMARY KEY,
+    name TEXT UNIQUE NOT NULL
 );
 
 CREATE TABLE product (
@@ -27,6 +25,19 @@ CREATE TABLE product (
     CONSTRAINT unique_product_name_brand UNIQUE(name, brand_id),
     CHECK (rating >= 0 AND rating <= 5),
     CHECK (price >= 0)
+);
+
+CREATE TABLE product_shade (
+    product_shade_id SERIAL PRIMARY KEY,
+    product_id INT NOT NULL REFERENCES product(product_id) ON DELETE CASCADE,
+    shade_name TEXT NOT NULL,
+    shade_hex_code TEXT,
+    shade_number INT,
+    image_link TEXT,
+    product_link TEXT,
+
+    UNIQUE (product_id, shade_name),
+    UNIQUE (product_shade_id, product_id)
 );
 
 CREATE TABLE ingredient (
@@ -48,17 +59,6 @@ CREATE TABLE may_contain_ingredient (
     product_id INT REFERENCES product(product_id) ON DELETE CASCADE,
     ingredient_id INT REFERENCES ingredient(ingredient_id) ON DELETE CASCADE,
     UNIQUE (product_id, ingredient_id)
-);
-
-CREATE TABLE product_shade (
-    product_shade_id SERIAL PRIMARY KEY,
-    product_id INT REFERENCES product(product_id) ON DELETE CASCADE,
-    shade_name TEXT NOT NULL,
-    shade_hex_code TEXT,
-    shade_number INT,
-    image_link TEXT,
-    product_link TEXT,
-    UNIQUE (product_id, shade_name)
 );
 
 CREATE TABLE account (
@@ -83,11 +83,15 @@ CREATE TABLE wishlist (
 
 CREATE TABLE wishlist_item (
     wishlist_item_id SERIAL PRIMARY KEY,
-    wishlist_id INT REFERENCES wishlist(wishlist_id) ON DELETE CASCADE,
-    product_id INT REFERENCES product(product_id) ON DELETE CASCADE,
-    shade_id INT REFERENCES product_shade(product_shade_id) ON DELETE SET NULL,
+    wishlist_id INT NOT NULL REFERENCES wishlist(wishlist_id) ON DELETE CASCADE,
+    product_id INT NOT NULL REFERENCES product(product_id) ON DELETE CASCADE,
+    shade_id INT,
     added_at TIMESTAMPTZ DEFAULT NOW(),
-    UNIQUE (wishlist_id, product_id, shade_id)
+
+    UNIQUE (wishlist_id, product_id, shade_id),
+    FOREIGN KEY (shade_id, product_id)
+        REFERENCES product_shade(product_shade_id, product_id)
+        ON DELETE SET NULL
 );
 
 CREATE TYPE routine_category_enum AS ENUM ('skincare', 'makeup', 'haircare', 'bodycare', 'other');
@@ -109,7 +113,7 @@ CREATE TABLE routine_item (
     routine_id INT NOT NULL REFERENCES routine(routine_id) ON DELETE CASCADE,
 
     product_id INT NOT NULL REFERENCES product(product_id) ON DELETE CASCADE,
-    shade_id INT REFERENCES product_shade(product_shade_id) ON DELETE SET NULL,
+    shade_id INT,
 
     step_order INT NOT NULL,
     notes TEXT,
@@ -120,7 +124,11 @@ CREATE TABLE routine_item (
     created_by INT REFERENCES account(account_id) ON DELETE SET NULL,
 
     CHECK (step_order >= 1),
-    CHECK (valid_to IS NULL OR valid_to > valid_from)
+    CHECK (valid_to IS NULL OR valid_to > valid_from),
+
+    FOREIGN KEY (shade_id, product_id)
+        REFERENCES product_shade(product_shade_id, product_id)
+        ON DELETE SET NULL
 );
 CREATE UNIQUE INDEX uniq_current_step_per_routine
   ON routine_item (routine_id, step_order)
@@ -141,7 +149,7 @@ CREATE TABLE review (
     review_id SERIAL PRIMARY KEY,
     account_id INT REFERENCES account(account_id) ON DELETE SET NULL,
     product_id INT REFERENCES product(product_id) ON DELETE CASCADE,
-    product_shade_id INT REFERENCES product_shade(product_shade_id) ON DELETE SET NULL,
+    product_shade_id INT,
     rating NUMERIC(2, 1) CHECK (rating >= 0 AND rating <= 5),
     review_text TEXT,
     helpful_count INT DEFAULT 0,
@@ -150,8 +158,20 @@ CREATE TABLE review (
     deleted_at TIMESTAMPTZ NULL,
     reported_count INT DEFAULT 0,
     approved BOOLEAN DEFAULT TRUE,
-    UNIQUE (account_id, product_id)
+
+    FOREIGN KEY (product_shade_id, product_id)
+        REFERENCES product_shade(product_shade_id, product_id)
+        ON DELETE SET NULL
 );
+-- One active review per account+product+shade (shade chosen)
+CREATE UNIQUE INDEX uq_review_account_product_shade_active
+ON review (account_id, product_id, product_shade_id)
+WHERE deleted_at IS NULL AND product_shade_id IS NOT NULL;
+-- One active review per account+product (no shade chosen)
+CREATE UNIQUE INDEX uq_review_account_product_noshade_active
+ON review (account_id, product_id)
+WHERE deleted_at IS NULL AND product_shade_id IS NULL;
+
 
 CREATE TABLE review_image (
     review_image_id SERIAL PRIMARY KEY,
@@ -242,7 +262,7 @@ CREATE TABLE notification (
 );
 
 CREATE TABLE product_question_notification (
-    notifcation_id INT PRIMARY KEY REFERENCES notification(notification_id) ON DELETE CASCADE,
+    notification_id INT PRIMARY KEY REFERENCES notification(notification_id) ON DELETE CASCADE,
     product_id INT NOT NULL REFERENCES product(product_id) ON DELETE CASCADE,
     question_id INT NOT NULL REFERENCES question(question_id) ON DELETE CASCADE
 );
@@ -393,9 +413,8 @@ CREATE TABLE discussion_answer_report (
 --other triggers?
 --constraints for data integrity
 --foreign key on delete behaviors review user product?
-
---upvote, report, notifcation polymorphic or not?
 --handle reviews with shades and not shades
+
 
 
 --indexes for performance optimization
