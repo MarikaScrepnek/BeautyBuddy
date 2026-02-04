@@ -24,7 +24,9 @@ CREATE TABLE product (
     rating NUMERIC(2, 1),
     raw_ingredients TEXT,
     may_contain_raw_ingredients TEXT,
-    CONSTRAINT unique_product_name_brand UNIQUE(name, brand_id)
+    CONSTRAINT unique_product_name_brand UNIQUE(name, brand_id),
+    CHECK (rating >= 0 AND rating <= 5),
+    CHECK (price >= 0)
 );
 
 CREATE TABLE ingredient (
@@ -62,18 +64,19 @@ CREATE TABLE product_shade (
 CREATE TABLE users (
     user_id SERIAL PRIMARY KEY,
     username TEXT UNIQUE NOT NULL,
-    email TEXT UNIQUE NOT NULL,
+    email CITEXT UNIQUE NOT NULL,
     password_hash TEXT NOT NULL,
     date_joined TIMESTAMP DEFAULT NOW(),
     followers_count INT DEFAULT 0,
     following_count INT DEFAULT 0,
     unread_notifications_count INT DEFAULT 0
 );
-CREATE UNIQUE INDEX idx_users_lower_email ON users ((lower(email)));
+
+--triggers to update followers_count, following_count, and unread_notifications_count in users table
 
 CREATE TABLE wishlist (
     wishlist_id SERIAL PRIMARY KEY,
-    user_id INT REFERENCES users(user_id) ON DELETE CASCADE,
+    user_id INT REFERENCES users(user_id) NOT NULL ON DELETE CASCADE,
     created_at TIMESTAMP DEFAULT NOW(),
     UNIQUE (user_id)
 );
@@ -123,6 +126,7 @@ CREATE TABLE question (
     reported_count INT DEFAULT 0,
     approved BOOLEAN DEFAULT TRUE
 );
+--triggers to update 'answered' field in question table when an answer is added or removed
 
 CREATE TABLE answer (
     answer_id SERIAL PRIMARY KEY,
@@ -153,7 +157,7 @@ CREATE TABLE discussion_answer (
     discussion_answer_id SERIAL PRIMARY KEY,
     discussion_id INT REFERENCES discussion(discussion_id) ON DELETE CASCADE,
     user_id INT REFERENCES users(user_id) ON DELETE SET NULL,
-    parent_discussion_answer_id INT REFERENCES discussion_answer(discussion_answer_id) ON DELETE CASCADE,
+    parent_discussion_answer_id INT REFERENCES discussion_answer(discussion_answer_id) ON DELETE SET NULL,
     content TEXT NOT NULL,
     helpful_count INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT NOW(),
@@ -225,3 +229,7 @@ CREATE TABLE report (
     resolved_at TIMESTAMP NULL,
     UNIQUE (user_id, target_type, target_id)
 );
+
+--triggers for updated_at fields and other automatic updates
+
+--name users user? and notifactions notification?
