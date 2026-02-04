@@ -65,14 +65,13 @@ CREATE TABLE may_contain_ingredient (
 CREATE TABLE account (
     account_id SERIAL PRIMARY KEY,
     username TEXT UNIQUE NOT NULL,
-    email TEXT UNIQUE NOT NULL,
+    email CITEXT UNIQUE NOT NULL,
     password_hash TEXT NOT NULL,
     date_joined TIMESTAMPTZ DEFAULT NOW(),
     followers_count INT DEFAULT 0,
     following_count INT DEFAULT 0,
     unread_notifications_count INT DEFAULT 0
 );
-CREATE UNIQUE INDEX uq_account_email_lower ON account (LOWER(email));
 
 --triggers to update followers_count, following_count, and unread_notifications_count in account table
 
