@@ -12,11 +12,17 @@ import com.beautybuddy.model.Brand;
 import com.beautybuddy.model.Category;
 
 @Entity
+@Table(
+    uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"name", "brand_id"})
+    }
+)
 public class Product {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // ensure DB auto-increments
-    private int product_id;
+    @Column(name = "product_id")
+    private int productId;
 
     @Column(nullable = false)
     private String name;
@@ -29,16 +35,16 @@ public class Product {
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
     
-    @Column
+    @Column(precision = 10, scale = 2)
     private BigDecimal price;
 
-    @Column
-    private String image_link;
+    @Column(name = "image_link")
+    private String imageLink;
 
-    @Column
-    private String product_link;
+    @Column(name = "product_link")
+    private String productLink;
 
-    @Column
+    @Column(precision = 2, scale = 1)
     private BigDecimal rating;
 
     @Column(name = "raw_ingredients", columnDefinition = "TEXT")
@@ -70,8 +76,8 @@ public class Product {
 
     public Product() {}
 
-    public int getProduct_id() { return product_id; }
-    public void setProduct_id(int product_id) { this.product_id = product_id; }
+    public int getProductId() { return productId; }
+    public void setProductId(int productId) { this.productId = productId; }
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
@@ -85,12 +91,12 @@ public class Product {
     public BigDecimal getPrice() { return price; }
     public void setPrice(BigDecimal price) { this.price = price; }
 
-    public String getImage_link() { return image_link; }
-    public void setImage_link(String image_link) { this.image_link = image_link; }
+    public String getImageLink() { return imageLink; }
+    public void setImageLink(String imageLink) { this.imageLink = imageLink; }
 
-    public String getProduct_link() { return product_link; }
-    public void setProduct_link(String product_link) { this.product_link = product_link; }
-
+    public String getProductLink() { return productLink; }
+    public void setProductLink(String productLink) { this.productLink = productLink; }
+    
     public BigDecimal getRating() { return rating; }
     public void setRating(BigDecimal rating) { this.rating = rating; }
 

@@ -10,7 +10,7 @@ CREATE TABLE brand (
 CREATE TABLE category (
     category_id SERIAL PRIMARY KEY,
     name TEXT UNIQUE NOT NULL,
-    parent_category_id INT REFERENCES category(category_id)
+    parent_category_id INT REFERENCES category(category_id) DEFAULT NULL
 );
 
 CREATE TABLE product (
@@ -18,10 +18,10 @@ CREATE TABLE product (
     name TEXT NOT NULL,
     brand_id INT REFERENCES brand(brand_id) NOT NULL,
     category_id INT REFERENCES category(category_id) NOT NULL,
-    price NUMERIC(5, 2),
+    price NUMERIC(10, 2),
     image_link TEXT,
     product_link TEXT,
-    rating NUMERIC(3, 2),
+    rating NUMERIC(2, 1),
     raw_ingredients TEXT,
     may_contain_raw_ingredients TEXT,
     CONSTRAINT unique_product_name_brand UNIQUE(name, brand_id)
@@ -62,7 +62,7 @@ CREATE TABLE product_shade (
 CREATE TABLE users (
     user_id SERIAL PRIMARY KEY,
     username TEXT UNIQUE NOT NULL,
-    email TEXT NOT NULL,
+    email TEXT UNIQUE NOT NULL,
     password_hash TEXT NOT NULL,
     date_joined TIMESTAMP DEFAULT NOW(),
     followers_count INT DEFAULT 0,

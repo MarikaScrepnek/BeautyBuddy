@@ -61,11 +61,11 @@ public class WishlistService {
             String shadeName = shade != null ? shade.getShadeName() : null;
             String imageLink = shade != null && shade.getImageLink() != null
                 ? shade.getImageLink()
-                : product.getImage_link();
+                : product.getImageLink();
 
             result.add(new WishlistItemDTO(
                 item.getWishlist_item_id(),
-                product.getProduct_id(),
+                product.getProductId(),
                 product.getName(),
                 shadeName,
                 imageLink
@@ -80,7 +80,7 @@ public class WishlistService {
         List<WishlistItem> items = wishlistItemRepository.findByWishlist_User_Email(email);
         WishlistItem target = null;
         for (WishlistItem item : items) {
-            if (item.getProduct().getProduct_id() == request.productId()) {
+            if (item.getProduct().getProductId() == request.productId()) {
                 if (request.shadeName() == null && item.getShade() == null) {
                     target = item;
                     break;
