@@ -15,11 +15,12 @@ import jakarta.persistence.OneToOne;
 
 
 @Entity
-@Table(name = "users")
+@Table(name = "account")
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "account_id")
     private int user_id;
 
     @Column(unique = true, nullable = false)

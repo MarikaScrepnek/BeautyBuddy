@@ -19,7 +19,7 @@ import java.sql.Timestamp;
 
 
 @Table(name = "wishlist",
-    uniqueConstraints = @jakarta.persistence.UniqueConstraint(columnNames = {"user_id"})
+    uniqueConstraints = @jakarta.persistence.UniqueConstraint(columnNames = {"account_id"})
 )
 @Entity
 public class Wishlist {
@@ -28,7 +28,7 @@ public class Wishlist {
     private int wishlist_id;
 
     @OneToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "account_id", nullable = false)
     private User user;
 
     @OneToMany(

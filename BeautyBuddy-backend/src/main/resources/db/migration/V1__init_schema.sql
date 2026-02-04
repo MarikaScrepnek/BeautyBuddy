@@ -1,4 +1,5 @@
-CREATE EXTENSION unaccent;
+CREATE EXTENSION IF NOT EXISTS unaccent;
+CREATE EXTENSION IF NOT EXISTS citext;
 
 CREATE TABLE category (
     category_id SERIAL PRIMARY KEY,
@@ -14,8 +15,8 @@ CREATE TABLE brand (
 CREATE TABLE product (
     product_id SERIAL PRIMARY KEY,
     name TEXT NOT NULL,
-    brand_id INT REFERENCES brand(brand_id) NOT NULL,
-    category_id INT REFERENCES category(category_id) NOT NULL,
+    brand_id INT NOT NULL REFERENCES brand(brand_id),
+    category_id INT NOT NULL REFERENCES category(category_id),
     price NUMERIC(10, 2),
     image_link TEXT,
     product_link TEXT,
@@ -64,19 +65,20 @@ CREATE TABLE may_contain_ingredient (
 CREATE TABLE account (
     account_id SERIAL PRIMARY KEY,
     username TEXT UNIQUE NOT NULL,
-    email CITEXT UNIQUE NOT NULL,
+    email TEXT UNIQUE NOT NULL,
     password_hash TEXT NOT NULL,
     date_joined TIMESTAMPTZ DEFAULT NOW(),
     followers_count INT DEFAULT 0,
     following_count INT DEFAULT 0,
     unread_notifications_count INT DEFAULT 0
 );
+CREATE UNIQUE INDEX uq_account_email_lower ON account (LOWER(email));
 
 --triggers to update followers_count, following_count, and unread_notifications_count in account table
 
 CREATE TABLE wishlist (
     wishlist_id SERIAL PRIMARY KEY,
-    account_id INT REFERENCES account(account_id) NOT NULL ON DELETE CASCADE,
+    account_id INT NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     UNIQUE (account_id)
 );
@@ -98,7 +100,7 @@ CREATE TYPE routine_category_enum AS ENUM ('skincare', 'makeup', 'haircare', 'bo
 
 CREATE TABLE routine (
     routine_id SERIAL PRIMARY KEY,
-    account_id INT REFERENCES account(account_id) NOT NULL ON DELETE CASCADE,
+    account_id INT NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
     name TEXT NOT NULL,
     notes TEXT,
     category routine_category_enum NOT NULL DEFAULT 'other',
@@ -138,7 +140,7 @@ CREATE UNIQUE INDEX uniq_current_step_per_routine
 
 CREATE TABLE routine_image (
     routine_image_id SERIAL PRIMARY KEY,
-    routine_id INT REFERENCES routine(routine_id) NOT NULL ON DELETE CASCADE,
+    routine_id INT NOT NULL REFERENCES routine(routine_id) ON DELETE CASCADE,
     image_link TEXT NOT NULL,
     uploaded_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -361,60 +363,62 @@ CREATE TYPE report_status_enum AS ENUM ('open', 'reviewing', 'resolved', 'reject
 
 CREATE TABLE review_report (
     report_id SERIAL PRIMARY KEY,
-    account_id INT REFERENCES account(account_id) ON DELETE CASCADE,
+    account_id INT NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
+    review_id INT NOT NULL REFERENCES review(review_id) ON DELETE CASCADE,
     reason TEXT,
     status report_status_enum DEFAULT 'open',
     created_at TIMESTAMPTZ DEFAULT NOW(),
     resolved_at TIMESTAMPTZ NULL,
-    PRIMARY KEY (report_id, account_id)
+    UNIQUE (account_id, review_id)
 );
 
 CREATE TABLE question_report (
     report_id SERIAL PRIMARY KEY,
-    account_id INT REFERENCES account(account_id) ON DELETE CASCADE,
+    account_id INT NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
+    question_id INT NOT NULL REFERENCES question(question_id) ON DELETE CASCADE,
     reason TEXT,
     status report_status_enum DEFAULT 'open',
     created_at TIMESTAMPTZ DEFAULT NOW(),
     resolved_at TIMESTAMPTZ NULL,
-    PRIMARY KEY (report_id, account_id)
+    UNIQUE (account_id, question_id)
 );
 
 CREATE TABLE answer_report (
     report_id SERIAL PRIMARY KEY,
-    account_id INT REFERENCES account(account_id) ON DELETE CASCADE,
+    account_id INT NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
+    answer_id INT NOT NULL REFERENCES answer(answer_id) ON DELETE CASCADE,
     reason TEXT,
     status report_status_enum DEFAULT 'open',
     created_at TIMESTAMPTZ DEFAULT NOW(),
     resolved_at TIMESTAMPTZ NULL,
-    PRIMARY KEY (report_id, account_id)
+    UNIQUE (account_id, answer_id)
 );
 
 CREATE TABLE discussion_report (
     report_id SERIAL PRIMARY KEY,
-    account_id INT REFERENCES account(account_id) ON DELETE CASCADE,
+    account_id INT NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
+    discussion_id INT NOT NULL REFERENCES discussion(discussion_id) ON DELETE CASCADE,
     reason TEXT,
     status report_status_enum DEFAULT 'open',
     created_at TIMESTAMPTZ DEFAULT NOW(),
     resolved_at TIMESTAMPTZ NULL,
-    PRIMARY KEY (report_id, account_id)
+    UNIQUE (account_id, discussion_id)
 );
 
 CREATE TABLE discussion_answer_report (
     report_id SERIAL PRIMARY KEY,
-    account_id INT REFERENCES account(account_id) ON DELETE CASCADE,
+    account_id INT NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
+    discussion_answer_id INT NOT NULL REFERENCES discussion_answer(discussion_answer_id) ON DELETE CASCADE,
     reason TEXT,
     status report_status_enum DEFAULT 'open',
     created_at TIMESTAMPTZ DEFAULT NOW(),
     resolved_at TIMESTAMPTZ NULL,
-    PRIMARY KEY (report_id, account_id)
+    UNIQUE (account_id, discussion_answer_id)
 );
 
 --triggers for updated_at fields and other automatic updates
 --other triggers?
 --constraints for data integrity
 --foreign key on delete behaviors review user product?
---handle reviews with shades and not shades
-
-
 
 --indexes for performance optimization

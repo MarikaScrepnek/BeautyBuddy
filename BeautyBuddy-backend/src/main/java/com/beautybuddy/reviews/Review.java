@@ -25,7 +25,7 @@ import com.beautybuddy.products.ProductShade;
 @Entity
 @Table(name = "review",
     uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"user_id", "product_id"})
+        @UniqueConstraint(columnNames = {"account_id", "product_id"})
     }
 )
 public class Review {
@@ -35,7 +35,7 @@ public class Review {
     private int review_id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "account_id", nullable = false)
     private User user;
 
     @ManyToOne
