@@ -66,7 +66,7 @@ CREATE TABLE account (
     username TEXT UNIQUE NOT NULL,
     email CITEXT UNIQUE NOT NULL,
     password_hash TEXT NOT NULL,
-    date_joined TIMESTAMP DEFAULT NOW(),
+    date_joined TIMESTAMPTZ DEFAULT NOW(),
     followers_count INT DEFAULT 0,
     following_count INT DEFAULT 0,
     unread_notifications_count INT DEFAULT 0
@@ -77,7 +77,7 @@ CREATE TABLE account (
 CREATE TABLE wishlist (
     wishlist_id SERIAL PRIMARY KEY,
     account_id INT REFERENCES account(account_id) NOT NULL ON DELETE CASCADE,
-    created_at TIMESTAMP DEFAULT NOW(),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
     UNIQUE (account_id)
 );
 
@@ -86,7 +86,7 @@ CREATE TABLE wishlist_item (
     wishlist_id INT REFERENCES wishlist(wishlist_id) ON DELETE CASCADE,
     product_id INT REFERENCES product(product_id) ON DELETE CASCADE,
     shade_id INT REFERENCES product_shade(product_shade_id) ON DELETE SET NULL,
-    added_at TIMESTAMP DEFAULT NOW(),
+    added_at TIMESTAMPTZ DEFAULT NOW(),
     UNIQUE (wishlist_id, product_id, shade_id)
 );
 
@@ -98,9 +98,9 @@ CREATE TABLE review (
     rating NUMERIC(2, 1) CHECK (rating >= 0 AND rating <= 5),
     review_text TEXT,
     helpful_count INT DEFAULT 0,
-    created_at TIMESTAMP DEFAULT NOW(),
-    updated_at TIMESTAMP DEFAULT NOW(),
-    deleted_at TIMESTAMP NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    deleted_at TIMESTAMPTZ NULL,
     reported_count INT DEFAULT 0,
     approved BOOLEAN DEFAULT TRUE,
     UNIQUE (account_id, product_id)
@@ -110,7 +110,7 @@ CREATE TABLE review_image (
     review_image_id SERIAL PRIMARY KEY,
     review_id INT REFERENCES review(review_id) ON DELETE CASCADE,
     image_link TEXT NOT NULL,
-    uploaded_at TIMESTAMP DEFAULT NOW()
+    uploaded_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 CREATE TABLE question (
@@ -120,9 +120,9 @@ CREATE TABLE question (
     question_text TEXT NOT NULL,
     answered BOOLEAN DEFAULT FALSE,
     upvote_count INT DEFAULT 0,
-    created_at TIMESTAMP DEFAULT NOW(),
-    updated_at TIMESTAMP DEFAULT NOW(),
-    deleted_at TIMESTAMP NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    deleted_at TIMESTAMPTZ NULL,
     reported_count INT DEFAULT 0,
     approved BOOLEAN DEFAULT TRUE
 );
@@ -134,9 +134,9 @@ CREATE TABLE answer (
     account_id INT REFERENCES account(account_id) ON DELETE SET NULL,
     answer_text TEXT NOT NULL,
     helpful_count INT DEFAULT 0,
-    created_at TIMESTAMP DEFAULT NOW(),
-    updated_at TIMESTAMP DEFAULT NOW(),
-    deleted_at TIMESTAMP NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    deleted_at TIMESTAMPTZ NULL,
     reported_count INT DEFAULT 0,
     approved BOOLEAN DEFAULT TRUE
 );
@@ -146,9 +146,9 @@ CREATE TABLE discussion (
     account_id INT REFERENCES account(account_id) ON DELETE SET NULL,
     title TEXT NOT NULL,
     content TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT NOW(),
-    updated_at TIMESTAMP DEFAULT NOW(),
-    deleted_at TIMESTAMP NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    deleted_at TIMESTAMPTZ NULL,
     reported_count INT DEFAULT 0,
     approved BOOLEAN DEFAULT TRUE
 );
@@ -160,9 +160,9 @@ CREATE TABLE discussion_answer (
     parent_discussion_answer_id INT REFERENCES discussion_answer(discussion_answer_id) ON DELETE SET NULL,
     content TEXT NOT NULL,
     helpful_count INT DEFAULT 0,
-    created_at TIMESTAMP DEFAULT NOW(),
-    updated_at TIMESTAMP DEFAULT NOW(),
-    deleted_at TIMESTAMP NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    deleted_at TIMESTAMPTZ NULL,
     reported_count INT DEFAULT 0,
     approved BOOLEAN DEFAULT TRUE
 );
@@ -171,7 +171,7 @@ CREATE TABLE user_discussion_pin (
   user_discussion_pin_id SERIAL PRIMARY KEY,
   discussion_id INT REFERENCES discussion(discussion_id) ON DELETE CASCADE,
   account_id INT REFERENCES account(account_id) ON DELETE CASCADE,
-  pinned_at TIMESTAMP DEFAULT NOW(),
+  pinned_at TIMESTAMPTZ DEFAULT NOW(),
   UNIQUE (discussion_id, account_id)
 );
 
@@ -179,7 +179,7 @@ CREATE TABLE user_follow (
     user_follow_id SERIAL PRIMARY KEY,
     follower_id INT REFERENCES account(account_id) ON DELETE CASCADE,
     following_id INT REFERENCES account(account_id) ON DELETE CASCADE,
-    followed_at TIMESTAMP DEFAULT NOW(),
+    followed_at TIMESTAMPTZ DEFAULT NOW(),
     UNIQUE (follower_id, following_id),
     CHECK (follower_id <> following_id)
 );
@@ -192,7 +192,7 @@ CREATE TABLE notification (
   object_type TEXT,              -- e.g. 'product','review','question'
   object_id INT,                 -- id of the object
   is_read BOOLEAN DEFAULT FALSE,
-  created_at TIMESTAMP DEFAULT NOW()
+  created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 CREATE TABLE user_notification_pref (
@@ -205,9 +205,9 @@ CREATE TABLE public_community_post (
     title TEXT NOT NULL,
     content TEXT NOT NULL,
     media JSONB,
-    created_at TIMESTAMP DEFAULT NOW(),
-    updated_at TIMESTAMP DEFAULT NOW(),
-    deleted_at TIMESTAMP NULL
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    deleted_at TIMESTAMPTZ NULL
 );
 
 CREATE TABLE upvote (
@@ -215,7 +215,7 @@ CREATE TABLE upvote (
     account_id INT REFERENCES account(account_id) ON DELETE CASCADE,
     target_type target_type_enum NOT NULL,
     target_id INT NOT NULL,
-    created_at TIMESTAMP DEFAULT NOW(),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
     UNIQUE (account_id, target_type, target_id)
 );
 
@@ -225,8 +225,8 @@ CREATE TABLE report (
     target_type target_type_enum NOT NULL,
     target_id INT NOT NULL,
     reason TEXT,
-    created_at TIMESTAMP DEFAULT NOW(),
-    resolved_at TIMESTAMP NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    resolved_at TIMESTAMPTZ NULL,
     UNIQUE (account_id, target_type, target_id)
 );
 
