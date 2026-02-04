@@ -187,7 +187,7 @@ CREATE TABLE user_follow (
 CREATE TABLE notification (
   notification_id SERIAL PRIMARY KEY,
   recipient_id INT NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
-  actor_id INT NULL REFERENCES account(account_id),
+  actor_id INT NULL REFERENCES account(account_id) ON DELETE SET NULL,
   type TEXT NOT NULL,            -- e.g. 'review.created','wishlist.added','product.question'
   object_type TEXT,              -- e.g. 'product','review','question'
   object_id INT,                 -- id of the object
