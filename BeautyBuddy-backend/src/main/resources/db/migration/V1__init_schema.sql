@@ -61,8 +61,8 @@ CREATE TABLE product_shade (
     UNIQUE (product_id, shade_name)
 );
 
-CREATE TABLE users (
-    user_id SERIAL PRIMARY KEY,
+CREATE TABLE account (
+    account_id SERIAL PRIMARY KEY,
     username TEXT UNIQUE NOT NULL,
     email CITEXT UNIQUE NOT NULL,
     password_hash TEXT NOT NULL,
@@ -72,13 +72,13 @@ CREATE TABLE users (
     unread_notifications_count INT DEFAULT 0
 );
 
---triggers to update followers_count, following_count, and unread_notifications_count in users table
+--triggers to update followers_count, following_count, and unread_notifications_count in account table
 
 CREATE TABLE wishlist (
     wishlist_id SERIAL PRIMARY KEY,
-    user_id INT REFERENCES users(user_id) NOT NULL ON DELETE CASCADE,
+    account_id INT REFERENCES account(account_id) NOT NULL ON DELETE CASCADE,
     created_at TIMESTAMP DEFAULT NOW(),
-    UNIQUE (user_id)
+    UNIQUE (account_id)
 );
 
 CREATE TABLE wishlist_item (
@@ -92,7 +92,7 @@ CREATE TABLE wishlist_item (
 
 CREATE TABLE review (
     review_id SERIAL PRIMARY KEY,
-    user_id INT REFERENCES users(user_id) ON DELETE SET NULL,
+    account_id INT REFERENCES account(account_id) ON DELETE SET NULL,
     product_id INT REFERENCES product(product_id) ON DELETE CASCADE,
     product_shade_id INT REFERENCES product_shade(product_shade_id) ON DELETE SET NULL,
     rating NUMERIC(2, 1) CHECK (rating >= 0 AND rating <= 5),
@@ -103,7 +103,7 @@ CREATE TABLE review (
     deleted_at TIMESTAMP NULL,
     reported_count INT DEFAULT 0,
     approved BOOLEAN DEFAULT TRUE,
-    UNIQUE (user_id, product_id)
+    UNIQUE (account_id, product_id)
 );
 
 CREATE TABLE review_image (
@@ -115,7 +115,7 @@ CREATE TABLE review_image (
 
 CREATE TABLE question (
     question_id SERIAL PRIMARY KEY,
-    user_id INT REFERENCES users(user_id) ON DELETE SET NULL,
+    account_id INT REFERENCES account(account_id) ON DELETE SET NULL,
     product_id INT REFERENCES product(product_id) ON DELETE CASCADE,
     question_text TEXT NOT NULL,
     answered BOOLEAN DEFAULT FALSE,
@@ -131,7 +131,7 @@ CREATE TABLE question (
 CREATE TABLE answer (
     answer_id SERIAL PRIMARY KEY,
     question_id INT REFERENCES question(question_id) ON DELETE CASCADE,
-    user_id INT REFERENCES users(user_id) ON DELETE SET NULL,
+    account_id INT REFERENCES account(account_id) ON DELETE SET NULL,
     answer_text TEXT NOT NULL,
     helpful_count INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT NOW(),
@@ -143,7 +143,7 @@ CREATE TABLE answer (
 
 CREATE TABLE discussion (
     discussion_id SERIAL PRIMARY KEY,
-    user_id INT REFERENCES users(user_id) ON DELETE SET NULL,
+    account_id INT REFERENCES account(account_id) ON DELETE SET NULL,
     title TEXT NOT NULL,
     content TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT NOW(),
@@ -156,7 +156,7 @@ CREATE TABLE discussion (
 CREATE TABLE discussion_answer (
     discussion_answer_id SERIAL PRIMARY KEY,
     discussion_id INT REFERENCES discussion(discussion_id) ON DELETE CASCADE,
-    user_id INT REFERENCES users(user_id) ON DELETE SET NULL,
+    account_id INT REFERENCES account(account_id) ON DELETE SET NULL,
     parent_discussion_answer_id INT REFERENCES discussion_answer(discussion_answer_id) ON DELETE SET NULL,
     content TEXT NOT NULL,
     helpful_count INT DEFAULT 0,
@@ -170,24 +170,24 @@ CREATE TABLE discussion_answer (
 CREATE TABLE user_discussion_pin (
   user_discussion_pin_id SERIAL PRIMARY KEY,
   discussion_id INT REFERENCES discussion(discussion_id) ON DELETE CASCADE,
-  user_id INT REFERENCES users(user_id) ON DELETE CASCADE,
+  account_id INT REFERENCES account(account_id) ON DELETE CASCADE,
   pinned_at TIMESTAMP DEFAULT NOW(),
-  UNIQUE (discussion_id, user_id)
+  UNIQUE (discussion_id, account_id)
 );
 
 CREATE TABLE user_follow (
     user_follow_id SERIAL PRIMARY KEY,
-    follower_id INT REFERENCES users(user_id) ON DELETE CASCADE,
-    following_id INT REFERENCES users(user_id) ON DELETE CASCADE,
+    follower_id INT REFERENCES account(account_id) ON DELETE CASCADE,
+    following_id INT REFERENCES account(account_id) ON DELETE CASCADE,
     followed_at TIMESTAMP DEFAULT NOW(),
     UNIQUE (follower_id, following_id),
     CHECK (follower_id <> following_id)
 );
 
-CREATE TABLE notifications (
+CREATE TABLE notification (
   notification_id SERIAL PRIMARY KEY,
-  recipient_id INT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
-  actor_id INT NULL REFERENCES users(user_id),
+  recipient_id INT NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
+  actor_id INT NULL REFERENCES account(account_id),
   type TEXT NOT NULL,            -- e.g. 'review.created','wishlist.added','product.question'
   object_type TEXT,              -- e.g. 'product','review','question'
   object_id INT,                 -- id of the object
@@ -196,7 +196,7 @@ CREATE TABLE notifications (
 );
 
 CREATE TABLE user_notification_pref (
-  user_id INT PRIMARY KEY REFERENCES users(user_id) ON DELETE CASCADE,
+  account_id INT PRIMARY KEY REFERENCES account(account_id) ON DELETE CASCADE,
   pref JSONB DEFAULT '{}'::jsonb
 );
 
@@ -212,24 +212,30 @@ CREATE TABLE public_community_post (
 
 CREATE TABLE upvote (
     upvote_id SERIAL PRIMARY KEY,
-    user_id INT REFERENCES users(user_id) ON DELETE CASCADE,
+    account_id INT REFERENCES account(account_id) ON DELETE CASCADE,
     target_type target_type_enum NOT NULL,
     target_id INT NOT NULL,
     created_at TIMESTAMP DEFAULT NOW(),
-    UNIQUE (user_id, target_type, target_id)
+    UNIQUE (account_id, target_type, target_id)
 );
 
 CREATE TABLE report (
     report_id SERIAL PRIMARY KEY,
-    user_id INT REFERENCES users(user_id) ON DELETE CASCADE,
+    account_id INT REFERENCES account(account_id) ON DELETE CASCADE,
     target_type target_type_enum NOT NULL,
     target_id INT NOT NULL,
     reason TEXT,
     created_at TIMESTAMP DEFAULT NOW(),
     resolved_at TIMESTAMP NULL,
-    UNIQUE (user_id, target_type, target_id)
+    UNIQUE (account_id, target_type, target_id)
 );
 
 --triggers for updated_at fields and other automatic updates
+--other triggers?
+--constraints for data integrity
+--foreign key on delete behaviors review user product?
 
---name users user? and notifactions notification?
+--name account user? and notifactions notification?
+--upvote, report, notifcation polymorphic or not?
+--handle reviews with shades and not shades
+--indexes for performance optimization
