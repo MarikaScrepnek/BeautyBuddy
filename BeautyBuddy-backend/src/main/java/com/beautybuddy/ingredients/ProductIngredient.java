@@ -12,7 +12,8 @@ public class ProductIngredient {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int product_ingredient_id;
+    @Column(name = "product_ingredient_id", nullable = false)
+    private int productIngredientId;
 
     @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)
@@ -27,8 +28,8 @@ public class ProductIngredient {
 
     public ProductIngredient() {}
 
-    public int getProduct_ingredient_id() { return product_ingredient_id; }
-    public void setProduct_ingredient_id(int product_ingredient_id) { this.product_ingredient_id = product_ingredient_id; }
+    public int getProductIngredientId() { return productIngredientId; }
+    public void setProductIngredientId(int productIngredientId) { this.productIngredientId = productIngredientId; }
 
     public Product getProduct() { return product; }
     public void setProduct(Product product) { this.product = product; }
