@@ -9,7 +9,8 @@ import jakarta.persistence.*;
 public class ProductShade {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int product_shade_id;
+    @Column(name = "product_shade_id")
+    private int productShadeId;
 
     @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)
@@ -31,11 +32,11 @@ public class ProductShade {
     private String productLink;
 
     // Getters and Setters
-    public int getProduct_shade_id() {
-        return product_shade_id;
+    public int getProductShadeId() {
+        return productShadeId;
     }
-    public void setProduct_shade_id(int product_shade_id) {
-        this.product_shade_id = product_shade_id;
+    public void setProductShadeId(int productShadeId) {
+        this.productShadeId = productShadeId;
     }
     public Product getProduct() {
         return product;
