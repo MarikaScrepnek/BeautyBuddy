@@ -83,7 +83,7 @@ public class MayContainIngredientService {
                 // Determine which ID to use for tracking duplicates
                 Integer canonicalIdToAdd = (canonicalIngredient.getCanonicalId() != null)
                         ? canonicalIngredient.getCanonicalId()
-                        : Integer.valueOf(canonicalIngredient.getIngredient_id());
+                        : Integer.valueOf(canonicalIngredient.getIngredientId());
 
                 // Skip if already added
                 if (!addedCanonicals.contains(canonicalIdToAdd)) {

@@ -70,7 +70,7 @@ public class ProductIngredientService {
 
                 // get canonical Ingredient directly
                 Ingredient canonicalIngredient = getCanonicalIngredient(normalized);
-                int canonicalId = canonicalIngredient.getIngredient_id();
+                int canonicalId = canonicalIngredient.getIngredientId();
 
                 if (!addedCanonicals.contains(canonicalId)) {
                     ProductIngredient pi = new ProductIngredient();

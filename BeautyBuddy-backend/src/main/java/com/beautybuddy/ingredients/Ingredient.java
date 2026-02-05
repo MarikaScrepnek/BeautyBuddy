@@ -10,7 +10,8 @@ public class Ingredient {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int ingredient_id;
+    @Column(name = "ingredient_id", nullable = false)
+    private int ingredientId;
 
     @Column(name = "name", nullable = false, unique = true)
     private String name;
@@ -20,8 +21,8 @@ public class Ingredient {
 
     public Ingredient() {}
 
-    public int getIngredient_id() { return ingredient_id; }
-    public void setIngredient_id(int ingredient_id) { this.ingredient_id = ingredient_id; }
+    public int getIngredientId() { return ingredientId; }
+    public void setIngredientId(int ingredientId) { this.ingredientId = ingredientId; }
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
