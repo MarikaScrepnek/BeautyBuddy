@@ -324,38 +324,43 @@ CREATE TABLE public_community_post (
 );
 
 CREATE TABLE review_upvote (
-  account_id INT NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
-  review_id INT NOT NULL REFERENCES review(review_id) ON DELETE CASCADE,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  PRIMARY KEY (account_id, review_id)
+    review_upvote_id SERIAL PRIMARY KEY,
+    account_id INT NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
+    review_id INT NOT NULL REFERENCES review(review_id) ON DELETE CASCADE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE (account_id, review_id)
 );
 
 CREATE TABLE question_upvote (
-  account_id INT NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
-  question_id INT NOT NULL REFERENCES question(question_id) ON DELETE CASCADE,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  PRIMARY KEY (account_id, question_id)
+    question_upvote_id SERIAL PRIMARY KEY,
+    account_id INT NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
+    question_id INT NOT NULL REFERENCES question(question_id) ON DELETE CASCADE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE (account_id, question_id)
 );
 
 CREATE TABLE answer_upvote (
-  account_id INT NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
-  answer_id INT NOT NULL REFERENCES answer(answer_id) ON DELETE CASCADE,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  PRIMARY KEY (account_id, answer_id)
+    answer_upvote_id SERIAL PRIMARY KEY,
+    account_id INT NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
+    answer_id INT NOT NULL REFERENCES answer(answer_id) ON DELETE CASCADE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE (account_id, answer_id)
 );
 
 CREATE TABLE discussion_upvote (
-  account_id INT NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
-  discussion_id INT NOT NULL REFERENCES discussion(discussion_id) ON DELETE CASCADE,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  PRIMARY KEY (account_id, discussion_id)
+    discussion_upvote_id SERIAL PRIMARY KEY,
+    account_id INT NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
+    discussion_id INT NOT NULL REFERENCES discussion(discussion_id) ON DELETE CASCADE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE (account_id, discussion_id)
 );
 
 CREATE TABLE discussion_answer_upvote (
-  account_id INT NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
-  discussion_answer_id INT NOT NULL REFERENCES discussion_answer(discussion_answer_id) ON DELETE CASCADE,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  PRIMARY KEY (account_id, discussion_answer_id)
+    discussion_answer_upvote_id SERIAL PRIMARY KEY,
+    account_id INT NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
+    discussion_answer_id INT NOT NULL REFERENCES discussion_answer(discussion_answer_id) ON DELETE CASCADE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE (account_id, discussion_answer_id)
 );
 
 CREATE TYPE report_status_enum AS ENUM ('open', 'reviewing', 'resolved', 'rejected');
