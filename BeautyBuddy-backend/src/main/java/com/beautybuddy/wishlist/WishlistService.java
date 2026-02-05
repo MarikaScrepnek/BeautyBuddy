@@ -3,7 +3,7 @@ package com.beautybuddy.wishlist;
 import com.beautybuddy.product.Product;
 import com.beautybuddy.product.ProductRepository;
 import com.beautybuddy.product.ProductShade;
-import com.beautybuddy.product.ShadeRepository;
+import com.beautybuddy.product.ProductShadeRepository;
 import com.beautybuddy.user.User;
 import com.beautybuddy.user.UserRepository;
 
@@ -16,10 +16,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class WishlistService {
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
-    private final ShadeRepository shadeRepository;
+    private final ProductShadeRepository shadeRepository;
     private final WishlistItemRepository wishlistItemRepository;
 
-    public WishlistService(UserRepository userRepository, ProductRepository productRepository, ShadeRepository shadeRepository, WishlistItemRepository wishlistItemRepository) {
+    public WishlistService(UserRepository userRepository, ProductRepository productRepository, ProductShadeRepository shadeRepository, WishlistItemRepository wishlistItemRepository) {
         this.userRepository = userRepository;
         this.productRepository = productRepository;
         this.shadeRepository = shadeRepository;

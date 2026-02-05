@@ -32,7 +32,8 @@ public class Review {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int review_id;
+    @Column(name = "review_id", nullable = false)
+    private int reviewId;
 
     @ManyToOne
     @JoinColumn(name = "account_id", nullable = false)
@@ -75,17 +76,17 @@ public class Review {
         cascade = CascadeType.ALL,
         orphanRemoval = true)
     @OrderBy("createdAt ASC")
-    private List<ReviewImage> images = new ArrayList<>();
+    private List<ReviewImage> reviewImages = new ArrayList<>();
 
     public Review() {
     }
 
     // Getters and Setters
-    public int getReview_id() {
-        return review_id;
+    public int getReviewId() {
+        return reviewId;
     }
-    public void setReview_id(int review_id) {
-        this.review_id = review_id;
+    public void setReviewId(int reviewId) {
+        this.reviewId = reviewId;
     }
 
     public User getUser() {
@@ -165,10 +166,10 @@ public class Review {
         this.approved = approved;
     }
 
-    public List<ReviewImage> getImages() {
-        return images;
+    public List<ReviewImage> getReviewImages() {
+        return reviewImages;
     }
-    public void setImages(List<ReviewImage> images) {
-        this.images = images;
+    public void setReviewImages(List<ReviewImage> reviewImages) {
+        this.reviewImages = reviewImages;
     }
 }

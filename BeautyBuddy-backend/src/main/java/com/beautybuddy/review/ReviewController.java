@@ -1,6 +1,5 @@
 package com.beautybuddy.review;
 
-import org.apache.catalina.connector.Response;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
