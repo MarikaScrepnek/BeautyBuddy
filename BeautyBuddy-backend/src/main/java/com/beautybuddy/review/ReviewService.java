@@ -13,12 +13,14 @@ import java.util.List;
 
 public class ReviewService {
     private final ReviewRepository reviewRepository;
+    private final ReviewReportRepository reviewReportRepository;
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
     private final ProductShadeRepository productShadeRepository;
 
-    public ReviewService(ReviewRepository reviewRepository, UserRepository userRepository, ProductRepository productRepository, ProductShadeRepository productShadeRepository) {
+    public ReviewService(ReviewRepository reviewRepository, ReviewReportRepository reviewReportRepository, UserRepository userRepository, ProductRepository productRepository, ProductShadeRepository productShadeRepository) {
         this.reviewRepository = reviewRepository;
+        this.reviewReportRepository = reviewReportRepository;
         this.userRepository = userRepository;
         this.productRepository = productRepository;
         this.productShadeRepository = productShadeRepository;
@@ -52,8 +54,8 @@ public class ReviewService {
         reviewRepository.save(newReview);
     }
 
-    public void removeReview(String userEmail, ReviewDTO review) {
-        User user = userRepository.findByEmail(userEmail)
+    public void removeReview(String email, ReviewDTO review) {
+        User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new RuntimeException("User not found"));
         Review existingReview = reviewRepository.findById(review.id())
             .orElseThrow(() -> new RuntimeException("Review not found"));
@@ -64,11 +66,23 @@ public class ReviewService {
         }
     }
 
-    public void reportReview(String userEmail, ReviewDTO review) {
-        // Implementation for reporting a review
+    public void reportReview(String email, ReviewReportDTO report) {
+        User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+        Review existingReview = reviewRepository.findById(report.reviewId())
+            .orElseThrow(() -> new RuntimeException("Review not found"));
+        
+        ReviewReport newReport = new ReviewReport();
+        newReport.setUser(user);
+        newReport.setReview(existingReview);
+        if (report.reason() != null && !report.reason().isEmpty()) {
+            newReport.setReason(report.reason());
+        }
+
+        reviewReportRepository.save(newReport);
     }
 
-    public void upvoteReview(String userEmail, ReviewDTO review) {
+    public void upvoteReview(String email, ReviewDTO review) {
         // Implementation for upvoting a review
     }
 
