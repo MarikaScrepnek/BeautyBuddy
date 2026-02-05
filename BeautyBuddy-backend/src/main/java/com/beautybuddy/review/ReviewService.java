@@ -14,13 +14,15 @@ import java.util.List;
 public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final ReviewReportRepository reviewReportRepository;
+    private final ReviewUpvoteRepository reviewUpvoteRepository;
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
     private final ProductShadeRepository productShadeRepository;
 
-    public ReviewService(ReviewRepository reviewRepository, ReviewReportRepository reviewReportRepository, UserRepository userRepository, ProductRepository productRepository, ProductShadeRepository productShadeRepository) {
+    public ReviewService(ReviewRepository reviewRepository, ReviewReportRepository reviewReportRepository, ReviewUpvoteRepository reviewUpvoteRepository, UserRepository userRepository, ProductRepository productRepository, ProductShadeRepository productShadeRepository) {
         this.reviewRepository = reviewRepository;
         this.reviewReportRepository = reviewReportRepository;
+        this.reviewUpvoteRepository = reviewUpvoteRepository;
         this.userRepository = userRepository;
         this.productRepository = productRepository;
         this.productShadeRepository = productShadeRepository;
@@ -82,8 +84,17 @@ public class ReviewService {
         reviewReportRepository.save(newReport);
     }
 
-    public void upvoteReview(String email, ReviewDTO review) {
-        // Implementation for upvoting a review
+    public void upvoteReview(String email, ReviewUpvoteDTO upvote) {
+        User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+        Review review = reviewRepository.findById(upvote.reviewId())
+            .orElseThrow(() -> new RuntimeException("Review not found"));
+        
+        ReviewUpvote newUpvote = new ReviewUpvote();
+        newUpvote.setUserId(user.getUserId());
+        newUpvote.setReviewId(review.getReviewId());
+
+        reviewUpvoteRepository.save(newUpvote);
     }
 
     public List<ReviewDTO> getReviewsForProduct(int productId) {
