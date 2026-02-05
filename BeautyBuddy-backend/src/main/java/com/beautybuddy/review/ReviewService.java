@@ -53,7 +53,15 @@ public class ReviewService {
     }
 
     public void removeReview(String userEmail, ReviewDTO review) {
-        // Implementation for removing a review
+        User user = userRepository.findByEmail(userEmail)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+        Review existingReview = reviewRepository.findById(review.id())
+            .orElseThrow(() -> new RuntimeException("Review not found"));
+        if (existingReview.getUser().getUserId() != user.getUserId()) {
+            throw new RuntimeException("User not authorized to delete this review");
+        } else {
+            reviewRepository.delete(existingReview);
+        }
     }
 
     public void reportReview(String userEmail, ReviewDTO review) {
