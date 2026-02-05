@@ -1,18 +1,19 @@
 package com.beautybuddy.common;
 
-import com.beautybuddy.dto.BrandDTO;
-import com.beautybuddy.dto.CategoryDTO;
-import com.beautybuddy.ingredients.Ingredient;
-import com.beautybuddy.ingredients.IngredientDTO;
-import com.beautybuddy.ingredients.MayContainIngredient;
-import com.beautybuddy.ingredients.MayContainIngredientDTO;
-import com.beautybuddy.ingredients.ProductIngredient;
-import com.beautybuddy.ingredients.ProductIngredientDTO;
-import com.beautybuddy.model.*;
-import com.beautybuddy.products.Product;
-import com.beautybuddy.products.ProductDTO;
-import com.beautybuddy.products.ProductShade;
-import com.beautybuddy.products.ProductShadeDTO;
+import com.beautybuddy.brand.Brand;
+import com.beautybuddy.brand.BrandDTO;
+import com.beautybuddy.category.Category;
+import com.beautybuddy.category.CategoryDTO;
+import com.beautybuddy.ingredient.Ingredient;
+import com.beautybuddy.ingredient.IngredientDTO;
+import com.beautybuddy.ingredient.MayContainIngredient;
+import com.beautybuddy.ingredient.MayContainIngredientDTO;
+import com.beautybuddy.ingredient.ProductIngredient;
+import com.beautybuddy.ingredient.ProductIngredientDTO;
+import com.beautybuddy.product.Product;
+import com.beautybuddy.product.ProductDTO;
+import com.beautybuddy.product.ProductShade;
+import com.beautybuddy.product.ProductShadeDTO;
 
 import java.util.Comparator;
 import java.util.List;

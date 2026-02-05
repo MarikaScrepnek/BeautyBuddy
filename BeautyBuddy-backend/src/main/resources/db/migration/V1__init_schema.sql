@@ -23,7 +23,7 @@ CREATE TABLE product (
     rating NUMERIC(2, 1),
     raw_ingredients TEXT,
     may_contain_raw_ingredients TEXT,
-    CONSTRAINT unique_product_name_brand UNIQUE(name, brand_id),
+    UNIQUE(name, brand_id),
     CHECK (rating >= 0 AND rating <= 5),
     CHECK (price >= 0)
 );
@@ -51,7 +51,7 @@ CREATE TABLE product_ingredient (
     product_ingredient_id SERIAL PRIMARY KEY,
     product_id INT REFERENCES product(product_id) ON DELETE CASCADE,
     ingredient_id INT REFERENCES ingredient(ingredient_id) ON DELETE CASCADE,
-    position INT,
+    position INT NOT NULL,
     UNIQUE (product_id, ingredient_id)
 );
 
