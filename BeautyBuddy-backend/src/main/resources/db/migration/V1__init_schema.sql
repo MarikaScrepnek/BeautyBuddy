@@ -367,7 +367,7 @@ CREATE TABLE review_report (
     reason TEXT,
     status report_status_enum DEFAULT 'open',
     created_at TIMESTAMPTZ DEFAULT NOW(),
-    resolved_at TIMESTAMPTZ NULL,
+    resolved_at TIMESTAMPTZ DEFAULT NULL,
     UNIQUE (account_id, review_id)
 );
 
@@ -378,7 +378,7 @@ CREATE TABLE question_report (
     reason TEXT,
     status report_status_enum DEFAULT 'open',
     created_at TIMESTAMPTZ DEFAULT NOW(),
-    resolved_at TIMESTAMPTZ NULL,
+    resolved_at TIMESTAMPTZ DEFAULT NULL,
     UNIQUE (account_id, question_id)
 );
 
@@ -389,7 +389,7 @@ CREATE TABLE answer_report (
     reason TEXT,
     status report_status_enum DEFAULT 'open',
     created_at TIMESTAMPTZ DEFAULT NOW(),
-    resolved_at TIMESTAMPTZ NULL,
+    resolved_at TIMESTAMPTZ DEFAULT NULL,
     UNIQUE (account_id, answer_id)
 );
 
@@ -400,7 +400,7 @@ CREATE TABLE discussion_report (
     reason TEXT,
     status report_status_enum DEFAULT 'open',
     created_at TIMESTAMPTZ DEFAULT NOW(),
-    resolved_at TIMESTAMPTZ NULL,
+    resolved_at TIMESTAMPTZ DEFAULT NULL,
     UNIQUE (account_id, discussion_id)
 );
 
@@ -411,7 +411,7 @@ CREATE TABLE discussion_answer_report (
     reason TEXT,
     status report_status_enum DEFAULT 'open',
     created_at TIMESTAMPTZ DEFAULT NOW(),
-    resolved_at TIMESTAMPTZ NULL,
+    resolved_at TIMESTAMPTZ DEFAULT NULL,
     UNIQUE (account_id, discussion_answer_id)
 );
 

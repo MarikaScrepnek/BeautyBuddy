@@ -42,12 +42,12 @@ public class ReviewController {
     }
 
     @PostMapping("/report")
-    public ResponseEntity<Void> reportReview(@RequestBody ReviewDTO reviewDTO, Authentication authentication) {
+    public ResponseEntity<Void> reportReview(@RequestBody ReviewReportDTO reviewReportDTO, Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.status(401).build();
         }
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        reviewService.reportReview(userDetails.getEmail(), reviewDTO);
+        reviewService.reportReview(userDetails.getEmail(), reviewReportDTO);
         return ResponseEntity.ok().build();
     }
 
