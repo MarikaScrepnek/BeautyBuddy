@@ -5,9 +5,6 @@ import com.beautybuddy.product.ProductShadeRepository;
 import com.beautybuddy.report.ReviewReport;
 import com.beautybuddy.report.ReviewReportDTO;
 import com.beautybuddy.report.ReviewReportRepository;
-import com.beautybuddy.upvote.UpvoteRequestDTO;
-import com.beautybuddy.upvote.entity.ReviewUpvote;
-import com.beautybuddy.upvote.repo.ReviewUpvoteRepository;
 import com.beautybuddy.user.UserRepository;
 
 import org.springframework.stereotype.Service;
@@ -29,15 +26,13 @@ import org.springframework.data.domain.PageRequest;
 public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final ReviewReportRepository reviewReportRepository;
-    private final ReviewUpvoteRepository reviewUpvoteRepository;
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
     private final ProductShadeRepository productShadeRepository;
 
-    public ReviewService(ReviewRepository reviewRepository, ReviewReportRepository reviewReportRepository, ReviewUpvoteRepository reviewUpvoteRepository, UserRepository userRepository, ProductRepository productRepository, ProductShadeRepository productShadeRepository) {
+    public ReviewService(ReviewRepository reviewRepository, ReviewReportRepository reviewReportRepository, UserRepository userRepository, ProductRepository productRepository, ProductShadeRepository productShadeRepository) {
         this.reviewRepository = reviewRepository;
         this.reviewReportRepository = reviewReportRepository;
-        this.reviewUpvoteRepository = reviewUpvoteRepository;
         this.userRepository = userRepository;
         this.productRepository = productRepository;
         this.productShadeRepository = productShadeRepository;
@@ -104,20 +99,6 @@ public class ReviewService {
         }
 
         reviewReportRepository.save(newReport);
-    }
-
-    @Transactional
-    public void upvoteReview(String email, UpvoteRequestDTO upvote) {
-        User user = userRepository.findByEmail(email)
-            .orElseThrow(() -> new RuntimeException("User not found"));
-        Review review = reviewRepository.findById(upvote.targetId())
-            .orElseThrow(() -> new RuntimeException("Review not found"));
-        
-        ReviewUpvote newUpvote = new ReviewUpvote();
-        newUpvote.setUser(user);
-        newUpvote.setReview(review);
-
-        reviewUpvoteRepository.save(newUpvote);
     }
 
     public BigDecimal getAverageRatingForProduct(int productId) {

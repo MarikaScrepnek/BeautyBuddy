@@ -16,14 +16,17 @@ import java.math.BigDecimal;
 import com.beautybuddy.report.ReviewReportDTO;
 import com.beautybuddy.security.CustomUserDetails;
 import com.beautybuddy.upvote.UpvoteRequestDTO;
+import com.beautybuddy.upvote.UpvoteService;
 
 @RestController
 @RequestMapping("/api/reviews")
 public class ReviewController {
     private final ReviewService reviewService;
+    private final UpvoteService upvoteService;
 
-    public ReviewController(ReviewService reviewService) {
+    public ReviewController(ReviewService reviewService, UpvoteService upvoteService) {
         this.reviewService = reviewService;
+        this.upvoteService = upvoteService;
     }
 
     @PostMapping("/add")
@@ -62,7 +65,7 @@ public class ReviewController {
             return ResponseEntity.status(401).build();
         }
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        reviewService.upvoteReview(userDetails.getEmail(), upvoteRequestDTO);
+        upvoteService.upvoteReview(userDetails.getEmail(), upvoteRequestDTO);
         return ResponseEntity.ok().build();
     }
 
