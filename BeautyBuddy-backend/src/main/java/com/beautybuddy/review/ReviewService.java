@@ -4,13 +4,22 @@ import com.beautybuddy.product.ProductRepository;
 import com.beautybuddy.product.ProductShadeRepository;
 import com.beautybuddy.user.UserRepository;
 
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.beautybuddy.user.User;
 import com.beautybuddy.product.Product;
 import com.beautybuddy.product.ProductShade;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+
+@Service
+@Transactional(readOnly = true)
 public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final ReviewReportRepository reviewReportRepository;
@@ -28,6 +37,7 @@ public class ReviewService {
         this.productShadeRepository = productShadeRepository;
     }
 
+    @Transactional
     public void addReview(String email, ReviewDTO review) {
         User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new RuntimeException("User not found"));
@@ -37,25 +47,30 @@ public class ReviewService {
             .orElseThrow(() -> new RuntimeException("Shade not found"));
         BigDecimal rating = review.rating();
         String reviewText = review.reviewText();
-        List<ReviewImage> reviewImages = review.images().stream()
-            .map(imgDto -> {
+        List<ReviewImage> reviewImages = review.imageLinks() == null ? List.of() : review.imageLinks().stream()
+            .map(link -> {
                 ReviewImage img = new ReviewImage();
-                img.setImageLink(imgDto.imageLink());
+                img.setImageLink(link);
+                img.setUploadedAt(LocalDateTime.now());
                 return img;
             })
             .toList();
-        
+                    
         Review newReview = new Review();
         newReview.setUser(user);
         newReview.setProduct(product);
         newReview.setProductShade(shade);
         newReview.setRating(rating);
         newReview.setReviewText(reviewText);
+        for (ReviewImage img : reviewImages) {
+            img.setReview(newReview);
+        }
         newReview.setReviewImages(reviewImages);
 
         reviewRepository.save(newReview);
     }
 
+    @Transactional
     public void removeReview(String email, ReviewDTO review) {
         User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new RuntimeException("User not found"));
@@ -68,6 +83,7 @@ public class ReviewService {
         }
     }
 
+    @Transactional
     public void reportReview(String email, ReviewReportDTO report) {
         User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new RuntimeException("User not found"));
@@ -84,6 +100,7 @@ public class ReviewService {
         reviewReportRepository.save(newReport);
     }
 
+    @Transactional
     public void upvoteReview(String email, ReviewUpvoteDTO upvote) {
         User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new RuntimeException("User not found"));
@@ -97,8 +114,35 @@ public class ReviewService {
         reviewUpvoteRepository.save(newUpvote);
     }
 
-    public List<ReviewDTO> getReviewsForProduct(int productId) {
-        // Implementation for retrieving reviews for a product
-        return null; // Replace with actual implementation
+    public BigDecimal getAverageRatingForProduct(int productId) {
+        BigDecimal averageRating = reviewRepository.findAverageRatingByProductId(productId);
+        return averageRating != null ? averageRating : BigDecimal.ZERO;
+    }
+
+    public Page<ReviewDTO> getReviewsForProduct(int productId, int page, int size) {
+        Page<Review> reviewPage =
+            reviewRepository.findByProduct_ProductIdAndDeletedAtIsNullAndApprovedTrueOrderByCreatedAtDesc(
+                productId,
+                PageRequest.of(page, size)
+            );
+
+        return reviewPage.map(review -> {
+            List<String> imageLinks = review.getReviewImages().stream()
+                .map(img -> img.getImageLink())
+                .toList();
+
+            String shadeName = review.getProductShade() != null
+                ? review.getProductShade().getShadeName()
+                : null;
+
+            return new ReviewDTO(
+                review.getReviewId(),
+                review.getProduct().getProductId(),
+                shadeName,
+                review.getRating(),
+                review.getReviewText(),
+                imageLinks
+            );
+        });
     }
 }
