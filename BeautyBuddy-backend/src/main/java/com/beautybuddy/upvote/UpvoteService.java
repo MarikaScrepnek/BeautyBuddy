@@ -35,4 +35,17 @@ public class UpvoteService {
 
         reviewUpvoteRepository.save(newUpvote);
     }
+
+    @Transactional
+    public void removeUpvote(String email, UpvoteRequestDTO upvote) {
+        User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+        Review review = reviewRepository.findById(upvote.targetId())
+            .orElseThrow(() -> new RuntimeException("Review not found"));
+        
+        ReviewUpvote existingUpvote = reviewUpvoteRepository.findByUserAndReview(user, review)
+            .orElseThrow(() -> new RuntimeException("Upvote not found"));
+
+        reviewUpvoteRepository.delete(existingUpvote);
+    }
 }
