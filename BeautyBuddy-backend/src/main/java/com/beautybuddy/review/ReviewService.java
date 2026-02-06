@@ -4,6 +4,7 @@ import com.beautybuddy.product.ProductRepository;
 import com.beautybuddy.product.ProductShadeRepository;
 import com.beautybuddy.upvote.ReviewUpvote;
 import com.beautybuddy.upvote.ReviewUpvoteDTO;
+import com.beautybuddy.upvote.ReviewUpvoteRepository;
 import com.beautybuddy.user.UserRepository;
 
 import org.springframework.stereotype.Service;
