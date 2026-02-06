@@ -2,9 +2,9 @@ package com.beautybuddy.review;
 
 import com.beautybuddy.product.ProductRepository;
 import com.beautybuddy.product.ProductShadeRepository;
-import com.beautybuddy.upvote.ReviewUpvote;
-import com.beautybuddy.upvote.ReviewUpvoteRepository;
 import com.beautybuddy.upvote.UpvoteRequestDTO;
+import com.beautybuddy.upvote.entity.ReviewUpvote;
+import com.beautybuddy.upvote.repo.ReviewUpvoteRepository;
 import com.beautybuddy.user.UserRepository;
 
 import org.springframework.stereotype.Service;

@@ -1,6 +1,7 @@
-package com.beautybuddy.upvote;
+package com.beautybuddy.upvote.entity;
 
 import com.beautybuddy.discussion.DiscussionAnswer;
+import com.beautybuddy.upvote.BaseUpvote;
 
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
