@@ -2,9 +2,9 @@ package com.beautybuddy.review;
 
 import com.beautybuddy.product.ProductRepository;
 import com.beautybuddy.product.ProductShadeRepository;
-import com.beautybuddy.report.ReviewReport;
-import com.beautybuddy.report.ReviewReportDTO;
-import com.beautybuddy.report.ReviewReportRepository;
+import com.beautybuddy.report.ReportRequestDTO;
+import com.beautybuddy.report.entity.ReviewReport;
+import com.beautybuddy.report.repo.ReviewReportRepository;
 import com.beautybuddy.user.UserRepository;
 
 import org.springframework.stereotype.Service;
@@ -85,7 +85,7 @@ public class ReviewService {
     }
 
     @Transactional
-    public void reportReview(String email, ReviewReportDTO report) {
+    public void reportReview(String email, ReportRequestDTO report) {
         User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new RuntimeException("User not found"));
         Review existingReview = reviewRepository.findById(report.reviewId())

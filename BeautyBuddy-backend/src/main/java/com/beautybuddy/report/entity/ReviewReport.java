@@ -1,4 +1,4 @@
-package com.beautybuddy.report;
+package com.beautybuddy.report.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

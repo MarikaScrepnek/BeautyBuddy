@@ -1,6 +1,6 @@
 package com.beautybuddy.report;
 
-public record ReviewReportDTO (
+public record ReportRequestDTO (
     int reviewId,
     String reason
 ) {}
