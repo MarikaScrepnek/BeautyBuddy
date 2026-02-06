@@ -2,6 +2,8 @@ package com.beautybuddy.review;
 
 import com.beautybuddy.product.ProductRepository;
 import com.beautybuddy.product.ProductShadeRepository;
+import com.beautybuddy.upvote.ReviewUpvote;
+import com.beautybuddy.upvote.ReviewUpvoteDTO;
 import com.beautybuddy.user.UserRepository;
 
 import org.springframework.stereotype.Service;
@@ -108,8 +110,8 @@ public class ReviewService {
             .orElseThrow(() -> new RuntimeException("Review not found"));
         
         ReviewUpvote newUpvote = new ReviewUpvote();
-        newUpvote.setUserId(user.getUserId());
-        newUpvote.setReviewId(review.getReviewId());
+        newUpvote.setUser(user);
+        newUpvote.setReview(review);
 
         reviewUpvoteRepository.save(newUpvote);
     }

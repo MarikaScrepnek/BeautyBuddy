@@ -14,6 +14,7 @@ import org.springframework.security.core.Authentication;
 import java.math.BigDecimal;
 
 import com.beautybuddy.security.CustomUserDetails;
+import com.beautybuddy.upvote.ReviewUpvoteDTO;
 
 @RestController
 @RequestMapping("/api/reviews")
