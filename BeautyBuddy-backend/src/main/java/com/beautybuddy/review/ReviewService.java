@@ -3,8 +3,8 @@ package com.beautybuddy.review;
 import com.beautybuddy.product.ProductRepository;
 import com.beautybuddy.product.ProductShadeRepository;
 import com.beautybuddy.upvote.ReviewUpvote;
-import com.beautybuddy.upvote.ReviewUpvoteDTO;
 import com.beautybuddy.upvote.ReviewUpvoteRepository;
+import com.beautybuddy.upvote.UpvoteRequestDTO;
 import com.beautybuddy.user.UserRepository;
 
 import org.springframework.stereotype.Service;
@@ -104,10 +104,10 @@ public class ReviewService {
     }
 
     @Transactional
-    public void upvoteReview(String email, ReviewUpvoteDTO upvote) {
+    public void upvoteReview(String email, UpvoteRequestDTO upvote) {
         User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new RuntimeException("User not found"));
-        Review review = reviewRepository.findById(upvote.reviewId())
+        Review review = reviewRepository.findById(upvote.targetId())
             .orElseThrow(() -> new RuntimeException("Review not found"));
         
         ReviewUpvote newUpvote = new ReviewUpvote();

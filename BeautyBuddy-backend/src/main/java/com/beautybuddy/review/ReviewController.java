@@ -14,7 +14,7 @@ import org.springframework.security.core.Authentication;
 import java.math.BigDecimal;
 
 import com.beautybuddy.security.CustomUserDetails;
-import com.beautybuddy.upvote.ReviewUpvoteDTO;
+import com.beautybuddy.upvote.UpvoteRequestDTO;
 
 @RestController
 @RequestMapping("/api/reviews")
@@ -56,12 +56,12 @@ public class ReviewController {
     }
 
     @PostMapping("/upvote")
-    public ResponseEntity<Void> upvoteReview(@RequestBody ReviewUpvoteDTO reviewUpvoteDTO, Authentication authentication) {
+    public ResponseEntity<Void> upvoteReview(@RequestBody UpvoteRequestDTO upvoteRequestDTO, Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.status(401).build();
         }
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        reviewService.upvoteReview(userDetails.getEmail(), reviewUpvoteDTO);
+        reviewService.upvoteReview(userDetails.getEmail(), upvoteRequestDTO);
         return ResponseEntity.ok().build();
     }
 
