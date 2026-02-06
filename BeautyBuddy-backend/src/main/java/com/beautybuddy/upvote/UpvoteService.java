@@ -23,7 +23,7 @@ public class UpvoteService {
     }
 
     @Transactional
-    public void upvoteReview(String email, UpvoteRequestDTO upvote) {
+    public void upvote(String email, UpvoteRequestDTO upvote) {
         User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new RuntimeException("User not found"));
         Review review = reviewRepository.findById(upvote.targetId())

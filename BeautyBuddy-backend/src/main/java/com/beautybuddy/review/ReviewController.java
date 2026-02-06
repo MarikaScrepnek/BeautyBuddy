@@ -65,7 +65,7 @@ public class ReviewController {
             return ResponseEntity.status(401).build();
         }
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        upvoteService.upvoteReview(userDetails.getEmail(), upvoteRequestDTO);
+        upvoteService.upvote(userDetails.getEmail(), upvoteRequestDTO);
         return ResponseEntity.ok().build();
     }
 
