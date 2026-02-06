@@ -1,8 +1,9 @@
 package com.beautybuddy.upvote;
 
-import com.beautybuddy.q&a.Answer;
+import com.beautybuddy.qa.Answer;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -11,6 +12,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
+@Entity
 @Table(
     name = "answer_upvotes",
     uniqueConstraints = @UniqueConstraint(columnNames = {"account_id", "answer_id"})

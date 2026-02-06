@@ -12,6 +12,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.UniqueConstraint;
 
+@Entity
 @Table(
     name = "discussion_answer_upvotes",
     uniqueConstraints = @UniqueConstraint(columnNames = {"account_id", "discussion_answer_id"})
