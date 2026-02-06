@@ -1,4 +1,4 @@
-package com.beautybuddy.review;
+package com.beautybuddy.report;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -10,6 +10,7 @@ import jakarta.persistence.UniqueConstraint;
 
 import java.time.LocalDateTime;
 
+import com.beautybuddy.review.Review;
 import com.beautybuddy.user.User;
 
 @Entity

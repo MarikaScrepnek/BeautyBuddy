@@ -2,6 +2,10 @@ package com.beautybuddy.review;
 
 import com.beautybuddy.product.ProductRepository;
 import com.beautybuddy.product.ProductShadeRepository;
+import com.beautybuddy.report.ReviewDTO;
+import com.beautybuddy.report.ReviewReport;
+import com.beautybuddy.report.ReviewReportDTO;
+import com.beautybuddy.report.ReviewReportRepository;
 import com.beautybuddy.upvote.UpvoteRequestDTO;
 import com.beautybuddy.upvote.entity.ReviewUpvote;
 import com.beautybuddy.upvote.repo.ReviewUpvoteRepository;

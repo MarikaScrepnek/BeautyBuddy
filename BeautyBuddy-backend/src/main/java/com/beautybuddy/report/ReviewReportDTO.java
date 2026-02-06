@@ -1,4 +1,4 @@
-package com.beautybuddy.review;
+package com.beautybuddy.report;
 
 public record ReviewReportDTO (
     int reviewId,

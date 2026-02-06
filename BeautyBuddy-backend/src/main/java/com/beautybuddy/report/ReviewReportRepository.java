@@ -1,4 +1,4 @@
-package com.beautybuddy.review;
+package com.beautybuddy.report;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
