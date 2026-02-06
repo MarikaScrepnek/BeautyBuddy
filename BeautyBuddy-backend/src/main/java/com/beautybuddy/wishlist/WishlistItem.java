@@ -3,6 +3,7 @@ package com.beautybuddy.wishlist;
 import com.beautybuddy.product.Product;
 import com.beautybuddy.product.ProductShade;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -18,7 +19,8 @@ import jakarta.persistence.UniqueConstraint;
 public class WishlistItem {
     @Id
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
-    private int wishlist_item_id;
+    @Column(name = "id", nullable = false)
+    private int id;
 
     @ManyToOne
     @JoinColumn(name = "wishlist_id", nullable = false)
@@ -33,11 +35,11 @@ public class WishlistItem {
     private ProductShade shade;
 
     public int getWishlist_item_id() {
-        return wishlist_item_id;
+        return id;
     }
 
     public void setWishlist_item_id(int wishlist_item_id) {
-        this.wishlist_item_id = wishlist_item_id;
+        this.id = wishlist_item_id;
     }
 
     public Wishlist getWishlist() {

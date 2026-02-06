@@ -25,7 +25,8 @@ import java.sql.Timestamp;
 public class Wishlist {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int wishlist_id;
+    @Column(name = "id", nullable = false)
+    private int id;
 
     @OneToOne
     @JoinColumn(name = "account_id", nullable = false)
@@ -44,11 +45,11 @@ public class Wishlist {
     public Wishlist() {}
 
     public int getWishlistId() {
-        return wishlist_id;
+        return id;
     }
 
-    public void setWishlistId(int wishlist_id) {
-        this.wishlist_id = wishlist_id;
+    public void setWishlistId(int id) {
+        this.id = id;
     }
 
     public User getUser() {

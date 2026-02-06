@@ -1,24 +1,24 @@
-package com.beautybuddy.upvote.entity;
+package com.beautybuddy.report.entity;
 
 import com.beautybuddy.discussion.DiscussionAnswer;
-import com.beautybuddy.upvote.BaseUpvote;
+import com.beautybuddy.report.BaseReport;
 
+import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.Entity;
 import jakarta.persistence.UniqueConstraint;
 
 @Entity
 @Table(
-    name = "discussion_answer_upvote",
-    uniqueConstraints = @UniqueConstraint(columnNames = {"account_id", "discussion_answer_id"})
+    name = "discussion_answer_report",
+    uniqueConstraints = @UniqueConstraint(columnNames = {"account_id", "answer_id"})
 )
-public class DiscussionAnswerUpvote extends BaseUpvote {
-
+public class DiscussionAnswerReport extends BaseReport {
+    
     @ManyToOne
-    @JoinColumn(name = "discussion_answer_id", nullable = false)
-    private DiscussionAnswer discussionAnswer;
+    @JoinColumn(name = "answer_id", nullable = false)
+    DiscussionAnswer discussionAnswer;
 
     public DiscussionAnswer getDiscussionAnswer() {
         return discussionAnswer;
