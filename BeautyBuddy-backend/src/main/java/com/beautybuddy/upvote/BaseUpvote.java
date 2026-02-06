@@ -15,7 +15,7 @@ public abstract class BaseUpvote {
 	@JoinColumn(name = "account_id", nullable = false)
 	private User user;
 
-	@Column(name = "created_at", nullable = false)
+	@Column(name = "created_at", nullable = false, insertable = false, updatable = false)
 	private LocalDateTime createdAt;
 
 	public User getUser() {
@@ -27,8 +27,5 @@ public abstract class BaseUpvote {
 
 	public LocalDateTime getCreatedAt() {
 		return createdAt;
-	}
-	public void setCreatedAt(LocalDateTime createdAt) {
-		this.createdAt = createdAt;
 	}
 }

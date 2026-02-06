@@ -15,7 +15,7 @@ import jakarta.persistence.UniqueConstraint;
 
 @Entity
 @Table(
-    name = "question_upvotes",
+    name = "question_upvote",
     uniqueConstraints = @UniqueConstraint(columnNames = {"account_id", "question_id"})
 )
 public class QuestionUpvote extends BaseUpvote {
