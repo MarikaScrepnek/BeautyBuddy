@@ -1,4 +1,4 @@
-package com.beautybuddy.report;
+package com.beautybuddy.review;
 
 import java.math.BigDecimal;
 import java.util.List;

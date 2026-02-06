@@ -13,7 +13,6 @@ import org.springframework.security.core.Authentication;
 
 import java.math.BigDecimal;
 
-import com.beautybuddy.report.ReviewDTO;
 import com.beautybuddy.report.ReviewReportDTO;
 import com.beautybuddy.security.CustomUserDetails;
 import com.beautybuddy.upvote.UpvoteRequestDTO;
