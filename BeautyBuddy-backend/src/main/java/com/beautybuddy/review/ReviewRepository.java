@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 
 public interface ReviewRepository extends JpaRepository<Review, Integer> {
 
-    Page<Review> findByProduct_ProductIdAndDeletedAtIsNullAndApprovedTrue(
+    Page<Review> findByProduct_ProductIdAndDeletedAtIsNullAndApprovedTrueOrderByCreatedAtDesc(
         int productId,
         Pageable pageable
     );
