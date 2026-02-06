@@ -9,7 +9,7 @@ public record ReviewDTO(
     String shadeName,
     BigDecimal rating,
     String reviewText,
-    List<ReviewImageDTO> images
+    List<String> imageLinks
 )
 { 
 }
