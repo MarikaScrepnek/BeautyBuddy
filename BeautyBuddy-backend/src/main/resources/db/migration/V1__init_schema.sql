@@ -366,7 +366,7 @@ CREATE TABLE discussion_answer_upvote (
 CREATE TYPE report_status_enum AS ENUM ('OPEN', 'REVIEWING', 'RESOLVED', 'REJECTED');
 
 CREATE TABLE review_report (
-    report_id SERIAL PRIMARY KEY,
+    review_report_id SERIAL PRIMARY KEY,
     account_id INT NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
     review_id INT NOT NULL REFERENCES review(review_id) ON DELETE CASCADE,
     reason TEXT,
@@ -377,7 +377,7 @@ CREATE TABLE review_report (
 );
 
 CREATE TABLE question_report (
-    report_id SERIAL PRIMARY KEY,
+    question_report_id SERIAL PRIMARY KEY,
     account_id INT NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
     question_id INT NOT NULL REFERENCES question(question_id) ON DELETE CASCADE,
     reason TEXT,
@@ -388,7 +388,7 @@ CREATE TABLE question_report (
 );
 
 CREATE TABLE answer_report (
-    report_id SERIAL PRIMARY KEY,
+    answer_report_id SERIAL PRIMARY KEY,
     account_id INT NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
     answer_id INT NOT NULL REFERENCES answer(answer_id) ON DELETE CASCADE,
     reason TEXT,
@@ -399,7 +399,7 @@ CREATE TABLE answer_report (
 );
 
 CREATE TABLE discussion_report (
-    report_id SERIAL PRIMARY KEY,
+    discussion_report_id SERIAL PRIMARY KEY,
     account_id INT NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
     discussion_id INT NOT NULL REFERENCES discussion(discussion_id) ON DELETE CASCADE,
     reason TEXT,
@@ -410,7 +410,7 @@ CREATE TABLE discussion_report (
 );
 
 CREATE TABLE discussion_answer_report (
-    report_id SERIAL PRIMARY KEY,
+    discussion_answer_report_id SERIAL PRIMARY KEY,
     account_id INT NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
     discussion_answer_id INT NOT NULL REFERENCES discussion_answer(discussion_answer_id) ON DELETE CASCADE,
     reason TEXT,
