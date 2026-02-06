@@ -363,14 +363,14 @@ CREATE TABLE discussion_answer_upvote (
     UNIQUE (account_id, discussion_answer_id)
 );
 
-CREATE TYPE report_status_enum AS ENUM ('open', 'reviewing', 'resolved', 'rejected');
+CREATE TYPE report_status_enum AS ENUM ('OPEN', 'REVIEWING', 'RESOLVED', 'REJECTED');
 
 CREATE TABLE review_report (
     report_id SERIAL PRIMARY KEY,
     account_id INT NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
     review_id INT NOT NULL REFERENCES review(review_id) ON DELETE CASCADE,
     reason TEXT,
-    status report_status_enum DEFAULT 'open',
+    status report_status_enum DEFAULT 'OPEN',
     created_at TIMESTAMPTZ DEFAULT NOW(),
     resolved_at TIMESTAMPTZ DEFAULT NULL,
     UNIQUE (account_id, review_id)
@@ -381,7 +381,7 @@ CREATE TABLE question_report (
     account_id INT NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
     question_id INT NOT NULL REFERENCES question(question_id) ON DELETE CASCADE,
     reason TEXT,
-    status report_status_enum DEFAULT 'open',
+    status report_status_enum DEFAULT 'OPEN',
     created_at TIMESTAMPTZ DEFAULT NOW(),
     resolved_at TIMESTAMPTZ DEFAULT NULL,
     UNIQUE (account_id, question_id)
@@ -392,7 +392,7 @@ CREATE TABLE answer_report (
     account_id INT NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
     answer_id INT NOT NULL REFERENCES answer(answer_id) ON DELETE CASCADE,
     reason TEXT,
-    status report_status_enum DEFAULT 'open',
+    status report_status_enum DEFAULT 'OPEN',
     created_at TIMESTAMPTZ DEFAULT NOW(),
     resolved_at TIMESTAMPTZ DEFAULT NULL,
     UNIQUE (account_id, answer_id)
@@ -403,7 +403,7 @@ CREATE TABLE discussion_report (
     account_id INT NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
     discussion_id INT NOT NULL REFERENCES discussion(discussion_id) ON DELETE CASCADE,
     reason TEXT,
-    status report_status_enum DEFAULT 'open',
+    status report_status_enum DEFAULT 'OPEN',
     created_at TIMESTAMPTZ DEFAULT NOW(),
     resolved_at TIMESTAMPTZ DEFAULT NULL,
     UNIQUE (account_id, discussion_id)
@@ -414,7 +414,7 @@ CREATE TABLE discussion_answer_report (
     account_id INT NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
     discussion_answer_id INT NOT NULL REFERENCES discussion_answer(discussion_answer_id) ON DELETE CASCADE,
     reason TEXT,
-    status report_status_enum DEFAULT 'open',
+    status report_status_enum DEFAULT 'OPEN',
     created_at TIMESTAMPTZ DEFAULT NOW(),
     resolved_at TIMESTAMPTZ DEFAULT NULL,
     UNIQUE (account_id, discussion_answer_id)
