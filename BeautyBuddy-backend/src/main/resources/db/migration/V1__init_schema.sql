@@ -112,6 +112,8 @@ CREATE TABLE account (
     email CITEXT UNIQUE NOT NULL,
     password_hash TEXT NOT NULL,
     date_joined TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    is_private BOOLEAN NOT NULL DEFAULT FALSE,
+
     followers_count INT NOT NULL DEFAULT 0,
     following_count INT NOT NULL DEFAULT 0,
     unread_notifications_count INT NOT NULL DEFAULT 0,
@@ -248,7 +250,7 @@ CREATE TABLE review (
     account_id INT REFERENCES account(id) ON DELETE SET NULL,
     product_id INT NOT NULL REFERENCES product(id) ON DELETE CASCADE,
     product_shade_id INT,
-    rating NUMERIC(2, 1) CHECK (rating >= 0 AND rating <= 5),
+    rating NUMERIC(3, 2) CHECK (rating >= 0 AND rating <= 5),
     review_text TEXT,
     helpful_count INT NOT NULL DEFAULT 0,
     reported_count INT NOT NULL DEFAULT 0,
@@ -541,7 +543,7 @@ CREATE TABLE discussion_answer_upvoted_notification (
 
 
 -- ===========================================================================
--- Extra
+-- Community Posts: Public
 -- ===========================================================================
 
 CREATE TABLE public_community_post (
@@ -555,6 +557,42 @@ CREATE TABLE public_community_post (
 
     CHECK (length(trim(title)) > 0),
     CHECK (length(trim(content)) > 0)
+);
+
+
+
+
+-- ===========================================================================
+-- Activity Feed (followed accounts only)
+-- ===========================================================================
+
+CREATE TABLE activity (
+    id BIGSERIAL PRIMARY KEY,
+    actor_id INT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    payload JSONB NOT NULL DEFAULT '{}'::jsonb,
+
+    CHECK (jsonb_typeof(payload) = 'object')
+);
+
+CREATE TABLE review_activity (
+    activity_id BIGINT PRIMARY KEY REFERENCES activity(id) ON DELETE CASCADE,
+    review_id INT NOT NULL REFERENCES review(id) ON DELETE CASCADE
+);
+
+CREATE TABLE routine_item_activity (
+    activity_id BIGINT PRIMARY KEY REFERENCES activity(id) ON DELETE CASCADE,
+    routine_item_id BIGINT NOT NULL REFERENCES routine_item(id) ON DELETE CASCADE
+);
+
+CREATE TABLE routine_image_activity (
+    activity_id BIGINT PRIMARY KEY REFERENCES activity(id) ON DELETE CASCADE,
+    routine_image_id INT NOT NULL REFERENCES routine_image(id) ON DELETE CASCADE
+);
+
+CREATE TABLE wishlist_item_activity (
+    activity_id BIGINT PRIMARY KEY REFERENCES activity(id) ON DELETE CASCADE,
+    wishlist_item_id INT NOT NULL REFERENCES wishlist_item(id) ON DELETE CASCADE
 );
 
 
