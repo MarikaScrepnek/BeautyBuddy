@@ -1,5 +1,17 @@
+-- ================================================================
+-- Extensions
+-- ================================================================
+
 CREATE EXTENSION IF NOT EXISTS unaccent;
 CREATE EXTENSION IF NOT EXISTS citext;
+
+
+
+
+
+-- ================================================================
+-- Products, Categories, Brands, Ingredients
+-- ================================================================
 
 CREATE TABLE category (
     id SERIAL PRIMARY KEY,
@@ -10,6 +22,7 @@ CREATE TABLE category (
     CHECK (parent_category_id IS NULL OR parent_category_id <> id)
 );
 
+-------------------------------------------------------------------
 CREATE TABLE brand (
     id SERIAL PRIMARY KEY,
     name CITEXT UNIQUE NOT NULL,
@@ -17,6 +30,7 @@ CREATE TABLE brand (
     CHECK (length(trim(name::text)) > 0)
 );
 
+-------------------------------------------------------------------
 CREATE TABLE product (
     id SERIAL PRIMARY KEY,
     name CITEXT NOT NULL,
@@ -54,12 +68,13 @@ CREATE TABLE product_shade (
     CHECK (length(trim(shade_name::text)) > 0)
 );
 
+------------------------------------------------------------------
 CREATE TABLE ingredient (
     id SERIAL PRIMARY KEY,
     name CITEXT UNIQUE NOT NULL,
     canonical_id INT REFERENCES ingredient(id) ON DELETE SET NULL,
     is_common_allergen BOOLEAN NOT NULL DEFAULT FALSE,
-    is_fragrence BOOLEAN NOT NULL DEFAULT FALSE,
+    is_fragrance BOOLEAN NOT NULL DEFAULT FALSE,
 
     CHECK (length(trim(name::text)) > 0),
     CHECK (canonical_id IS NULL OR canonical_id <> id)
@@ -83,6 +98,14 @@ CREATE TABLE may_contain_ingredient (
     UNIQUE (product_id, ingredient_id)
 );
 
+
+
+
+
+-- ================================================================
+-- User Accounts, Wishlists, Routines
+-- ================================================================
+
 CREATE TABLE account (
     id SERIAL PRIMARY KEY,
     username CITEXT UNIQUE NOT NULL,
@@ -101,8 +124,24 @@ CREATE TABLE account (
     CHECK (unread_notifications_count >= 0)
 );
 
---triggers to update followers_count, following_count, and unread_notifications_count in account table
+CREATE TABLE account_follow (
+    id SERIAL PRIMARY KEY,
+    follower_id INT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
+    following_id INT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
+    followed_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE (follower_id, following_id),
+    CHECK (follower_id <> following_id)
+);
 
+CREATE TABLE account_notification_pref (
+    account_id INT PRIMARY KEY REFERENCES account(id) ON DELETE CASCADE,
+    question_on_routine_product BOOLEAN NOT NULL DEFAULT TRUE,
+    answer_on_your_question BOOLEAN NOT NULL DEFAULT TRUE,
+    discussion_answer_on_your_discussion BOOLEAN NOT NULL DEFAULT TRUE,
+    upvotes BOOLEAN NOT NULL DEFAULT TRUE
+);
+
+-------------------------------------------------------------------
 CREATE TABLE wishlist (
     id SERIAL PRIMARY KEY,
     account_id INT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
@@ -130,6 +169,7 @@ CREATE UNIQUE INDEX uq_wishlist_item_product_noshade
 ON wishlist_item (wishlist_id, product_id)
 WHERE shade_id IS NULL;
 
+-------------------------------------------------------------------
 CREATE TABLE routine (
     id SERIAL PRIMARY KEY,
     account_id INT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
@@ -195,6 +235,14 @@ CREATE TABLE routine_image (
 
 --add routine item schedules later
 
+
+
+
+
+--================================================================
+-- Product Page Content: Reviews, Q&A
+--================================================================
+
 CREATE TABLE review (
     id SERIAL PRIMARY KEY,
     account_id INT REFERENCES account(id) ON DELETE SET NULL,
@@ -246,6 +294,7 @@ CREATE TABLE review_image (
     CHECK (length(trim(image_link)) > 0)
 );
 
+-----------------------------------------------------------------------------
 CREATE TABLE question (
     id SERIAL PRIMARY KEY,
     account_id INT REFERENCES account(id) ON DELETE SET NULL,
@@ -289,6 +338,14 @@ CREATE TABLE answer (
 
     CHECK (length(trim(answer_text)) > 0)
 );
+
+
+
+
+
+-- ===========================================================================
+-- Discussions
+-- ===========================================================================
 
 CREATE TABLE discussion (
     id SERIAL PRIMARY KEY,
@@ -348,14 +405,13 @@ CREATE TABLE user_discussion_pin (
     UNIQUE (discussion_id, account_id)
 );
 
-CREATE TABLE user_follow (
-    id SERIAL PRIMARY KEY,
-    follower_id INT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
-    following_id INT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
-    followed_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    UNIQUE (follower_id, following_id),
-    CHECK (follower_id <> following_id)
-);
+
+
+
+
+-- ===========================================================================
+-- Upvotes, reports, notifications
+-- ===========================================================================
 
 CREATE TABLE upvote (
     id SERIAL PRIMARY KEY,
@@ -388,6 +444,7 @@ CREATE TABLE discussion_answer_upvote (
     discussion_answer_id INT NOT NULL REFERENCES discussion_answer(id) ON DELETE CASCADE
 );
 
+------------------------------------------------------------------------------
 CREATE TYPE report_status_enum AS ENUM ('OPEN', 'REVIEWING', 'RESOLVED', 'REJECTED');
 
 CREATE TABLE report (
@@ -424,19 +481,7 @@ CREATE TABLE discussion_answer_report (
     discussion_answer_id INT NOT NULL REFERENCES discussion_answer(id) ON DELETE CASCADE
 );
 
-CREATE TABLE public_community_post (
-    id SERIAL PRIMARY KEY,
-    title TEXT NOT NULL,
-    content TEXT NOT NULL,
-    media JSONB,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    deleted_at TIMESTAMPTZ NULL,
-
-    CHECK (length(trim(title)) > 0),
-    CHECK (length(trim(content)) > 0)
-);
-
+------------------------------------------------------------------------------
 CREATE TABLE notification (
     id BIGSERIAL PRIMARY KEY,
     recipient_id INT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
@@ -491,13 +536,30 @@ CREATE TABLE discussion_answer_upvoted_notification (
     discussion_answer_id INT NOT NULL REFERENCES discussion_answer(id) ON DELETE CASCADE
 );
 
-CREATE TABLE user_notification_pref (
-    account_id INT PRIMARY KEY REFERENCES account(id) ON DELETE CASCADE,
-    question_on_routine_product BOOLEAN NOT NULL DEFAULT TRUE,
-    answer_on_your_question BOOLEAN NOT NULL DEFAULT TRUE,
-    discussion_answer_on_your_discussion BOOLEAN NOT NULL DEFAULT TRUE,
-    upvotes BOOLEAN NOT NULL DEFAULT TRUE
+
+
+
+
+-- ===========================================================================
+-- Extra
+-- ===========================================================================
+
+CREATE TABLE public_community_post (
+    id SERIAL PRIMARY KEY,
+    title TEXT NOT NULL,
+    content TEXT NOT NULL,
+    media JSONB,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    deleted_at TIMESTAMPTZ NULL,
+
+    CHECK (length(trim(title)) > 0),
+    CHECK (length(trim(content)) > 0)
 );
+
+
+
+
 
 --triggers for updating fields
 --indexes for performance optimization
