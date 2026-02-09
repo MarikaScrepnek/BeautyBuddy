@@ -3,18 +3,23 @@ CREATE EXTENSION IF NOT EXISTS citext;
 
 CREATE TABLE category (
     id SERIAL PRIMARY KEY,
-    name TEXT UNIQUE NOT NULL,
-    parent_category_id INT REFERENCES category(id) DEFAULT NULL
+    name CITEXT UNIQUE NOT NULL,
+    parent_category_id INT REFERENCES category(id) ON DELETE SET NULL,
+
+    CHECK (length(trim(name::text)) > 0),
+    CHECK (parent_category_id IS NULL OR parent_category_id <> id)
 );
 
 CREATE TABLE brand (
     id SERIAL PRIMARY KEY,
-    name TEXT UNIQUE NOT NULL
+    name CITEXT UNIQUE NOT NULL,
+
+    CHECK (length(trim(name::text)) > 0)
 );
 
 CREATE TABLE product (
     id SERIAL PRIMARY KEY,
-    name TEXT NOT NULL,
+    name CITEXT NOT NULL,
     brand_id INT NOT NULL REFERENCES brand(id),
     category_id INT NOT NULL REFERENCES category(id),
     price NUMERIC(10, 2),
@@ -23,53 +28,77 @@ CREATE TABLE product (
     rating NUMERIC(2, 1),
     raw_ingredients TEXT,
     may_contain_raw_ingredients TEXT,
+
     UNIQUE(name, brand_id),
+
     CHECK (rating >= 0 AND rating <= 5),
-    CHECK (price >= 0)
+    CHECK (price >= 0),
+
+    CHECK (length(trim(name::text)) > 0),
+    CHECK (image_link IS NULL OR length(trim(image_link)) > 0),
+    CHECK (product_link IS NULL OR length(trim(product_link)) > 0)
 );
 
 CREATE TABLE product_shade (
     id SERIAL PRIMARY KEY,
     product_id INT NOT NULL REFERENCES product(id) ON DELETE CASCADE,
-    shade_name TEXT NOT NULL,
+    shade_name CITEXT NOT NULL,
     shade_hex_code TEXT,
     shade_number INT,
     image_link TEXT,
     product_link TEXT,
 
-    UNIQUE (product_id, shade_name)
+    UNIQUE (product_id, shade_name), -- prevents duplicate shade names for the same product
+    UNIQUE (id, product_id), -- allows other tables to ensure shade belongs to product in FKs
+
+    CHECK (length(trim(shade_name::text)) > 0)
 );
 
 CREATE TABLE ingredient (
     id SERIAL PRIMARY KEY,
-    name TEXT UNIQUE NOT NULL,
-    canonical_id INT REFERENCES ingredient(id)
+    name CITEXT UNIQUE NOT NULL,
+    canonical_id INT REFERENCES ingredient(id) ON DELETE SET NULL,
+    is_common_allergen BOOLEAN NOT NULL DEFAULT FALSE,
+    is_fragrence BOOLEAN NOT NULL DEFAULT FALSE,
+
+    CHECK (length(trim(name::text)) > 0),
+    CHECK (canonical_id IS NULL OR canonical_id <> id)
 );
 
 CREATE TABLE product_ingredient (
     id SERIAL PRIMARY KEY,
-    product_id INT REFERENCES product(id) ON DELETE CASCADE,
-    ingredient_id INT REFERENCES ingredient(id) ON DELETE CASCADE,
+    product_id INT NOT NULL REFERENCES product(id) ON DELETE CASCADE,
+    ingredient_id INT NOT NULL REFERENCES ingredient(id) ON DELETE CASCADE,
     position INT NOT NULL,
-    UNIQUE (product_id, ingredient_id)
+    UNIQUE (product_id, ingredient_id),
+    UNIQUE (product_id, position),
+
+    CHECK (position >= 1)
 );
 
 CREATE TABLE may_contain_ingredient (
     id SERIAL PRIMARY KEY,
-    product_id INT REFERENCES product(id) ON DELETE CASCADE,
-    ingredient_id INT REFERENCES ingredient(id) ON DELETE CASCADE,
+    product_id INT NOT NULL REFERENCES product(id) ON DELETE CASCADE,
+    ingredient_id INT NOT NULL REFERENCES ingredient(id) ON DELETE CASCADE,
     UNIQUE (product_id, ingredient_id)
 );
 
 CREATE TABLE account (
     id SERIAL PRIMARY KEY,
-    username TEXT UNIQUE NOT NULL,
+    username CITEXT UNIQUE NOT NULL,
     email CITEXT UNIQUE NOT NULL,
     password_hash TEXT NOT NULL,
     date_joined TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    followers_count INT DEFAULT 0,
-    following_count INT DEFAULT 0,
-    unread_notifications_count INT DEFAULT 0
+    followers_count INT NOT NULL DEFAULT 0,
+    following_count INT NOT NULL DEFAULT 0,
+    unread_notifications_count INT NOT NULL DEFAULT 0,
+
+    CHECK (length(trim(username)) > 0),
+    CHECK (length(trim(email)) > 0),
+
+    CHECK (followers_count >= 0),
+    CHECK (following_count >= 0),
+    CHECK (unread_notifications_count >= 0)
 );
 
 --triggers to update followers_count, following_count, and unread_notifications_count in account table
@@ -78,6 +107,7 @@ CREATE TABLE wishlist (
     id SERIAL PRIMARY KEY,
     account_id INT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     UNIQUE (account_id)
 );
 
@@ -86,24 +116,31 @@ CREATE TABLE wishlist_item (
     wishlist_id INT NOT NULL REFERENCES wishlist(id) ON DELETE CASCADE,
     product_id INT NOT NULL REFERENCES product(id) ON DELETE CASCADE,
     shade_id INT,
-    added_at TIMESTAMPTZ DEFAULT NOW(),
+    added_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+
+    CHECK (shade_id IS NULL OR product_id IS NOT NULL),
 
     UNIQUE (wishlist_id, product_id, shade_id),
-    FOREIGN KEY (shade_id, product_id)
-        REFERENCES product_shade(id, product_id)
-        ON DELETE SET NULL
-);
 
-CREATE TYPE routine_category_enum AS ENUM ('skincare', 'makeup', 'haircare', 'bodycare', 'other');
+    FOREIGN KEY (shade_id, product_id)
+    REFERENCES product_shade(id, product_id)
+    ON DELETE SET NULL
+);
+CREATE UNIQUE INDEX uq_wishlist_item_product_noshade
+ON wishlist_item (wishlist_id, product_id)
+WHERE shade_id IS NULL;
 
 CREATE TABLE routine (
     id SERIAL PRIMARY KEY,
     account_id INT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
     name TEXT NOT NULL,
     notes TEXT,
-    category routine_category_enum NOT NULL DEFAULT 'other',
+    category_id INT NOT NULL REFERENCES category(id),
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+
+    CHECK (length(trim(name)) > 0),
+    CHECK (notes IS NULL OR length(trim(notes)) > 0),
 
     UNIQUE (account_id, name)
 );
@@ -125,14 +162,23 @@ CREATE TABLE routine_item (
 
     CHECK (step_order >= 1),
     CHECK (valid_to IS NULL OR valid_to > valid_from),
+    CHECK (shade_id IS NULL OR product_id IS NOT NULL),
 
     FOREIGN KEY (shade_id, product_id)
-        REFERENCES product_shade(id, product_id)
-        ON DELETE SET NULL
+    REFERENCES product_shade(id, product_id)
+    ON DELETE SET NULL
 );
 CREATE UNIQUE INDEX uniq_current_step_per_routine
-  ON routine_item (routine_id, step_order)
-  WHERE valid_to IS NULL;
+ON routine_item (routine_id, step_order)
+WHERE valid_to IS NULL;
+
+CREATE UNIQUE INDEX uq_current_routine_item_product_noshade
+ON routine_item (routine_id, product_id)
+WHERE valid_to IS NULL AND shade_id IS NULL;
+
+CREATE UNIQUE INDEX uq_current_routine_item_product_shade
+ON routine_item (routine_id, product_id, shade_id)
+WHERE valid_to IS NULL AND shade_id IS NOT NULL;
 --When someone “removes” an item: you just set valid_to = now() (no special removed_at column needed)
 --When they “add” it again later: you insert a new row with a new valid_from
 
@@ -140,7 +186,11 @@ CREATE TABLE routine_image (
     id SERIAL PRIMARY KEY,
     routine_id INT NOT NULL REFERENCES routine(id) ON DELETE CASCADE,
     image_link TEXT NOT NULL,
-    uploaded_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    uploaded_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+
+    UNIQUE (routine_id, image_link),
+
+    CHECK (length(trim(image_link)) > 0)
 );
 
 --add routine item schedules later
@@ -148,20 +198,32 @@ CREATE TABLE routine_image (
 CREATE TABLE review (
     id SERIAL PRIMARY KEY,
     account_id INT REFERENCES account(id) ON DELETE SET NULL,
-    product_id INT REFERENCES product(id) ON DELETE CASCADE,
+    product_id INT NOT NULL REFERENCES product(id) ON DELETE CASCADE,
     product_shade_id INT,
     rating NUMERIC(2, 1) CHECK (rating >= 0 AND rating <= 5),
     review_text TEXT,
-    helpful_count INT DEFAULT 0,
+    helpful_count INT NOT NULL DEFAULT 0,
+    reported_count INT NOT NULL DEFAULT 0,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     deleted_at TIMESTAMPTZ DEFAULT NULL,
-    reported_count INT DEFAULT 0,
-    approved BOOLEAN DEFAULT TRUE,
+    approved BOOLEAN NOT NULL DEFAULT TRUE,
+
+    CHECK (helpful_count >= 0),
+    CHECK (reported_count >= 0),
+    CHECK (review_text IS NULL OR length(trim(review_text)) > 0),
+
+    CHECK (
+        (product_shade_id IS NULL AND product_id IS NOT NULL) OR
+        (product_shade_id IS NOT NULL AND product_id IS NOT NULL)
+    ),
+
+    CHECK (created_at <= updated_at),
+    CHECK (deleted_at IS NULL OR deleted_at >= created_at),
 
     FOREIGN KEY (product_shade_id, product_id)
-        REFERENCES product_shade(id, product_id)
-        ON DELETE SET NULL
+    REFERENCES product_shade(id, product_id)
+    ON DELETE SET NULL
 );
 -- One active review per account+product+shade (shade chosen)
 CREATE UNIQUE INDEX uq_review_account_product_shade_active
@@ -175,37 +237,57 @@ WHERE deleted_at IS NULL AND product_shade_id IS NULL;
 
 CREATE TABLE review_image (
     id SERIAL PRIMARY KEY,
-    review_id INT REFERENCES review(id) ON DELETE CASCADE,
+    review_id INT NOT NULL REFERENCES review(id) ON DELETE CASCADE,
     image_link TEXT NOT NULL,
-    uploaded_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    uploaded_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+
+    UNIQUE (review_id, image_link),
+
+    CHECK (length(trim(image_link)) > 0)
 );
 
 CREATE TABLE question (
     id SERIAL PRIMARY KEY,
     account_id INT REFERENCES account(id) ON DELETE SET NULL,
-    product_id INT REFERENCES product(id) ON DELETE CASCADE,
+    product_id INT NOT NULL REFERENCES product(id) ON DELETE CASCADE,
     question_text TEXT NOT NULL,
-    answered BOOLEAN DEFAULT FALSE,
-    upvote_count INT DEFAULT 0,
+    answered BOOLEAN NOT NULL DEFAULT FALSE,
+    upvote_count INT NOT NULL DEFAULT 0,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     deleted_at TIMESTAMPTZ NULL,
-    reported_count INT DEFAULT 0,
-    approved BOOLEAN DEFAULT TRUE
+    reported_count INT NOT NULL DEFAULT 0,
+    approved BOOLEAN NOT NULL DEFAULT TRUE,
+
+    CHECK (upvote_count >= 0),
+    CHECK (reported_count >= 0),
+
+    CHECK (created_at <= updated_at),
+    CHECK (deleted_at IS NULL OR deleted_at >= created_at),
+
+    CHECK (length(trim(question_text)) > 0)
 );
 --triggers to update 'answered' field in question table when an answer is added or removed
 
 CREATE TABLE answer (
     id SERIAL PRIMARY KEY,
-    question_id INT REFERENCES question(id) ON DELETE CASCADE,
+    question_id INT NOT NULL REFERENCES question(id) ON DELETE CASCADE,
     account_id INT REFERENCES account(id) ON DELETE SET NULL,
     answer_text TEXT NOT NULL,
-    helpful_count INT DEFAULT 0,
+    helpful_count INT NOT NULL DEFAULT 0,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     deleted_at TIMESTAMPTZ NULL,
-    reported_count INT DEFAULT 0,
-    approved BOOLEAN DEFAULT TRUE
+    reported_count INT NOT NULL DEFAULT 0,
+    approved BOOLEAN NOT NULL DEFAULT TRUE,
+
+    CHECK (helpful_count >= 0),
+    CHECK (reported_count >= 0),
+
+    CHECK (created_at <= updated_at),
+    CHECK (deleted_at IS NULL OR deleted_at >= created_at),
+
+    CHECK (length(trim(answer_text)) > 0)
 );
 
 CREATE TABLE discussion (
@@ -216,49 +298,154 @@ CREATE TABLE discussion (
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     deleted_at TIMESTAMPTZ NULL,
-    reported_count INT DEFAULT 0,
-    approved BOOLEAN DEFAULT TRUE
+    reported_count INT NOT NULL DEFAULT 0,
+    approved BOOLEAN NOT NULL DEFAULT TRUE,
+
+    CHECK (reported_count >= 0),
+
+    CHECK (created_at <= updated_at),
+    CHECK (deleted_at IS NULL OR deleted_at >= created_at),
+
+    CHECK (length(trim(title)) > 0),
+    CHECK (length(trim(content)) > 0)
 );
 
 CREATE TABLE discussion_answer (
     id SERIAL PRIMARY KEY,
-    discussion_id INT REFERENCES discussion(id) ON DELETE CASCADE,
+    discussion_id INT NOT NULL REFERENCES discussion(id) ON DELETE CASCADE,
     account_id INT REFERENCES account(id) ON DELETE SET NULL,
-    parent_discussion_answer_id INT REFERENCES discussion_answer(id) ON DELETE SET NULL,
+    parent_discussion_answer_id INT,
     content TEXT NOT NULL,
-    helpful_count INT DEFAULT 0,
+    helpful_count INT NOT NULL DEFAULT 0,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     deleted_at TIMESTAMPTZ NULL,
-    reported_count INT DEFAULT 0,
-    approved BOOLEAN DEFAULT TRUE
+    reported_count INT NOT NULL DEFAULT 0,
+    approved BOOLEAN NOT NULL DEFAULT TRUE,
+
+    CHECK (helpful_count >= 0),
+    CHECK (reported_count >= 0),
+
+    CHECK (length(trim(content)) > 0),
+
+    CHECK (created_at <= updated_at),
+    CHECK (deleted_at IS NULL OR deleted_at >= created_at),
+
+    CHECK (parent_discussion_answer_id IS NULL OR parent_discussion_answer_id <> id),
+
+    UNIQUE (id, discussion_id),
+
+    FOREIGN KEY (parent_discussion_answer_id, discussion_id)
+    REFERENCES discussion_answer(id, discussion_id)
+    ON DELETE SET NULL
 );
 
 CREATE TABLE user_discussion_pin (
-  id SERIAL PRIMARY KEY,
-  discussion_id INT REFERENCES discussion(id) ON DELETE CASCADE,
-  account_id INT REFERENCES account(id) ON DELETE CASCADE,
+    id SERIAL PRIMARY KEY,
+    discussion_id INT NOT NULL REFERENCES discussion(id) ON DELETE CASCADE,
+    account_id INT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
     pinned_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  UNIQUE (discussion_id, account_id)
+    UNIQUE (discussion_id, account_id)
 );
 
 CREATE TABLE user_follow (
     id SERIAL PRIMARY KEY,
-    follower_id INT REFERENCES account(id) ON DELETE CASCADE,
-    following_id INT REFERENCES account(id) ON DELETE CASCADE,
+    follower_id INT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
+    following_id INT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
     followed_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     UNIQUE (follower_id, following_id),
     CHECK (follower_id <> following_id)
 );
 
+CREATE TABLE upvote (
+    id SERIAL PRIMARY KEY,
+    account_id INT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE review_upvote (
+    upvote_id INT PRIMARY KEY NOT NULL REFERENCES upvote(id) ON DELETE CASCADE,
+    review_id INT NOT NULL REFERENCES review(id) ON DELETE CASCADE
+);
+
+CREATE TABLE question_upvote (
+    upvote_id INT PRIMARY KEY NOT NULL REFERENCES upvote(id) ON DELETE CASCADE,
+    question_id INT NOT NULL REFERENCES question(id) ON DELETE CASCADE
+);
+
+CREATE TABLE answer_upvote (
+    upvote_id INT PRIMARY KEY NOT NULL REFERENCES upvote(id) ON DELETE CASCADE,
+    answer_id INT NOT NULL REFERENCES answer(id) ON DELETE CASCADE
+);
+
+CREATE TABLE discussion_upvote (
+    upvote_id INT PRIMARY KEY NOT NULL REFERENCES upvote(id) ON DELETE CASCADE,
+    discussion_id INT NOT NULL REFERENCES discussion(id) ON DELETE CASCADE
+);
+
+CREATE TABLE discussion_answer_upvote (
+    upvote_id INT PRIMARY KEY NOT NULL REFERENCES upvote(id) ON DELETE CASCADE,
+    discussion_answer_id INT NOT NULL REFERENCES discussion_answer(id) ON DELETE CASCADE
+);
+
+CREATE TYPE report_status_enum AS ENUM ('OPEN', 'REVIEWING', 'RESOLVED', 'REJECTED');
+
+CREATE TABLE report (
+    id SERIAL PRIMARY KEY,
+    account_id INT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
+    reason TEXT,
+    status report_status_enum NOT NULL DEFAULT 'OPEN',
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    resolved_at TIMESTAMPTZ DEFAULT NULL
+);
+
+CREATE TABLE review_report (
+    report_id INT PRIMARY KEY NOT NULL REFERENCES report(id) ON DELETE CASCADE,
+    review_id INT NOT NULL REFERENCES review(id) ON DELETE CASCADE
+);
+
+CREATE TABLE question_report (
+    report_id INT PRIMARY KEY NOT NULL REFERENCES report(id) ON DELETE CASCADE,
+    question_id INT NOT NULL REFERENCES question(id) ON DELETE CASCADE
+);
+
+CREATE TABLE answer_report (
+    report_id INT PRIMARY KEY NOT NULL REFERENCES report(id) ON DELETE CASCADE,
+    answer_id INT NOT NULL REFERENCES answer(id) ON DELETE CASCADE
+);
+
+CREATE TABLE discussion_report (
+    report_id INT PRIMARY KEY NOT NULL REFERENCES report(id) ON DELETE CASCADE,
+    discussion_id INT NOT NULL REFERENCES discussion(id) ON DELETE CASCADE
+);
+
+CREATE TABLE discussion_answer_report (
+    report_id INT PRIMARY KEY NOT NULL REFERENCES report(id) ON DELETE CASCADE,
+    discussion_answer_id INT NOT NULL REFERENCES discussion_answer(id) ON DELETE CASCADE
+);
+
+CREATE TABLE public_community_post (
+    id SERIAL PRIMARY KEY,
+    title TEXT NOT NULL,
+    content TEXT NOT NULL,
+    media JSONB,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    deleted_at TIMESTAMPTZ NULL,
+
+    CHECK (length(trim(title)) > 0),
+    CHECK (length(trim(content)) > 0)
+);
+
 CREATE TABLE notification (
     id BIGSERIAL PRIMARY KEY,
-  recipient_id INT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
-  actor_id INT NULL REFERENCES account(id) ON DELETE SET NULL,
-  type TEXT NOT NULL,
-  is_read BOOLEAN NOT NULL DEFAULT FALSE,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  payload JSONB NOT NULL DEFAULT '{}'::jsonb
+    recipient_id INT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
+    actor_id INT NULL REFERENCES account(id) ON DELETE SET NULL,
+    is_read BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    payload JSONB NOT NULL DEFAULT '{}'::jsonb,
+
+    CHECK (jsonb_typeof(payload) = 'object')
 );
 
 CREATE TABLE product_question_notification (
@@ -311,116 +498,6 @@ CREATE TABLE user_notification_pref (
     discussion_answer_on_your_discussion BOOLEAN NOT NULL DEFAULT TRUE,
     upvotes BOOLEAN NOT NULL DEFAULT TRUE
 );
-
-CREATE TABLE public_community_post (
-    id SERIAL PRIMARY KEY,
-    title TEXT NOT NULL,
-    content TEXT NOT NULL,
-    media JSONB,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    deleted_at TIMESTAMPTZ NULL
-);
-
-CREATE TABLE review_upvote (
-    id SERIAL PRIMARY KEY,
-    account_id INT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
-    review_id INT NOT NULL REFERENCES review(id) ON DELETE CASCADE,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    UNIQUE (account_id, review_id)
-);
-
-CREATE TABLE question_upvote (
-    id SERIAL PRIMARY KEY,
-    account_id INT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
-    question_id INT NOT NULL REFERENCES question(id) ON DELETE CASCADE,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    UNIQUE (account_id, question_id)
-);
-
-CREATE TABLE answer_upvote (
-    id SERIAL PRIMARY KEY,
-    account_id INT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
-    answer_id INT NOT NULL REFERENCES answer(id) ON DELETE CASCADE,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    UNIQUE (account_id, answer_id)
-);
-
-CREATE TABLE discussion_upvote (
-    id SERIAL PRIMARY KEY,
-    account_id INT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
-    discussion_id INT NOT NULL REFERENCES discussion(id) ON DELETE CASCADE,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    UNIQUE (account_id, discussion_id)
-);
-
-CREATE TABLE discussion_answer_upvote (
-    id SERIAL PRIMARY KEY,
-    account_id INT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
-    discussion_answer_id INT NOT NULL REFERENCES discussion_answer(id) ON DELETE CASCADE,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    UNIQUE (account_id, discussion_answer_id)
-);
-
-CREATE TYPE report_status_enum AS ENUM ('OPEN', 'REVIEWING', 'RESOLVED', 'REJECTED');
-
-CREATE TABLE review_report (
-    id SERIAL PRIMARY KEY,
-    account_id INT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
-    review_id INT NOT NULL REFERENCES review(id) ON DELETE CASCADE,
-    reason TEXT,
-    status report_status_enum NOT NULL DEFAULT 'OPEN',
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    resolved_at TIMESTAMPTZ DEFAULT NULL,
-    UNIQUE (account_id, review_id)
-);
-
-CREATE TABLE question_report (
-    id SERIAL PRIMARY KEY,
-    account_id INT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
-    question_id INT NOT NULL REFERENCES question(id) ON DELETE CASCADE,
-    reason TEXT,
-    status report_status_enum NOT NULL DEFAULT 'OPEN',
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    resolved_at TIMESTAMPTZ DEFAULT NULL,
-    UNIQUE (account_id, question_id)
-);
-
-CREATE TABLE answer_report (
-    id SERIAL PRIMARY KEY,
-    account_id INT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
-    answer_id INT NOT NULL REFERENCES answer(id) ON DELETE CASCADE,
-    reason TEXT,
-    status report_status_enum NOT NULL DEFAULT 'OPEN',
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    resolved_at TIMESTAMPTZ DEFAULT NULL,
-    UNIQUE (account_id, answer_id)
-);
-
-CREATE TABLE discussion_report (
-    id SERIAL PRIMARY KEY,
-    account_id INT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
-    discussion_id INT NOT NULL REFERENCES discussion(id) ON DELETE CASCADE,
-    reason TEXT,
-    status report_status_enum DEFAULT 'OPEN',
-    created_at TIMESTAMPTZ DEFAULT NOW(),
-    resolved_at TIMESTAMPTZ DEFAULT NULL,
-    UNIQUE (account_id, discussion_id)
-);
-
-CREATE TABLE discussion_answer_report (
-    id SERIAL PRIMARY KEY,
-    account_id INT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
-    discussion_answer_id INT NOT NULL REFERENCES discussion_answer(id) ON DELETE CASCADE,
-    reason TEXT,
-    status report_status_enum DEFAULT 'OPEN',
-    created_at TIMESTAMPTZ DEFAULT NOW(),
-    resolved_at TIMESTAMPTZ DEFAULT NULL,
-    UNIQUE (account_id, discussion_answer_id)
-);
-
---constraints for data integrity
---foreign key on delete behaviors review user product?
 
 --triggers for updating fields
 --indexes for performance optimization
