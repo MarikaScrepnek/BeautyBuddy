@@ -69,7 +69,8 @@ CREATE TABLE product_shade (
     UNIQUE (product_id, shade_name), -- prevents duplicate shade names for the same product
     UNIQUE (id, product_id), -- allows other tables to ensure shade belongs to product in FKs
 
-    CHECK (length(trim(shade_name::text)) > 0)
+    CHECK (length(trim(shade_name::text)) > 0),
+    CHECK (shade_hex_code IS NULL OR shade_hex_code ~* '^#[0-9A-F]{6}$')
 );
 CREATE INDEX idx_product_shade_product ON product_shade (product_id);
 
@@ -136,7 +137,10 @@ CREATE TABLE account (
 
     CHECK (followers_count >= 0),
     CHECK (following_count >= 0),
-    CHECK (unread_notifications_count >= 0)
+    CHECK (unread_notifications_count >= 0),
+
+    CHECK (username ~* '^[a-zA-Z0-9_]+$'),
+    CHECK (length(username) <= 30)
 );
 
 CREATE TABLE account_follow (
@@ -255,6 +259,7 @@ CREATE TABLE routine_image (
     routine_id INT NOT NULL REFERENCES routine(id) ON DELETE CASCADE,
     image_link TEXT NOT NULL,
     uploaded_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    display_order INT NOT NULL DEFAULT 1,
 
     UNIQUE (routine_id, image_link),
 
@@ -320,6 +325,7 @@ CREATE TABLE review_image (
     review_id INT NOT NULL REFERENCES review(id) ON DELETE CASCADE,
     image_link TEXT NOT NULL,
     uploaded_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    display_order INT NOT NULL DEFAULT 1,
 
     UNIQUE (review_id, image_link),
 
@@ -340,6 +346,7 @@ CREATE TABLE question (
     deleted_at TIMESTAMPTZ NULL,
     reported_count INT NOT NULL DEFAULT 0,
     approved BOOLEAN NOT NULL DEFAULT TRUE,
+    answer_count INT NOT NULL DEFAULT 0,
 
     CHECK (upvote_count >= 0),
     CHECK (reported_count >= 0),
@@ -465,31 +472,41 @@ CREATE INDEX idx_upvote_account ON upvote (account_id);
 
 CREATE TABLE review_upvote (
     upvote_id INT PRIMARY KEY NOT NULL REFERENCES upvote(id) ON DELETE CASCADE,
-    review_id INT NOT NULL REFERENCES review(id) ON DELETE CASCADE
+    review_id INT NOT NULL REFERENCES review(id) ON DELETE CASCADE,
+
+    UNIQUE (upvote_id, review_id)
 );
 CREATE INDEX idx_review_upvote_review ON review_upvote (review_id);
 
 CREATE TABLE question_upvote (
     upvote_id INT PRIMARY KEY NOT NULL REFERENCES upvote(id) ON DELETE CASCADE,
-    question_id INT NOT NULL REFERENCES question(id) ON DELETE CASCADE
+    question_id INT NOT NULL REFERENCES question(id) ON DELETE CASCADE,
+
+    UNIQUE (upvote_id, question_id)
 );
 CREATE INDEX idx_question_upvote_question ON question_upvote (question_id);
 
 CREATE TABLE answer_upvote (
     upvote_id INT PRIMARY KEY NOT NULL REFERENCES upvote(id) ON DELETE CASCADE,
-    answer_id INT NOT NULL REFERENCES answer(id) ON DELETE CASCADE
+    answer_id INT NOT NULL REFERENCES answer(id) ON DELETE CASCADE,
+
+    UNIQUE (upvote_id, answer_id)
 );
 CREATE INDEX idx_answer_upvote_answer ON answer_upvote (answer_id);
 
 CREATE TABLE discussion_upvote (
     upvote_id INT PRIMARY KEY NOT NULL REFERENCES upvote(id) ON DELETE CASCADE,
-    discussion_id INT NOT NULL REFERENCES discussion(id) ON DELETE CASCADE
+    discussion_id INT NOT NULL REFERENCES discussion(id) ON DELETE CASCADE,
+
+    UNIQUE (upvote_id, discussion_id)
 );
 CREATE INDEX idx_discussion_upvote_discussion ON discussion_upvote (discussion_id);
 
 CREATE TABLE discussion_answer_upvote (
     upvote_id INT PRIMARY KEY NOT NULL REFERENCES upvote(id) ON DELETE CASCADE,
-    discussion_answer_id INT NOT NULL REFERENCES discussion_answer(id) ON DELETE CASCADE
+    discussion_answer_id INT NOT NULL REFERENCES discussion_answer(id) ON DELETE CASCADE,
+
+    UNIQUE (upvote_id, discussion_answer_id)
 );
 CREATE INDEX idx_discussion_answer_upvote_discussion_answer ON discussion_answer_upvote (discussion_answer_id);
 
