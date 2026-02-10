@@ -463,12 +463,21 @@ CREATE INDEX idx_user_discussion_pin_account ON user_discussion_pin (account_id)
 -- Upvotes, reports, notifications
 -- ===========================================================================
 
+CREATE TYPE upvote_target_enum AS ENUM (
+    'REVIEW',
+    'QUESTION',
+    'ANSWER',
+    'DISCUSSION_ANSWER'
+);
+
 CREATE TABLE upvote (
     id SERIAL PRIMARY KEY,
     account_id INT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
+    target_type upvote_target_enum NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 CREATE INDEX idx_upvote_account ON upvote (account_id);
+CREATE INDEX idx_upvote_target_type ON upvote (target_type);
 
 CREATE TABLE review_upvote (
     upvote_id INT PRIMARY KEY NOT NULL REFERENCES upvote(id) ON DELETE CASCADE,
@@ -494,14 +503,6 @@ CREATE TABLE answer_upvote (
 );
 CREATE INDEX idx_answer_upvote_answer ON answer_upvote (answer_id);
 
-CREATE TABLE discussion_upvote (
-    upvote_id INT PRIMARY KEY NOT NULL REFERENCES upvote(id) ON DELETE CASCADE,
-    discussion_id INT NOT NULL REFERENCES discussion(id) ON DELETE CASCADE,
-
-    UNIQUE (upvote_id, discussion_id)
-);
-CREATE INDEX idx_discussion_upvote_discussion ON discussion_upvote (discussion_id);
-
 CREATE TABLE discussion_answer_upvote (
     upvote_id INT PRIMARY KEY NOT NULL REFERENCES upvote(id) ON DELETE CASCADE,
     discussion_answer_id INT NOT NULL REFERENCES discussion_answer(id) ON DELETE CASCADE,
@@ -511,6 +512,14 @@ CREATE TABLE discussion_answer_upvote (
 CREATE INDEX idx_discussion_answer_upvote_discussion_answer ON discussion_answer_upvote (discussion_answer_id);
 
 ------------------------------------------------------------------------------
+CREATE TYPE report_target_enum AS ENUM (
+    'REVIEW',
+    'QUESTION',
+    'ANSWER',
+    'DISCUSSION',
+    'DISCUSSION_ANSWER'
+);
+
 CREATE TYPE report_status_enum AS ENUM ('OPEN', 'REVIEWING', 'RESOLVED', 'REJECTED');
 
 CREATE TABLE report (
@@ -518,10 +527,13 @@ CREATE TABLE report (
     account_id INT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
     reason TEXT,
     status report_status_enum NOT NULL DEFAULT 'OPEN',
+    target_type report_target_enum NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     resolved_at TIMESTAMPTZ DEFAULT NULL
 );
 CREATE INDEX idx_report_account ON report (account_id);
+CREATE INDEX idx_report_status ON report (status);
+CREATE INDEX idx_report_target_type ON report (target_type);
 
 CREATE TABLE review_report (
     report_id INT PRIMARY KEY NOT NULL REFERENCES report(id) ON DELETE CASCADE,
@@ -554,10 +566,21 @@ CREATE TABLE discussion_answer_report (
 CREATE INDEX idx_discussion_answer_report_discussion_answer ON discussion_answer_report (discussion_answer_id);
 
 ------------------------------------------------------------------------------
+CREATE TYPE notification_type_enum AS ENUM (
+    'PRODUCT_QUESTION',
+    'QUESTION_ASNSWERED',
+    'DISCUSSION_ANSWERED',
+    'REVIEW_UPVOTED',
+    'QUESTION_UPVOTED',
+    'ANSWER_UPVOTED',
+    'DISCUSSION_ANSWER_UPVOTED'
+);
+
 CREATE TABLE notification (
     id BIGSERIAL PRIMARY KEY,
     recipient_id INT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
     actor_id INT NULL REFERENCES account(id) ON DELETE SET NULL,
+    type notification_type_enum NOT NULL,
     is_read BOOLEAN NOT NULL DEFAULT FALSE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     payload JSONB NOT NULL DEFAULT '{}'::jsonb,
@@ -566,6 +589,7 @@ CREATE TABLE notification (
 );
 CREATE INDEX idx_notification_recipient ON notification (recipient_id);
 CREATE INDEX idx_notification_actor ON notification (actor_id);
+CREATE INDEX idx_notification_type ON notification (type);
 
 CREATE TABLE product_question_notification (
     notification_id BIGINT PRIMARY KEY REFERENCES notification(id) ON DELETE CASCADE,
@@ -608,12 +632,6 @@ CREATE TABLE answer_upvoted_notification (
     answer_id INT NOT NULL REFERENCES answer(id) ON DELETE CASCADE
 );
 CREATE INDEX idx_answer_upvoted_notification_answer ON answer_upvoted_notification (answer_id);
-
-CREATE TABLE discussion_upvoted_notification (
-    notification_id BIGINT PRIMARY KEY REFERENCES notification(id) ON DELETE CASCADE,
-    discussion_id INT NOT NULL REFERENCES discussion(id) ON DELETE CASCADE
-);
-CREATE INDEX idx_discussion_upvoted_notification_discussion ON discussion_upvoted_notification (discussion_id);
 
 CREATE TABLE discussion_answer_upvoted_notification (
     notification_id BIGINT PRIMARY KEY REFERENCES notification(id) ON DELETE CASCADE,
