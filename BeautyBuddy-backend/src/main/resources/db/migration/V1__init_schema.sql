@@ -415,6 +415,7 @@ CREATE TABLE discussion (
     upvote_count INT NOT NULL DEFAULT 0,
 
     CHECK (reported_count >= 0),
+    CHECK (upvote_count >= 0),
 
     CHECK (created_at <= updated_at),
     CHECK (deleted_at IS NULL OR deleted_at >= created_at),
@@ -548,6 +549,7 @@ CREATE TABLE review_report (
 );
 CREATE INDEX idx_review_report_account ON review_report (account_id);
 CREATE INDEX idx_review_report_review ON review_report (review_id);
+CREATE INDEX idx_review_report_status ON review_report (status);
 
 CREATE TABLE question_report (
     id SERIAL PRIMARY KEY,
@@ -562,6 +564,7 @@ CREATE TABLE question_report (
 );
 CREATE INDEX idx_question_report_account ON question_report (account_id);
 CREATE INDEX idx_question_report_question ON question_report (question_id);
+CREATE INDEX idx_question_report_status ON question_report (status);
 
 CREATE TABLE answer_report (
     id SERIAL PRIMARY KEY,
@@ -576,6 +579,7 @@ CREATE TABLE answer_report (
 );
 CREATE INDEX idx_answer_report_account ON answer_report (account_id);
 CREATE INDEX idx_answer_report_answer ON answer_report (answer_id);
+CREATE INDEX idx_answer_report_status ON answer_report (status);
 
 CREATE TABLE discussion_report (
     id SERIAL PRIMARY KEY,
@@ -590,6 +594,7 @@ CREATE TABLE discussion_report (
 );
 CREATE INDEX idx_discussion_report_account ON discussion_report (account_id);
 CREATE INDEX idx_discussion_report_discussion ON discussion_report (discussion_id);
+CREATE INDEX idx_discussion_report_status ON discussion_report (status);
 
 CREATE TABLE discussion_answer_report (
     id SERIAL PRIMARY KEY,
@@ -604,6 +609,7 @@ CREATE TABLE discussion_answer_report (
 );
 CREATE INDEX idx_discussion_answer_report_account ON discussion_answer_report (account_id);
 CREATE INDEX idx_discussion_answer_report_discussion_answer ON discussion_answer_report (discussion_answer_id);
+CREATE INDEX idx_discussion_answer_report_status ON discussion_answer_report (status);
 
 ------------------------------------------------------------------------------
 CREATE TYPE notification_type_enum AS ENUM (
@@ -731,6 +737,7 @@ CREATE TABLE activity (
     CHECK (jsonb_typeof(payload) = 'object')
 );
 CREATE INDEX idx_activity_actor ON activity (actor_id);
+CREATE INDEX idx_activity_type ON activity (type);
 
 CREATE TABLE review_activity (
     activity_id INT PRIMARY KEY REFERENCES activity(id) ON DELETE CASCADE,
