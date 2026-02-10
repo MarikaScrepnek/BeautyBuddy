@@ -542,7 +542,9 @@ CREATE TABLE review_report (
     reason TEXT,
     status report_status_enum NOT NULL DEFAULT 'OPEN',
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    resolved_at TIMESTAMPTZ DEFAULT NULL
+    resolved_at TIMESTAMPTZ DEFAULT NULL,
+
+    UNIQUE (account_id, review_id)
 );
 CREATE INDEX idx_review_report_account ON review_report (account_id);
 CREATE INDEX idx_review_report_review ON review_report (review_id);
@@ -554,7 +556,9 @@ CREATE TABLE question_report (
     reason TEXT,
     status report_status_enum NOT NULL DEFAULT 'OPEN',
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    resolved_at TIMESTAMPTZ DEFAULT NULL
+    resolved_at TIMESTAMPTZ DEFAULT NULL,
+
+    UNIQUE (account_id, question_id)
 );
 CREATE INDEX idx_question_report_account ON question_report (account_id);
 CREATE INDEX idx_question_report_question ON question_report (question_id);
@@ -566,7 +570,9 @@ CREATE TABLE answer_report (
     reason TEXT,
     status report_status_enum NOT NULL DEFAULT 'OPEN',
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    resolved_at TIMESTAMPTZ DEFAULT NULL
+    resolved_at TIMESTAMPTZ DEFAULT NULL,
+
+    UNIQUE (account_id, answer_id)
 );
 CREATE INDEX idx_answer_report_account ON answer_report (account_id);
 CREATE INDEX idx_answer_report_answer ON answer_report (answer_id);
@@ -578,7 +584,9 @@ CREATE TABLE discussion_report (
     reason TEXT,
     status report_status_enum NOT NULL DEFAULT 'OPEN',
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    resolved_at TIMESTAMPTZ DEFAULT NULL
+    resolved_at TIMESTAMPTZ DEFAULT NULL,
+
+    UNIQUE (account_id, discussion_id)
 );
 CREATE INDEX idx_discussion_report_account ON discussion_report (account_id);
 CREATE INDEX idx_discussion_report_discussion ON discussion_report (discussion_id);
@@ -590,7 +598,9 @@ CREATE TABLE discussion_answer_report (
     reason TEXT,
     status report_status_enum NOT NULL DEFAULT 'OPEN',
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    resolved_at TIMESTAMPTZ DEFAULT NULL
+    resolved_at TIMESTAMPTZ DEFAULT NULL,
+
+    UNIQUE (account_id, discussion_answer_id)
 );
 CREATE INDEX idx_discussion_answer_report_account ON discussion_answer_report (account_id);
 CREATE INDEX idx_discussion_answer_report_discussion_answer ON discussion_answer_report (discussion_answer_id);
