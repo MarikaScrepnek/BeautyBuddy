@@ -476,115 +476,123 @@ CREATE INDEX idx_user_discussion_pin_account ON user_discussion_pin (account_id)
 -- Upvotes, reports, notifications
 -- ===========================================================================
 
-CREATE TYPE upvote_target_enum AS ENUM (
-    'REVIEW',
-    'QUESTION',
-    'ANSWER',
-    'DISCUSSION',
-    'DISCUSSION_ANSWER'
-);
-
-CREATE TABLE upvote (
+CREATE TABLE review_upvote (
     id SERIAL PRIMARY KEY,
     account_id INT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
-    target_type upvote_target_enum NOT NULL,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-CREATE INDEX idx_upvote_account ON upvote (account_id);
-CREATE INDEX idx_upvote_target_type ON upvote (target_type);
-
-CREATE TABLE review_upvote (
-    upvote_id INT PRIMARY KEY NOT NULL REFERENCES upvote(id) ON DELETE CASCADE,
     review_id INT NOT NULL REFERENCES review(id) ON DELETE CASCADE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
-    UNIQUE (upvote_id, review_id)
+    UNIQUE (account_id, review_id)
 );
+CREATE INDEX idx_review_upvote_account ON review_upvote (account_id);
 CREATE INDEX idx_review_upvote_review ON review_upvote (review_id);
 
 CREATE TABLE question_upvote (
-    upvote_id INT PRIMARY KEY NOT NULL REFERENCES upvote(id) ON DELETE CASCADE,
+    id SERIAL PRIMARY KEY,
+    account_id INT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
     question_id INT NOT NULL REFERENCES question(id) ON DELETE CASCADE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
-    UNIQUE (upvote_id, question_id)
+    UNIQUE (account_id, question_id)
 );
+CREATE INDEX idx_question_upvote_account ON question_upvote (account_id);
 CREATE INDEX idx_question_upvote_question ON question_upvote (question_id);
 
 CREATE TABLE answer_upvote (
-    upvote_id INT PRIMARY KEY NOT NULL REFERENCES upvote(id) ON DELETE CASCADE,
+    id SERIAL PRIMARY KEY,
+    account_id INT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
     answer_id INT NOT NULL REFERENCES answer(id) ON DELETE CASCADE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
-    UNIQUE (upvote_id, answer_id)
+    UNIQUE (account_id, answer_id)
 );
+CREATE INDEX idx_answer_upvote_account ON answer_upvote (account_id);
 CREATE INDEX idx_answer_upvote_answer ON answer_upvote (answer_id);
 
 CREATE TABLE discussion_upvote (
-    upvote_id INT PRIMARY KEY NOT NULL REFERENCES upvote(id) ON DELETE CASCADE,
+    id SERIAL PRIMARY KEY,
+    account_id INT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
     discussion_id INT NOT NULL REFERENCES discussion(id) ON DELETE CASCADE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
-    UNIQUE (upvote_id, discussion_id)
+    UNIQUE (account_id, discussion_id)
 );
+CREATE INDEX idx_discussion_upvote_account ON discussion_upvote (account_id);
 CREATE INDEX idx_discussion_upvote_discussion ON discussion_upvote (discussion_id);
 
 CREATE TABLE discussion_answer_upvote (
-    upvote_id INT PRIMARY KEY NOT NULL REFERENCES upvote(id) ON DELETE CASCADE,
+    id SERIAL PRIMARY KEY,
+    account_id INT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
     discussion_answer_id INT NOT NULL REFERENCES discussion_answer(id) ON DELETE CASCADE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
-    UNIQUE (upvote_id, discussion_answer_id)
+    UNIQUE (account_id, discussion_answer_id)
 );
+CREATE INDEX idx_discussion_answer_upvote_account ON discussion_answer_upvote (account_id);
 CREATE INDEX idx_discussion_answer_upvote_discussion_answer ON discussion_answer_upvote (discussion_answer_id);
 
 ------------------------------------------------------------------------------
-CREATE TYPE report_target_enum AS ENUM (
-    'REVIEW',
-    'QUESTION',
-    'ANSWER',
-    'DISCUSSION',
-    'DISCUSSION_ANSWER'
-);
 
 CREATE TYPE report_status_enum AS ENUM ('OPEN', 'REVIEWING', 'RESOLVED', 'REJECTED');
 
-CREATE TABLE report (
+CREATE TABLE review_report (
     id SERIAL PRIMARY KEY,
     account_id INT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
+    review_id INT NOT NULL REFERENCES review(id) ON DELETE CASCADE,
     reason TEXT,
     status report_status_enum NOT NULL DEFAULT 'OPEN',
-    target_type report_target_enum NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     resolved_at TIMESTAMPTZ DEFAULT NULL
 );
-CREATE INDEX idx_report_account ON report (account_id);
-CREATE INDEX idx_report_status ON report (status);
-CREATE INDEX idx_report_target_type ON report (target_type);
-
-CREATE TABLE review_report (
-    report_id INT PRIMARY KEY NOT NULL REFERENCES report(id) ON DELETE CASCADE,
-    review_id INT NOT NULL REFERENCES review(id) ON DELETE CASCADE
-);
+CREATE INDEX idx_review_report_account ON review_report (account_id);
 CREATE INDEX idx_review_report_review ON review_report (review_id);
 
 CREATE TABLE question_report (
-    report_id INT PRIMARY KEY NOT NULL REFERENCES report(id) ON DELETE CASCADE,
-    question_id INT NOT NULL REFERENCES question(id) ON DELETE CASCADE
+    id SERIAL PRIMARY KEY,
+    account_id INT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
+    question_id INT NOT NULL REFERENCES question(id) ON DELETE CASCADE,
+    reason TEXT,
+    status report_status_enum NOT NULL DEFAULT 'OPEN',
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    resolved_at TIMESTAMPTZ DEFAULT NULL
 );
+CREATE INDEX idx_question_report_account ON question_report (account_id);
 CREATE INDEX idx_question_report_question ON question_report (question_id);
 
 CREATE TABLE answer_report (
-    report_id INT PRIMARY KEY NOT NULL REFERENCES report(id) ON DELETE CASCADE,
-    answer_id INT NOT NULL REFERENCES answer(id) ON DELETE CASCADE
+    id SERIAL PRIMARY KEY,
+    account_id INT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
+    answer_id INT NOT NULL REFERENCES answer(id) ON DELETE CASCADE,
+    reason TEXT,
+    status report_status_enum NOT NULL DEFAULT 'OPEN',
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    resolved_at TIMESTAMPTZ DEFAULT NULL
 );
+CREATE INDEX idx_answer_report_account ON answer_report (account_id);
 CREATE INDEX idx_answer_report_answer ON answer_report (answer_id);
 
 CREATE TABLE discussion_report (
-    report_id INT PRIMARY KEY NOT NULL REFERENCES report(id) ON DELETE CASCADE,
-    discussion_id INT NOT NULL REFERENCES discussion(id) ON DELETE CASCADE
+    id SERIAL PRIMARY KEY,
+    account_id INT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
+    discussion_id INT NOT NULL REFERENCES discussion(id) ON DELETE CASCADE,
+    reason TEXT,
+    status report_status_enum NOT NULL DEFAULT 'OPEN',
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    resolved_at TIMESTAMPTZ DEFAULT NULL
 );
+CREATE INDEX idx_discussion_report_account ON discussion_report (account_id);
 CREATE INDEX idx_discussion_report_discussion ON discussion_report (discussion_id);
 
 CREATE TABLE discussion_answer_report (
-    report_id INT PRIMARY KEY NOT NULL REFERENCES report(id) ON DELETE CASCADE,
-    discussion_answer_id INT NOT NULL REFERENCES discussion_answer(id) ON DELETE CASCADE
+    id SERIAL PRIMARY KEY,
+    account_id INT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
+    discussion_answer_id INT NOT NULL REFERENCES discussion_answer(id) ON DELETE CASCADE,
+    reason TEXT,
+    status report_status_enum NOT NULL DEFAULT 'OPEN',
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    resolved_at TIMESTAMPTZ DEFAULT NULL
 );
+CREATE INDEX idx_discussion_answer_report_account ON discussion_answer_report (account_id);
 CREATE INDEX idx_discussion_answer_report_discussion_answer ON discussion_answer_report (discussion_answer_id);
 
 ------------------------------------------------------------------------------
