@@ -1,7 +1,13 @@
+-- ================================================================
+-- SEED DATA
+-- ================================================================
+
+-- Insert brands
 INSERT INTO brand(name) VALUES
 ('L''Oréal Paris')
 ON CONFLICT (name) DO NOTHING;
 
+-- Insert top-level categories
 INSERT INTO category (name, parent_category_id) VALUES
 ('Makeup', NULL),
 ('Skincare', NULL),
@@ -9,27 +15,29 @@ INSERT INTO category (name, parent_category_id) VALUES
 ('Bodycare', NULL)
 ON CONFLICT (name) DO NOTHING;
 
+-- Insert subcategories
 INSERT INTO category (name, parent_category_id) VALUES
-('Primer', (SELECT category_id FROM category WHERE name='Makeup')),
-('Foundation', (SELECT category_id FROM category WHERE name='Makeup')),
-('Concealer', (SELECT category_id FROM category WHERE name='Makeup')),
-('Contour', (SELECT category_id FROM category WHERE name='Makeup')),
-('Blush', (SELECT category_id FROM category WHERE name='Makeup')),
-('Bronzer', (SELECT category_id FROM category WHERE name='Makeup')),
-('Highlighter', (SELECT category_id FROM category WHERE name='Makeup')),
-('Powder', (SELECT category_id FROM category WHERE name='Makeup')),
-('Eyebrow Pencil', (SELECT category_id FROM category WHERE name='Makeup')),
-('Eyebrow Gel', (SELECT category_id FROM category WHERE name='Makeup')),
-('Eyeshadow', (SELECT category_id FROM category WHERE name='Makeup')),
-('Eyeliner', (SELECT category_id FROM category WHERE name='Makeup')),
-('Lip Liner', (SELECT category_id FROM category WHERE name='Makeup')),
-('Lipstick', (SELECT category_id FROM category WHERE name='Makeup')),
-('Lip Gloss', (SELECT category_id FROM category WHERE name='Makeup')),
-('Lip Balm', (SELECT category_id FROM category WHERE name='Makeup')),
-('Setting Spray', (SELECT category_id FROM category WHERE name='Makeup')),
-('Mascara', (SELECT category_id FROM category WHERE name='Makeup'))
+('Primer', (SELECT id FROM category WHERE name='Makeup')),
+('Foundation', (SELECT id FROM category WHERE name='Makeup')),
+('Concealer', (SELECT id FROM category WHERE name='Makeup')),
+('Contour', (SELECT id FROM category WHERE name='Makeup')),
+('Blush', (SELECT id FROM category WHERE name='Makeup')),
+('Bronzer', (SELECT id FROM category WHERE name='Makeup')),
+('Highlighter', (SELECT id FROM category WHERE name='Makeup')),
+('Powder', (SELECT id FROM category WHERE name='Makeup')),
+('Eyebrow Pencil', (SELECT id FROM category WHERE name='Makeup')),
+('Eyebrow Gel', (SELECT id FROM category WHERE name='Makeup')),
+('Eyeshadow', (SELECT id FROM category WHERE name='Makeup')),
+('Eyeliner', (SELECT id FROM category WHERE name='Makeup')),
+('Lip Liner', (SELECT id FROM category WHERE name='Makeup')),
+('Lipstick', (SELECT id FROM category WHERE name='Makeup')),
+('Lip Gloss', (SELECT id FROM category WHERE name='Makeup')),
+('Lip Balm', (SELECT id FROM category WHERE name='Makeup')),
+('Setting Spray', (SELECT id FROM category WHERE name='Makeup')),
+('Mascara', (SELECT id FROM category WHERE name='Makeup'))
 ON CONFLICT (name) DO NOTHING;
 
+-- Insert canonical ingredients (base names)
 INSERT INTO ingredient (name, canonical_id) VALUES
 ('water', NULL),
 ('cera alba', NULL),
@@ -37,20 +45,22 @@ INSERT INTO ingredient (name, canonical_id) VALUES
 ('acacia senegal', NULL)
 ON CONFLICT (name) DO NOTHING;
 
+-- Insert ingredient aliases (variants that reference canonical)
 INSERT INTO ingredient (name, canonical_id) VALUES
-('aqua', (SELECT ingredient_id FROM ingredient WHERE name='water')),
-('eau', (SELECT ingredient_id FROM ingredient WHERE name='water')),
-('beeswax', (SELECT ingredient_id FROM ingredient WHERE name='cera alba')),
-('cire d''abeille', (SELECT ingredient_id FROM ingredient WHERE name='cera alba')),
-('carnauba wax', (SELECT ingredient_id FROM ingredient WHERE name='cera carnauba')),
-('cire de carnauba', (SELECT ingredient_id FROM ingredient WHERE name='cera carnauba')),
-('acacia senegal gum', (SELECT ingredient_id FROM ingredient WHERE name='acacia senegal'))
+('aqua', (SELECT id FROM ingredient WHERE name='water')),
+('eau', (SELECT id FROM ingredient WHERE name='water')),
+('beeswax', (SELECT id FROM ingredient WHERE name='cera alba')),
+('cire d''abeille', (SELECT id FROM ingredient WHERE name='cera alba')),
+('carnauba wax', (SELECT id FROM ingredient WHERE name='cera carnauba')),
+('cire de carnauba', (SELECT id FROM ingredient WHERE name='cera carnauba')),
+('acacia senegal gum', (SELECT id FROM ingredient WHERE name='acacia senegal'))
 ON CONFLICT (name) DO NOTHING;
 
+-- Insert product
 INSERT INTO product (name, brand_id, category_id, price, image_link, product_link, rating, raw_ingredients, may_contain_raw_ingredients) VALUES
 ('Telescopic Original Mascara', 
- (SELECT brand_id FROM brand WHERE name='L''Oréal Paris'),
- (SELECT category_id FROM category WHERE name='Mascara'),
+ (SELECT id FROM brand WHERE name='L''Oréal Paris'),
+ (SELECT id FROM category WHERE name='Mascara'),
  NULL, 
  'https://www.lorealparis.ca/-/media/project/loreal/brand-sites/oap/americas/ca/products/makeup/eyes/telescopic-original/blackest-black/071249104743_01.png',
  'https://www.lorealparis.ca/en-ca/telescopic-eye-collection/telescopic-original-mascara-blackest-black',
@@ -60,17 +70,18 @@ INSERT INTO product (name, brand_id, category_id, price, image_link, product_lin
 )
 ON CONFLICT (name, brand_id) DO NOTHING;
 
+-- Insert product shades
 INSERT INTO product_shade (product_id, shade_name, shade_hex_code, shade_number, image_link, product_link) VALUES
 (
-(SELECT product_id FROM product WHERE name='Telescopic Original Mascara' AND brand_id=(SELECT brand_id FROM brand WHERE name='L''Oréal Paris')),
+(SELECT id FROM product WHERE name='Telescopic Original Mascara' AND brand_id=(SELECT id FROM brand WHERE name='L''Oréal Paris')),
 'Blackest Black',
 '#000000',
 1,
-(SELECT image_link FROM product WHERE name='Telescopic Original Mascara' AND brand_id=(SELECT brand_id FROM brand WHERE name='L''Oréal Paris')),
-(SELECT product_link FROM product WHERE name='Telescopic Original Mascara' AND brand_id=(SELECT brand_id FROM brand WHERE name='L''Oréal Paris'))
+(SELECT image_link FROM product WHERE name='Telescopic Original Mascara' AND brand_id=(SELECT id FROM brand WHERE name='L''Oréal Paris')),
+(SELECT product_link FROM product WHERE name='Telescopic Original Mascara' AND brand_id=(SELECT id FROM brand WHERE name='L''Oréal Paris'))
 ),
 (
-(SELECT product_id FROM product WHERE name='Telescopic Original Mascara' AND brand_id=(SELECT brand_id FROM brand WHERE name='L''Oréal Paris')),
+(SELECT id FROM product WHERE name='Telescopic Original Mascara' AND brand_id=(SELECT id FROM brand WHERE name='L''Oréal Paris')),
 'Carbon Black',
 '#000000',
 2,
@@ -78,7 +89,7 @@ INSERT INTO product_shade (product_id, shade_name, shade_hex_code, shade_number,
 'https://www.lorealparis.ca/en-ca/telescopic-eye-collection/telescopic-original-mascara-carbon-black'
 ),
 (
-(SELECT product_id FROM product WHERE name='Telescopic Original Mascara' AND brand_id=(SELECT brand_id FROM brand WHERE name='L''Oréal Paris')),
+(SELECT id FROM product WHERE name='Telescopic Original Mascara' AND brand_id=(SELECT id FROM brand WHERE name='L''Oréal Paris')),
 'Black',
 '#000000',
 3,
@@ -86,7 +97,7 @@ INSERT INTO product_shade (product_id, shade_name, shade_hex_code, shade_number,
 'https://www.lorealparis.ca/en-ca/telescopic-eye-collection/telescopic-original-mascara-black'
 ),
 (
-(SELECT product_id FROM product WHERE name='Telescopic Original Mascara' AND brand_id=(SELECT brand_id FROM brand WHERE name='L''Oréal Paris')),
+(SELECT id FROM product WHERE name='Telescopic Original Mascara' AND brand_id=(SELECT id FROM brand WHERE name='L''Oréal Paris')),
 'Waterproof Black',
 '#000000',
 4,
