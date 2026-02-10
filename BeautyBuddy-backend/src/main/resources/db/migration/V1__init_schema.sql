@@ -161,7 +161,6 @@ CREATE TABLE account_notification_pref (
     discussion_answer_on_your_discussion BOOLEAN NOT NULL DEFAULT TRUE,
     upvotes BOOLEAN NOT NULL DEFAULT TRUE
 );
-CREATE INDEX idx_account_notification_pref_account ON account_notification_pref (account_id);
 
 -------------------------------------------------------------------
 CREATE TABLE wishlist (
@@ -402,6 +401,7 @@ CREATE TABLE discussion (
     reported_count INT NOT NULL DEFAULT 0,
     approved BOOLEAN NOT NULL DEFAULT TRUE,
     reply_count INT NOT NULL DEFAULT 0,
+    upvote_count INT NOT NULL DEFAULT 0,
 
     CHECK (reported_count >= 0),
 
@@ -467,6 +467,7 @@ CREATE TYPE upvote_target_enum AS ENUM (
     'REVIEW',
     'QUESTION',
     'ANSWER',
+    'DISCUSSION',
     'DISCUSSION_ANSWER'
 );
 
@@ -502,6 +503,14 @@ CREATE TABLE answer_upvote (
     UNIQUE (upvote_id, answer_id)
 );
 CREATE INDEX idx_answer_upvote_answer ON answer_upvote (answer_id);
+
+CREATE TABLE discussion_upvote (
+    upvote_id INT PRIMARY KEY NOT NULL REFERENCES upvote(id) ON DELETE CASCADE,
+    discussion_id INT NOT NULL REFERENCES discussion(id) ON DELETE CASCADE,
+
+    UNIQUE (upvote_id, discussion_id)
+);
+CREATE INDEX idx_discussion_upvote_discussion ON discussion_upvote (discussion_id);
 
 CREATE TABLE discussion_answer_upvote (
     upvote_id INT PRIMARY KEY NOT NULL REFERENCES upvote(id) ON DELETE CASCADE,
@@ -568,11 +577,12 @@ CREATE INDEX idx_discussion_answer_report_discussion_answer ON discussion_answer
 ------------------------------------------------------------------------------
 CREATE TYPE notification_type_enum AS ENUM (
     'PRODUCT_QUESTION',
-    'QUESTION_ASNSWERED',
+    'QUESTION_ANSWERED',
     'DISCUSSION_ANSWERED',
     'REVIEW_UPVOTED',
     'QUESTION_UPVOTED',
     'ANSWER_UPVOTED',
+    'DISCUSSION_UPVOTED',
     'DISCUSSION_ANSWER_UPVOTED'
 );
 
@@ -633,6 +643,12 @@ CREATE TABLE answer_upvoted_notification (
 );
 CREATE INDEX idx_answer_upvoted_notification_answer ON answer_upvoted_notification (answer_id);
 
+CREATE TABLE discussion_upvoted_notification (
+    notification_id BIGINT PRIMARY KEY REFERENCES notification(id) ON DELETE CASCADE,
+    discussion_id INT NOT NULL REFERENCES discussion(id) ON DELETE CASCADE
+);
+CREATE INDEX idx_discussion_upvoted_notification_discussion ON discussion_upvoted_notification (discussion_id);
+
 CREATE TABLE discussion_answer_upvoted_notification (
     notification_id BIGINT PRIMARY KEY REFERENCES notification(id) ON DELETE CASCADE,
     discussion_answer_id INT NOT NULL REFERENCES discussion_answer(id) ON DELETE CASCADE
@@ -667,10 +683,18 @@ CREATE TABLE public_community_post (
 -- Activity Feed (followed accounts only)
 -- ===========================================================================
 
+CREATE TYPE activity_type_enum AS ENUM (
+    'REVIEW',
+    'ROUTINE_ITEM',
+    'ROUTINE_IMAGE',
+    'WISHLIST_ITEM'
+);
+
 CREATE TABLE activity (
     id SERIAL PRIMARY KEY,
     actor_id INT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    type activity_type_enum NOT NULL,
     payload JSONB NOT NULL DEFAULT '{}'::jsonb,
 
     CHECK (jsonb_typeof(payload) = 'object')
