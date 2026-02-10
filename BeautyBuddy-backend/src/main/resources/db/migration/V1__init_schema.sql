@@ -17,6 +17,8 @@ CREATE TABLE category (
     id SERIAL PRIMARY KEY,
     name CITEXT UNIQUE NOT NULL,
     parent_category_id INT REFERENCES category(id) ON DELETE SET NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
     CHECK (length(trim(name::text)) > 0),
     CHECK (parent_category_id IS NULL OR parent_category_id <> id)
@@ -27,6 +29,8 @@ CREATE INDEX idx_category_parent ON category (parent_category_id);
 CREATE TABLE brand (
     id SERIAL PRIMARY KEY,
     name CITEXT UNIQUE NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
     CHECK (length(trim(name::text)) > 0)
 );
@@ -44,6 +48,9 @@ CREATE TABLE product (
     raw_ingredients TEXT,
     may_contain_raw_ingredients TEXT,
     review_count INT NOT NULL DEFAULT 0,
+
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
     UNIQUE(name, brand_id),
 
@@ -140,7 +147,9 @@ CREATE TABLE account (
     CHECK (unread_notifications_count >= 0),
 
     CHECK (username ~* '^[a-zA-Z0-9_]+$'),
-    CHECK (length(username) <= 30)
+    CHECK (length(username) <= 30),
+
+    CHECK (display_name IS NULL OR length(display_name) <= 100)
 );
 
 CREATE TABLE account_follow (
@@ -294,6 +303,8 @@ CREATE TABLE review (
     CHECK (helpful_count >= 0),
     CHECK (reported_count >= 0),
     CHECK (review_text IS NULL OR length(trim(review_text)) > 0),
+    CHECK (review_title IS NULL OR length(trim(review_title)) > 0),
+    CHECK (review_title IS NULL OR length(review_title) <= 200),
 
     CHECK (
         (product_shade_id IS NULL AND product_id IS NOT NULL) OR
@@ -409,7 +420,9 @@ CREATE TABLE discussion (
     CHECK (deleted_at IS NULL OR deleted_at >= created_at),
 
     CHECK (length(trim(title)) > 0),
-    CHECK (length(trim(content)) > 0)
+    CHECK (length(trim(content)) > 0),
+
+    CHECK (length(title) <= 200)
 );
 CREATE INDEX idx_discussion_account ON discussion (account_id);
 
