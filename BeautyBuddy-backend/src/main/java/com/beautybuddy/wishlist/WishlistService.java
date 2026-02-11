@@ -62,7 +62,7 @@ public class WishlistService {
                 : product.getImageLink();
 
             result.add(new WishlistItemDTO(
-                item.getWishlist_item_id(),
+                item.getId(),
                 product.getProductId(),
                 product.getName(),
                 shadeName,

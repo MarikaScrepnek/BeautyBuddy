@@ -1,12 +1,10 @@
 package com.beautybuddy.wishlist;
 
+import com.beautybuddy.common.entity.BaseEntity;
 import com.beautybuddy.product.Product;
 import com.beautybuddy.product.ProductShade;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -16,11 +14,7 @@ import jakarta.persistence.UniqueConstraint;
 @Table(name = "wishlist_item",
          uniqueConstraints = @UniqueConstraint(columnNames = {"wishlist_id", "product_id"})
 )
-public class WishlistItem {
-    @Id
-    @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
-    private int id;
+public class WishlistItem extends BaseEntity{
 
     @ManyToOne
     @JoinColumn(name = "wishlist_id", nullable = false)
@@ -33,14 +27,6 @@ public class WishlistItem {
     @ManyToOne
     @JoinColumn(name = "shade_id")
     private ProductShade shade;
-
-    public int getWishlist_item_id() {
-        return id;
-    }
-
-    public void setWishlist_item_id(int wishlist_item_id) {
-        this.id = wishlist_item_id;
-    }
 
     public Wishlist getWishlist() {
         return wishlist;

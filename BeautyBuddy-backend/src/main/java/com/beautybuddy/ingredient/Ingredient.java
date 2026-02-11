@@ -1,17 +1,16 @@
 package com.beautybuddy.ingredient;
 
-import jakarta.persistence.*;
+import com.beautybuddy.common.entity.UpdatableEntity;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 
 @Entity
-@Table (name = "ingredient",
-    uniqueConstraints = @UniqueConstraint(columnNames = "normalized_name")
+@Table (
+    name = "ingredient"
 )
-public class Ingredient {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ingredient_id", nullable = false)
-    private int ingredientId;
+public class Ingredient extends UpdatableEntity{
 
     @Column(name = "name", nullable = false, unique = true)
     private String name;
@@ -19,14 +18,27 @@ public class Ingredient {
     @Column(name = "canonical_id")
     private Integer canonicalId;
 
-    public Ingredient() {}
+    @Column(name = "is_common_allergen", nullable = false)
+    private boolean isCommonAllergen = false;
 
-    public int getIngredientId() { return ingredientId; }
-    public void setIngredientId(int ingredientId) { this.ingredientId = ingredientId; }
+    @Column(name = "is_common_irritant", nullable = false)
+    private boolean isCommonIrritant = false;
+
+    @Column(name = "is_fragrance", nullable = false)
+    private boolean isFragrance = false;
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
 
     public Integer getCanonicalId() { return canonicalId; }
     public void setCanonicalId(Integer canonicalId) { this.canonicalId = canonicalId; }
+
+    public boolean isCommonAllergen() { return isCommonAllergen; }
+    public void setCommonAllergen(boolean commonAllergen) { isCommonAllergen = commonAllergen; }
+
+    public boolean isCommonIrritant() { return isCommonIrritant; }
+    public void setCommonIrritant(boolean commonIrritant) { isCommonIrritant = commonIrritant; }
+
+    public boolean isFragrance() { return isFragrance; }
+    public void setFragrance(boolean fragrance) { isFragrance = fragrance; }
 }

@@ -1,19 +1,20 @@
 package com.beautybuddy.ingredient;
 
 import com.beautybuddy.product.Product;
+import com.beautybuddy.common.entity.BaseEntity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 
 @Entity
 @Table (name = "product_ingredient",
     uniqueConstraints = @UniqueConstraint(columnNames = {"product_id", "ingredient_id"})
 )
-public class ProductIngredient {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "product_ingredient_id", nullable = false)
-    private int productIngredientId;
+public class ProductIngredient extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)
@@ -25,11 +26,6 @@ public class ProductIngredient {
 
     @Column(name = "position", nullable = false)
     private int position;
-
-    public ProductIngredient() {}
-
-    public int getProductIngredientId() { return productIngredientId; }
-    public void setProductIngredientId(int productIngredientId) { this.productIngredientId = productIngredientId; }
 
     public Product getProduct() { return product; }
     public void setProduct(Product product) { this.product = product; }

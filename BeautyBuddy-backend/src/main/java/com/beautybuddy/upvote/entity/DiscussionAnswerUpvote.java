@@ -1,6 +1,6 @@
 package com.beautybuddy.upvote.entity;
 
-import com.beautybuddy.discussion.DiscussionAnswer;
+import com.beautybuddy.discussion.DiscussionComment;
 import com.beautybuddy.upvote.BaseUpvote;
 
 import jakarta.persistence.JoinColumn;
@@ -18,12 +18,12 @@ public class DiscussionAnswerUpvote extends BaseUpvote {
 
     @ManyToOne
     @JoinColumn(name = "discussion_answer_id", nullable = false)
-    private DiscussionAnswer discussionAnswer;
+    private DiscussionComment discussionAnswer;
 
-    public DiscussionAnswer getDiscussionAnswer() {
+    public DiscussionComment getDiscussionAnswer() {
         return discussionAnswer;
     }
-    public void setDiscussionAnswer(DiscussionAnswer discussionAnswer) {
+    public void setDiscussionAnswer(DiscussionComment discussionAnswer) {
         this.discussionAnswer = discussionAnswer;
     }
 }

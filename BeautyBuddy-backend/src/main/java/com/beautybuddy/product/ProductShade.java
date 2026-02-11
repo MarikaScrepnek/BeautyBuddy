@@ -1,16 +1,19 @@
 package com.beautybuddy.product;
 
-import jakarta.persistence.*;
+import com.beautybuddy.common.entity.UpdatableEntity;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 
 @Entity
 @Table(name = "product_shade",
     uniqueConstraints = {@UniqueConstraint(columnNames = {"product_id", "shade_name"}), @UniqueConstraint(columnNames = {"product_shade_id", "product_id"})}
 )
-public class ProductShade {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "product_shade_id")
-    private int productShadeId;
+public class ProductShade extends UpdatableEntity{
 
     @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)
@@ -31,13 +34,6 @@ public class ProductShade {
     @Column (name = "product_link")
     private String productLink;
 
-    // Getters and Setters
-    public int getProductShadeId() {
-        return productShadeId;
-    }
-    public void setProductShadeId(int productShadeId) {
-        this.productShadeId = productShadeId;
-    }
     public Product getProduct() {
         return product;
     }

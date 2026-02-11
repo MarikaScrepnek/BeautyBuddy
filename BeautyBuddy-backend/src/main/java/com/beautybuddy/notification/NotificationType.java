@@ -1,0 +1,12 @@
+package com.beautybuddy.notification;
+
+public enum NotificationType {
+    PRODUCT_QUESTION,
+    QUESTION_ANSWERED,
+    DISCUSSION_COMMENTED,
+    REVIEW_UPVOTED,
+    QUESTION_UPVOTED,
+    ANSWER_UPVOTED,
+    DISCUSSION_UPVOTED,
+    DISCUSSION_COMMENT_UPVOTED
+}

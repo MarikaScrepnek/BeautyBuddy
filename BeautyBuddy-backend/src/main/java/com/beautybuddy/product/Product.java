@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.beautybuddy.common.entity.UpdatableEntity;
 import com.beautybuddy.brand.Brand;
 import com.beautybuddy.category.Category;
 import com.beautybuddy.ingredient.MayContainIngredient;
@@ -17,12 +18,7 @@ import com.beautybuddy.ingredient.ProductIngredient;
         @UniqueConstraint(columnNames = {"name", "brand_id"})
     }
 )
-public class Product {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // ensure DB auto-increments
-    @Column(name = "product_id")
-    private int productId;
+public class Product extends UpdatableEntity {
 
     @Column(nullable = false)
     private String name;
@@ -52,7 +48,13 @@ public class Product {
 
     @Column(name = "may_contain_raw_ingredients", columnDefinition = "TEXT")
     private String rawMayContainIngredients;
-    
+
+    @Column(name = "review_count", nullable = false)
+    private int reviewCount = 0;
+
+    @Column(name = "is_discontinued", nullable = false)
+    private boolean isDiscontinued = false;
+
     @OneToMany(
         mappedBy = "product",
         cascade = CascadeType.ALL,
@@ -73,11 +75,6 @@ public class Product {
     orphanRemoval = true
     )
     private Set<ProductShade> productShades = new HashSet<>();
-
-    public Product() {}
-
-    public int getProductId() { return productId; }
-    public void setProductId(int productId) { this.productId = productId; }
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
@@ -105,6 +102,12 @@ public class Product {
 
     public String getRawMayContainIngredients() { return rawMayContainIngredients; }
     public void setRawMayContainIngredients(String rawMayContainIngredients) { this.rawMayContainIngredients = rawMayContainIngredients; }
+
+    public int getReviewCount() { return reviewCount; }
+    public void setReviewCount(int reviewCount) { this.reviewCount = reviewCount; }
+
+    public boolean isDiscontinued() { return isDiscontinued; }
+    public void setDiscontinued(boolean discontinued) { this.isDiscontinued = discontinued; }
 
     public Set<ProductIngredient> getProductIngredients() {
         return productIngredients;

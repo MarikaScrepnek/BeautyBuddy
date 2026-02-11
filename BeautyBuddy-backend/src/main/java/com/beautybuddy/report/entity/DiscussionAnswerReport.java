@@ -1,6 +1,6 @@
 package com.beautybuddy.report.entity;
 
-import com.beautybuddy.discussion.DiscussionAnswer;
+import com.beautybuddy.discussion.DiscussionComment;
 import com.beautybuddy.report.BaseReport;
 
 import jakarta.persistence.Entity;
@@ -18,12 +18,12 @@ public class DiscussionAnswerReport extends BaseReport {
     
     @ManyToOne
     @JoinColumn(name = "answer_id", nullable = false)
-    DiscussionAnswer discussionAnswer;
+    DiscussionComment discussionAnswer;
 
-    public DiscussionAnswer getDiscussionAnswer() {
+    public DiscussionComment getDiscussionAnswer() {
         return discussionAnswer;
     }
-    public void setDiscussionAnswer(DiscussionAnswer discussionAnswer) {
+    public void setDiscussionAnswer(DiscussionComment discussionAnswer) {
         this.discussionAnswer = discussionAnswer;
     }
 }
