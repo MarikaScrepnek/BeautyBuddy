@@ -13,7 +13,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MappedSuperclass;
 
 @MappedSuperclass
-public class BaseReport extends BaseEntity{
+public abstract class BaseReport extends BaseEntity{
     @ManyToOne
     @JoinColumn(name = "account_id", nullable = false, updatable = false)
     private User user;
