@@ -336,7 +336,7 @@ CREATE TABLE review (
     product_shade_id INT,
     rating NUMERIC(3, 2) CHECK (rating >= 0 AND rating <= 5),
     review_title TEXT,
-    review_text TEXT,
+    text TEXT,
     upvote_count INT NOT NULL DEFAULT 0,
     reported_count INT NOT NULL DEFAULT 0,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -392,7 +392,7 @@ CREATE TABLE question (
     id SERIAL PRIMARY KEY,
     account_id INT REFERENCES account(id) ON DELETE SET NULL,
     product_id INT NOT NULL REFERENCES product(id) ON DELETE CASCADE,
-    question_text TEXT NOT NULL,
+    text TEXT NOT NULL,
     answered BOOLEAN NOT NULL DEFAULT FALSE,
     upvote_count INT NOT NULL DEFAULT 0,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -408,7 +408,7 @@ CREATE TABLE question (
     CHECK (created_at <= updated_at),
     CHECK (deleted_at IS NULL OR deleted_at >= created_at),
 
-    CHECK (length(trim(question_text)) > 0)
+    CHECK (length(trim(text)) > 0)
 );
 CREATE INDEX idx_question_product ON question (product_id);
 CREATE INDEX idx_question_account ON question (account_id);
@@ -417,7 +417,7 @@ CREATE TABLE answer (
     id SERIAL PRIMARY KEY,
     question_id INT NOT NULL REFERENCES question(id) ON DELETE CASCADE,
     account_id INT REFERENCES account(id) ON DELETE SET NULL,
-    answer_text TEXT NOT NULL,
+    text TEXT NOT NULL,
     upvote_count INT NOT NULL DEFAULT 0,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -431,7 +431,7 @@ CREATE TABLE answer (
     CHECK (created_at <= updated_at),
     CHECK (deleted_at IS NULL OR deleted_at >= created_at),
 
-    CHECK (length(trim(answer_text)) > 0)
+    CHECK (length(trim(text)) > 0)
 );
 CREATE INDEX idx_answer_question ON answer (question_id);
 CREATE INDEX idx_answer_account ON answer (account_id);
@@ -448,7 +448,7 @@ CREATE TABLE discussion (
     id SERIAL PRIMARY KEY,
     account_id INT REFERENCES account(id) ON DELETE SET NULL,
     title TEXT NOT NULL,
-    content TEXT NOT NULL,
+    text TEXT NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     deleted_at TIMESTAMPTZ NULL,
@@ -464,7 +464,7 @@ CREATE TABLE discussion (
     CHECK (deleted_at IS NULL OR deleted_at >= created_at),
 
     CHECK (length(trim(title)) > 0),
-    CHECK (length(trim(content)) > 0),
+    CHECK (length(trim(text)) > 0),
 
     CHECK (length(title) <= 200)
 );
@@ -475,7 +475,7 @@ CREATE TABLE discussion_comment (
     discussion_id INT NOT NULL REFERENCES discussion(id) ON DELETE CASCADE,
     account_id INT REFERENCES account(id) ON DELETE SET NULL,
     parent_discussion_comment_id INT,
-    content TEXT NOT NULL,
+    text TEXT NOT NULL,
     upvote_count INT NOT NULL DEFAULT 0,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -486,7 +486,7 @@ CREATE TABLE discussion_comment (
     CHECK (upvote_count >= 0),
     CHECK (reported_count >= 0),
 
-    CHECK (length(trim(content)) > 0),
+    CHECK (length(trim(text)) > 0),
 
     CHECK (created_at <= updated_at),
     CHECK (deleted_at IS NULL OR deleted_at >= created_at),
