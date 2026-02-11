@@ -5,8 +5,14 @@ import com.beautybuddy.user.User;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Entity
 @Table(
@@ -15,13 +21,15 @@ import jakarta.persistence.Table;
 public class Activity extends BaseEntity{
     
     @ManyToOne
-    @Column(name = "actor_id", nullable = false)
+    @JoinColumn(name = "actor_id", nullable = false)
     private User actor;
 
-    @Column(name = "type", nullable = false)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type", nullable = false, columnDefinition = "activity_type_enum")
     private ActivityType type;
 
-    @Column(name = "payload", nullable = false)
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "payload", nullable = false, columnDefinition = "jsonb")
     private String payload;
 
     public User getActor() {
