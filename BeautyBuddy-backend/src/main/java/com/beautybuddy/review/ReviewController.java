@@ -70,14 +70,14 @@ public class ReviewController {
     }
 
     @GetMapping("/{productId}/average-rating")
-    public ResponseEntity<BigDecimal> getAverageRatingForProduct(@PathVariable int productId) {
+    public ResponseEntity<BigDecimal> getAverageRatingForProduct(@PathVariable Long productId) {
         BigDecimal averageRating = reviewService.getAverageRatingForProduct(productId);
         return ResponseEntity.ok(averageRating);
     }
 
     @GetMapping("/{productId}")
     public ResponseEntity<Page<ReviewDTO>> getReviewsForProduct(
-        @PathVariable int productId,
+        @PathVariable Long productId,
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") int size
     ) {

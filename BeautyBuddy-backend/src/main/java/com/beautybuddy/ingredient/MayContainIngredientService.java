@@ -37,7 +37,7 @@ public class MayContainIngredientService {
             });
 
         // Safely resolve canonical ingredient if canonicalId is not null
-        Integer canonicalIdValue = ingredient.getCanonicalId();
+        Long canonicalIdValue = ingredient.getCanonicalId();
         if (canonicalIdValue != null) {
             ingredient = ingredientRepository.findById(canonicalIdValue).orElse(ingredient);
         }
@@ -60,7 +60,7 @@ public class MayContainIngredientService {
             raw = raw.replace("/", ",");             // replace slashes
             String[] ingredients = raw.split(",");
 
-            Set<Integer> addedCanonicals = new HashSet<>();
+            Set<Long> addedCanonicals = new HashSet<>();
 
             for (String ing : ingredients) {
                 String normalized = ing.trim().toLowerCase(Locale.ROOT);
@@ -70,7 +70,7 @@ public class MayContainIngredientService {
                 Ingredient ingredient = getCanonicalIngredient(normalized);
 
                 // Resolve canonical ingredient safely
-                Integer canonicalIdValue = ingredient.getCanonicalId();
+                Long canonicalIdValue = ingredient.getCanonicalId();
                 Ingredient canonicalIngredient;
                 if (canonicalIdValue != null) {
                     canonicalIngredient = ingredientRepository.findById(canonicalIdValue).orElse(ingredient);
@@ -79,9 +79,9 @@ public class MayContainIngredientService {
                 }
 
                 // Determine which ID to use for tracking duplicates
-                Integer canonicalIdToAdd = (canonicalIngredient.getCanonicalId() != null)
+                Long canonicalIdToAdd = (canonicalIngredient.getCanonicalId() != null)
                         ? canonicalIngredient.getCanonicalId()
-                        : Integer.valueOf(canonicalIngredient.getIngredientId());
+                        : canonicalIngredient.getId();
 
                 // Skip if already added
                 if (!addedCanonicals.contains(canonicalIdToAdd)) {

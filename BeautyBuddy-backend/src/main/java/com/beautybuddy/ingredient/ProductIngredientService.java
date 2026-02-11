@@ -36,7 +36,7 @@ public class ProductIngredientService {
             });
 
         // If it has a canonicalId, fetch the canonical ingredient object
-        Integer canonicalIdValue = ingredient.getCanonicalId();
+        Long canonicalIdValue = ingredient.getCanonicalId();
         if (canonicalIdValue != null) {
             ingredient = ingredientRepository.findById(canonicalIdValue)
                                            .orElse(ingredient);
@@ -59,7 +59,7 @@ public class ProductIngredientService {
             raw = raw.replace("/", ",");             // replace slashes
             String[] ingredients = raw.split(",");
 
-            Set<Integer> addedCanonicals = new HashSet<>();
+            Set<Long> addedCanonicals = new HashSet<>();
             int order = 1;
 
             for (String ing : ingredients) {
@@ -68,7 +68,7 @@ public class ProductIngredientService {
 
                 // get canonical Ingredient directly
                 Ingredient canonicalIngredient = getCanonicalIngredient(normalized);
-                int canonicalId = canonicalIngredient.getIngredientId();
+                Long canonicalId = canonicalIngredient.getId();
 
                 if (!addedCanonicals.contains(canonicalId)) {
                     ProductIngredient pi = new ProductIngredient();

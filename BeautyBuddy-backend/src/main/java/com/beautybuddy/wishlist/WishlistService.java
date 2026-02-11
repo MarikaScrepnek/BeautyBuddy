@@ -63,7 +63,7 @@ public class WishlistService {
 
             result.add(new WishlistItemDTO(
                 item.getId(),
-                product.getProductId(),
+                product.getId(),
                 product.getName(),
                 shadeName,
                 imageLink
@@ -78,7 +78,7 @@ public class WishlistService {
         List<WishlistItem> items = wishlistItemRepository.findByWishlist_User_Email(email);
         WishlistItem target = null;
         for (WishlistItem item : items) {
-            if (item.getProduct().getProductId() == request.productId()) {
+            if (item.getProduct().getId() == request.productId()) {
                 if (request.shadeName() == null && item.getShade() == null) {
                     target = item;
                     break;

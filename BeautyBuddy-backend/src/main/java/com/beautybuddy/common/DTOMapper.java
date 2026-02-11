@@ -21,11 +21,11 @@ import java.util.List;
 public class DTOMapper {
 
     public static BrandDTO toBrandDTO(Brand brand) {
-        return new BrandDTO(brand.getBrandId(), brand.getName());
+        return new BrandDTO(brand.getId(), brand.getName());
     }
 
     public static CategoryDTO toCategoryDTO(Category category) {
-        return new CategoryDTO(category.getCategoryId(), category.getName());
+        return new CategoryDTO(category.getId(), category.getName());
     }
 
     public static IngredientDTO toIngredientDTO(Ingredient ingredient) {
@@ -70,7 +70,7 @@ public class DTOMapper {
             .toList();
 
         return new ProductDTO(
-                product.getProductId(),
+                product.getId(),
                 product.getName(),
                 toBrandDTO(product.getBrand()),
                 toCategoryDTO(product.getCategory()),

@@ -2,7 +2,7 @@ package com.beautybuddy.wishlist;
 
 public record WishlistItemDTO (
     Long id,
-    int productId,
+    Long productId,
     String productName,
     String shadeName,
     String imageLink

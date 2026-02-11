@@ -6,19 +6,19 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import java.math.BigDecimal;
 
-public interface ReviewRepository extends JpaRepository<Review, Integer> {
+public interface ReviewRepository extends JpaRepository<Review, Long> {
 
-    Page<Review> findByProduct_ProductIdAndDeletedAtIsNullAndApprovedTrueOrderByCreatedAtDesc(
-        int productId,
+    Page<Review> findByProduct_IdAndDeletedAtIsNullAndApprovedTrueOrderByCreatedAtDesc(
+        Long productId,
         Pageable pageable
     );
 
     @Query("""
         SELECT AVG(r.rating)
         FROM Review r
-        WHERE r.product.productId = :productId
+        WHERE r.product.id = :productId
           AND r.deletedAt IS NULL
           AND r.approved = true
     """)
-    BigDecimal findAverageRatingByProductId(int productId);
+    BigDecimal findAverageRatingByProductId(Long productId);
 }

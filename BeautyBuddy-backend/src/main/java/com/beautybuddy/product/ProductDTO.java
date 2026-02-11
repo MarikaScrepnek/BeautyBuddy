@@ -8,7 +8,7 @@ import com.beautybuddy.category.CategoryDTO;
 import com.beautybuddy.ingredient.IngredientDTO;
 
 public record ProductDTO (
-    int id,
+    Long id,
     String name,
     BrandDTO brand,
     CategoryDTO category,

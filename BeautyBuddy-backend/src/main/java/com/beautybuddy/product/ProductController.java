@@ -33,14 +33,14 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    public ProductDTO getProduct(@PathVariable("id") int productId) {
+    public ProductDTO getProduct(@PathVariable("id") Long productId) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
         return DTOMapper.toProductDTO(product);
     }
 
     @GetMapping("/{id}/ingredients")
-    public List<ProductIngredientDTO> getProductIngredients(@PathVariable("id") int productId) {
+    public List<ProductIngredientDTO> getProductIngredients(@PathVariable("id") Long productId) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
         return product.getProductIngredients().stream()
@@ -49,7 +49,7 @@ public class ProductController {
     }
 
     @GetMapping("/{id}/maycontain")
-    public List<MayContainIngredientDTO> getMayContainIngredients(@PathVariable("id") int productId) {
+    public List<MayContainIngredientDTO> getMayContainIngredients(@PathVariable("id") Long productId) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
         return product.getMayContainIngredients().stream()

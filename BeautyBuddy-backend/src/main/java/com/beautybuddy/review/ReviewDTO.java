@@ -4,8 +4,8 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public record ReviewDTO(
-    int id,
-    int productId,
+    Long id,
+    Long productId,
     String shadeName,
     BigDecimal rating,
     String reviewText,

@@ -1,5 +1,5 @@
 package com.beautybuddy.brand;
 
-public record BrandDTO (int id, String name) {
+public record BrandDTO (Long id, String name) {
     
 }

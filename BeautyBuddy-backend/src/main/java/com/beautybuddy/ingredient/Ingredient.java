@@ -16,7 +16,7 @@ public class Ingredient extends UpdatableEntity{
     private String name;
 
     @Column(name = "canonical_id")
-    private Integer canonicalId;
+    private Long canonicalId;
 
     @Column(name = "is_common_allergen", nullable = false)
     private boolean isCommonAllergen = false;
@@ -30,8 +30,8 @@ public class Ingredient extends UpdatableEntity{
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
 
-    public Integer getCanonicalId() { return canonicalId; }
-    public void setCanonicalId(Integer canonicalId) { this.canonicalId = canonicalId; }
+    public Long getCanonicalId() { return canonicalId; }
+    public void setCanonicalId(Long canonicalId) { this.canonicalId = canonicalId; }
 
     public boolean isCommonAllergen() { return isCommonAllergen; }
     public void setCommonAllergen(boolean commonAllergen) { isCommonAllergen = commonAllergen; }

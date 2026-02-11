@@ -62,7 +62,7 @@ public class ReviewService {
         newReview.setProduct(product);
         newReview.setProductShade(shade);
         newReview.setRating(rating);
-        newReview.setReviewText(reviewText);
+        newReview.setText(reviewText);
         for (ReviewImage img : reviewImages) {
             img.setReview(newReview);
         }
@@ -77,7 +77,7 @@ public class ReviewService {
             .orElseThrow(() -> new RuntimeException("User not found"));
         Review existingReview = reviewRepository.findById(review.id())
             .orElseThrow(() -> new RuntimeException("Review not found"));
-        if (existingReview.getUser().getUserId() != user.getUserId()) {
+        if (existingReview.getUser().getId() != user.getId()) {
             throw new RuntimeException("User not authorized to delete this review");
         } else {
             reviewRepository.delete(existingReview);
@@ -101,14 +101,14 @@ public class ReviewService {
         reviewReportRepository.save(newReport);
     }
 
-    public BigDecimal getAverageRatingForProduct(int productId) {
+    public BigDecimal getAverageRatingForProduct(Long productId) {
         BigDecimal averageRating = reviewRepository.findAverageRatingByProductId(productId);
         return averageRating != null ? averageRating : BigDecimal.ZERO;
     }
 
-    public Page<ReviewDTO> getReviewsForProduct(int productId, int page, int size) {
+    public Page<ReviewDTO> getReviewsForProduct(Long productId, int page, int size) {
         Page<Review> reviewPage =
-            reviewRepository.findByProduct_ProductIdAndDeletedAtIsNullAndApprovedTrueOrderByCreatedAtDesc(
+            reviewRepository.findByProduct_IdAndDeletedAtIsNullAndApprovedTrueOrderByCreatedAtDesc(
                 productId,
                 PageRequest.of(page, size)
             );
@@ -123,11 +123,11 @@ public class ReviewService {
                 : null;
 
             return new ReviewDTO(
-                review.getReviewId(),
-                review.getProduct().getProductId(),
+                review.getId(),
+                review.getProduct().getId(),
                 shadeName,
                 review.getRating(),
-                review.getReviewText(),
+                review.getText(),
                 imageLinks
             );
         });

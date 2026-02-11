@@ -7,19 +7,19 @@ import java.util.Collections;
 import java.util.Collection;
 
 public class CustomUserDetails implements UserDetails {
-    private int id;
+    private Long id;
     private final String username;
     private final String email;
     private final String password;
 
-    public CustomUserDetails(int id, String username, String email, String password) {
+    public CustomUserDetails(Long id, String username, String email, String password) {
         this.id = id;
         this.username = username;
         this.email = email;
         this.password = password;
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
