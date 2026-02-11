@@ -31,7 +31,7 @@ CREATE TABLE brand (
     name CITEXT UNIQUE NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    discontinued BOOLEAN NOT NULL DEFAULT FALSE,
+    is_discontinued BOOLEAN NOT NULL DEFAULT FALSE,
 
     CHECK (length(trim(name::text)) > 0)
 );
@@ -49,7 +49,7 @@ CREATE TABLE product (
     raw_ingredients TEXT,
     may_contain_raw_ingredients TEXT,
     review_count INT NOT NULL DEFAULT 0,
-    discontinued BOOLEAN NOT NULL DEFAULT FALSE,
+    is_discontinued BOOLEAN NOT NULL DEFAULT FALSE,
 
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -93,6 +93,7 @@ CREATE TABLE ingredient (
     name CITEXT UNIQUE NOT NULL,
     canonical_id INT REFERENCES ingredient(id) ON DELETE SET NULL,
     is_common_allergen BOOLEAN NOT NULL DEFAULT FALSE,
+    is_common_irritant BOOLEAN NOT NULL DEFAULT FALSE,
     is_fragrance BOOLEAN NOT NULL DEFAULT FALSE,
 
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -335,7 +336,7 @@ CREATE TABLE review (
     product_id INT NOT NULL REFERENCES product(id) ON DELETE CASCADE,
     product_shade_id INT,
     rating NUMERIC(3, 2) CHECK (rating >= 0 AND rating <= 5),
-    review_title TEXT,
+    title TEXT,
     text TEXT,
     upvote_count INT NOT NULL DEFAULT 0,
     reported_count INT NOT NULL DEFAULT 0,
@@ -346,9 +347,9 @@ CREATE TABLE review (
 
     CHECK (upvote_count >= 0),
     CHECK (reported_count >= 0),
-    CHECK (review_text IS NULL OR length(trim(review_text)) > 0),
-    CHECK (review_title IS NULL OR length(trim(review_title)) > 0),
-    CHECK (review_title IS NULL OR length(review_title) <= 200),
+    CHECK (text IS NULL OR length(trim(text)) > 0),
+    CHECK (title IS NULL OR length(trim(title)) > 0),
+    CHECK (title IS NULL OR length(title) <= 200),
 
     CHECK (
         (product_shade_id IS NULL AND product_id IS NOT NULL) OR
@@ -393,7 +394,7 @@ CREATE TABLE question (
     account_id INT REFERENCES account(id) ON DELETE SET NULL,
     product_id INT NOT NULL REFERENCES product(id) ON DELETE CASCADE,
     text TEXT NOT NULL,
-    answered BOOLEAN NOT NULL DEFAULT FALSE,
+    is_answered BOOLEAN NOT NULL DEFAULT FALSE,
     upvote_count INT NOT NULL DEFAULT 0,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
