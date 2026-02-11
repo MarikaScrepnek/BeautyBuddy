@@ -10,7 +10,7 @@ import jakarta.persistence.Table;
 @Table(name = "brand")
 public class Brand extends UpdatableEntity {
 
-    @Column(unique = true, nullable = false)
+    @Column(unique = true, nullable = false, columnDefinition = "CITEXT")
     private String name;
 
     @Column(name = "is_discontinued", nullable = false)

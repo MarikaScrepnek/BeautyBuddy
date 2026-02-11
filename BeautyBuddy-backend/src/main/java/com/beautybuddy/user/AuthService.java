@@ -1,11 +1,10 @@
 package com.beautybuddy.user;
 
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
 import com.beautybuddy.wishlist.Wishlist;
 
-import java.sql.Timestamp;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import java.time.LocalDateTime;
 
 @Service
 public class AuthService {
@@ -28,7 +27,7 @@ public class AuthService {
 
         Wishlist wishlist = new Wishlist();
         wishlist.setUser(user);
-        wishlist.setCreatedAt(new Timestamp(System.currentTimeMillis()));
+        wishlist.setUpdatedAt(LocalDateTime.now());
         user.setWishlist(wishlist);
 
         userRepo.save(user);

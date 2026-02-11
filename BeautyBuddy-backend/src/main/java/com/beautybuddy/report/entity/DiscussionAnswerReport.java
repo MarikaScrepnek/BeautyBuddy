@@ -11,13 +11,13 @@ import jakarta.persistence.UniqueConstraint;
 
 @Entity
 @Table(
-    name = "discussion_answer_report",
-    uniqueConstraints = @UniqueConstraint(columnNames = {"account_id", "answer_id"})
+    name = "discussion_comment_report",
+    uniqueConstraints = @UniqueConstraint(columnNames = {"account_id", "discussion_comment_id"})
 )
 public class DiscussionAnswerReport extends BaseReport {
     
     @ManyToOne
-    @JoinColumn(name = "answer_id", nullable = false)
+    @JoinColumn(name = "discussion_comment_id", nullable = false)
     DiscussionComment discussionAnswer;
 
     public DiscussionComment getDiscussionAnswer() {

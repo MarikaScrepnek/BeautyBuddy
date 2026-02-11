@@ -52,7 +52,7 @@ public class ReviewService {
             .map(link -> {
                 ReviewImage img = new ReviewImage();
                 img.setImageLink(link);
-                img.setUploadedAt(LocalDateTime.now());
+                img.setCreatedAt(LocalDateTime.now());
                 return img;
             })
             .toList();

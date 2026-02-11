@@ -20,7 +20,7 @@ import com.beautybuddy.ingredient.ProductIngredient;
 )
 public class Product extends UpdatableEntity {
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "CITEXT")
     private String name;
 
     @ManyToOne

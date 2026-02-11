@@ -12,7 +12,7 @@ import jakarta.persistence.Table;
 @Table (name = "category")
 public class Category extends UpdatableEntity {
 
-    @Column(unique = true, nullable = false)
+    @Column(unique = true, nullable = false, columnDefinition = "CITEXT")
     private String name;
 
     @ManyToOne

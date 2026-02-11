@@ -2,8 +2,9 @@ package com.beautybuddy.user;
 
 import com.beautybuddy.common.entity.BaseEntity;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
@@ -13,10 +14,12 @@ import jakarta.persistence.UniqueConstraint;
     uniqueConstraints = @UniqueConstraint(columnNames = {"follower_id", "followed_id"})
 )
 public class UserFollow extends BaseEntity {
-    @Column(name = "follower_id", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "follower_id", nullable = false)
     private User follower;
 
-    @Column(name = "followed_id", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "followed_id", nullable = false)
     private User followed;
 
     public User getFollower() {

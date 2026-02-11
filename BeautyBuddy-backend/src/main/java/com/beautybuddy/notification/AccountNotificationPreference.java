@@ -1,13 +1,18 @@
 package com.beautybuddy.notification;
 
+import com.beautybuddy.common.entity.ForeignKeyIdEntity;
 import com.beautybuddy.user.User;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 
-public class AccountNotificationPreference {
+@Entity
+@Table(name = "account_notification_preference")
+public class AccountNotificationPreference extends ForeignKeyIdEntity {
     @Id
     @OneToOne
     @JoinColumn(name = "account_id")
@@ -19,8 +24,11 @@ public class AccountNotificationPreference {
     @Column(name = "answer_on_your_question", nullable = false)
     private boolean answerOnYourQuestion = true;
 
-    @Column(name = "discussion_comment_on_your_comment", nullable = false)
-    private boolean discussionCommentOnYourComment = true;
+    @Column(name = "discussion_comment_on_your_discussion", nullable = false)
+    private boolean discussionCommentOnYourDiscussion = true;
+
+    @Column(name = "discussion_comment_on_your_discussion_comment", nullable = false)
+    private boolean discussionCommentOnYourDiscussionComment = true;
 
     @Column(name = "upvotes", nullable = false)
     private boolean upvotes = true;
@@ -46,11 +54,18 @@ public class AccountNotificationPreference {
         this.answerOnYourQuestion = answerOnYourQuestion;
     }
 
-    public boolean isDiscussionCommentOnYourComment() {
-        return discussionCommentOnYourComment;
+    public boolean isDiscussionCommentOnYourDiscussion() {
+        return discussionCommentOnYourDiscussion;
     }
-    public void setDiscussionCommentOnYourComment(boolean discussionCommentOnYourComment) {
-        this.discussionCommentOnYourComment = discussionCommentOnYourComment;
+    public void setDiscussionCommentOnYourDiscussion(boolean discussionCommentOnYourDiscussion) {
+        this.discussionCommentOnYourDiscussion = discussionCommentOnYourDiscussion;
+    }
+
+    public boolean isDiscussionCommentOnYourDiscussionComment() {
+        return discussionCommentOnYourDiscussionComment;
+    }
+    public void setDiscussionCommentOnYourDiscussionComment(boolean discussionCommentOnYourDiscussionComment) {
+        this.discussionCommentOnYourDiscussionComment = discussionCommentOnYourDiscussionComment;
     }
 
     public boolean isUpvotes() {
@@ -58,5 +73,10 @@ public class AccountNotificationPreference {
     }
     public void setUpvotes(boolean upvotes) {
         this.upvotes = upvotes;
+    }
+
+    @Override
+    protected Long getForeignKeyId() {
+        return user != null ? user.getId() : null;
     }
 }

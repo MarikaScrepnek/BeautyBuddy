@@ -9,7 +9,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(
@@ -35,10 +35,10 @@ public class RoutineItem extends BaseEntity {
     private String notes;
 
     @Column(name = "valid_from", nullable = false)
-    private LocalDate validFrom;
+    private LocalDateTime validFrom;
 
     @Column(name = "valid_to")
-    private LocalDate validTo;
+    private LocalDateTime validTo;
 
     public Routine getRoutine() { return routine; }
     public void setRoutine(Routine routine) { this.routine = routine; }
@@ -55,9 +55,9 @@ public class RoutineItem extends BaseEntity {
     public String getNotes() { return notes; }
     public void setNotes(String notes) { this.notes = notes; }
 
-    public LocalDate getValidFrom() { return validFrom; }
-    public void setValidFrom(LocalDate validFrom) { this.validFrom = validFrom; }
+    public LocalDateTime getValidFrom() { return validFrom; }
+    public void setValidFrom(LocalDateTime validFrom) { this.validFrom = validFrom; }
 
-    public LocalDate getValidTo() { return validTo; }
-    public void setValidTo(LocalDate validTo) { this.validTo = validTo; }
+    public LocalDateTime getValidTo() { return validTo; }
+    public void setValidTo(LocalDateTime validTo) { this.validTo = validTo; }
 }

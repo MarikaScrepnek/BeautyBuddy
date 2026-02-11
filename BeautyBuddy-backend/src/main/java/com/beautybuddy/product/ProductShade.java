@@ -19,7 +19,7 @@ public class ProductShade extends UpdatableEntity{
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
-    @Column (name = "shade_name", nullable = false)
+    @Column (name = "shade_name", nullable = false, columnDefinition = "CITEXT")
     private String shadeName;
 
     @Column (name = "shade_hex_code")

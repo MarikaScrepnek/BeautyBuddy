@@ -1,36 +1,31 @@
 package com.beautybuddy.wishlist;
 
+import com.beautybuddy.common.entity.ForeignKeyIdEntity;
+import com.beautybuddy.user.User;
+
 import jakarta.persistence.Table;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.CascadeType;
-
+import java.time.LocalDateTime;
 import java.util.Set;
-
-import com.beautybuddy.user.User;
-
-import java.sql.Timestamp;
-
 
 @Table(name = "wishlist",
     uniqueConstraints = @jakarta.persistence.UniqueConstraint(columnNames = {"account_id"})
 )
 @Entity
-public class Wishlist {
+public class Wishlist extends ForeignKeyIdEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
-    private int id;
-
     @OneToOne
     @JoinColumn(name = "account_id", nullable = false)
     private User user;
+
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime updated_at;
 
     @OneToMany(
         mappedBy = "wishlist",
@@ -39,25 +34,19 @@ public class Wishlist {
     )
     private Set<WishlistItem> wishlist_items;
 
-    @Column(name = "created_at", nullable = false)
-    private Timestamp created_at;
-
-    public Wishlist() {}
-
-    public int getWishlistId() {
-        return id;
-    }
-
-    public void setWishlistId(int id) {
-        this.id = id;
-    }
-
     public User getUser() {
         return user;
     }
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updated_at;
+    }
+    public void setUpdatedAt(LocalDateTime updated_at) {
+        this.updated_at = updated_at;
     }
 
     public Set<WishlistItem> getItems() {
@@ -68,12 +57,8 @@ public class Wishlist {
         this.wishlist_items = wishlist_items;
     }
 
-    public Timestamp getCreatedAt() {
-        return created_at;
+    @Override
+    protected Long getForeignKeyId() {
+        return user != null ? user.getId() : null;
     }
-
-    public void setCreatedAt(Timestamp createdAt) {
-        this.created_at = createdAt;
-    }
-
 }

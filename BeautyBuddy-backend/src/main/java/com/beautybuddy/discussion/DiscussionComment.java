@@ -1,5 +1,7 @@
 package com.beautybuddy.discussion;
 
+import com.beautybuddy.common.entity.UserWrittenEntity;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -11,7 +13,7 @@ import jakarta.persistence.UniqueConstraint;
     name = "discussion_comment",
     uniqueConstraints = @UniqueConstraint(columnNames = {"id", "discussion_id"})
 )
-public class DiscussionComment {
+public class DiscussionComment extends UserWrittenEntity{
     
     @ManyToOne
     @JoinColumn(name = "discussion_id", nullable = false)

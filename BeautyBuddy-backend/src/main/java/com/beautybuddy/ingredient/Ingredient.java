@@ -12,7 +12,7 @@ import jakarta.persistence.Table;
 )
 public class Ingredient extends UpdatableEntity{
 
-    @Column(name = "name", nullable = false, unique = true)
+    @Column(name = "name", nullable = false, unique = true, columnDefinition = "CITEXT")
     private String name;
 
     @Column(name = "canonical_id")

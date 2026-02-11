@@ -1,7 +1,5 @@
 package com.beautybuddy.common.entity;
 
-import java.time.LocalDateTime;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
 
@@ -9,9 +7,6 @@ import jakarta.persistence.MappedSuperclass;
 public abstract class UserImageEntity extends BaseEntity {
     @Column(name = "image_link", nullable = false)
     private String imageLink;
-
-    @Column(name = "uploaded_at", nullable = false)
-    private LocalDateTime uploadedAt;
 
     @Column(name = "display_order", nullable = false)
     private int displayOrder;
@@ -21,13 +16,6 @@ public abstract class UserImageEntity extends BaseEntity {
     }
     public void setImageLink(String imageLink) {
         this.imageLink = imageLink;
-    }
-
-    public LocalDateTime getUploadedAt() {
-        return uploadedAt;
-    }
-    public void setUploadedAt(LocalDateTime uploadedAt) {
-        this.uploadedAt = uploadedAt;
     }
 
     public int getDisplayOrder() {

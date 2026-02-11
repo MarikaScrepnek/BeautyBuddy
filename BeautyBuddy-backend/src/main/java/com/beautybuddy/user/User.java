@@ -14,7 +14,7 @@ import jakarta.persistence.OneToOne;
 @Table(name = "account")
 public class User extends SoftDeletableEntity{
 
-    @Column(name = "username", unique = true, nullable = false)
+    @Column(name = "username", unique = true, nullable = false, columnDefinition = "CITEXT")
     private String username;
 
     @Column(name = "email", unique = true, nullable = false, columnDefinition = "CITEXT")

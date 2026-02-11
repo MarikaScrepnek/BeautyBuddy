@@ -6,6 +6,9 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 @Entity
 @Table(name = "public_community_post")
 public class PublicCommunityPost extends SoftDeletableEntity{
@@ -16,7 +19,8 @@ public class PublicCommunityPost extends SoftDeletableEntity{
     @Column(name = "content", nullable = false, columnDefinition = "TEXT")
     private String content;
 
-    @Column(name = "media")
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "media", columnDefinition = "jsonb")
     private String media;
 
     public String getTitle() { return title; }

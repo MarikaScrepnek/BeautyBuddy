@@ -2,6 +2,7 @@ package com.beautybuddy.notification.entity;
 
 import com.beautybuddy.discussion.Discussion;
 import com.beautybuddy.discussion.DiscussionComment;
+import com.beautybuddy.notification.BaseNotificationType;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
@@ -12,7 +13,7 @@ import jakarta.persistence.Table;
 @Table(
     name = "discussion_comment_notification"
 )
-public class DiscussionCommentNotification {
+public class DiscussionCommentNotification extends BaseNotificationType {
     @ManyToOne
     @JoinColumn(name = "discussion_id", nullable = false)
     private Discussion discussion;
