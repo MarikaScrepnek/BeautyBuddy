@@ -16,7 +16,7 @@ CREATE EXTENSION IF NOT EXISTS citext;
 CREATE TABLE category (
     id BIGSERIAL PRIMARY KEY,
     name CITEXT UNIQUE NOT NULL,
-    parent_category_id INT REFERENCES category(id) ON DELETE SET NULL,
+    parent_category_id BIGINT REFERENCES category(id) ON DELETE SET NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
@@ -40,8 +40,8 @@ CREATE TABLE brand (
 CREATE TABLE product (
     id BIGSERIAL PRIMARY KEY,
     name CITEXT NOT NULL,
-    brand_id INT NOT NULL REFERENCES brand(id),
-    category_id INT NOT NULL REFERENCES category(id),
+    brand_id BIGINT NOT NULL REFERENCES brand(id),
+    category_id BIGINT NOT NULL REFERENCES category(id),
     price NUMERIC(10, 2),
     image_link TEXT,
     product_link TEXT,
@@ -68,7 +68,7 @@ CREATE INDEX idx_product_category ON product (category_id);
 
 CREATE TABLE product_shade (
     id BIGSERIAL PRIMARY KEY,
-    product_id INT NOT NULL REFERENCES product(id) ON DELETE CASCADE,
+    product_id BIGINT NOT NULL REFERENCES product(id) ON DELETE CASCADE,
     shade_name CITEXT NOT NULL,
     shade_hex_code TEXT,
     shade_number INT,
@@ -91,7 +91,7 @@ CREATE INDEX idx_product_shade_product ON product_shade (product_id);
 CREATE TABLE ingredient (
     id BIGSERIAL PRIMARY KEY,
     name CITEXT UNIQUE NOT NULL,
-    canonical_id INT REFERENCES ingredient(id) ON DELETE SET NULL,
+    canonical_id BIGINT REFERENCES ingredient(id) ON DELETE SET NULL,
     is_common_allergen BOOLEAN NOT NULL DEFAULT FALSE,
     is_common_irritant BOOLEAN NOT NULL DEFAULT FALSE,
     is_fragrance BOOLEAN NOT NULL DEFAULT FALSE,
@@ -106,8 +106,8 @@ CREATE INDEX idx_ingredient_canonical ON ingredient (canonical_id);
 
 CREATE TABLE product_ingredient (
     id BIGSERIAL PRIMARY KEY,
-    product_id INT NOT NULL REFERENCES product(id) ON DELETE CASCADE,
-    ingredient_id INT NOT NULL REFERENCES ingredient(id) ON DELETE CASCADE,
+    product_id BIGINT NOT NULL REFERENCES product(id) ON DELETE CASCADE,
+    ingredient_id BIGINT NOT NULL REFERENCES ingredient(id) ON DELETE CASCADE,
     position INT NOT NULL,
 
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -122,8 +122,8 @@ CREATE INDEX idx_product_ingredient_ingredient ON product_ingredient (ingredient
 
 CREATE TABLE may_contain_ingredient (
     id BIGSERIAL PRIMARY KEY,
-    product_id INT NOT NULL REFERENCES product(id) ON DELETE CASCADE,
-    ingredient_id INT NOT NULL REFERENCES ingredient(id) ON DELETE CASCADE,
+    product_id BIGINT NOT NULL REFERENCES product(id) ON DELETE CASCADE,
+    ingredient_id BIGINT NOT NULL REFERENCES ingredient(id) ON DELETE CASCADE,
 
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
@@ -180,20 +180,21 @@ WHERE deleted_at IS NULL;
 
 CREATE TABLE account_follow (
     id BIGSERIAL PRIMARY KEY,
-    follower_id INT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
-    following_id INT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
+    follower_id BIGINT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
+    followed_id BIGINT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    UNIQUE (follower_id, following_id),
-    CHECK (follower_id <> following_id)
+    UNIQUE (follower_id, followed_id),
+    CHECK (follower_id <> followed_id)
 );
 CREATE INDEX idx_account_follow_follower ON account_follow (follower_id);
-CREATE INDEX idx_account_follow_following ON account_follow (following_id);
+CREATE INDEX idx_account_follow_followed ON account_follow (followed_id);
 
 CREATE TABLE account_notification_preference (
-    account_id INT PRIMARY KEY REFERENCES account(id) ON DELETE CASCADE,
+    account_id BIGINT PRIMARY KEY REFERENCES account(id) ON DELETE CASCADE,
     question_on_routine_product BOOLEAN NOT NULL DEFAULT TRUE,
     answer_on_your_question BOOLEAN NOT NULL DEFAULT TRUE,
     discussion_comment_on_your_discussion BOOLEAN NOT NULL DEFAULT TRUE,
+    discussion_comment_on_your_discussion_comment BOOLEAN NOT NULL DEFAULT TRUE,
     upvotes BOOLEAN NOT NULL DEFAULT TRUE
 );
 
@@ -201,9 +202,9 @@ CREATE TABLE account_notification_preference (
 
 CREATE TABLE product_purchase (
     id BIGSERIAL PRIMARY KEY,
-    account_id INT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
-    product_id INT NOT NULL REFERENCES product(id) ON DELETE CASCADE,
-    shade_id INT,
+    account_id BIGINT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
+    product_id BIGINT NOT NULL REFERENCES product(id) ON DELETE CASCADE,
+    shade_id BIGINT,
     times_purchased INT NOT NULL DEFAULT 1,
 
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -224,15 +225,15 @@ CREATE UNIQUE INDEX uq_product_purchase_product_noshade ON product_purchase (acc
 
 -------------------------------------------------------------------
 CREATE TABLE wishlist (
-    account_id INT PRIMARY KEY NOT NULL REFERENCES account(id) ON DELETE CASCADE,
+    account_id BIGINT PRIMARY KEY NOT NULL REFERENCES account(id) ON DELETE CASCADE,
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 CREATE TABLE wishlist_item (
     id BIGSERIAL PRIMARY KEY,
-    wishlist_id INT NOT NULL REFERENCES wishlist(account_id) ON DELETE CASCADE,
-    product_id INT NOT NULL REFERENCES product(id) ON DELETE CASCADE,
-    shade_id INT,
+    wishlist_id BIGINT NOT NULL REFERENCES wishlist(account_id) ON DELETE CASCADE,
+    product_id BIGINT NOT NULL REFERENCES product(id) ON DELETE CASCADE,
+    shade_id BIGINT,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
     UNIQUE (wishlist_id, product_id, shade_id),
@@ -251,10 +252,10 @@ WHERE shade_id IS NULL;
 -------------------------------------------------------------------
 CREATE TABLE routine (
     id BIGSERIAL PRIMARY KEY,
-    account_id INT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
+    account_id BIGINT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
     name TEXT NOT NULL,
     notes TEXT,
-    category_id INT NOT NULL REFERENCES category(id),
+    category_id BIGINT NOT NULL REFERENCES category(id),
 
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -270,10 +271,10 @@ CREATE INDEX idx_routine_category ON routine (category_id);
 
 CREATE TABLE routine_item (
     id BIGSERIAL PRIMARY KEY,
-    routine_id INT NOT NULL REFERENCES routine(id) ON DELETE CASCADE,
+    routine_id BIGINT NOT NULL REFERENCES routine(id) ON DELETE CASCADE,
 
-    product_id INT NOT NULL REFERENCES product(id) ON DELETE CASCADE,
-    shade_id INT,
+    product_id BIGINT NOT NULL REFERENCES product(id) ON DELETE CASCADE,
+    shade_id BIGINT,
 
     step_order INT NOT NULL,
     notes TEXT,
@@ -309,9 +310,9 @@ WHERE valid_to IS NULL AND shade_id IS NOT NULL;
 
 CREATE TABLE routine_image (
     id BIGSERIAL PRIMARY KEY,
-    routine_id INT NOT NULL REFERENCES routine(id) ON DELETE CASCADE,
+    routine_id BIGINT NOT NULL REFERENCES routine(id) ON DELETE CASCADE,
     image_link TEXT NOT NULL,
-    uploaded_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     display_order INT NOT NULL DEFAULT 1,
 
     UNIQUE (routine_id, image_link),
@@ -332,9 +333,9 @@ CREATE INDEX idx_routine_image_routine ON routine_image (routine_id);
 
 CREATE TABLE review (
     id BIGSERIAL PRIMARY KEY,
-    account_id INT REFERENCES account(id) ON DELETE SET NULL,
-    product_id INT NOT NULL REFERENCES product(id) ON DELETE CASCADE,
-    product_shade_id INT,
+    account_id BIGINT REFERENCES account(id) ON DELETE SET NULL,
+    product_id BIGINT NOT NULL REFERENCES product(id) ON DELETE CASCADE,
+    product_shade_id BIGINT,
     rating NUMERIC(3, 2) CHECK (rating >= 0 AND rating <= 5),
     title TEXT,
     text TEXT,
@@ -377,9 +378,9 @@ WHERE deleted_at IS NULL AND product_shade_id IS NULL;
 
 CREATE TABLE review_image (
     id BIGSERIAL PRIMARY KEY,
-    review_id INT NOT NULL REFERENCES review(id) ON DELETE CASCADE,
+    review_id BIGINT NOT NULL REFERENCES review(id) ON DELETE CASCADE,
     image_link TEXT NOT NULL,
-    uploaded_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     display_order INT NOT NULL DEFAULT 1,
 
     UNIQUE (review_id, image_link),
@@ -391,8 +392,8 @@ CREATE INDEX idx_review_image_review ON review_image (review_id);
 -----------------------------------------------------------------------------
 CREATE TABLE question (
     id BIGSERIAL PRIMARY KEY,
-    account_id INT REFERENCES account(id) ON DELETE SET NULL,
-    product_id INT NOT NULL REFERENCES product(id) ON DELETE CASCADE,
+    account_id BIGINT REFERENCES account(id) ON DELETE SET NULL,
+    product_id BIGINT NOT NULL REFERENCES product(id) ON DELETE CASCADE,
     text TEXT NOT NULL,
     is_answered BOOLEAN NOT NULL DEFAULT FALSE,
     upvote_count INT NOT NULL DEFAULT 0,
@@ -416,8 +417,8 @@ CREATE INDEX idx_question_account ON question (account_id);
 
 CREATE TABLE answer (
     id BIGSERIAL PRIMARY KEY,
-    question_id INT NOT NULL REFERENCES question(id) ON DELETE CASCADE,
-    account_id INT REFERENCES account(id) ON DELETE SET NULL,
+    question_id BIGINT NOT NULL REFERENCES question(id) ON DELETE CASCADE,
+    account_id BIGINT REFERENCES account(id) ON DELETE SET NULL,
     text TEXT NOT NULL,
     upvote_count INT NOT NULL DEFAULT 0,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -447,7 +448,7 @@ CREATE INDEX idx_answer_account ON answer (account_id);
 
 CREATE TABLE discussion (
     id BIGSERIAL PRIMARY KEY,
-    account_id INT REFERENCES account(id) ON DELETE SET NULL,
+    account_id BIGINT REFERENCES account(id) ON DELETE SET NULL,
     title TEXT NOT NULL,
     text TEXT NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -473,8 +474,8 @@ CREATE INDEX idx_discussion_account ON discussion (account_id);
 
 CREATE TABLE discussion_comment (
     id BIGSERIAL PRIMARY KEY,
-    discussion_id INT NOT NULL REFERENCES discussion(id) ON DELETE CASCADE,
-    account_id INT REFERENCES account(id) ON DELETE SET NULL,
+    discussion_id BIGINT NOT NULL REFERENCES discussion(id) ON DELETE CASCADE,
+    account_id BIGINT REFERENCES account(id) ON DELETE SET NULL,
     parent_discussion_comment_id INT,
     text TEXT NOT NULL,
     upvote_count INT NOT NULL DEFAULT 0,
@@ -505,8 +506,8 @@ CREATE INDEX idx_discussion_comment_account ON discussion_comment (account_id);
 
 CREATE TABLE user_discussion_pin (
     id BIGSERIAL PRIMARY KEY,
-    discussion_id INT NOT NULL REFERENCES discussion(id) ON DELETE CASCADE,
-    account_id INT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
+    discussion_id BIGINT NOT NULL REFERENCES discussion(id) ON DELETE CASCADE,
+    account_id BIGINT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     UNIQUE (discussion_id, account_id)
 );
@@ -523,8 +524,8 @@ CREATE INDEX idx_user_discussion_pin_account ON user_discussion_pin (account_id)
 
 CREATE TABLE review_upvote (
     id BIGSERIAL PRIMARY KEY,
-    account_id INT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
-    review_id INT NOT NULL REFERENCES review(id) ON DELETE CASCADE,
+    account_id BIGINT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
+    review_id BIGINT NOT NULL REFERENCES review(id) ON DELETE CASCADE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
     UNIQUE (account_id, review_id)
@@ -534,8 +535,8 @@ CREATE INDEX idx_review_upvote_review ON review_upvote (review_id);
 
 CREATE TABLE question_upvote (
     id BIGSERIAL PRIMARY KEY,
-    account_id INT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
-    question_id INT NOT NULL REFERENCES question(id) ON DELETE CASCADE,
+    account_id BIGINT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
+    question_id BIGINT NOT NULL REFERENCES question(id) ON DELETE CASCADE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
     UNIQUE (account_id, question_id)
@@ -545,8 +546,8 @@ CREATE INDEX idx_question_upvote_question ON question_upvote (question_id);
 
 CREATE TABLE answer_upvote (
     id BIGSERIAL PRIMARY KEY,
-    account_id INT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
-    answer_id INT NOT NULL REFERENCES answer(id) ON DELETE CASCADE,
+    account_id BIGINT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
+    answer_id BIGINT NOT NULL REFERENCES answer(id) ON DELETE CASCADE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
     UNIQUE (account_id, answer_id)
@@ -556,8 +557,8 @@ CREATE INDEX idx_answer_upvote_answer ON answer_upvote (answer_id);
 
 CREATE TABLE discussion_upvote (
     id BIGSERIAL PRIMARY KEY,
-    account_id INT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
-    discussion_id INT NOT NULL REFERENCES discussion(id) ON DELETE CASCADE,
+    account_id BIGINT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
+    discussion_id BIGINT NOT NULL REFERENCES discussion(id) ON DELETE CASCADE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
     UNIQUE (account_id, discussion_id)
@@ -567,8 +568,8 @@ CREATE INDEX idx_discussion_upvote_discussion ON discussion_upvote (discussion_i
 
 CREATE TABLE discussion_comment_upvote (
     id BIGSERIAL PRIMARY KEY,
-    account_id INT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
-    discussion_comment_id INT NOT NULL REFERENCES discussion_comment(id) ON DELETE CASCADE,
+    account_id BIGINT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
+    discussion_comment_id BIGINT NOT NULL REFERENCES discussion_comment(id) ON DELETE CASCADE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
     UNIQUE (account_id, discussion_comment_id)
@@ -582,8 +583,8 @@ CREATE TYPE report_status_enum AS ENUM ('OPEN', 'REVIEWING', 'RESOLVED', 'REJECT
 
 CREATE TABLE review_report (
     id BIGSERIAL PRIMARY KEY,
-    account_id INT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
-    review_id INT NOT NULL REFERENCES review(id) ON DELETE CASCADE,
+    account_id BIGINT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
+    review_id BIGINT NOT NULL REFERENCES review(id) ON DELETE CASCADE,
     reason TEXT,
     status report_status_enum NOT NULL DEFAULT 'OPEN',
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -597,8 +598,8 @@ CREATE INDEX idx_review_report_status ON review_report (status);
 
 CREATE TABLE question_report (
     id BIGSERIAL PRIMARY KEY,
-    account_id INT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
-    question_id INT NOT NULL REFERENCES question(id) ON DELETE CASCADE,
+    account_id BIGINT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
+    question_id BIGINT NOT NULL REFERENCES question(id) ON DELETE CASCADE,
     reason TEXT,
     status report_status_enum NOT NULL DEFAULT 'OPEN',
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -612,8 +613,8 @@ CREATE INDEX idx_question_report_status ON question_report (status);
 
 CREATE TABLE answer_report (
     id BIGSERIAL PRIMARY KEY,
-    account_id INT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
-    answer_id INT NOT NULL REFERENCES answer(id) ON DELETE CASCADE,
+    account_id BIGINT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
+    answer_id BIGINT NOT NULL REFERENCES answer(id) ON DELETE CASCADE,
     reason TEXT,
     status report_status_enum NOT NULL DEFAULT 'OPEN',
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -627,8 +628,8 @@ CREATE INDEX idx_answer_report_status ON answer_report (status);
 
 CREATE TABLE discussion_report (
     id BIGSERIAL PRIMARY KEY,
-    account_id INT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
-    discussion_id INT NOT NULL REFERENCES discussion(id) ON DELETE CASCADE,
+    account_id BIGINT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
+    discussion_id BIGINT NOT NULL REFERENCES discussion(id) ON DELETE CASCADE,
     reason TEXT,
     status report_status_enum NOT NULL DEFAULT 'OPEN',
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -642,8 +643,8 @@ CREATE INDEX idx_discussion_report_status ON discussion_report (status);
 
 CREATE TABLE discussion_comment_report (
     id BIGSERIAL PRIMARY KEY,
-    account_id INT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
-    discussion_comment_id INT NOT NULL REFERENCES discussion_comment(id) ON DELETE CASCADE,
+    account_id BIGINT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
+    discussion_comment_id BIGINT NOT NULL REFERENCES discussion_comment(id) ON DELETE CASCADE,
     reason TEXT,
     status report_status_enum NOT NULL DEFAULT 'OPEN',
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -660,6 +661,7 @@ CREATE TYPE notification_type_enum AS ENUM (
     'PRODUCT_QUESTION',
     'QUESTION_ANSWERED',
     'DISCUSSION_COMMENTED',
+    'DISCUSSION_COMMENT_COMMENTED',
     'REVIEW_UPVOTED',
     'QUESTION_UPVOTED',
     'ANSWER_UPVOTED',
@@ -669,8 +671,8 @@ CREATE TYPE notification_type_enum AS ENUM (
 
 CREATE TABLE notification (
     id BIGSERIAL PRIMARY KEY,
-    recipient_id INT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
-    actor_id INT NULL REFERENCES account(id) ON DELETE SET NULL,
+    recipient_id BIGINT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
+    actor_id BIGINT NULL REFERENCES account(id) ON DELETE SET NULL,
     type notification_type_enum NOT NULL,
     read_at TIMESTAMPTZ NULL, --null is unread
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -684,55 +686,63 @@ CREATE INDEX idx_notification_type ON notification (type);
 
 CREATE TABLE product_question_notification (
     notification_id BIGINT PRIMARY KEY REFERENCES notification(id) ON DELETE CASCADE,
-    product_id INT NOT NULL REFERENCES product(id) ON DELETE CASCADE,
-    question_id INT NOT NULL REFERENCES question(id) ON DELETE CASCADE
+    product_id BIGINT NOT NULL REFERENCES product(id) ON DELETE CASCADE,
+    question_id BIGINT NOT NULL REFERENCES question(id) ON DELETE CASCADE
 );
 CREATE INDEX idx_product_question_notification_product ON product_question_notification (product_id);
 CREATE INDEX idx_product_question_notification_question ON product_question_notification (question_id);
 
 CREATE TABLE question_answered_notification (
     notification_id BIGINT PRIMARY KEY REFERENCES notification(id) ON DELETE CASCADE,
-    question_id INT NOT NULL REFERENCES question(id) ON DELETE CASCADE,
-    answer_id INT NOT NULL REFERENCES answer(id) ON DELETE CASCADE
+    question_id BIGINT NOT NULL REFERENCES question(id) ON DELETE CASCADE,
+    answer_id BIGINT NOT NULL REFERENCES answer(id) ON DELETE CASCADE
 );
 CREATE INDEX idx_question_answered_notification_question ON question_answered_notification (question_id);
 CREATE INDEX idx_question_answered_notification_answer ON question_answered_notification (answer_id);
 
 CREATE TABLE discussion_comment_notification (
     notification_id BIGINT PRIMARY KEY REFERENCES notification(id) ON DELETE CASCADE,
-    discussion_id INT NOT NULL REFERENCES discussion(id) ON DELETE CASCADE,
-    discussion_comment_id INT NOT NULL REFERENCES discussion_comment(id) ON DELETE CASCADE
+    discussion_id BIGINT NOT NULL REFERENCES discussion(id) ON DELETE CASCADE,
+    discussion_comment_id BIGINT NOT NULL REFERENCES discussion_comment(id) ON DELETE CASCADE
 );
 CREATE INDEX idx_discussion_comment_notification_discussion ON discussion_comment_notification (discussion_id);
 CREATE INDEX idx_discussion_comment_notification_discussion_comment ON discussion_comment_notification (discussion_comment_id);
 
+CREATE TABLE discussion_comment_comment_notification (
+    notification_id BIGINT PRIMARY KEY REFERENCES notification(id) ON DELETE CASCADE,
+    parent_discussion_comment_id BIGINT NOT NULL REFERENCES discussion_comment(id) ON DELETE CASCADE,
+    discussion_comment_id BIGINT NOT NULL REFERENCES discussion_comment(id) ON DELETE CASCADE
+);
+CREATE INDEX idx_discussion_comment_comment_notification_parent_discussion_comment ON discussion_comment_comment_notification (parent_discussion_comment_id);
+CREATE INDEX idx_discussion_comment_comment_notification_discussion_comment ON discussion_comment_comment_notification (discussion_comment_id);
+
 CREATE TABLE review_upvoted_notification (
     notification_id BIGINT PRIMARY KEY REFERENCES notification(id) ON DELETE CASCADE,
-    review_id INT NOT NULL REFERENCES review(id) ON DELETE CASCADE
+    review_id BIGINT NOT NULL REFERENCES review(id) ON DELETE CASCADE
 );
 CREATE INDEX idx_review_upvoted_notification_review ON review_upvoted_notification (review_id);
 
 CREATE TABLE question_upvoted_notification (
     notification_id BIGINT PRIMARY KEY REFERENCES notification(id) ON DELETE CASCADE,
-    question_id INT NOT NULL REFERENCES question(id) ON DELETE CASCADE
+    question_id BIGINT NOT NULL REFERENCES question(id) ON DELETE CASCADE
 );
 CREATE INDEX idx_question_upvoted_notification_question ON question_upvoted_notification (question_id);
 
 CREATE TABLE answer_upvoted_notification (
     notification_id BIGINT PRIMARY KEY REFERENCES notification(id) ON DELETE CASCADE,
-    answer_id INT NOT NULL REFERENCES answer(id) ON DELETE CASCADE
+    answer_id BIGINT NOT NULL REFERENCES answer(id) ON DELETE CASCADE
 );
 CREATE INDEX idx_answer_upvoted_notification_answer ON answer_upvoted_notification (answer_id);
 
 CREATE TABLE discussion_upvoted_notification (
     notification_id BIGINT PRIMARY KEY REFERENCES notification(id) ON DELETE CASCADE,
-    discussion_id INT NOT NULL REFERENCES discussion(id) ON DELETE CASCADE
+    discussion_id BIGINT NOT NULL REFERENCES discussion(id) ON DELETE CASCADE
 );
 CREATE INDEX idx_discussion_upvoted_notification_discussion ON discussion_upvoted_notification (discussion_id);
 
 CREATE TABLE discussion_comment_upvoted_notification (
     notification_id BIGINT PRIMARY KEY REFERENCES notification(id) ON DELETE CASCADE,
-    discussion_comment_id INT NOT NULL REFERENCES discussion_comment(id) ON DELETE CASCADE
+    discussion_comment_id BIGINT NOT NULL REFERENCES discussion_comment(id) ON DELETE CASCADE
 );
 CREATE INDEX idx_discussion_comment_upvoted_notification_discussion_comment ON discussion_comment_upvoted_notification (discussion_comment_id);
 
@@ -773,7 +783,7 @@ CREATE TYPE activity_type_enum AS ENUM (
 
 CREATE TABLE activity (
     id BIGSERIAL PRIMARY KEY,
-    actor_id INT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
+    actor_id BIGINT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     type activity_type_enum NOT NULL,
     payload JSONB NOT NULL DEFAULT '{}'::jsonb,
@@ -784,25 +794,25 @@ CREATE INDEX idx_activity_actor ON activity (actor_id);
 CREATE INDEX idx_activity_type ON activity (type);
 
 CREATE TABLE review_activity (
-    activity_id INT PRIMARY KEY REFERENCES activity(id) ON DELETE CASCADE,
-    review_id INT NOT NULL REFERENCES review(id) ON DELETE CASCADE
+    activity_id BIGINT PRIMARY KEY REFERENCES activity(id) ON DELETE CASCADE,
+    review_id BIGINT NOT NULL REFERENCES review(id) ON DELETE CASCADE
 );
 CREATE INDEX idx_review_activity_review ON review_activity (review_id);
 
 CREATE TABLE routine_item_activity (
-    activity_id INT PRIMARY KEY REFERENCES activity(id) ON DELETE CASCADE,
-    routine_item_id INT NOT NULL REFERENCES routine_item(id) ON DELETE CASCADE
+    activity_id BIGINT PRIMARY KEY REFERENCES activity(id) ON DELETE CASCADE,
+    routine_item_id BIGINT NOT NULL REFERENCES routine_item(id) ON DELETE CASCADE
 );
 CREATE INDEX idx_routine_item_activity_routine_item ON routine_item_activity (routine_item_id);
 
 CREATE TABLE routine_image_activity (
-    activity_id INT PRIMARY KEY REFERENCES activity(id) ON DELETE CASCADE,
-    routine_image_id INT NOT NULL REFERENCES routine_image(id) ON DELETE CASCADE
+    activity_id BIGINT PRIMARY KEY REFERENCES activity(id) ON DELETE CASCADE,
+    routine_image_id BIGINT NOT NULL REFERENCES routine_image(id) ON DELETE CASCADE
 );
 CREATE INDEX idx_routine_image_activity_routine_image ON routine_image_activity (routine_image_id);
 
 CREATE TABLE wishlist_item_activity (
-    activity_id INT PRIMARY KEY REFERENCES activity(id) ON DELETE CASCADE,
-    wishlist_item_id INT NOT NULL REFERENCES wishlist_item(id) ON DELETE CASCADE
+    activity_id BIGINT PRIMARY KEY REFERENCES activity(id) ON DELETE CASCADE,
+    wishlist_item_id BIGINT NOT NULL REFERENCES wishlist_item(id) ON DELETE CASCADE
 );
 CREATE INDEX idx_wishlist_item_activity_wishlist_item ON wishlist_item_activity (wishlist_item_id);
