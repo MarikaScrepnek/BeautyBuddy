@@ -23,6 +23,6 @@ public abstract class BaseActivityType extends ForeignKeyIdEntity {
 
     @Override
     protected Long getForeignKeyId() {
-        return activity != null ? activity.getId() : null;
+        return activity.getId();
     }
 }

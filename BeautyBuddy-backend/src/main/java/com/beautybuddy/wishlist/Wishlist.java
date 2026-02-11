@@ -59,6 +59,6 @@ public class Wishlist extends ForeignKeyIdEntity {
 
     @Override
     protected Long getForeignKeyId() {
-        return user != null ? user.getId() : null;
+        return user.getId();
     }
 }

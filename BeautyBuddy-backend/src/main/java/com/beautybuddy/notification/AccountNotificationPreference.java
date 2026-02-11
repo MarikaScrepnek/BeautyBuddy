@@ -77,6 +77,6 @@ public class AccountNotificationPreference extends ForeignKeyIdEntity {
 
     @Override
     protected Long getForeignKeyId() {
-        return user != null ? user.getId() : null;
+        return user.getId();
     }
 }

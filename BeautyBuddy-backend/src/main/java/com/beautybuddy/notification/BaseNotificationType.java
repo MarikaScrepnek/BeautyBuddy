@@ -23,6 +23,6 @@ public abstract class BaseNotificationType extends ForeignKeyIdEntity {
 
     @Override
     protected Long getForeignKeyId() {
-        return notification != null ? notification.getId() : null;
+        return notification.getId();
     }
 }
