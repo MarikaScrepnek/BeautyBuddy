@@ -1,29 +1,21 @@
 package com.beautybuddy.report;
 
+import java.time.LocalDateTime;
+
+import com.beautybuddy.common.entity.BaseEntity;
 import com.beautybuddy.user.User;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MappedSuperclass;
 
-import java.time.LocalDateTime;
-
 @MappedSuperclass
-public class BaseReport {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
-    private int id;
-
+public class BaseReport extends BaseEntity{
     @ManyToOne
-    @JoinColumn(name = "account_id", nullable = false)
+    @JoinColumn(name = "account_id", nullable = false, updatable = false)
     private User user;
 
     @Column(name = "reason", nullable = true)
@@ -33,18 +25,8 @@ public class BaseReport {
     @Enumerated(EnumType.STRING)
     private ReportStatus status;
 
-    @Column(name = "created_at", nullable = false, insertable = false, updatable = false)
-    private LocalDateTime createdAt;
-
     @Column(name = "resolved_at", nullable = true)
     private LocalDateTime resolvedAt;
-
-    public int getId() {
-        return id;
-    }
-    public void setId(int id) {
-        this.id = id;
-    }
 
     public User getUser() {
         return user;
@@ -67,10 +49,6 @@ public class BaseReport {
         this.status = status;
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
     public LocalDateTime getResolvedAt() {
         return resolvedAt;
     }
@@ -78,3 +56,5 @@ public class BaseReport {
         this.resolvedAt = resolvedAt;
     }
 }
+
+// reports
