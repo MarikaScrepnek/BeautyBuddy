@@ -30,6 +30,8 @@ export default function ProductDetails() {
 
   const [toast, setToast] = useState(null);
 
+  const [questions, setQuestions] = useState([]);
+
   const showToast = (message, type = "success") => {
     setToast({ message, type});
   }
@@ -271,20 +273,24 @@ export default function ProductDetails() {
                 </h2>
                     {questionsOpen && (
                         <div className="questions-content">
-                        <div className="questions-empty-state">
-                            <p>Have a question about this product?</p>
-
                             <button
-                            className="ask-question-icon-button"
-                            aria-label="Ask a question"
-                            >
-                            <RiQuestionnaireLine />
+                            className="ask-question-button"
+                            onClick={() => showToast("Question submission not implemented yet", "info")}
+                            > Ask a question about this product
                             </button>
-                        </div>
-
-                        <p className="no-questions">
-                            No questions have been asked yet.
-                        </p>
+                            {questions.length === 0 ? (
+                                <div className="questions-empty-state">
+                                    <p className="no-questions">
+                                        No questions have been asked about this product yet.
+                                    </p>
+                                </div>
+                            ) : (
+                                <div>
+                                    {questions.map(q => (
+                                        <QuestionCard key={q.id} question={q} />
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     )}
             </section>
