@@ -10,7 +10,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query(
         value = "SELECT p.* " +
                 "FROM product p " +
-                "JOIN brand b ON p.brand_id = b.brand_id " +
+            "JOIN brand b ON p.brand_id = b.id " +
                 "WHERE replace(unaccent(lower(p.name)), '''', '') LIKE replace(unaccent(lower(CONCAT('%', :query, '%'))), '''', '') " +
                 "   OR replace(unaccent(lower(b.name)), '''', '') LIKE replace(unaccent(lower(CONCAT('%', :query, '%'))), '''', '')",
         nativeQuery = true
