@@ -354,12 +354,12 @@
   transform: scale(0.92);
 }
 
-.questions-empty-state {
+.questions-empty-state, .reviews-empty-state {
   margin-top: 0.75rem;
   width: 100%;
 }
 
-.ask-question-button {
+.ask-question-button, .submit-review-button {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -376,16 +376,16 @@
   transition: 0.3s ease;
 }
 
-.ask-question-button:hover {
+.ask-question-button:hover, .submit-review-button:hover {
   background: #f0cef0;
   color: white;
 }
 
-.ask-question-button:active {
+.ask-question-button:active, .submit-review-button:active {
   transform: scale(0.99);
 }
 
-.no-questions {
+.questions-empty-state p, .reviews-empty-state p {
   margin-top: 0.75rem;
   font-size: 1rem;
   color: #777;

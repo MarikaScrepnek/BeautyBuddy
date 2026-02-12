@@ -31,6 +31,7 @@ export default function ProductDetails() {
   const [toast, setToast] = useState(null);
 
   const [questions, setQuestions] = useState([]);
+  const [reviews, setReviews] = useState([]);
 
   const showToast = (message, type = "success") => {
     setToast({ message, type});
@@ -274,13 +275,13 @@ export default function ProductDetails() {
                     {questionsOpen && (
                         <div className="questions-content">
                             <button
-                            className="ask-question-button"
-                            onClick={() => showToast("Question submission not implemented yet", "info")}
-                            > Ask a question about this product
+                                className="ask-question-button"
+                                onClick={() => showToast("Question submission not implemented yet", "info")}
+                                > Ask a question about this product
                             </button>
                             {questions.length === 0 ? (
                                 <div className="questions-empty-state">
-                                    <p className="no-questions">
+                                    <p>
                                         No questions have been asked about this product yet.
                                     </p>
                                 </div>
@@ -307,8 +308,25 @@ export default function ProductDetails() {
                 </h2>
                 {reviewsOpen && (
                     <div className="reviews-content">
-                        {/* Reviews content goes here */}
-                        <p>No reviews have been submitted about this product yet.</p>
+                        <button
+                            className="submit-review-button"
+                            onClick={() => showToast("Review submission not implemented yet", "info")}
+                            > Write a review for this product
+                        </button>
+
+                        {reviews.length === 0 ? (
+                                <div className="reviews-empty-state">
+                                    <p>
+                                        No reviews have been submitted about this product yet.
+                                    </p>
+                                </div>
+                            ) : (
+                                <div>
+                                    {reviews.map(r => (
+                                        <ReviewCard key={r.id} review={r} />
+                                    ))}
+                                </div>
+                            )}
                     </div>
                 )}
             </section>
