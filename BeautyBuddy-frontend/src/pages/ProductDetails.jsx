@@ -5,11 +5,12 @@ import { FaSearch } from 'react-icons/fa';
 import AuthModal from "../components/AuthModal";
 import { addToWishlist, removeFromWishlist, getWishlist } from "../api/wishlistApi";
 
+import AskQuestionModal from "../components/AskQuestionModal";
+import SubmitReviewModal from "../components/SubmitReviewModal";
+
 import './ProductDetails.css';
 import { getCurrentUser } from "../api/authApi";
 import Toast from "../components/Toast";
-
-import { RiQuestionnaireLine } from "react-icons/ri";
 
 export default function ProductDetails() {
   const { productId } = useParams();
@@ -31,7 +32,10 @@ export default function ProductDetails() {
   const [toast, setToast] = useState(null);
 
   const [questions, setQuestions] = useState([]);
+  const [askOpen, setAskOpen] = useState(false);
+
   const [reviews, setReviews] = useState([]);
+  const [reviewOpen, setReviewOpen] = useState(false);
 
   const showToast = (message, type = "success") => {
     setToast({ message, type});
@@ -274,11 +278,23 @@ export default function ProductDetails() {
                 </h2>
                     {questionsOpen && (
                         <div className="questions-content">
+                            <AskQuestionModal
+                                isOpen={askOpen}
+                                onClose={() => setAskOpen(false)}
+                                onSubmit={async (payload) => {
+                                    // call your API here
+                                    // await createQuestion(productId, payload);
+                                    setAskOpen(false);
+                                }}
+                                productName={data?.name}
+                            />
                             <button
                                 className="ask-question-button"
-                                onClick={() => showToast("Question submission not implemented yet", "info")}
+                                onClick={() => setAskOpen(true)}
                                 > Ask a question about this product
                             </button>
+
+
                             {questions.length === 0 ? (
                                 <div className="questions-empty-state">
                                     <p>
@@ -308,9 +324,19 @@ export default function ProductDetails() {
                 </h2>
                 {reviewsOpen && (
                     <div className="reviews-content">
+                        <SubmitReviewModal
+                                isOpen={reviewOpen}
+                                onClose={() => setReviewOpen(false)}
+                                onSubmit={async (payload) => {
+                                    // call your API here
+                                    // await createQuestion(productId, payload);
+                                    setReviewOpen(false);
+                                }}
+                                productName={data?.name}
+                            />
                         <button
                             className="submit-review-button"
-                            onClick={() => showToast("Review submission not implemented yet", "info")}
+                            onClick={() => setReviewOpen(true)}
                             > Write a review for this product
                         </button>
 
