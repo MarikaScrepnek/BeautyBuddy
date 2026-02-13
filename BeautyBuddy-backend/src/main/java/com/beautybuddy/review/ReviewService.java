@@ -5,6 +5,9 @@ import com.beautybuddy.product.ProductShadeRepository;
 import com.beautybuddy.report.ReportRequestDTO;
 import com.beautybuddy.report.entity.ReviewReport;
 import com.beautybuddy.report.repo.ReviewReportRepository;
+import com.beautybuddy.review.dto.DisplayReviewDTO;
+import com.beautybuddy.review.dto.SubmitReviewDTO;
+import com.beautybuddy.review.dto.DeleteReviewDTO;
 import com.beautybuddy.user.UserRepository;
 
 import org.springframework.stereotype.Service;
@@ -39,7 +42,7 @@ public class ReviewService {
     }
 
     @Transactional
-    public void addReview(String email, ReviewDTO review) {
+    public void addReview(String email, SubmitReviewDTO review) {
         User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new RuntimeException("User not found"));
         Product product = productRepository.findById(review.productId())
@@ -72,7 +75,7 @@ public class ReviewService {
     }
 
     @Transactional
-    public void removeReview(String email, ReviewDTO review) {
+    public void removeReview(String email, DeleteReviewDTO review) {
         User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new RuntimeException("User not found"));
         Review existingReview = reviewRepository.findById(review.id())
@@ -106,7 +109,7 @@ public class ReviewService {
         return averageRating != null ? averageRating : BigDecimal.ZERO;
     }
 
-    public Page<ReviewDTO> getReviewsForProduct(Long productId, int page, int size) {
+    public Page<DisplayReviewDTO> getReviewsForProduct(Long productId, int page, int size) {
         Page<Review> reviewPage =
             reviewRepository.findByProduct_IdAndDeletedAtIsNullAndApprovedTrueOrderByCreatedAtDesc(
                 productId,
@@ -122,11 +125,14 @@ public class ReviewService {
                 ? review.getProductShade().getShadeName()
                 : null;
 
-            return new ReviewDTO(
-                review.getId(),
+            return new DisplayReviewDTO(
+                review.getUser().getUsername(),
+                review.getUser().getAvatarLink(),
+                review.getRating(),
+                review.getCreatedAt(),
                 review.getProduct().getId(),
                 shadeName,
-                review.getRating(),
+                review.getTitle(),
                 review.getText(),
                 imageLinks
             );

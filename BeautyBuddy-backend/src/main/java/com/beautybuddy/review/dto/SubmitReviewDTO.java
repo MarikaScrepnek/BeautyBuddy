@@ -1,10 +1,9 @@
-package com.beautybuddy.review;
+package com.beautybuddy.review.dto;
 
 import java.math.BigDecimal;
 import java.util.List;
 
-public record ReviewDTO(
-    Long id,
+public record SubmitReviewDTO(
     Long productId,
     String shadeName,
     BigDecimal rating,

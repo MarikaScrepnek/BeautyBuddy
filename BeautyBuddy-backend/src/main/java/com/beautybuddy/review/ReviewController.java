@@ -1,5 +1,13 @@
 package com.beautybuddy.review;
 
+import com.beautybuddy.security.CustomUserDetails;
+import com.beautybuddy.upvote.UpvoteRequestDTO;
+import com.beautybuddy.upvote.UpvoteService;
+import com.beautybuddy.report.ReportRequestDTO;
+import com.beautybuddy.review.dto.DisplayReviewDTO;
+import com.beautybuddy.review.dto.SubmitReviewDTO;
+import com.beautybuddy.review.dto.DeleteReviewDTO;
+
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -10,13 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-
 import java.math.BigDecimal;
-
-import com.beautybuddy.security.CustomUserDetails;
-import com.beautybuddy.upvote.UpvoteRequestDTO;
-import com.beautybuddy.upvote.UpvoteService;
-import com.beautybuddy.report.ReportRequestDTO;
 
 @RestController
 @RequestMapping("/api/reviews")
@@ -30,7 +32,7 @@ public class ReviewController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<Void> addReview(@RequestBody ReviewDTO reviewDTO, Authentication authentication) {
+    public ResponseEntity<Void> addReview(@RequestBody SubmitReviewDTO reviewDTO, Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.status(401).build();
         }
@@ -40,7 +42,7 @@ public class ReviewController {
     }
 
     @PostMapping("/remove")
-    public ResponseEntity<Void> removeReview(@RequestBody ReviewDTO reviewDTO, Authentication authentication) {
+    public ResponseEntity<Void> removeReview(@RequestBody DeleteReviewDTO reviewDTO, Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.status(401).build();
         }
@@ -76,12 +78,12 @@ public class ReviewController {
     }
 
     @GetMapping("/{productId}")
-    public ResponseEntity<Page<ReviewDTO>> getReviewsForProduct(
+    public ResponseEntity<Page<DisplayReviewDTO>> getReviewsForProduct(
         @PathVariable Long productId,
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") int size
     ) {
-        Page<ReviewDTO> reviews = reviewService.getReviewsForProduct(productId, page, size);
+        Page<DisplayReviewDTO> reviews = reviewService.getReviewsForProduct(productId, page, size);
         return ResponseEntity.ok(reviews);
     }
 
