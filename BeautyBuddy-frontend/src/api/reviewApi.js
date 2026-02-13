@@ -13,7 +13,7 @@ export async function submitReview(productId, shadeName, rating, title, text, im
             imageLinks
         })
     });
-    return response.json();
+    return response.ok;
 }
 
 export async function deleteReview(reviewId) {
@@ -29,7 +29,7 @@ export async function getAverageRating(productId) {
 }
 
 export async function getReviews(productId) {
-    const response = await fetch(`/api/reviews/productId=${productId}`);
+    const response = await fetch(`/api/reviews/${productId}`);
     return response.json();
 }
 
@@ -44,8 +44,9 @@ export async function reportReview(reviewId, reason) {
     const response = await fetch(`/api/reviews/${reviewId}/report`, {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'        },
-        body: JSON.stringify({reason})
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ reason })
     });
     return response.ok;
 }
