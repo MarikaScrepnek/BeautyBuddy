@@ -101,7 +101,7 @@ export default function AskQuestionModal({
               Cancel
             </button>
             <button type="submit" className="modal-primary">
-              Post question
+              Submit review
             </button>
           </div>
         </form>
