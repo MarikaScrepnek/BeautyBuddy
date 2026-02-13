@@ -71,3 +71,119 @@
 .modal-textarea {
   resize: none;
 }
+
+/* ===== Rating container ===== */
+
+.rating-row{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin: 10px 0 16px;
+}
+
+.rating-label{
+  font-weight:600;
+  font-size:0.95rem;
+  min-width:60px;
+}
+
+/* ===== Stars container ===== */
+
+.stars{
+  display:flex;
+  gap:6px;
+  align-items:center;
+}
+
+/* ===== Star button ===== */
+
+.star-btn{
+  background:transparent;
+  border:none;
+  padding:0;
+  cursor:pointer;
+  line-height:1;
+  transition: transform 0.15s ease;
+}
+
+.star-btn:hover{
+  transform: scale(1.15);
+}
+
+.star-btn:active{
+  transform: scale(0.95);
+}
+
+/* ===== Star structure ===== */
+
+.star-btn{
+  background:transparent;
+  border:none;
+  padding:0;
+  cursor:pointer;
+  line-height:1;
+  transition: transform 0.15s ease;
+}
+
+.star-btn:hover{ transform: scale(1.12); }
+.star-btn:active{ transform: scale(0.96); }
+
+.star-svg{
+  --fill: 0%;
+  display:inline-flex;
+  width: 26px;
+  height: 26px;
+}
+
+.star-svg svg{
+  width:100%;
+  height:100%;
+  display:block;
+}
+
+/* outline star */
+.star-svg .star-outline{
+  fill: #d4d4d4;
+}
+
+/* filled star clipped perfectly by percentage */
+.star-svg .star-fill{
+  clip-path: inset(0 calc(100% - var(--fill)) 0 0);
+}
+
+.star-svg .star-fill path{
+  fill: #f5b301;
+}
+
+/* Hover glow removed to avoid square filter box */
+
+/* ===== Rating number ===== */
+
+.rating-value{
+  font-size:0.9rem;
+  color:#666;
+  min-width:36px;
+}
+
+/* ===== Clear button ===== */
+
+.rating-clear{
+  margin-left:auto;
+  background:none;
+  border:none;
+  color:#666;
+  cursor:pointer;
+  font-size:0.85rem;
+  text-decoration:underline;
+  transition: color 0.15s ease;
+}
+
+.rating-clear:hover{
+  color:#000;
+}
+
+/* ===== Optional: smoother modal look ===== */
+
+.modal-card .stars{
+  margin-top:4px;
+}

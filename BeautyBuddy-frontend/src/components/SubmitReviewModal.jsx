@@ -1,4 +1,7 @@
 import { useEffect, useState } from "react";
+import { useMemo } from "react";
+
+import "./SubmitReviewModal.css"
 
 export default function AskQuestionModal({
   isOpen,
@@ -6,6 +9,9 @@ export default function AskQuestionModal({
   onSubmit,
   productName,
 }) {
+  const [rating, setRating] = useState(0);
+  const [hoverRating, setHoverRating] = useState(null);
+  const displayedRating = hoverRating ?? rating;
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [error, setError] = useState("");
@@ -14,6 +20,8 @@ export default function AskQuestionModal({
     if (!isOpen) return;
 
     // reset when opened
+    setRating(0);
+    setHoverRating(null);
     setTitle("");
     setBody("");
     setError("");
@@ -32,6 +40,11 @@ export default function AskQuestionModal({
     const trimmedTitle = title.trim();
     const trimmedBody = body.trim();
 
+    if (rating <= 0) {
+      setError("Please select a rating.");
+      return;
+    }
+
     if (trimmedTitle.length < 5) {
       setError("Title must be at least 5 characters.");
       return;
@@ -43,12 +56,55 @@ export default function AskQuestionModal({
 
     setError("");
     await onSubmit?.({
+      rating: rating,
       title: trimmedTitle,
-      body: trimmedBody,
+      text: trimmedBody
     });
   };
 
   const stop = (e) => e.stopPropagation();
+
+    const getStarValueFromEvent = (e, starIndex1to5) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const isHalf = x < rect.width / 2;
+    return isHalf ? starIndex1to5 - 0.5 : starIndex1to5;
+  };
+
+  const Star = ({ index }) => {
+  const fillPct = useMemo(() => {
+    const v = displayedRating - (index - 1);
+    if (v >= 1) return 100;
+    if (v >= 0.5) return 50;
+    return 0;
+  }, [displayedRating, index]);
+
+    return (
+      <button
+      type="button"
+      className="star-btn"
+      aria-label={`Rate ${index} star${index > 1 ? "s" : ""}`}
+      onMouseMove={(e) => setHoverRating(getStarValueFromEvent(e, index))}
+      onMouseEnter={(e) => setHoverRating(getStarValueFromEvent(e, index))}
+      onMouseLeave={() => setHoverRating(null)}
+      onClick={(e) => setRating(getStarValueFromEvent(e, index))}
+    >
+      <span className="star-svg" style={{ "--fill": `${fillPct}%` }}>
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          {/* outline */}
+          <path
+            className="star-outline"
+            d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"
+          />
+          {/* filled (clipped) */}
+          <g className="star-fill">
+            <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+          </g>
+        </svg>
+      </span>
+    </button>
+  );
+};
 
   return (
     <div className="modal-overlay" onClick={onClose} role="presentation">
@@ -70,6 +126,27 @@ export default function AskQuestionModal({
         </div>
 
         <form className="modal-form" onSubmit={handleSubmit}>
+
+          <div className="rating-row">
+            <span className="rating-label">Rating</span>
+            <div className="stars" role="radiogroup" aria-label="Rating">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <Star key={i} index={i} />
+              ))}
+            </div>
+            <span className="rating-value">{displayedRating ? displayedRating.toFixed(1) : ""}</span>
+
+            {rating > 0 && (
+              <button
+                type="button"
+                className="rating-clear"
+                onClick={() => setRating(0)}
+              >
+                Clear
+              </button>
+            )}
+          </div>
+          
           <label className="modal-label">
             Title
             <input
