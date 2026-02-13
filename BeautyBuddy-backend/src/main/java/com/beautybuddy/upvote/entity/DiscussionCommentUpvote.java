@@ -14,7 +14,7 @@ import jakarta.persistence.UniqueConstraint;
     name = "discussion_comment_upvote",
     uniqueConstraints = @UniqueConstraint(columnNames = {"account_id", "discussion_comment_id"})
 )
-public class DiscussionAnswerUpvote extends BaseUpvote {
+public class DiscussionCommentUpvote extends BaseUpvote {
 
     @ManyToOne
     @JoinColumn(name = "discussion_comment_id", nullable = false)

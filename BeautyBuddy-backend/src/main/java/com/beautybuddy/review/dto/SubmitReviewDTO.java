@@ -7,7 +7,8 @@ public record SubmitReviewDTO(
     Long productId,
     String shadeName,
     BigDecimal rating,
-    String reviewText,
+    String title,
+    String text,
     List<String> imageLinks
 )
 { 

@@ -1,17 +1,15 @@
 package com.beautybuddy.review;
 
 import com.beautybuddy.security.CustomUserDetails;
-import com.beautybuddy.upvote.UpvoteRequestDTO;
 import com.beautybuddy.upvote.UpvoteService;
-import com.beautybuddy.report.ReportRequestDTO;
 import com.beautybuddy.review.dto.DisplayReviewDTO;
 import com.beautybuddy.review.dto.SubmitReviewDTO;
-import com.beautybuddy.review.dto.DeleteReviewDTO;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -41,33 +39,33 @@ public class ReviewController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/remove")
-    public ResponseEntity<Void> removeReview(@RequestBody DeleteReviewDTO reviewDTO, Authentication authentication) {
+    @DeleteMapping("/{reviewId}")
+    public ResponseEntity<Void> removeReview(@PathVariable Long reviewId, Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.status(401).build();
         }
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        reviewService.removeReview(userDetails.getEmail(), reviewDTO);
+        reviewService.removeReview(userDetails.getEmail(), reviewId);
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/report")
-    public ResponseEntity<Void> reportReview(@RequestBody ReportRequestDTO reportRequestDTO, Authentication authentication) {
+    @PostMapping("/{reviewId}/report")
+    public ResponseEntity<Void> reportReview(@PathVariable Long reviewId, @RequestBody String reason, Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.status(401).build();
         }
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        reviewService.reportReview(userDetails.getEmail(), reportRequestDTO);
+        reviewService.reportReview(userDetails.getEmail(), reviewId, reason);
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/upvote")
-    public ResponseEntity<Void> upvoteReview(@RequestBody UpvoteRequestDTO upvoteRequestDTO, Authentication authentication) {
+    @PostMapping("/{reviewId}/upvote")
+    public ResponseEntity<Void> upvoteReview(@PathVariable Long reviewId, Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.status(401).build();
         }
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        upvoteService.upvote(userDetails.getEmail(), upvoteRequestDTO);
+        upvoteService.upvote(userDetails.getEmail(), "review", reviewId);
         return ResponseEntity.ok().build();
     }
 

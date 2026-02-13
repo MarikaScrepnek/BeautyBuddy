@@ -2,12 +2,10 @@ package com.beautybuddy.review;
 
 import com.beautybuddy.product.ProductRepository;
 import com.beautybuddy.product.ProductShadeRepository;
-import com.beautybuddy.report.ReportRequestDTO;
 import com.beautybuddy.report.entity.ReviewReport;
 import com.beautybuddy.report.repo.ReviewReportRepository;
 import com.beautybuddy.review.dto.DisplayReviewDTO;
 import com.beautybuddy.review.dto.SubmitReviewDTO;
-import com.beautybuddy.review.dto.DeleteReviewDTO;
 import com.beautybuddy.user.UserRepository;
 
 import org.springframework.stereotype.Service;
@@ -50,7 +48,8 @@ public class ReviewService {
         ProductShade shade = productShadeRepository.findByProductAndShadeName(product, review.shadeName())
             .orElseThrow(() -> new RuntimeException("Shade not found"));
         BigDecimal rating = review.rating();
-        String reviewText = review.reviewText();
+        String reviewTitle = review.title();
+        String reviewText = review.text();
         List<ReviewImage> reviewImages = review.imageLinks() == null ? List.of() : review.imageLinks().stream()
             .map(link -> {
                 ReviewImage img = new ReviewImage();
@@ -65,6 +64,7 @@ public class ReviewService {
         newReview.setProduct(product);
         newReview.setProductShade(shade);
         newReview.setRating(rating);
+        newReview.setTitle(reviewTitle);
         newReview.setText(reviewText);
         for (ReviewImage img : reviewImages) {
             img.setReview(newReview);
@@ -75,10 +75,10 @@ public class ReviewService {
     }
 
     @Transactional
-    public void removeReview(String email, DeleteReviewDTO review) {
+    public void removeReview(String email, Long reviewId) {
         User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new RuntimeException("User not found"));
-        Review existingReview = reviewRepository.findById(review.id())
+        Review existingReview = reviewRepository.findById(reviewId)
             .orElseThrow(() -> new RuntimeException("Review not found"));
         if (existingReview.getUser().getId() != user.getId()) {
             throw new RuntimeException("User not authorized to delete this review");
@@ -88,17 +88,17 @@ public class ReviewService {
     }
 
     @Transactional
-    public void reportReview(String email, ReportRequestDTO report) {
+    public void reportReview(String email, Long reviewId, String reason) {
         User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new RuntimeException("User not found"));
-        Review existingReview = reviewRepository.findById(report.reviewId())
+        Review existingReview = reviewRepository.findById(reviewId)
             .orElseThrow(() -> new RuntimeException("Review not found"));
         
         ReviewReport newReport = new ReviewReport();
         newReport.setUser(user);
         newReport.setReview(existingReview);
-        if (report.reason() != null && !report.reason().isEmpty()) {
-            newReport.setReason(report.reason());
+        if (reason != null && !reason.isEmpty()) {
+            newReport.setReason(reason);
         }
 
         reviewReportRepository.save(newReport);

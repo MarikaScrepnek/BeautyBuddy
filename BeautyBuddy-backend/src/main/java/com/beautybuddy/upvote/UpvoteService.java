@@ -23,29 +23,63 @@ public class UpvoteService {
     }
 
     @Transactional
-    public void upvote(String email, UpvoteRequestDTO upvote) {
+    public void upvote(String email, String targetType, Long targetId) {
         User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new RuntimeException("User not found"));
-        Review review = reviewRepository.findById(upvote.targetId())
-            .orElseThrow(() -> new RuntimeException("Review not found"));
+        if (targetType.equals("review")) {
+            Review review = reviewRepository.findById(targetId)
+                .orElseThrow(() -> new RuntimeException("Review not found"));
         
-        ReviewUpvote newUpvote = new ReviewUpvote();
-        newUpvote.setUser(user);
-        newUpvote.setReview(review);
+            ReviewUpvote newUpvote = new ReviewUpvote();
+            newUpvote.setUser(user);
+            newUpvote.setReview(review);
 
-        reviewUpvoteRepository.save(newUpvote);
+            reviewUpvoteRepository.save(newUpvote);
+        }
+        else if (targetType.equals("question")) {
+            // Handle comment upvote logic here
+        }
+        else if (targetType.equals("answer")) {
+            // Handle answer upvote logic here
+        }
+        else if (targetType.equals("discussion")) {
+            // Handle discussion upvote logic here
+        }
+        else if (targetType.equals("discussion_comment")) {
+            // Handle discussion comment upvote logic here
+        }
+        else {
+            throw new RuntimeException("Invalid target type");
+        }
     }
 
     @Transactional
-    public void removeUpvote(String email, UpvoteRequestDTO upvote) {
+    public void removeUpvote(String email, String targetType, Long targetId) {
         User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new RuntimeException("User not found"));
-        Review review = reviewRepository.findById(upvote.targetId())
-            .orElseThrow(() -> new RuntimeException("Review not found"));
+        if (targetType.equals("review")) {
+            Review review = reviewRepository.findById(targetId)
+                .orElseThrow(() -> new RuntimeException("Review not found"));
         
-        ReviewUpvote existingUpvote = reviewUpvoteRepository.findByUserAndReview(user, review)
-            .orElseThrow(() -> new RuntimeException("Upvote not found"));
+            ReviewUpvote existingUpvote = reviewUpvoteRepository.findByUserAndReview(user, review)
+                .orElseThrow(() -> new RuntimeException("Upvote not found"));
 
-        reviewUpvoteRepository.delete(existingUpvote);
+            reviewUpvoteRepository.delete(existingUpvote);
+        }
+        else if (targetType.equals("question")) {
+            // Handle comment upvote logic here
+        }
+        else if (targetType.equals("answer")) {
+            // Handle answer upvote logic here
+        }
+        else if (targetType.equals("discussion")) {
+            // Handle discussion upvote logic here
+        }
+        else if (targetType.equals("discussion_comment")) {
+            // Handle discussion comment upvote logic here
+        }
+        else {
+            throw new RuntimeException("Invalid target type");
+        }
     }
 }
