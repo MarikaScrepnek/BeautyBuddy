@@ -12,7 +12,7 @@ import './ProductDetails.css';
 import { getCurrentUser } from "../api/authApi";
 import Toast from "../components/Toast";
 
-export default function ProductDetails() {
+export default function ProductDetails({ productId }) {
   const { productId } = useParams();
 
   const [data, setData] = useState(null);
