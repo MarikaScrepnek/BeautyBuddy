@@ -45,15 +45,6 @@ export default function AskQuestionModal({
       return;
     }
 
-    if (trimmedTitle.length < 5) {
-      setError("Title must be at least 5 characters.");
-      return;
-    }
-    if (trimmedBody.length < 10) {
-      setError("Details must be at least 10 characters.");
-      return;
-    }
-
     setError("");
     await onSubmit?.({
       rating: rating,
