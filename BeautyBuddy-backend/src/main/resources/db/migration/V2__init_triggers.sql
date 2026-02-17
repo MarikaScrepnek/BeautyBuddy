@@ -65,7 +65,7 @@ CREATE TRIGGER trigger_update_product_updated_at
         NEW.product_link IS DISTINCT FROM OLD.product_link OR
         NEW.raw_ingredients IS DISTINCT FROM OLD.raw_ingredients OR
         NEW.may_contain_raw_ingredients IS DISTINCT FROM OLD.may_contain_raw_ingredients OR
-        NEW.discontinued IS DISTINCT FROM OLD.discontinued
+        NEW.is_discontinued IS DISTINCT FROM OLD.is_discontinued
     )
     EXECUTE FUNCTION update_updated_at_column();
 
@@ -85,8 +85,8 @@ CREATE TRIGGER trigger_update_review_updated_at
         NEW.product_id IS DISTINCT FROM OLD.product_id OR
         NEW.product_shade_id IS DISTINCT FROM OLD.product_shade_id OR
         NEW.rating IS DISTINCT FROM OLD.rating OR
-        NEW.review_title IS DISTINCT FROM OLD.review_title OR
-        NEW.review_text IS DISTINCT FROM OLD.review_text OR
+        NEW.title IS DISTINCT FROM OLD.title OR
+        NEW.text IS DISTINCT FROM OLD.text OR
         NEW.deleted_at IS DISTINCT FROM OLD.deleted_at OR
         NEW.approved IS DISTINCT FROM OLD.approved
     )
@@ -98,7 +98,7 @@ CREATE TRIGGER trigger_update_question_updated_at
     WHEN (
         NEW.account_id IS DISTINCT FROM OLD.account_id OR
         NEW.product_id IS DISTINCT FROM OLD.product_id OR
-        NEW.question_text IS DISTINCT FROM OLD.question_text OR
+        NEW.text IS DISTINCT FROM OLD.text OR
         NEW.deleted_at IS DISTINCT FROM OLD.deleted_at OR
         NEW.approved IS DISTINCT FROM OLD.approved
     )
@@ -110,7 +110,7 @@ CREATE TRIGGER trigger_update_answer_updated_at
     WHEN (
         NEW.question_id IS DISTINCT FROM OLD.question_id OR
         NEW.account_id IS DISTINCT FROM OLD.account_id OR
-        NEW.answer_text IS DISTINCT FROM OLD.answer_text OR
+        NEW.text IS DISTINCT FROM OLD.text OR
         NEW.deleted_at IS DISTINCT FROM OLD.deleted_at OR
         NEW.approved IS DISTINCT FROM OLD.approved
     )
@@ -122,7 +122,7 @@ CREATE TRIGGER trigger_update_discussion_updated_at
     WHEN (
         NEW.account_id IS DISTINCT FROM OLD.account_id OR
         NEW.title IS DISTINCT FROM OLD.title OR
-        NEW.content IS DISTINCT FROM OLD.content OR
+        NEW.text IS DISTINCT FROM OLD.text OR
         NEW.deleted_at IS DISTINCT FROM OLD.deleted_at OR
         NEW.approved IS DISTINCT FROM OLD.approved
     )
@@ -135,7 +135,7 @@ CREATE TRIGGER trigger_update_discussion_comment_updated_at
         NEW.discussion_id IS DISTINCT FROM OLD.discussion_id OR
         NEW.account_id IS DISTINCT FROM OLD.account_id OR
         NEW.parent_discussion_comment_id IS DISTINCT FROM OLD.parent_discussion_comment_id OR
-        NEW.content IS DISTINCT FROM OLD.content OR
+        NEW.text IS DISTINCT FROM OLD.text OR
         NEW.deleted_at IS DISTINCT FROM OLD.deleted_at OR
         NEW.approved IS DISTINCT FROM OLD.approved
     )
@@ -483,7 +483,7 @@ CREATE TRIGGER trigger_update_routine_on_image_change
 
 
 -- ================================================================
--- Maintain reported_count on content
+-- Maintain reported_count on text
 -- ================================================================
 
 CREATE OR REPLACE FUNCTION update_review_reported_count()

@@ -7,9 +7,9 @@
 -- Review performance indexes
 -- ================================================================
 
--- Most helpful reviews (sorted by helpful_count)
-CREATE INDEX idx_review_helpful 
-ON review (product_id, helpful_count DESC) 
+-- Most upvoted reviews (sorted by upvote_count)
+CREATE INDEX idx_review_upvote
+ON review (product_id, upvote_count DESC) 
 WHERE deleted_at IS NULL;
 
 -- Recent reviews
@@ -30,7 +30,7 @@ WHERE deleted_at IS NULL;
 -- Unanswered questions (commonly needed for product pages)
 CREATE INDEX idx_question_unanswered 
 ON question (product_id, created_at DESC) 
-WHERE answered = FALSE AND deleted_at IS NULL;
+WHERE is_answered = FALSE AND deleted_at IS NULL;
 
 -- Most upvoted questions
 CREATE INDEX idx_question_upvotes 
@@ -52,9 +52,9 @@ CREATE INDEX idx_answer_active
 ON answer (question_id) 
 WHERE deleted_at IS NULL;
 
--- Most helpful answers
-CREATE INDEX idx_answer_helpful 
-ON answer (question_id, helpful_count DESC) 
+-- Most upvoted answers
+CREATE INDEX idx_answer_upvote
+ON answer (question_id, upvote_count DESC) 
 WHERE deleted_at IS NULL;
 
 
@@ -83,13 +83,13 @@ WHERE deleted_at IS NULL;
 -- ================================================================
 
 -- Active discussion answers
-CREATE INDEX idx_discussion_answer_active 
-ON discussion_answer (discussion_id, created_at) 
+CREATE INDEX idx_discussion_comment_active 
+ON discussion_comment (discussion_id, created_at) 
 WHERE deleted_at IS NULL;
 
--- Most helpful discussion answers
-CREATE INDEX idx_discussion_answer_helpful 
-ON discussion_answer (discussion_id, helpful_count DESC) 
+-- Most upvoted discussion answers
+CREATE INDEX idx_discussion_comment_upvote 
+ON discussion_comment (discussion_id, upvote_count DESC) 
 WHERE deleted_at IS NULL;
 
 
@@ -100,7 +100,7 @@ WHERE deleted_at IS NULL;
 -- Unread notifications (most common query)
 CREATE INDEX idx_notification_unread 
 ON notification (recipient_id, created_at DESC) 
-WHERE is_read = FALSE;
+WHERE read_at IS NULL;
 
 -- All notifications by recipient
 CREATE INDEX idx_notification_recipient_recent 
@@ -132,8 +132,8 @@ ON discussion_report (status, created_at DESC)
 WHERE status = 'OPEN';
 
 -- Open discussion answer reports
-CREATE INDEX idx_discussion_answer_report_open 
-ON discussion_answer_report (status, created_at DESC) 
+CREATE INDEX idx_discussion_comment_report_open 
+ON discussion_comment_report (status, created_at DESC) 
 WHERE status = 'OPEN';
 
 
