@@ -57,8 +57,8 @@ export default function AskQuestionModal({
     await onSubmit?.({
       shadeName: shadeName || null,
       rating: rating,
-      title: trimmedTitle,
-      text: trimmedBody,
+      title: trimmedTitle ? trimmedTitle : null,
+      text: trimmedBody ? trimmedBody : null,
       images: images
     });
   };
