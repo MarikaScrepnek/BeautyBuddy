@@ -7,6 +7,7 @@ import { addToWishlist, removeFromWishlist, getWishlist } from "../api/wishlistA
 
 import AskQuestionModal from "../components/AskQuestionModal";
 import SubmitReviewModal from "../components/SubmitReviewModal";
+import ReviewList from "../components/ReviewList";
 
 import './ProductDetails.css';
 import { getCurrentUser } from "../api/authApi";
@@ -36,8 +37,8 @@ export default function ProductDetails() {
   const [questions, setQuestions] = useState([]);
   const [askOpen, setAskOpen] = useState(false);
 
-  const [reviews, setReviews] = useState([]);
   const [reviewOpen, setReviewOpen] = useState(false);
+    const [reviewRefreshKey, setReviewRefreshKey] = useState(0);
 
   const showToast = (message, type = "success") => {
     setToast({ message, type});
@@ -358,6 +359,7 @@ export default function ProductDetails() {
                                     if (success) {
                                         showToast("Review submitted successfully!", "success");
                                         setReviewOpen(false);
+                                        setReviewRefreshKey((value) => value + 1);
                                     } else {
                                         showToast("Failed to submit review. Please try again.", "error");
                                     }
@@ -371,20 +373,10 @@ export default function ProductDetails() {
                             onClick={() => handleWriteReview()}
                             > Write a review for this product
                         </button>
-
-                        {reviews.length === 0 ? (
-                                <div className="reviews-empty-state">
-                                    <p>
-                                        No reviews have been submitted about this product yet.
-                                    </p>
-                                </div>
-                            ) : (
-                                <div>
-                                    {reviews.map(r => (
-                                        <ReviewCard key={r.id} review={r} />
-                                    ))}
-                                </div>
-                            )}
+                        <ReviewList
+                            productId={productId}
+                            refreshKey={reviewRefreshKey}
+                        />
                     </div>
                 )}
             </section>

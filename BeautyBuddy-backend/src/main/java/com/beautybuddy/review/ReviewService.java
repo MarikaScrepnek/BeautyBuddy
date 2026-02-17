@@ -129,6 +129,7 @@ public class ReviewService {
                 : null;
 
             return new DisplayReviewDTO(
+                review.getId(),
                 review.getUser().getUsername(),
                 review.getUser().getAvatarLink(),
                 review.getRating(),
