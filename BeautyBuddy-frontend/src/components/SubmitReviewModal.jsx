@@ -151,7 +151,7 @@ export default function AskQuestionModal({
           {Array.isArray(shades) && shades.length > 0 ? (
             <div className="shade-row">
               <label className="shade-label" htmlFor="shade-input">
-                Shade (optional)
+                Shade (optional) - you may submit one review per shade
               </label>
               <select
                 id="shade-input"
