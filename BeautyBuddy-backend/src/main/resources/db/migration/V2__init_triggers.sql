@@ -638,7 +638,7 @@ RETURNS TRIGGER AS $$
 BEGIN
     -- Ensure wishlist row exists
     INSERT INTO wishlist (account_id, updated_at)
-    VALUES (NEW.account_id, NOW())
+    VALUES (NEW.wishlist_id, NOW())
     ON CONFLICT (account_id) DO NOTHING;
     
     RETURN NEW;
