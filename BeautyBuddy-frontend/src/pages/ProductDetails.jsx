@@ -129,6 +129,22 @@ export default function ProductDetails() {
         // Logic to add to routine
     };
 
+    const handleAskQuestion = async () => {
+        if (!isLoggedIn) {
+            setShowLoginModal(true);
+            return;
+        }
+        setAskOpen(true);
+    }
+
+    const handleWriteReview = async () => {
+        if (!isLoggedIn) {
+            setShowLoginModal(true);
+            return;
+        }
+        setReviewOpen(true);
+    }
+
   if (loading) return <p className="loading">Loading product details...</p>;
   if (!data) return <p className="error">Product not found</p>;
 
@@ -290,7 +306,7 @@ export default function ProductDetails() {
                             />
                             <button
                                 className="ask-question-button"
-                                onClick={() => setAskOpen(true)}
+                                onClick={() => handleAskQuestion()}
                                 > Ask a question about this product
                             </button>
 
@@ -336,7 +352,7 @@ export default function ProductDetails() {
                             />
                         <button
                             className="submit-review-button"
-                            onClick={() => setReviewOpen(true)}
+                            onClick={() => handleWriteReview()}
                             > Write a review for this product
                         </button>
 
