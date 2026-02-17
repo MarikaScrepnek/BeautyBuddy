@@ -46,19 +46,13 @@ public class ReviewService {
         Product product = productRepository.findById(review.productId())
             .orElseThrow(() -> new RuntimeException("Product not found"));
         ProductShade shade = null;
-        if (review.shadeName() != "") {
+        if (review.shadeName() != null) {
             shade = productShadeRepository.findByProductAndShadeName(product, review.shadeName())
                 .orElseThrow(() -> new RuntimeException("Shade not found"));
         }
         BigDecimal rating = review.rating();
         String reviewTitle = review.title();
-        if (reviewTitle == "") {
-            reviewTitle = null;
-        }
         String reviewText = review.text();
-        if (reviewText == "") {
-            reviewText = null;
-        }
         List<ReviewImage> reviewImages = review.imageLinks() == null ? List.of() : review.imageLinks().stream()
             .map(link -> {
                 ReviewImage img = new ReviewImage();
