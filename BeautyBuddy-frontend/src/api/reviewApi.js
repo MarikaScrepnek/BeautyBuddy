@@ -1,9 +1,10 @@
 export async function submitReview(productId, shadeName, rating, title, text, imageLinks) {
-    const response = await fetch('/api/reviews', {
+    const response = await fetch('http://localhost:8080/api/reviews/add', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
+        credentials: 'include',
         body: JSON.stringify({
             productId,
             shadeName,
@@ -17,35 +18,38 @@ export async function submitReview(productId, shadeName, rating, title, text, im
 }
 
 export async function deleteReview(reviewId) {
-    const response = await fetch(`/api/reviews/${reviewId}`, {
-        method: 'DELETE'
+    const response = await fetch(`http://localhost:8080/api/reviews/${reviewId}`, {
+        method: 'DELETE',
+        credentials: 'include'
     });
     return response.ok;
 }
 
 export async function getAverageRating(productId) {
-    const response = await fetch(`/api/reviews/${productId}/average-rating`);
+    const response = await fetch(`http://localhost:8080/api/reviews/${productId}/average-rating`);
     return response.json();
 }
 
 export async function getReviews(productId) {
-    const response = await fetch(`/api/reviews/${productId}`);
+    const response = await fetch(`http://localhost:8080/api/reviews/${productId}`);
     return response.json();
 }
 
 export async function upvoteReview(reviewId) {
-    const response = await fetch(`/api/reviews/${reviewId}/upvote`, {
-        method: 'POST'
+    const response = await fetch(`http://localhost:8080/api/reviews/${reviewId}/upvote`, {
+        method: 'POST',
+        credentials: 'include'
     });
     return response.ok;
 }
 
 export async function reportReview(reviewId, reason) {
-    const response = await fetch(`/api/reviews/${reviewId}/report`, {
+    const response = await fetch(`http://localhost:8080/api/reviews/${reviewId}/report`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
+        credentials: 'include',
         body: JSON.stringify({ reason })
     });
     return response.ok;
