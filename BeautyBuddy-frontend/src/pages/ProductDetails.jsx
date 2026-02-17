@@ -349,6 +349,8 @@ export default function ProductDetails() {
                                     setReviewOpen(false);
                                 }}
                                 productName={data?.name}
+                                shades={data?.shades}
+                                selectedShadeName={selectedShade?.shadeName ?? ""}
                             />
                         <button
                             className="submit-review-button"

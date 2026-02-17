@@ -35,11 +35,15 @@
 .modal-form { display: flex; flex-direction: column; gap: 12px; }
 .modal-label { display: flex; flex-direction: column; gap: 6px; font-size: 0.95rem; }
 
-.modal-input, .modal-textarea {
+.modal-input, .modal-textarea, .modal-select {
   border: 1px solid #ddd;
   border-radius: 8px;
   padding: 10px;
   font-size: 1rem;
+}
+
+.modal-select {
+  background: #fff;
 }
 
 .modal-error { color: #c0392b; margin: 0; }
@@ -70,6 +74,26 @@
 
 .modal-textarea {
   resize: none;
+}
+
+/* ===== Shade selector ===== */
+
+.shade-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.shade-label {
+  font-size: 0.95rem;
+}
+
+.shade-select {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 10px;
+  font-size: 1rem;
+  background: #fff;
 }
 
 /* ===== Rating container ===== */

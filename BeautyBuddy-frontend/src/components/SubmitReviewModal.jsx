@@ -8,22 +8,30 @@ export default function AskQuestionModal({
   onClose,
   onSubmit,
   productName,
+  shades,
+  selectedShadeName,
 }) {
+  const [shadeName, setShadeName] = useState("");
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(null);
   const displayedRating = hoverRating ?? rating;
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
+  const [images, setImages] = useState([]);
+
   const [error, setError] = useState("");
 
   useEffect(() => {
     if (!isOpen) return;
 
     // reset when opened
+    setShadeName(selectedShadeName ?? "");
     setRating(0);
     setHoverRating(null);
     setTitle("");
     setBody("");
+    setImages([]);
+
     setError("");
 
     const onKeyDown = (e) => {
@@ -47,9 +55,11 @@ export default function AskQuestionModal({
 
     setError("");
     await onSubmit?.({
+      shadeName: shadeName || null,
       rating: rating,
       title: trimmedTitle,
-      text: trimmedBody
+      text: trimmedBody,
+      images: images
     });
   };
 
@@ -137,9 +147,30 @@ export default function AskQuestionModal({
               </button>
             )}
           </div>
+
+          {Array.isArray(shades) && shades.length > 0 ? (
+            <div className="shade-row">
+              <label className="shade-label" htmlFor="shade-input">
+                Shade (optional)
+              </label>
+              <select
+                id="shade-input"
+                className="shade-select"
+                value={shadeName}
+                onChange={(e) => setShadeName(e.target.value)}
+              >
+                <option value="">No shade</option>
+                {shades.map((shade) => (
+                  <option key={shade.shadeName} value={shade.shadeName}>
+                    {shade.shadeName}
+                  </option>
+                ))}
+              </select>
+            </div>
+          ) : null}
           
           <label className="modal-label">
-            Title
+            Title (optional)
             <input
               className="modal-input"
               value={title}
@@ -151,7 +182,7 @@ export default function AskQuestionModal({
           </label>
 
           <label className="modal-label">
-            Details
+            Details (optional)
             <textarea
               className="modal-textarea"
               value={body}
