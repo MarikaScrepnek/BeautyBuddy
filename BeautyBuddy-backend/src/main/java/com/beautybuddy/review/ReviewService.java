@@ -86,7 +86,8 @@ public class ReviewService {
         if (existingReview.getUser().getId() != user.getId()) {
             throw new RuntimeException("User not authorized to delete this review");
         } else {
-            reviewRepository.delete(existingReview);
+            existingReview.setDeletedAt(LocalDateTime.now());
+            reviewRepository.save(existingReview);
         }
     }
 
