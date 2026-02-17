@@ -177,10 +177,10 @@
 }
 
 .review-empty {
-	padding: 16px;
-	border-radius: 12px;
-	background: #f7efe8;
-	color: #7b4b27;
+	padding: 12px;
+	color: #777;
+    display: flex;
+    justify-content: center;
 }
 
 @media (max-width: 640px) {
