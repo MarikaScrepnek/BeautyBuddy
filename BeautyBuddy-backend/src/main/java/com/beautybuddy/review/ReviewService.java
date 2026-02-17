@@ -7,6 +7,7 @@ import com.beautybuddy.report.repo.ReviewReportRepository;
 import com.beautybuddy.review.dto.DisplayReviewDTO;
 import com.beautybuddy.review.dto.SubmitReviewDTO;
 import com.beautybuddy.user.UserRepository;
+import com.beautybuddy.upvote.repo.ReviewUpvoteRepository;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,13 +31,15 @@ public class ReviewService {
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
     private final ProductShadeRepository productShadeRepository;
+    private final ReviewUpvoteRepository reviewUpvoteRepository;
 
-    public ReviewService(ReviewRepository reviewRepository, ReviewReportRepository reviewReportRepository, UserRepository userRepository, ProductRepository productRepository, ProductShadeRepository productShadeRepository) {
+    public ReviewService(ReviewRepository reviewRepository, ReviewReportRepository reviewReportRepository, UserRepository userRepository, ProductRepository productRepository, ProductShadeRepository productShadeRepository, ReviewUpvoteRepository reviewUpvoteRepository) {
         this.reviewRepository = reviewRepository;
         this.reviewReportRepository = reviewReportRepository;
         this.userRepository = userRepository;
         this.productRepository = productRepository;
         this.productShadeRepository = productShadeRepository;
+        this.reviewUpvoteRepository = reviewUpvoteRepository;
     }
 
     @Transactional
@@ -113,7 +116,10 @@ public class ReviewService {
         return averageRating != null ? averageRating : BigDecimal.ZERO;
     }
 
-    public Page<DisplayReviewDTO> getReviewsForProduct(Long productId, int page, int size) {
+    public Page<DisplayReviewDTO> getReviewsForProduct(Long productId, int page, int size, String userEmail) {
+        final User currentUser = userEmail != null
+            ? userRepository.findByEmail(userEmail).orElse(null)
+            : null;
         Page<Review> reviewPage =
             reviewRepository.findByProduct_IdAndDeletedAtIsNullAndApprovedTrueOrderByCreatedAtDesc(
                 productId,
@@ -129,6 +135,9 @@ public class ReviewService {
                 ? review.getProductShade().getShadeName()
                 : null;
 
+            boolean hasUpvoted = currentUser != null
+                && reviewUpvoteRepository.findByUserAndReview(currentUser, review).isPresent();
+
             return new DisplayReviewDTO(
                 review.getId(),
                 review.getUser().getUsername(),
@@ -139,7 +148,9 @@ public class ReviewService {
                 shadeName,
                 review.getTitle(),
                 review.getText(),
-                imageLinks
+                imageLinks,
+                review.getUpvoteCount(),
+                hasUpvoted
             );
         });
     }

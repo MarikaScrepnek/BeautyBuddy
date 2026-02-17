@@ -79,9 +79,15 @@ public class ReviewController {
     public ResponseEntity<Page<DisplayReviewDTO>> getReviewsForProduct(
         @PathVariable Long productId,
         @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "10") int size
+        @RequestParam(defaultValue = "10") int size,
+        Authentication authentication
     ) {
-        Page<DisplayReviewDTO> reviews = reviewService.getReviewsForProduct(productId, page, size);
+        String email = null;
+        if (authentication != null && authentication.isAuthenticated()) {
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            email = userDetails.getEmail();
+        }
+        Page<DisplayReviewDTO> reviews = reviewService.getReviewsForProduct(productId, page, size, email);
         return ResponseEntity.ok(reviews);
     }
 

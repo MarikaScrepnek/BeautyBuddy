@@ -119,6 +119,13 @@
 	display: flex;
 	gap: 10px;
 	margin-top: 14px;
+	align-items: center;
+}
+
+.review-upvote-count {
+	font-size: 0.85rem;
+	color: #7f6b5b;
+	font-weight: 600;
 }
 
 .review-action-btn {

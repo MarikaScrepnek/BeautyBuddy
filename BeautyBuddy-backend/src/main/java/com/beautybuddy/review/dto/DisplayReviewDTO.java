@@ -14,5 +14,7 @@ public record DisplayReviewDTO(
     String shadeName,
     String reviewTitle,
     String reviewText,
-    List<String> imageLinks
+    List<String> imageLinks,
+    Integer upvoteCount,
+    Boolean hasUpvoted
 ) {}

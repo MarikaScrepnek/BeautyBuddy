@@ -36,9 +36,6 @@ public class Review extends UserWrittenEntity{
     @Column(name = "title")
     private String title;
 
-    @Column(name = "approved", nullable = false)
-    private boolean approved = true;
-
     @OneToMany(
         mappedBy = "review",
         cascade = CascadeType.ALL,

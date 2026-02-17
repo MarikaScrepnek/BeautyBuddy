@@ -17,7 +17,7 @@ public abstract class UserWrittenEntity extends SoftDeletableEntity {
     private String text;
 
     @Column(name = "approved", nullable = false)
-    private boolean approved = false;
+    private boolean approved = true;
 
     @Column(name = "reported_count", nullable = false)
     private int reportedCount = 0;

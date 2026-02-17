@@ -29,6 +29,9 @@ public class UpvoteService {
         if (targetType.equals("review")) {
             Review review = reviewRepository.findById(targetId)
                 .orElseThrow(() -> new RuntimeException("Review not found"));
+            if (reviewUpvoteRepository.findByUserAndReview(user, review).isPresent()) {
+                return;
+            }
         
             ReviewUpvote newUpvote = new ReviewUpvote();
             newUpvote.setUser(user);

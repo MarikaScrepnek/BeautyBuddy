@@ -31,7 +31,9 @@ export async function getAverageRating(productId) {
 }
 
 export async function getReviews(productId) {
-    const response = await fetch(`http://localhost:8080/api/reviews/${productId}`);
+    const response = await fetch(`http://localhost:8080/api/reviews/${productId}`, {
+        credentials: 'include'
+    });
     return response.json();
 }
 

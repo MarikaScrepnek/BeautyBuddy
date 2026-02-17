@@ -70,6 +70,7 @@ export default function ReviewList({ productId, refreshKey, onEditReview }) {
 	const [currentUser, setCurrentUser] = useState(null);
 	const [actionMessage, setActionMessage] = useState("");
 	const [pendingId, setPendingId] = useState(null);
+	const [upvotedIds, setUpvotedIds] = useState(() => new Set());
 
 	useEffect(() => {
 		getCurrentUser()
@@ -87,7 +88,16 @@ export default function ReviewList({ productId, refreshKey, onEditReview }) {
 		getReviews(productId)
 			.then((data) => {
 				if (!isMounted) return;
-				setReviews(normalizeReviews(data));
+				const nextReviews = normalizeReviews(data);
+				setReviews(nextReviews);
+				setUpvotedIds(
+					new Set(
+						nextReviews
+							.filter((review) => review?.hasUpvoted)
+							.map((review) => getReviewId(review))
+							.filter(Boolean)
+					)
+				);
 			})
 			.catch(() => {
 				if (!isMounted) return;
@@ -116,6 +126,10 @@ export default function ReviewList({ productId, refreshKey, onEditReview }) {
 			setActionMessage("Helpful votes are unavailable for this review.");
 			return;
 		}
+		if (upvotedIds.has(reviewId)) {
+			setActionMessage("You already marked this as helpful.");
+			return;
+		}
 
 		setPendingId(reviewId);
 		const success = await upvoteReview(reviewId);
@@ -123,6 +137,18 @@ export default function ReviewList({ productId, refreshKey, onEditReview }) {
 		if (!success) {
 			setActionMessage("Unable to mark as helpful right now.");
 		} else {
+			setReviews((items) =>
+				items.map((item) => {
+					if (getReviewId(item) !== reviewId) return item;
+					const nextCount = Number(item?.upvoteCount ?? 0) + 1;
+					return { ...item, upvoteCount: nextCount };
+				})
+			);
+			setUpvotedIds((prev) => {
+				const next = new Set(prev);
+				next.add(reviewId);
+				return next;
+			});
 			setActionMessage("Thanks for the feedback!");
 		}
 	};
@@ -176,6 +202,8 @@ export default function ReviewList({ productId, refreshKey, onEditReview }) {
 					currentUser?.username && currentUser.username === reviewerName;
 				const avatar = review?.reviewerProfilePicture;
 				const isPending = Boolean(reviewId) && pendingId === reviewId;
+				const isUpvoted = Boolean(reviewId) && upvotedIds.has(reviewId);
+				const upvoteCount = Number(review?.upvoteCount ?? 0);
 
 				return (
 					<article key={reviewId ?? `${reviewerName}-${reviewDate}`} className="review-card">
@@ -229,14 +257,19 @@ export default function ReviewList({ productId, refreshKey, onEditReview }) {
 									</button>
 								</>
 							) : (
-								<button
-									type="button"
-									className="review-action-btn"
-									onClick={() => handleUpvote(review)}
-									disabled={isPending}
-								>
-									Helpful
-								</button>
+								<>
+									<button
+										type="button"
+										className="review-action-btn"
+										onClick={() => handleUpvote(review)}
+										disabled={isPending || isUpvoted}
+									>
+										{isUpvoted ? "Helpful ✓" : "Helpful"}
+									</button>
+									<span className="review-upvote-count">
+										{upvoteCount} helpful vote{upvoteCount !== 1 ? "s" : ""}
+									</span>
+								</>
 							)}
 						</div>
 					</article>
