@@ -12,6 +12,8 @@ import './ProductDetails.css';
 import { getCurrentUser } from "../api/authApi";
 import Toast from "../components/Toast";
 
+import {submitReview} from "../api/reviewApi";
+
 export default function ProductDetails() {
   const { productId } = useParams();
 
@@ -344,9 +346,21 @@ export default function ProductDetails() {
                                 isOpen={reviewOpen}
                                 onClose={() => setReviewOpen(false)}
                                 onSubmit={async (payload) => {
-                                    // call your API here
-                                    // await createQuestion(productId, payload);
-                                    setReviewOpen(false);
+                                    const success = await submitReview(
+                                        productId,
+                                        payload.shadeName,
+                                        payload.rating,
+                                        payload.title,
+                                        payload.text,
+                                        payload.images
+                                    );
+
+                                    if (success) {
+                                        showToast("Review submitted successfully!", "success");
+                                        setReviewOpen(false);
+                                    } else {
+                                        showToast("Failed to submit review. Please try again.", "error");
+                                    }
                                 }}
                                 productName={data?.name}
                                 shades={data?.shades}
