@@ -1,7 +1,7 @@
 package com.beautybuddy.notification.entity;
 
-import com.beautybuddy.review.Review;
 import com.beautybuddy.notification.BaseNotificationType;
+import com.beautybuddy.review.entity.Review;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;

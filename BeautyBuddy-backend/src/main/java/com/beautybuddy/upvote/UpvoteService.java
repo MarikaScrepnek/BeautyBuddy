@@ -3,10 +3,10 @@ package com.beautybuddy.upvote;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.beautybuddy.review.Review;
 import com.beautybuddy.upvote.entity.ReviewUpvote;
 import com.beautybuddy.user.User;
 import com.beautybuddy.review.ReviewRepository;
+import com.beautybuddy.review.entity.Review;
 import com.beautybuddy.user.UserRepository;
 import com.beautybuddy.upvote.repo.ReviewUpvoteRepository;
 

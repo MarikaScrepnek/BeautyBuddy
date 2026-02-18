@@ -10,6 +10,9 @@ export default function AskQuestionModal({
   productName,
   shades,
   selectedShadeName,
+  initialValues,
+  modalTitle = "Submit a review",
+  submitLabel = "Submit review",
 }) {
   const [shadeName, setShadeName] = useState("");
   const [rating, setRating] = useState(0);
@@ -24,13 +27,16 @@ export default function AskQuestionModal({
   useEffect(() => {
     if (!isOpen) return;
 
+    const nextShade = initialValues?.shadeName ?? selectedShadeName ?? "";
+    const nextRating = initialValues?.rating ?? 0;
+
     // reset when opened
-    setShadeName(selectedShadeName ?? "");
-    setRating(0);
+    setShadeName(nextShade);
+    setRating(nextRating);
     setHoverRating(null);
-    setTitle("");
-    setBody("");
-    setImages([]);
+    setTitle(initialValues?.title ?? "");
+    setBody(initialValues?.text ?? "");
+    setImages(initialValues?.images ?? []);
 
     setError("");
 
@@ -39,7 +45,7 @@ export default function AskQuestionModal({
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, initialValues, selectedShadeName]);
 
   if (!isOpen) return null;
 
@@ -117,7 +123,7 @@ export default function AskQuestionModal({
         onClick={stop}
       >
         <div className="modal-header">
-          <h2 className="modal-title">Submit a review</h2>
+          <h2 className="modal-title">{modalTitle}</h2>
           {productName ? (
             <p className="modal-subtitle">On: {productName}</p>
           ) : null}
@@ -200,7 +206,7 @@ export default function AskQuestionModal({
               Cancel
             </button>
             <button type="submit" className="modal-primary">
-              Submit review
+              {submitLabel}
             </button>
           </div>
         </form>

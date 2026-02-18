@@ -1,6 +1,6 @@
 package com.beautybuddy.upvote.entity;
 
-import com.beautybuddy.review.Review;
+import com.beautybuddy.review.entity.Review;
 import com.beautybuddy.upvote.BaseUpvote;
 
 import jakarta.persistence.Entity;

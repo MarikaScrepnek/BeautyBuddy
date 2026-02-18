@@ -17,6 +17,24 @@ export async function submitReview(productId, shadeName, rating, title, text, im
     return response.ok;
 }
 
+export async function editReview(reviewId, shadeName, rating, title, text, imageLinks) {
+    const response = await fetch(`http://localhost:8080/api/reviews/${reviewId}/edit`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+            shadeName,
+            rating,
+            title,
+            text,
+            imageLinks
+        })
+    });
+    return response.ok;
+}
+
 export async function deleteReview(reviewId) {
     const response = await fetch(`http://localhost:8080/api/reviews/${reviewId}`, {
         method: 'DELETE',

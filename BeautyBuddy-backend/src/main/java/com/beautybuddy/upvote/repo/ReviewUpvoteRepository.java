@@ -2,7 +2,7 @@ package com.beautybuddy.upvote.repo;
 
 import java.util.Optional;
 
-import com.beautybuddy.review.Review;
+import com.beautybuddy.review.entity.Review;
 import com.beautybuddy.upvote.BaseUpvoteRepository;
 import com.beautybuddy.upvote.entity.ReviewUpvote;
 import com.beautybuddy.user.User;

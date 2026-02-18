@@ -13,7 +13,7 @@ import './ProductDetails.css';
 import { getCurrentUser } from "../api/authApi";
 import Toast from "../components/Toast";
 
-import {submitReview} from "../api/reviewApi";
+import {submitReview, editReview} from "../api/reviewApi";
 
 export default function ProductDetails() {
   const { productId } = useParams();
@@ -38,7 +38,8 @@ export default function ProductDetails() {
   const [askOpen, setAskOpen] = useState(false);
 
   const [reviewOpen, setReviewOpen] = useState(false);
-    const [reviewRefreshKey, setReviewRefreshKey] = useState(0);
+        const [reviewRefreshKey, setReviewRefreshKey] = useState(0);
+    const [editingReview, setEditingReview] = useState(null);
 
   const showToast = (message, type = "success") => {
     setToast({ message, type});
@@ -145,6 +146,12 @@ export default function ProductDetails() {
             setShowLoginModal(true);
             return;
         }
+        setEditingReview(null);
+        setReviewOpen(true);
+    }
+
+    const handleEditReview = (review) => {
+        setEditingReview(review);
         setReviewOpen(true);
     }
 
@@ -353,28 +360,68 @@ export default function ProductDetails() {
                     <div className="reviews-content">
                         <SubmitReviewModal
                                 isOpen={reviewOpen}
-                                onClose={() => setReviewOpen(false)}
+                                onClose={() => {
+                                    setReviewOpen(false);
+                                    setEditingReview(null);
+                                }}
                                 onSubmit={async (payload) => {
-                                    const success = await submitReview(
-                                        productId,
-                                        payload.shadeName,
-                                        payload.rating,
-                                        payload.title,
-                                        payload.text,
-                                        payload.images
-                                    );
+                                    const reviewId = editingReview?.reviewId ?? editingReview?.id;
+                                    const isEditing = Boolean(reviewId);
+                                    const success = isEditing
+                                        ? await editReview(
+                                            reviewId,
+                                            payload.shadeName,
+                                            payload.rating,
+                                            payload.title,
+                                            payload.text,
+                                            payload.images
+                                        )
+                                        : await submitReview(
+                                            productId,
+                                            payload.shadeName,
+                                            payload.rating,
+                                            payload.title,
+                                            payload.text,
+                                            payload.images
+                                        );
 
                                     if (success) {
-                                        showToast("Review submitted successfully!", "success");
+                                        showToast(
+                                            isEditing
+                                                ? "Review updated successfully!"
+                                                : "Review submitted successfully!",
+                                            "success"
+                                        );
                                         setReviewOpen(false);
+                                        setEditingReview(null);
                                         setReviewRefreshKey((value) => value + 1);
                                     } else {
-                                        showToast("Failed to submit review. Please try again.", "error");
+                                        showToast(
+                                            isEditing
+                                                ? "Failed to update review. Please try again."
+                                                : "Failed to submit review. Please try again.",
+                                            "error"
+                                        );
                                     }
                                 }}
                                 productName={data?.name}
                                 shades={data?.shades}
                                 selectedShadeName={selectedShade?.shadeName ?? ""}
+                                initialValues={
+                                    editingReview
+                                        ? {
+                                            shadeName: editingReview?.shadeName ?? "",
+                                            rating: Number(editingReview?.rating ?? 0),
+                                            title: editingReview?.reviewTitle ?? "",
+                                            text: editingReview?.reviewText ?? "",
+                                            images: editingReview?.imageLinks ?? []
+                                        }
+                                        : null
+                                }
+                                modalTitle={
+                                    editingReview ? "Edit your review" : "Submit a review"
+                                }
+                                submitLabel={editingReview ? "Save changes" : "Submit review"}
                             />
                         <button
                             className="submit-review-button"
@@ -384,6 +431,7 @@ export default function ProductDetails() {
                         <ReviewList
                             productId={productId}
                             refreshKey={reviewRefreshKey}
+                            onEditReview={handleEditReview}
                         />
                     </div>
                 )}

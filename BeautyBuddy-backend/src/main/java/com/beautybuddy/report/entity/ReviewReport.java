@@ -1,7 +1,7 @@
 package com.beautybuddy.report.entity;
 
-import com.beautybuddy.review.Review;
 import com.beautybuddy.report.BaseReport;
+import com.beautybuddy.review.entity.Review;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;

@@ -6,8 +6,11 @@ import com.beautybuddy.report.entity.ReviewReport;
 import com.beautybuddy.report.repo.ReviewReportRepository;
 import com.beautybuddy.review.dto.DisplayReviewDTO;
 import com.beautybuddy.review.dto.SubmitReviewDTO;
+import com.beautybuddy.review.entity.Review;
+import com.beautybuddy.review.entity.ReviewImage;
 import com.beautybuddy.user.UserRepository;
 import com.beautybuddy.upvote.repo.ReviewUpvoteRepository;
+import com.beautybuddy.review.dto.EditReviewDTO;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -78,6 +81,45 @@ public class ReviewService {
         newReview.setReviewImages(reviewImages);
 
         reviewRepository.save(newReview);
+    }
+
+    @Transactional
+    public void editReview(String email, Long reviewId, EditReviewDTO review) {
+        User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+        Review existingReview = reviewRepository.findById(reviewId)
+            .orElseThrow(() -> new RuntimeException("Review not found"));
+        if (existingReview.getUser().getId() != user.getId()) {
+            throw new RuntimeException("User not authorized to edit this review");
+        } else {
+            ProductShade shade = null;
+            if (review.shadeName() != null) {
+                shade = productShadeRepository.findByProductAndShadeName(existingReview.getProduct(), review.shadeName())
+                    .orElseThrow(() -> new RuntimeException("Shade not found"));
+            }
+            existingReview.setProductShade(shade);
+            existingReview.setRating(review.rating());
+            existingReview.setTitle(review.title());
+            existingReview.setText(review.text());
+
+            // Handle review images
+            List<ReviewImage> newImages = review.imageLinks() == null ? List.of() : review.imageLinks().stream()
+                .map(link -> {
+                    ReviewImage img = new ReviewImage();
+                    img.setImageLink(link);
+                    img.setCreatedAt(LocalDateTime.now());
+                    img.setReview(existingReview);
+                    return img;
+                })
+                .toList();
+            
+            // Remove old images
+            existingReview.getReviewImages().clear();
+            // Add new images
+            existingReview.getReviewImages().addAll(newImages);
+
+            reviewRepository.save(existingReview);
+        }
     }
 
     @Transactional

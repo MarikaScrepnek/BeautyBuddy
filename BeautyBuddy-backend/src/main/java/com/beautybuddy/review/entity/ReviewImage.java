@@ -1,4 +1,4 @@
-package com.beautybuddy.review;
+package com.beautybuddy.review.entity;
 
 import com.beautybuddy.common.entity.UserImageEntity;
 

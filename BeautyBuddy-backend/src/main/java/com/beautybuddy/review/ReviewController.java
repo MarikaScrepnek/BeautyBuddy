@@ -3,6 +3,7 @@ package com.beautybuddy.review;
 import com.beautybuddy.security.CustomUserDetails;
 import com.beautybuddy.upvote.UpvoteService;
 import com.beautybuddy.review.dto.DisplayReviewDTO;
+import com.beautybuddy.review.dto.EditReviewDTO;
 import com.beautybuddy.review.dto.SubmitReviewDTO;
 
 import org.springframework.web.bind.annotation.PostMapping;
@@ -36,6 +37,16 @@ public class ReviewController {
         }
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         reviewService.addReview(userDetails.getEmail(), reviewDTO);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{reviewId}/edit")
+    public ResponseEntity<Void> editReview(@PathVariable Long reviewId, @RequestBody EditReviewDTO editReviewDTO, Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(401).build();
+        }
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        reviewService.editReview(userDetails.getEmail(), reviewId, editReviewDTO);
         return ResponseEntity.ok().build();
     }
 
