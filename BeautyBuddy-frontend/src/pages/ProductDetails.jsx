@@ -153,6 +153,14 @@ export default function ProductDetails() {
 
   return (
     <div className="product-details-container">
+        {toast && (
+            <Toast
+                message={toast.message}
+                type={toast.type}
+                duration={750}
+                onClose={() => setToast(null)}
+            />
+        )}
         {showLoginModal && (
                 <AuthModal
                     onClose={() => setShowLoginModal(false)}
@@ -381,14 +389,6 @@ export default function ProductDetails() {
                 )}
             </section>
 
-            {toast && (
-                <Toast
-                    message={toast.message}
-                    type={toast.type}
-                    duration={750}
-                    onClose={() => setToast(null)}
-                />
-            )}
         </div>
     </div>
   );

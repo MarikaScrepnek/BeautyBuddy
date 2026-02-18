@@ -1,17 +1,33 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import "./Toast.css";
 
 export default function Toast({ message, type = "info", duration = 2500, onClose }) {
-    useEffect(() => {
-        if (!message) return;
-        const id = setTimeout(() => onClose?.(), duration);
-        return () => clearTimeout(id);
-    }, [message, duration, onClose]);
+  const [closing, setClosing] = useState(false);
 
-    if (!message) return null;
+  useEffect(() => {
+    if (!message) return;
 
-    return (
-        <div className={`toast toast--${type}`}>
-            {message}
-        </div>
-    );
+    setClosing(false);
+
+    const exitTimer = setTimeout(() => {
+      setClosing(true);
+    }, duration);
+
+    const removeTimer = setTimeout(() => {
+      onClose?.();
+    }, duration + 300); // must match CSS exit duration
+
+    return () => {
+      clearTimeout(exitTimer);
+      clearTimeout(removeTimer);
+    };
+  }, [message, duration, onClose]);
+
+  if (!message) return null;
+
+  return (
+    <div className={`toast toast-${type} ${closing ? "toast-exit" : ""}`}>
+      {message}
+    </div>
+  );
 }
