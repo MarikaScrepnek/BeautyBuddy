@@ -14,16 +14,16 @@ import jakarta.persistence.UniqueConstraint;
     name = "discussion_comment_report",
     uniqueConstraints = @UniqueConstraint(columnNames = {"account_id", "discussion_comment_id"})
 )
-public class DiscussionAnswerReport extends BaseReport {
+public class DiscussionCommentReport extends BaseReport {
     
     @ManyToOne
     @JoinColumn(name = "discussion_comment_id", nullable = false)
-    DiscussionComment discussionAnswer;
+    DiscussionComment discussionComment;
 
-    public DiscussionComment getDiscussionAnswer() {
-        return discussionAnswer;
+    public DiscussionComment getDiscussionComment() {
+        return discussionComment;
     }
-    public void setDiscussionAnswer(DiscussionComment discussionAnswer) {
-        this.discussionAnswer = discussionAnswer;
+    public void setDiscussionComment(DiscussionComment discussionComment) {
+        this.discussionComment = discussionComment;
     }
 }
