@@ -75,7 +75,7 @@ public class QAController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/questions/{questionId}/remove-upvote")
+    @DeleteMapping("/questions/{questionId}/upvote")
     public ResponseEntity<Void> removeQuestionUpvote(@PathVariable Long targetId, Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.status(401).build();
@@ -135,7 +135,7 @@ public class QAController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/answers/{answerId}/remove-upvote")
+    @DeleteMapping("/answers/{answerId}/upvote")
     public ResponseEntity<Void> removeAnswerUpvote(@PathVariable Long answerId, Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.status(401).build();
