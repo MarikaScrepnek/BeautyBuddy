@@ -2,7 +2,6 @@ package com.beautybuddy.review;
 
 import com.beautybuddy.product.ProductRepository;
 import com.beautybuddy.product.ProductShadeRepository;
-import com.beautybuddy.report.entity.ReviewReport;
 import com.beautybuddy.report.repo.ReviewReportRepository;
 import com.beautybuddy.review.dto.DisplayReviewDTO;
 import com.beautybuddy.review.dto.SubmitReviewDTO;
@@ -30,7 +29,6 @@ import org.springframework.data.domain.PageRequest;
 @Transactional(readOnly = true)
 public class ReviewService {
     private final ReviewRepository reviewRepository;
-    private final ReviewReportRepository reviewReportRepository;
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
     private final ProductShadeRepository productShadeRepository;
@@ -38,7 +36,6 @@ public class ReviewService {
 
     public ReviewService(ReviewRepository reviewRepository, ReviewReportRepository reviewReportRepository, UserRepository userRepository, ProductRepository productRepository, ProductShadeRepository productShadeRepository, ReviewUpvoteRepository reviewUpvoteRepository) {
         this.reviewRepository = reviewRepository;
-        this.reviewReportRepository = reviewReportRepository;
         this.userRepository = userRepository;
         this.productRepository = productRepository;
         this.productShadeRepository = productShadeRepository;
@@ -134,23 +131,6 @@ public class ReviewService {
             existingReview.setDeletedAt(LocalDateTime.now());
             reviewRepository.save(existingReview);
         }
-    }
-
-    @Transactional
-    public void reportReview(String email, Long reviewId, String reason) {
-        User user = userRepository.findByEmail(email)
-            .orElseThrow(() -> new RuntimeException("User not found"));
-        Review existingReview = reviewRepository.findById(reviewId)
-            .orElseThrow(() -> new RuntimeException("Review not found"));
-        
-        ReviewReport newReport = new ReviewReport();
-        newReport.setUser(user);
-        newReport.setReview(existingReview);
-        if (reason != null && !reason.isEmpty()) {
-            newReport.setReason(reason);
-        }
-
-        reviewReportRepository.save(newReport);
     }
 
     public BigDecimal getAverageRatingForProduct(Long productId) {

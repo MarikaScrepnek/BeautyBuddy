@@ -2,6 +2,7 @@ package com.beautybuddy.review;
 
 import com.beautybuddy.security.CustomUserDetails;
 import com.beautybuddy.upvote.UpvoteService;
+import com.beautybuddy.report.ReportService;
 import com.beautybuddy.review.dto.DisplayReviewDTO;
 import com.beautybuddy.review.dto.EditReviewDTO;
 import com.beautybuddy.review.dto.SubmitReviewDTO;
@@ -24,10 +25,12 @@ import java.math.BigDecimal;
 public class ReviewController {
     private final ReviewService reviewService;
     private final UpvoteService upvoteService;
+    private final ReportService reportService;
 
-    public ReviewController(ReviewService reviewService, UpvoteService upvoteService) {
+    public ReviewController(ReviewService reviewService, UpvoteService upvoteService, ReportService reportService) {
         this.reviewService = reviewService;
         this.upvoteService = upvoteService;
+        this.reportService = reportService;
     }
 
     @PostMapping("/add")
@@ -66,7 +69,7 @@ public class ReviewController {
             return ResponseEntity.status(401).build();
         }
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        reviewService.reportReview(userDetails.getEmail(), reviewId, reason);
+        reportService.report(userDetails.getEmail(), reason, "review", reviewId);
         return ResponseEntity.ok().build();
     }
 
