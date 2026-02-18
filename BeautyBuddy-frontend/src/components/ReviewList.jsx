@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 
 import { deleteReview, getReviews, upvoteReview } from "../api/reviewApi";
 import { getCurrentUser } from "../api/authApi";
-import AuthModal from "./AuthModal";
 
 import Toast from "./Toast";
 
@@ -66,7 +65,7 @@ const StarDisplay = ({ rating }) => {
 	);
 };
 
-export default function ReviewList({ productId, refreshKey, onEditReview }) {
+export default function ReviewList({ productId, refreshKey, onEditReview, onRequireLogin }) {
 	const [reviews, setReviews] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const [currentUser, setCurrentUser] = useState(null);
@@ -74,7 +73,19 @@ export default function ReviewList({ productId, refreshKey, onEditReview }) {
 	const [pendingId, setPendingId] = useState(null);
 	const [upvotedIds, setUpvotedIds] = useState(() => new Set());
     const [toast, setToast] = useState({ message: "", type: "info" });
-    const [showLoginModal, setShowLoginModal] = useState(false);
+
+	const applyReviews = (data) => {
+		const nextReviews = normalizeReviews(data);
+		setReviews(nextReviews);
+		setUpvotedIds(
+			new Set(
+				nextReviews
+					.filter((review) => review?.hasUpvoted)
+					.map((review) => getReviewId(review))
+					.filter(Boolean)
+			)
+		);
+	};
 
 	useEffect(() => {
 		getCurrentUser()
@@ -92,16 +103,7 @@ export default function ReviewList({ productId, refreshKey, onEditReview }) {
 		getReviews(productId)
 			.then((data) => {
 				if (!isMounted) return;
-				const nextReviews = normalizeReviews(data);
-				setReviews(nextReviews);
-				setUpvotedIds(
-					new Set(
-						nextReviews
-							.filter((review) => review?.hasUpvoted)
-							.map((review) => getReviewId(review))
-							.filter(Boolean)
-					)
-				);
+				applyReviews(data);
 			})
 			.catch(() => {
 				if (!isMounted) return;
@@ -117,11 +119,38 @@ export default function ReviewList({ productId, refreshKey, onEditReview }) {
 		};
 	}, [productId, refreshKey]);
 
+	useEffect(() => {
+		if (!productId) return;
+
+		const handleAuthLogin = () => {
+			getCurrentUser()
+				.then(setCurrentUser)
+				.catch(() => setCurrentUser(null));
+			getReviews(productId)
+				.then(applyReviews)
+				.catch(() =>
+					setToast({ message: "Failed to load reviews.", type: "error" })
+				);
+		};
+
+		const handleAuthLogout = () => {
+			setCurrentUser(null);
+			setUpvotedIds(new Set());
+		};
+
+		window.addEventListener("auth:login", handleAuthLogin);
+		window.addEventListener("auth:logout", handleAuthLogout);
+		return () => {
+			window.removeEventListener("auth:login", handleAuthLogin);
+			window.removeEventListener("auth:logout", handleAuthLogout);
+		};
+	}, [productId]);
+
 	const handleUpvote = async (review) => {
 		setActionMessage("");
 
 		if (!currentUser) {
-			setShowLoginModal(true);
+			onRequireLogin?.();
 			return;
 		}
 
@@ -195,16 +224,6 @@ export default function ReviewList({ productId, refreshKey, onEditReview }) {
 
 	return (
 		<div className="review-list">
-            {showLoginModal && (
-                <AuthModal
-                    onClose={() => setShowLoginModal(false)}
-                    onLoginSuccess={() => {
-                        setIsLoggedIn(true);
-                        loadWishlist();
-                        setShowLoginModal(false);
-                    }}
-                />
-            )}
 			{actionMessage ? <p className="review-message">{actionMessage}</p> : null}
 			{reviews.map((review) => {
 				const reviewId = getReviewId(review);

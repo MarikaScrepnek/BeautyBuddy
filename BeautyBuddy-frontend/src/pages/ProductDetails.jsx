@@ -91,13 +91,18 @@ export default function ProductDetails() {
         }
     }, [isLoggedIn]);
 
-  useEffect(() => {
-    fetch(`http://localhost:8080/api/products/${productId}`)
-      .then(res => res.json())
-      .then(setData)
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, [productId]);
+    const loadProduct = () => {
+        setLoading(true);
+        fetch(`http://localhost:8080/api/products/${productId}`)
+            .then(res => res.json())
+            .then(setData)
+            .catch(console.error)
+            .finally(() => setLoading(false));
+    };
+
+    useEffect(() => {
+        loadProduct();
+    }, [productId]);
 
     useEffect(() => {
     if (data?.shades?.length) {
@@ -415,6 +420,7 @@ export default function ProductDetails() {
                                                 : "Review submitted successfully!",
                                             "success"
                                         );
+                                        loadProduct();
                                         setReviewOpen(false);
                                         setEditingReview(null);
                                         setReviewRefreshKey((value) => value + 1);
@@ -455,6 +461,7 @@ export default function ProductDetails() {
                             productId={productId}
                             refreshKey={reviewRefreshKey}
                             onEditReview={handleEditReview}
+                            onRequireLogin={() => setShowLoginModal(true)}
                         />
                     </div>
                 )}
