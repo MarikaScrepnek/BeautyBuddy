@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { deleteReview, getReviews, upvoteReview } from "../api/reviewApi";
 import { getCurrentUser } from "../api/authApi";
 
+import Toast from "./Toast";
+
 import "./ReviewList.css";
 
 const normalizeReviews = (data) => {
@@ -66,11 +68,11 @@ const StarDisplay = ({ rating }) => {
 export default function ReviewList({ productId, refreshKey, onEditReview }) {
 	const [reviews, setReviews] = useState([]);
 	const [loading, setLoading] = useState(true);
-	const [error, setError] = useState("");
 	const [currentUser, setCurrentUser] = useState(null);
 	const [actionMessage, setActionMessage] = useState("");
 	const [pendingId, setPendingId] = useState(null);
 	const [upvotedIds, setUpvotedIds] = useState(() => new Set());
+    const [toast, setToast] = useState({ message: "", type: "info" });
 
 	useEffect(() => {
 		getCurrentUser()
@@ -83,7 +85,7 @@ export default function ReviewList({ productId, refreshKey, onEditReview }) {
 		let isMounted = true;
 
 		setLoading(true);
-		setError("");
+		setToast({ message: "", type: "info" });
 
 		getReviews(productId)
 			.then((data) => {
@@ -101,7 +103,7 @@ export default function ReviewList({ productId, refreshKey, onEditReview }) {
 			})
 			.catch(() => {
 				if (!isMounted) return;
-				setError("Failed to load reviews.");
+				setToast({ message: "Failed to load reviews.", type: "error" });
 			})
 			.finally(() => {
 				if (!isMounted) return;
@@ -149,7 +151,7 @@ export default function ReviewList({ productId, refreshKey, onEditReview }) {
 				next.add(reviewId);
 				return next;
 			});
-			setActionMessage("Thanks for the feedback!");
+			setToast({ message: "Thanks for the feedback!", type: "success" });
 		}
 	};
 
@@ -158,7 +160,7 @@ export default function ReviewList({ productId, refreshKey, onEditReview }) {
 
 		const reviewId = getReviewId(review);
 		if (!reviewId) {
-			setActionMessage("Delete is unavailable for this review.");
+			setToast({ message: "Unable to delete this review.", type: "error" });
 			return;
 		}
 
@@ -166,7 +168,7 @@ export default function ReviewList({ productId, refreshKey, onEditReview }) {
 		const success = await deleteReview(reviewId);
 		setPendingId(null);
 		if (!success) {
-			setActionMessage("Unable to delete this review right now.");
+			setToast({ message: "Unable to delete this review right now.", type: "error" });
 			return;
 		}
 
@@ -177,8 +179,8 @@ export default function ReviewList({ productId, refreshKey, onEditReview }) {
 		return <p className="review-loading">Loading reviews...</p>;
 	}
 
-	if (error) {
-		return <p className="review-error">{error}</p>;
+	if (toast.message) {
+		return <Toast message={toast.message} type={toast.type} onClose={() => setToast({ message: "", type: "info" })} />;
 	}
 
 	if (!reviews.length) {
