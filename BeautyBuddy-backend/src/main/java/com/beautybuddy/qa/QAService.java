@@ -4,15 +4,23 @@ import com.beautybuddy.qa.dto.EditAnswerDTO;
 import com.beautybuddy.qa.dto.EditQuestionDTO;
 import com.beautybuddy.qa.dto.SubmitAnswerDTO;
 import com.beautybuddy.qa.dto.SubmitQuestionDTO;
+import com.beautybuddy.qa.dto.DisplayAnswerDTO;
+import com.beautybuddy.qa.dto.DisplayQuestionWithAnswersDTO;
+import com.beautybuddy.upvote.repo.AnswerUpvoteRepository;
+import com.beautybuddy.upvote.repo.QuestionUpvoteRepository;
 import com.beautybuddy.user.User;
 import com.beautybuddy.product.Product;
 import com.beautybuddy.user.UserRepository;
 import com.beautybuddy.product.ProductRepository;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 @Service
 public class QAService {
@@ -20,12 +28,17 @@ public class QAService {
     private final ProductRepository productRepository;
     private final QuestionRepository questionRepository;
     private final AnswerRepository answerRepository;
+    private final QuestionUpvoteRepository questionUpvoteRepository;
+    private final AnswerUpvoteRepository answerUpvoteRepository;
     public QAService(UserRepository userRepository, ProductRepository productRepository,
-                     QuestionRepository questionRepository, AnswerRepository answerRepository) {
+                     QuestionRepository questionRepository, AnswerRepository answerRepository,
+                     QuestionUpvoteRepository questionUpvoteRepository, AnswerUpvoteRepository answerUpvoteRepository) {
         this.userRepository = userRepository;
         this.productRepository = productRepository;
         this.questionRepository = questionRepository;
         this.answerRepository = answerRepository;
+        this.questionUpvoteRepository = questionUpvoteRepository;
+        this.answerUpvoteRepository = answerUpvoteRepository;
     }
 
     @Transactional
@@ -115,5 +128,44 @@ public class QAService {
         answerRepository.save(answer);
     }
 
-    //implement GETMAPPING for questions and answers
+    @Transactional(readOnly = true)
+    public Page<DisplayQuestionWithAnswersDTO> getQuestionsAndAnswersForProduct(Long productId, int page, int size, String userEmail) {
+        final User currentUser = userEmail != null
+            ? userRepository.findByEmail(userEmail).orElse(null)
+            : null;
+        Page<Question> questions = questionRepository
+            .findByProduct_IdAndDeletedAtIsNullAndApprovedTrueOrderByCreatedAtDesc(
+                productId,
+                PageRequest.of(page, size)
+            );
+
+        return questions.map(question -> {
+            List<DisplayAnswerDTO> answers = question.getAnswers().stream()
+                .filter(answer -> answer.getDeletedAt() == null && answer.isApproved())
+                .sorted(Comparator.comparing(Answer::getCreatedAt))
+                .map(answer -> new DisplayAnswerDTO(
+                    answer.getId(),
+                    question.getId(),
+                    answer.getText(),
+                    answer.getUser().getUsername(),
+                    answer.getCreatedAt(),
+                    answer.getUpvoteCount(),
+                    currentUser != null
+                        && answerUpvoteRepository.findByUserAndAnswer(currentUser, answer).isPresent()
+                ))
+                .toList();
+
+            return new DisplayQuestionWithAnswersDTO(
+                question.getId(),
+                question.getProduct().getId(),
+                question.getText(),
+                question.getUser().getUsername(),
+                question.getCreatedAt(),
+                question.getUpvoteCount(),
+                currentUser != null
+                    && questionUpvoteRepository.findByUserAndQuestion(currentUser, question).isPresent(),
+                answers
+            );
+        });
+    }
 }

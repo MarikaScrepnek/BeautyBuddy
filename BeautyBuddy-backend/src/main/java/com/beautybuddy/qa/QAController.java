@@ -3,23 +3,27 @@ package com.beautybuddy.qa;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.data.domain.Page;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.beautybuddy.security.CustomUserDetails;
 import com.beautybuddy.upvote.UpvoteService;
 import com.beautybuddy.qa.dto.EditAnswerDTO;
 import com.beautybuddy.qa.dto.EditQuestionDTO;
+import com.beautybuddy.qa.dto.DisplayQuestionWithAnswersDTO;
 import com.beautybuddy.qa.dto.SubmitAnswerDTO;
 import com.beautybuddy.qa.dto.SubmitQuestionDTO;
 import com.beautybuddy.report.ReportService;
 import com.beautybuddy.report.dto.SubmitReportDTO;
 
 @RestController
-@RequestMapping("/api/qa")
+@RequestMapping("/api")
 public class QAController {
     private final QAService qaService;
     private final UpvoteService upvoteService;
@@ -149,5 +153,20 @@ public class QAController {
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         reportService.report(userDetails.getEmail(), reportDTO.reason(), "answer", reportDTO.targetId());
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/questions/{productId}")
+    public ResponseEntity<Page<DisplayQuestionWithAnswersDTO>> getQuestionsForProduct(
+        @PathVariable Long productId,
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size,
+        Authentication authentication
+    ) {
+        String email = null;
+        if (authentication != null && authentication.isAuthenticated()) {
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            email = userDetails.getEmail();
+        }
+        return ResponseEntity.ok(qaService.getQuestionsAndAnswersForProduct(productId, page, size, email));
     }
 }
