@@ -61,6 +61,29 @@ export default function ProductDetails() {
     };
 
     useEffect(() => {
+        const handleAuthLogin = () => {
+            getCurrentUser()
+                .then(() => {
+                    setIsLoggedIn(true);
+                    loadWishlist();
+                })
+                .catch(() => setIsLoggedIn(false));
+        };
+
+        const handleAuthLogout = () => {
+            setIsLoggedIn(false);
+            setWishlistItems([]);
+        };
+
+        window.addEventListener("auth:login", handleAuthLogin);
+        window.addEventListener("auth:logout", handleAuthLogout);
+        return () => {
+            window.removeEventListener("auth:login", handleAuthLogin);
+            window.removeEventListener("auth:logout", handleAuthLogout);
+        };
+    }, []);
+
+    useEffect(() => {
         if (isLoggedIn) {
             loadWishlist();
         } else {
