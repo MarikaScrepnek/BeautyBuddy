@@ -45,7 +45,7 @@ export default function LoginModal({ onClose, onSwitchToSignup, onSwitchToResetP
   return (
     <div className="modal-overlay">
         <div className="modal" onClick={(e) => e.stopPropagation()}>
-        <h2>Login</h2>
+        <h2 className="modal-title">Login</h2>
 
         {error && <p style={{ color: "red" }}>{error}</p>}
 
@@ -85,7 +85,7 @@ export default function LoginModal({ onClose, onSwitchToSignup, onSwitchToResetP
         <button className='modal-forgot-password-link' onClick={onSwitchToResetPass}>Forgot Password?</button>
 
         <div className='modal-signup'>
-            <h2 className='modal-signup-prompt'>Don't have an account?</h2>
+            <p className='modal-signup-prompt'>Don't have an account?</p>
             <button className="modal-signup-link" onClick={onSwitchToSignup}>Sign Up</button>
         </div>
 

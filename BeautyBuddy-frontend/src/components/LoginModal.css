@@ -1,5 +1,7 @@
-h2 {
-    cursor: default;
+.modal-title {
+  cursor: default;
+  margin: 0;
+  font-size: 1.4rem;
 }
 
 .modal-overlay {

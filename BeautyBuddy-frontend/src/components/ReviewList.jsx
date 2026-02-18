@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import { deleteReview, getReviews, upvoteReview } from "../api/reviewApi";
 import { getCurrentUser } from "../api/authApi";
+import AuthModal from "./AuthModal";
 
 import Toast from "./Toast";
 
@@ -73,6 +74,7 @@ export default function ReviewList({ productId, refreshKey, onEditReview }) {
 	const [pendingId, setPendingId] = useState(null);
 	const [upvotedIds, setUpvotedIds] = useState(() => new Set());
     const [toast, setToast] = useState({ message: "", type: "info" });
+    const [showLoginModal, setShowLoginModal] = useState(false);
 
 	useEffect(() => {
 		getCurrentUser()
@@ -119,7 +121,7 @@ export default function ReviewList({ productId, refreshKey, onEditReview }) {
 		setActionMessage("");
 
 		if (!currentUser) {
-			setActionMessage("Log in to mark reviews as helpful.");
+			setShowLoginModal(true);
 			return;
 		}
 
@@ -193,6 +195,16 @@ export default function ReviewList({ productId, refreshKey, onEditReview }) {
 
 	return (
 		<div className="review-list">
+            {showLoginModal && (
+                <AuthModal
+                    onClose={() => setShowLoginModal(false)}
+                    onLoginSuccess={() => {
+                        setIsLoggedIn(true);
+                        loadWishlist();
+                        setShowLoginModal(false);
+                    }}
+                />
+            )}
 			{actionMessage ? <p className="review-message">{actionMessage}</p> : null}
 			{reviews.map((review) => {
 				const reviewId = getReviewId(review);
