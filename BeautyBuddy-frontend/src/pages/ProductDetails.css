@@ -281,6 +281,13 @@
   font-family: 'Arial', sans-serif;
 }
 
+.shade-swatch {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
 .shade-selector label {
   font-weight: 500;
   color: #333;
@@ -299,7 +306,7 @@
   appearance: none; /* remove default arrow */
   width: 100%;         /* fill the wrapper */
   box-sizing: border-box; /* include padding in width */
-  padding: 0.5rem 1.5rem 0.5rem 0.5rem;
+  padding: 0.5rem 3.25rem 0.5rem 0.5rem;
   border-radius: 0.5rem;
   border: 1px solid #ccc;
   background-color: #fff;
@@ -307,57 +314,79 @@
   cursor: pointer;
   transition: all 0.2s ease;
 }
+  /* Custom shade dropdown */
+  .shade-dropdown {
+    position: relative;
+    width: 100%;
+    max-width: 220px;
+  }
 
-/* Hover/focus */
-.custom-select select:hover {
-  border-color: #888;
-}
+  .shade-trigger {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+    border: 1px solid #ccc;
+    background: #fff;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
 
-.custom-select select:focus {
-  border-color: #555;
-  box-shadow: 0 0 0 2px rgba(100, 149, 237, 0.3);
-  outline: none;
-}
+  .shade-trigger:hover {
+    border-color: #888;
+  }
 
-/* Custom arrow */
-.custom-select::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  right: 0.5rem;
-  width: 0;
-  height: 0;
-  pointer-events: none;
-  border-left: 5px solid transparent;
-  border-right: 5px solid transparent;
-  border-top: 6px solid #333;
-  transform: translateY(-50%);
-}
+  .shade-trigger:focus-visible {
+    outline: none;
+  }
 
-/* Optional: smaller font for options */
-.custom-select select option {
-  padding: 0.5rem;
-}
+  .shade-label-text {
+    flex: 1;
+    text-align: left;
+  }
 
-.shade-rating {
-  margin: 0.25rem 0 0;
-  font-size: 0.9rem;
-  color: #555;
-}
+  .shade-caret {
+    font-size: 0.75rem;
+  }
 
-/* Reviews / Q&A */
-.reviews-and-questions-section {
-  display: flex;
-  flex-direction: column; /* stack header + search */
-  gap: 0.75rem;
-}
+  .shade-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    width: 100%;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+    padding: 0.25rem 0;
+    z-index: 10;
+    max-height: 220px;
+    overflow-y: auto;
+  }
 
-.reviews-and-questions-header-section {
-  display:flex;
-  justify-content: center;
-  margin-top: 0rem;
-  gap: 15rem;
-}
+  .shade-option {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    font-size: 0.9rem;
+  }
+
+  .shade-option:hover {
+    background: #f7f7f7;
+  }
+
+  .shade-option[aria-selected="true"] {
+    background: #f0cef0;
+  }
 
 .reviews-and-questions-header {
   font-size: 1.2rem;

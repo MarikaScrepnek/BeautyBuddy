@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FaSearch } from 'react-icons/fa';
 
 import AuthModal from "../components/AuthModal";
@@ -48,6 +48,8 @@ export default function ProductDetails() {
     const [userReviewsByShade, setUserReviewsByShade] = useState({});
     const [shadeRatingValue, setShadeRatingValue] = useState(null);
     const [allReviews, setAllReviews] = useState([]);
+        const [isShadeOpen, setIsShadeOpen] = useState(false);
+        const shadeSelectRef = useRef(null);
     const [quickRating, setQuickRating] = useState(0);
     const [quickHoverRating, setQuickHoverRating] = useState(null);
     const [isSubmittingQuickRating, setIsSubmittingQuickRating] = useState(false);
@@ -206,6 +208,17 @@ export default function ProductDetails() {
         setQuickRating(0);
         setQuickHoverRating(null);
     }, [productId, selectedShade?.shadeName]);
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (!shadeSelectRef.current) return;
+            if (shadeSelectRef.current.contains(event.target)) return;
+            setIsShadeOpen(false);
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
 
     const isInWishlist = Boolean(
         data && wishlistItems.some((item) => {
@@ -435,21 +448,51 @@ export default function ProductDetails() {
 
                     <div className="shade-selector">
                         <p htmlFor={`shade-${data.id}`}>Shade:</p>
-                        <div className="custom-select">
-                            <select
-                            id={`shade-${data.id}`}
-                            value={selectedShade?.shadeName ?? data.shades[0]?.shadeName}
-                            onChange={(e) => {
-                                const shade = data.shades.find(s => s.shadeName === e.target.value);
-                                setSelectedShade(shade);
-                            }}
+                        <div
+                            className={`shade-dropdown ${isShadeOpen ? "is-open" : ""}`}
+                            ref={shadeSelectRef}
+                        >
+                            <button
+                                type="button"
+                                className="shade-trigger"
+                                aria-haspopup="listbox"
+                                aria-expanded={isShadeOpen}
+                                onClick={() => setIsShadeOpen((open) => !open)}
                             >
-                            {data.shades.map((s) => (
-                                <option key={s.shadeName} value={s.shadeName}>
-                                {s.shadeName}
-                                </option>
-                            ))}
-                            </select>
+                                <span
+                                    className="shade-swatch"
+                                    style={{ backgroundColor: selectedShade?.hexCode ?? "#eee" }}
+                                    aria-hidden="true"
+                                />
+                                <span className="shade-label-text">
+                                    {selectedShade?.shadeName ?? "Select shade"}
+                                </span>
+                                <span className="shade-caret">▼</span>
+                            </button>
+                            {isShadeOpen && (
+                                <div className="shade-menu" role="listbox">
+                                    {data.shades.map((shade) => (
+                                        <button
+                                            key={shade.shadeName}
+                                            type="button"
+                                            className="shade-option"
+                                            role="option"
+                                            aria-selected={shade.shadeName === selectedShade?.shadeName}
+                                            onClick={() => {
+                                                setSelectedShade(shade);
+                                                setIsShadeOpen(false);
+                                            }}
+                                        >
+                                            <span
+                                                className="shade-swatch"
+                                                style={{ backgroundColor: shade?.hexCode ?? "#eee" }}
+                                                aria-hidden="true"
+                                            />
+                                            <span className="shade-option-text">{shade.shadeName}</span>
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     </div>
                     <p className="shade-rating">

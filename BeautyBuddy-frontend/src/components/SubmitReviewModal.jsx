@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import "./SubmitReviewModal.css"
 
@@ -24,6 +23,8 @@ export default function AskQuestionModal({
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [images, setImages] = useState([]);
+  const [isShadeOpen, setIsShadeOpen] = useState(false);
+  const shadeMenuRef = useRef(null);
 
   const [error, setError] = useState("");
 
@@ -55,6 +56,19 @@ export default function AskQuestionModal({
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [isOpen, onClose, initialValues, selectedShadeName, existingReviewsByShade]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleClickOutside = (event) => {
+      if (!shadeMenuRef.current) return;
+      if (shadeMenuRef.current.contains(event.target)) return;
+      setIsShadeOpen(false);
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isOpen]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -188,26 +202,58 @@ export default function AskQuestionModal({
               <label className="shade-label" htmlFor="shade-input">
                 Shade (optional) - you may submit one review per shade
               </label>
-              <select
-                id="shade-input"
-                className="shade-select"
-                value={shadeName}
-                onChange={(e) => {
-                  const nextShade = e.target.value;
-                  const reviewKey = nextShade || "";
-                  const existingReview = existingReviewsByShade?.[reviewKey] ?? null;
-                  if (existingReview) {
-                    onToast?.("Fetching your review", "info");
-                  }
-                  setShadeName(nextShade);
-                }}
+              <div
+                className={`modal-shade-dropdown ${isShadeOpen ? "is-open" : ""}`}
+                ref={shadeMenuRef}
               >
-                {shades.map((shade) => (
-                  <option key={shade.shadeName} value={shade.shadeName}>
-                    {shade.shadeName}
-                  </option>
-                ))}
-              </select>
+                <button
+                  type="button"
+                  className="modal-shade-trigger"
+                  aria-haspopup="listbox"
+                  aria-expanded={isShadeOpen}
+                  onClick={() => setIsShadeOpen((open) => !open)}
+                >
+                  <span
+                    className="modal-shade-swatch"
+                    style={{ backgroundColor: shades.find((s) => s.shadeName === shadeName)?.hexCode ?? "#eee" }}
+                    aria-hidden="true"
+                  />
+                  <span className="modal-shade-label-text">
+                    {shadeName || "Select shade"}
+                  </span>
+                  <span className="modal-shade-caret">▼</span>
+                </button>
+                {isShadeOpen && (
+                  <div className="modal-shade-menu" role="listbox" aria-label="Shades">
+                    {shades.map((shade) => (
+                      <button
+                        key={shade.shadeName}
+                        type="button"
+                        className="modal-shade-option"
+                        role="option"
+                        aria-selected={shade.shadeName === shadeName}
+                        onClick={() => {
+                          const nextShade = shade.shadeName;
+                          const reviewKey = nextShade || "";
+                          const existingReview = existingReviewsByShade?.[reviewKey] ?? null;
+                          if (existingReview) {
+                            onToast?.("Fetching your review", "info");
+                          }
+                          setShadeName(nextShade);
+                          setIsShadeOpen(false);
+                        }}
+                      >
+                        <span
+                          className="modal-shade-swatch"
+                          style={{ backgroundColor: shade?.hexCode ?? "#eee" }}
+                          aria-hidden="true"
+                        />
+                        <span className="modal-shade-option-text">{shade.shadeName}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           ) : null}
           
