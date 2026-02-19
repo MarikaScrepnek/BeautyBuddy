@@ -294,8 +294,9 @@ export default function ProductDetails() {
     }
 
     const ratingValue = Number(data?.rating ?? 0);
-    const ratingText = data?.rating ? `${ratingValue.toFixed(1)}/5` : "Be the first to review!";
-    const ratingAria = data?.rating ? `Rated ${ratingValue.toFixed(1)} out of 5` : "No ratings yet";
+    const hasRating = Boolean(data?.rating);
+    const ratingText = hasRating ? `${ratingValue.toFixed(1)}/5` : "";
+    const ratingAria = hasRating ? `Rated ${ratingValue.toFixed(1)} out of 5` : "No ratings yet";
     const displayedRating = quickHoverRating ?? ratingValue;
     const ratingDisplayText = ratingText;
     const ratingTooltipValue = quickHoverRating ?? quickRating;
@@ -408,7 +409,7 @@ export default function ProductDetails() {
                 />
 
                 <div className="product-meta">
-                    <div className="rating-row" aria-label={ratingAria}>
+                    <div className="rating-group" aria-label={ratingAria}>
                         <span className="rating-label">Overall Rating:</span>
                         <div className="rating-stars" role="radiogroup" aria-label="Rate this product">
                             {[1, 2, 3, 4, 5].map((i) => (
@@ -441,6 +442,9 @@ export default function ProductDetails() {
                             ))}
                         </div>
                         <span className="rating-text">{ratingDisplayText}</span>
+                        {!hasRating && (
+                            <p className="rating-empty">Be the first to review!</p>
+                        )}
                     </div>
 
                     <div className="shade-selector">

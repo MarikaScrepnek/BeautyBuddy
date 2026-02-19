@@ -39,10 +39,11 @@
     cursor: default;
 }
 
-.rating-row {
-  display: flex;
+.rating-group {
+  display: grid;
+  grid-template-columns: auto auto auto;
   align-items: center;
-  gap: 0.5rem;
+  column-gap: 0.5rem;
 }
 
 .rating-label {
@@ -54,6 +55,9 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
+  width: 110px;
+  justify-content: center;
+  justify-self: center;
 }
 
 .rating-star-btn {
@@ -122,6 +126,18 @@
 .rating-text {
   font-size: 0.95rem;
   color: #444;
+}
+
+.rating-empty {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #777;
+  grid-column: 2;
+  justify-self: center;
+  text-align: center;
+  width: 110px;
+  white-space: nowrap;
+  overflow: visible;
 }
 
 /* Main section: Image left, Meta right */
