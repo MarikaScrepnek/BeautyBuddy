@@ -132,6 +132,10 @@
     gap: 1rem;
 }
 
+.price {
+  margin-top: 1.5rem;
+}
+
 .product-image {
   width: 350px;
   height: 350px;

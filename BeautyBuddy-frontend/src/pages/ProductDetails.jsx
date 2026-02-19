@@ -442,9 +442,6 @@ export default function ProductDetails() {
                         </div>
                         <span className="rating-text">{ratingDisplayText}</span>
                     </div>
-                    <p className="price">
-                        <span>Price:</span> {data.price ? `$${data.price}` : "N/A"}
-                    </p>
 
                     <div className="shade-selector">
                         <p htmlFor={`shade-${data.id}`}>Shade:</p>
@@ -500,6 +497,10 @@ export default function ProductDetails() {
                         {shadeRatingValue !== null
                             ? `${shadeRatingValue.toFixed(1)}/5`
                             : "No shade ratings yet"}
+                    </p>
+
+                    <p className="price">
+                        <span>Price:</span> {data.price ? `$${data.price}` : "N/A"}
                     </p>
 
                     <div className="product-actions">
