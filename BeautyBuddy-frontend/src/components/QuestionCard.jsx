@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import {
   editAnswer,
   editQuestion,
+  removeQuestion,
   submitAnswer,
   upvoteAnswer,
   upvoteQuestion,
@@ -214,6 +215,25 @@ export default function QuestionCard({
     }
   };
 
+  const handleQuestionDelete = async () => {
+    if (!isLoggedIn) {
+      onRequireLogin?.();
+      return;
+    }
+    if (!isAuthor) return;
+
+    const confirmed = window.confirm("Delete this question? This can't be undone.");
+    if (!confirmed) return;
+
+    const success = await removeQuestion(question.id);
+    if (success) {
+      onRefresh?.();
+      onToast?.("Question deleted.", "success");
+    } else {
+      onToast?.("Unable to delete question.", "error");
+    }
+  };
+
   return (
     <div className="question-card">
       <div className="question-card__header">
@@ -234,7 +254,7 @@ export default function QuestionCard({
           <span className="question-upvotes">{questionUpvoteCount} upvotes</span>
         </div>
       </div>
-      {showEdit || showAnswer ? (
+      {showEdit || showAnswer || isAuthor ? (
         <div className="question-actions">
           {showEdit ? (
             <button
@@ -246,6 +266,15 @@ export default function QuestionCard({
               }}
             >
               {isEditing ? "Cancel edit" : "Edit question"}
+            </button>
+          ) : null}
+          {isAuthor ? (
+            <button
+              type="button"
+              className="question-action-btn question-action-danger"
+              onClick={handleQuestionDelete}
+            >
+              Delete question
             </button>
           ) : null}
           {showAnswer ? (

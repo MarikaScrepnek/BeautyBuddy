@@ -114,6 +114,11 @@
   border-color: #bdbdbd;
 }
 
+.question-action-danger {
+  border-color: #e7b7b0;
+  color: #a13b2f;
+}
+
 .question-answer-actions {
   display: flex;
   gap: 0.5rem;
