@@ -85,7 +85,7 @@ export default function ReviewCard({
 
       <div className="review-actions">
         {isOwner ? (
-          <>
+          <div className="review-actions-left">
             <button
               type="button"
               className="review-action-btn"
@@ -102,7 +102,7 @@ export default function ReviewCard({
             >
               Delete
             </button>
-          </>
+          </div>
         ) : (
           <>
             <div className="review-actions-left">
