@@ -8,6 +8,7 @@ export default function AskQuestionModal({
   onClose,
   onSubmit,
   onDelete,
+  onToast,
   productName,
   shades,
   initialValues,
@@ -33,7 +34,7 @@ export default function AskQuestionModal({
   useEffect(() => {
     if (!isOpen) return;
 
-    const nextShade = initialValues?.shadeName ?? "";
+    const nextShade = initialValues?.shadeName ?? selectedShadeName ?? "";
     const reviewKey = nextShade || "";
     const existingReview = existingReviewsByShade?.[reviewKey] ?? null;
     const nextRating = existingReview?.rating ?? initialValues?.rating ?? 0;
@@ -59,11 +60,17 @@ export default function AskQuestionModal({
     if (!isOpen) return;
     const reviewKey = shadeName || "";
     const existingReview = existingReviewsByShade?.[reviewKey] ?? null;
-    setRating(existingReview?.rating ?? 0);
+    if (existingReview) {
+      setRating(existingReview?.rating ?? 0);
+      setTitle(existingReview?.reviewTitle ?? existingReview?.title ?? "");
+      setBody(existingReview?.reviewText ?? existingReview?.text ?? "");
+      setImages(existingReview?.imageLinks ?? []);
+    } else {
+      setTitle("");
+      setBody("");
+      setImages([]);
+    }
     setHoverRating(null);
-    setTitle(existingReview?.reviewTitle ?? existingReview?.title ?? "");
-    setBody(existingReview?.reviewText ?? existingReview?.text ?? "");
-    setImages(existingReview?.imageLinks ?? []);
   }, [shadeName, existingReviewsByShade, isOpen]);
 
   if (!isOpen) return null;
@@ -185,9 +192,16 @@ export default function AskQuestionModal({
                 id="shade-input"
                 className="shade-select"
                 value={shadeName}
-                onChange={(e) => setShadeName(e.target.value)}
+                onChange={(e) => {
+                  const nextShade = e.target.value;
+                  const reviewKey = nextShade || "";
+                  const existingReview = existingReviewsByShade?.[reviewKey] ?? null;
+                  if (existingReview) {
+                    onToast?.("Fetching your review", "info");
+                  }
+                  setShadeName(nextShade);
+                }}
               >
-                <option value="">No shade</option>
                 {shades.map((shade) => (
                   <option key={shade.shadeName} value={shade.shadeName}>
                     {shade.shadeName}

@@ -486,6 +486,7 @@ export default function ProductDetails() {
                                     setReviewOpen(false);
                                     setEditingReview(null);
                                 }}
+                                onToast={showToast}
                                 onDelete={async (reviewId) => {
                                     const success = await deleteReview(reviewId);
                                     if (success) {
