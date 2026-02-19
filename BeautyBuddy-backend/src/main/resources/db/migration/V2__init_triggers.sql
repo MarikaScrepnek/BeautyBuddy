@@ -318,7 +318,7 @@ BEGIN
             WHERE question_id = v_question_id 
             AND deleted_at IS NULL
         ),
-        answered = v_answer_exists
+        is_answered = v_answer_exists
     WHERE id = v_question_id;
     
     RETURN NULL;
