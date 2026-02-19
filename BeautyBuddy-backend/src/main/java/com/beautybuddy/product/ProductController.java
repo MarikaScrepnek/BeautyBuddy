@@ -5,17 +5,23 @@ import java.util.List;
 import com.beautybuddy.common.DTOMapper;
 import com.beautybuddy.ingredient.MayContainIngredientDTO;
 import com.beautybuddy.ingredient.ProductIngredientDTO;
+import com.beautybuddy.report.ReportService;
+import com.beautybuddy.security.CustomUserDetails;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
 
 @RestController
 @RequestMapping("/api/products")
 public class ProductController {
 
     private final ProductRepository productRepository;
+    private final ReportService reportService;
 
-    public ProductController(ProductRepository productRepository) {
+    public ProductController(ProductRepository productRepository, ReportService reportService) {
         this.productRepository = productRepository;
+        this.reportService = reportService;
     }
 
     @GetMapping
@@ -55,5 +61,15 @@ public class ProductController {
         return product.getMayContainIngredients().stream()
                 .map(DTOMapper::toMayContainIngredientDTO)
                 .toList();
+    }
+
+    @PostMapping("/{id}/report")
+    public ResponseEntity<Void> report(@PathVariable Long productId, @RequestBody String reason, Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(401).build();
+        }
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        reportService.report(userDetails.getEmail(), reason, "product", productId);
+        return ResponseEntity.ok().build();
     }
 }

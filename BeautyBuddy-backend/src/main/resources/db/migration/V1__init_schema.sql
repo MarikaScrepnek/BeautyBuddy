@@ -658,6 +658,21 @@ CREATE INDEX idx_discussion_comment_report_account ON discussion_comment_report 
 CREATE INDEX idx_discussion_comment_report_discussion_comment ON discussion_comment_report (discussion_comment_id);
 CREATE INDEX idx_discussion_comment_report_status ON discussion_comment_report (status);
 
+CREATE TABLE product_report (
+    id BIGSERIAL PRIMARY KEY,
+    account_id BIGINT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
+    product_id BIGINT NOT NULL REFERENCES product(id) ON DELETE CASCADE,
+    reason TEXT,
+    status report_status_enum NOT NULL DEFAULT 'OPEN',
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    resolved_at TIMESTAMPTZ DEFAULT NULL,
+
+    UNIQUE (account_id, product_id)
+);
+CREATE INDEX idx_product_report_account ON product_report (account_id);
+CREATE INDEX idx_product_report_product ON product_report (product_id);
+CREATE INDEX idx_product_report_status ON product_report (status);
+
 ------------------------------------------------------------------------------
 CREATE TYPE notification_type_enum AS ENUM (
     'PRODUCT_QUESTION',

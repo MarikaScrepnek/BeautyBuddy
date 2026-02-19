@@ -8,6 +8,8 @@ import com.beautybuddy.discussion.Discussion;
 import com.beautybuddy.discussion.DiscussionComment;
 import com.beautybuddy.discussion.repo.DiscussionCommentRepository;
 import com.beautybuddy.discussion.repo.DiscussionRepository;
+import com.beautybuddy.product.Product;
+import com.beautybuddy.product.ProductRepository;
 import com.beautybuddy.qa.Answer;
 import com.beautybuddy.qa.AnswerRepository;
 import com.beautybuddy.qa.Question;
@@ -15,11 +17,13 @@ import com.beautybuddy.qa.QuestionRepository;
 import com.beautybuddy.report.entity.AnswerReport;
 import com.beautybuddy.report.entity.DiscussionCommentReport;
 import com.beautybuddy.report.entity.DiscussionReport;
+import com.beautybuddy.report.entity.ProductReport;
 import com.beautybuddy.report.entity.QuestionReport;
 import com.beautybuddy.report.entity.ReviewReport;
 import com.beautybuddy.report.repo.AnswerReportRepository;
 import com.beautybuddy.report.repo.DiscussionCommentReportRepository;
 import com.beautybuddy.report.repo.DiscussionReportRepository;
+import com.beautybuddy.report.repo.ProductReportRepository;
 import com.beautybuddy.report.repo.QuestionReportRepository;
 import com.beautybuddy.report.repo.ReviewReportRepository;
 import com.beautybuddy.review.ReviewRepository;
@@ -34,24 +38,27 @@ public class ReportService {
     private final AnswerRepository answerRepository;
     private final DiscussionRepository discussionRepository;
     private final DiscussionCommentRepository discussionCommentRepository;
+    private final ProductRepository productRepository;
     private final ReviewReportRepository reviewReportRepository;
     private final QuestionReportRepository questionReportRepository;
     private final AnswerReportRepository answerReportRepository;
     private final DiscussionReportRepository discussionReportRepository;
     private final DiscussionCommentReportRepository discussionCommentReportRepository;
-    
+    private final ProductReportRepository productReportRepository;
     public ReportService(UserRepository userRepository, ReviewRepository reviewRepository,
                          QuestionRepository questionRepository, AnswerRepository answerRepository,
                          DiscussionRepository discussionRepository, DiscussionCommentRepository discussionCommentRepository,
-                         ReviewReportRepository reviewReportRepository, QuestionReportRepository questionReportRepository,
+                         ProductRepository productRepository, ReviewReportRepository reviewReportRepository, QuestionReportRepository questionReportRepository,
                          AnswerReportRepository answerReportRepository, DiscussionReportRepository discussionReportRepository,
-                         DiscussionCommentReportRepository discussionCommentReportRepository) {
+                         DiscussionCommentReportRepository discussionCommentReportRepository, ProductReportRepository productReportRepository) {
         this.reviewRepository = reviewRepository;
         this.userRepository = userRepository;
         this.questionRepository = questionRepository;
         this.answerRepository = answerRepository;
         this.discussionRepository = discussionRepository;
+        this.productRepository = productRepository;
         this.discussionCommentRepository = discussionCommentRepository;
+        this.productReportRepository = productReportRepository;
         this.reviewReportRepository = reviewReportRepository;
         this.questionReportRepository = questionReportRepository;
         this.answerReportRepository = answerReportRepository;
@@ -128,6 +135,19 @@ public class ReportService {
             newReport.setReason(reason);
 
             discussionCommentReportRepository.save(newReport);
+        }
+        else if (targetType.equals("product")) {
+            Product product = productRepository.findById(targetId)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+            if (productReportRepository.findByUserAndProduct(user, product).isPresent()) {
+                return;
+            }
+            ProductReport newReport = new ProductReport();
+            newReport.setUser(user);
+            newReport.setProduct(product);
+            newReport.setReason(reason);
+
+            productReportRepository.save(newReport);
         }
         else {
             throw new RuntimeException("Invalid target type");
