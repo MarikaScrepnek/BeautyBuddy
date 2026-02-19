@@ -83,6 +83,16 @@ public class ReviewController {
         return ResponseEntity.ok().build();
     }
 
+    @DeleteMapping("/{reviewId}/upvote")
+    public ResponseEntity<Void> removeReviewUpvote(@PathVariable Long reviewId, Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(401).build();
+        }
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        upvoteService.removeUpvote(userDetails.getEmail(), "review", reviewId);
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping("/{productId}/average-rating")
     public ResponseEntity<BigDecimal> getAverageRatingForProduct(@PathVariable Long productId) {
         BigDecimal averageRating = reviewService.getAverageRatingForProduct(productId);
