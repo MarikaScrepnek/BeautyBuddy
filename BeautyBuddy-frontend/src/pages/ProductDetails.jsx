@@ -14,7 +14,7 @@ import './ProductDetails.css';
 import { getCurrentUser } from "../api/authApi";
 import Toast from "../components/Toast";
 
-import {submitReview, editReview} from "../api/reviewApi";
+import { deleteReview, getReviews, submitReview, editReview } from "../api/reviewApi";
 import { getQuestionsForProduct, submitQuestion } from "../api/qaApi";
 
 export default function ProductDetails() {
@@ -45,6 +45,7 @@ export default function ProductDetails() {
   const [reviewOpen, setReviewOpen] = useState(false);
         const [reviewRefreshKey, setReviewRefreshKey] = useState(0);
     const [editingReview, setEditingReview] = useState(null);
+    const [userReviewsByShade, setUserReviewsByShade] = useState({});
 
   const showToast = (message, type = "success") => {
     setToast({ message, type});
@@ -120,6 +121,26 @@ export default function ProductDetails() {
         loadProduct();
     }, [productId]);
 
+    const loadUserReviews = async () => {
+        if (!productId || !currentUser?.username) {
+            setUserReviewsByShade({});
+            return;
+        }
+        try {
+            const response = await getReviews(productId, 0, 100);
+            const reviews = Array.isArray(response?.content) ? response.content : response;
+            const nextByShade = {};
+            (reviews ?? []).forEach((review) => {
+                if (review?.reviewerName !== currentUser.username) return;
+                const key = review?.shadeName ?? "";
+                nextByShade[key] = review;
+            });
+            setUserReviewsByShade(nextByShade);
+        } catch {
+            setUserReviewsByShade({});
+        }
+    };
+
     const loadQuestions = async (page = 0) => {
         try {
             const response = await getQuestionsForProduct(productId, page, 10);
@@ -136,6 +157,10 @@ export default function ProductDetails() {
     useEffect(() => {
         loadQuestions(0);
     }, [productId]);
+
+    useEffect(() => {
+        loadUserReviews();
+    }, [productId, currentUser, reviewRefreshKey]);
 
     useEffect(() => {
     if (data?.shades?.length) {
@@ -461,8 +486,20 @@ export default function ProductDetails() {
                                     setReviewOpen(false);
                                     setEditingReview(null);
                                 }}
+                                onDelete={async (reviewId) => {
+                                    const success = await deleteReview(reviewId);
+                                    if (success) {
+                                        showToast("Review deleted successfully.", "success");
+                                        loadProduct();
+                                        setReviewOpen(false);
+                                        setEditingReview(null);
+                                        setReviewRefreshKey((value) => value + 1);
+                                    } else {
+                                        showToast("Failed to delete review. Please try again.", "error");
+                                    }
+                                }}
                                 onSubmit={async (payload) => {
-                                    const reviewId = editingReview?.reviewId ?? editingReview?.id;
+                                    const reviewId = payload.existingReviewId ?? editingReview?.reviewId ?? editingReview?.id;
                                     const isEditing = Boolean(reviewId);
                                     const success = isEditing
                                         ? await editReview(
@@ -505,6 +542,7 @@ export default function ProductDetails() {
                                 productName={data?.name}
                                 shades={data?.shades}
                                 selectedShadeName={selectedShade?.shadeName ?? ""}
+                                existingReviewsByShade={userReviewsByShade}
                                 initialValues={
                                     editingReview
                                         ? {

@@ -7,9 +7,12 @@ export default function AskQuestionModal({
   isOpen,
   onClose,
   onSubmit,
+  onDelete,
   productName,
   shades,
   initialValues,
+  existingReviewsByShade,
+  selectedShadeName,
   modalTitle = "Submit a review",
   submitLabel = "Submit review",
 }) {
@@ -23,19 +26,25 @@ export default function AskQuestionModal({
 
   const [error, setError] = useState("");
 
+  const reviewKey = shadeName || "";
+  const existingReview = existingReviewsByShade?.[reviewKey] ?? null;
+  const existingReviewId = existingReview?.reviewId ?? existingReview?.id ?? null;
+
   useEffect(() => {
     if (!isOpen) return;
 
     const nextShade = initialValues?.shadeName ?? "";
-    const nextRating = initialValues?.rating ?? 0;
+    const reviewKey = nextShade || "";
+    const existingReview = existingReviewsByShade?.[reviewKey] ?? null;
+    const nextRating = existingReview?.rating ?? initialValues?.rating ?? 0;
 
     // reset when opened
     setShadeName(nextShade);
     setRating(nextRating);
     setHoverRating(null);
-    setTitle(initialValues?.title ?? "");
-    setBody(initialValues?.text ?? "");
-    setImages(initialValues?.images ?? []);
+    setTitle(existingReview?.reviewTitle ?? existingReview?.title ?? initialValues?.title ?? "");
+    setBody(existingReview?.reviewText ?? existingReview?.text ?? initialValues?.text ?? "");
+    setImages(existingReview?.imageLinks ?? initialValues?.images ?? []);
 
     setError("");
 
@@ -44,7 +53,18 @@ export default function AskQuestionModal({
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [isOpen, onClose, initialValues, ""]);
+  }, [isOpen, onClose, initialValues, selectedShadeName, existingReviewsByShade]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const reviewKey = shadeName || "";
+    const existingReview = existingReviewsByShade?.[reviewKey] ?? null;
+    setRating(existingReview?.rating ?? 0);
+    setHoverRating(null);
+    setTitle(existingReview?.reviewTitle ?? existingReview?.title ?? "");
+    setBody(existingReview?.reviewText ?? existingReview?.text ?? "");
+    setImages(existingReview?.imageLinks ?? []);
+  }, [shadeName, existingReviewsByShade, isOpen]);
 
   if (!isOpen) return null;
 
@@ -64,7 +84,8 @@ export default function AskQuestionModal({
       rating: rating,
       title: trimmedTitle ? trimmedTitle : null,
       text: trimmedBody ? trimmedBody : null,
-      images: images
+      images: images,
+      existingReviewId,
     });
   };
 
@@ -122,7 +143,9 @@ export default function AskQuestionModal({
         onClick={stop}
       >
         <div className="modal-header">
-          <h2 className="modal-title">{modalTitle}</h2>
+          <h2 className="modal-title">
+            {existingReviewId ? "Edit your review" : modalTitle}
+          </h2>
           {productName ? (
             <p className="modal-subtitle">On: {productName}</p>
           ) : null}
@@ -204,9 +227,20 @@ export default function AskQuestionModal({
             <button type="button" className="modal-secondary" onClick={onClose}>
               Cancel
             </button>
-            <button type="submit" className="modal-primary">
-              {submitLabel}
-            </button>
+            <div className="modal-actions-right">
+              {existingReviewId ? (
+                <button
+                  type="button"
+                  className="modal-secondary modal-danger"
+                  onClick={() => onDelete?.(existingReviewId)}
+                >
+                  Delete review
+                </button>
+              ) : null}
+              <button type="submit" className="modal-primary">
+                {existingReviewId ? "Save changes" : submitLabel}
+              </button>
+            </div>
           </div>
         </form>
       </div>

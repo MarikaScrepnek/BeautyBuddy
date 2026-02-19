@@ -48,8 +48,8 @@ export async function getAverageRating(productId) {
     return response.json();
 }
 
-export async function getReviews(productId) {
-    const response = await fetch(`http://localhost:8080/api/reviews/${productId}`, {
+export async function getReviews(productId, page = 0, size = 10) {
+    const response = await fetch(`http://localhost:8080/api/reviews/${productId}?page=${page}&size=${size}`, {
         credentials: 'include'
     });
     return response.json();
