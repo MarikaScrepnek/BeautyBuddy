@@ -6,6 +6,7 @@ import AuthModal from "../components/AuthModal";
 import { addToWishlist, removeFromWishlist, getWishlist } from "../api/wishlistApi";
 
 import AskQuestionModal from "../components/AskQuestionModal";
+import QuestionCard from "../components/QuestionCard";
 import SubmitReviewModal from "../components/SubmitReviewModal";
 import ReviewList from "../components/ReviewList";
 
@@ -14,6 +15,7 @@ import { getCurrentUser } from "../api/authApi";
 import Toast from "../components/Toast";
 
 import {submitReview, editReview} from "../api/reviewApi";
+import { getQuestionsForProduct, submitQuestion } from "../api/qaApi";
 
 export default function ProductDetails() {
   const { productId } = useParams();
@@ -27,6 +29,7 @@ export default function ProductDetails() {
   const [questionsOpen, setQuestionsOpen] = useState(true);
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [currentUser, setCurrentUser] = useState(null);
   const [wishlistItems, setWishlistItems] = useState([]);
   const [isTogglingWishlist, setIsTogglingWishlist] = useState(false);
 
@@ -35,6 +38,8 @@ export default function ProductDetails() {
   const [toast, setToast] = useState(null);
 
   const [questions, setQuestions] = useState([]);
+    const [questionsPage, setQuestionsPage] = useState(0);
+    const [questionsTotalPages, setQuestionsTotalPages] = useState(0);
   const [askOpen, setAskOpen] = useState(false);
 
   const [reviewOpen, setReviewOpen] = useState(false);
@@ -47,8 +52,14 @@ export default function ProductDetails() {
 
   useEffect(() => {
     getCurrentUser()
-      .then(() => setIsLoggedIn(true))
-      .catch(() => setIsLoggedIn(false));
+            .then((user) => {
+                setIsLoggedIn(true);
+                setCurrentUser(user);
+            })
+            .catch(() => {
+                setIsLoggedIn(false);
+                setCurrentUser(null);
+            });
   }, []);
 
     const loadWishlist = async () => {
@@ -63,15 +74,20 @@ export default function ProductDetails() {
     useEffect(() => {
         const handleAuthLogin = () => {
             getCurrentUser()
-                .then(() => {
+                .then((user) => {
                     setIsLoggedIn(true);
+                    setCurrentUser(user);
                     loadWishlist();
                 })
-                .catch(() => setIsLoggedIn(false));
+                .catch(() => {
+                    setIsLoggedIn(false);
+                    setCurrentUser(null);
+                });
         };
 
         const handleAuthLogout = () => {
             setIsLoggedIn(false);
+            setCurrentUser(null);
             setWishlistItems([]);
         };
 
@@ -102,6 +118,23 @@ export default function ProductDetails() {
 
     useEffect(() => {
         loadProduct();
+    }, [productId]);
+
+    const loadQuestions = async (page = 0) => {
+        try {
+            const response = await getQuestionsForProduct(productId, page, 10);
+            setQuestions(response?.content ?? []);
+            setQuestionsPage(response?.number ?? page);
+            setQuestionsTotalPages(response?.totalPages ?? 0);
+        } catch {
+            setQuestions([]);
+            setQuestionsPage(page);
+            setQuestionsTotalPages(0);
+        }
+    };
+
+    useEffect(() => {
+        loadQuestions(0);
     }, [productId]);
 
     useEffect(() => {
@@ -344,9 +377,14 @@ export default function ProductDetails() {
                                 isOpen={askOpen}
                                 onClose={() => setAskOpen(false)}
                                 onSubmit={async (payload) => {
-                                    // call your API here
-                                    // await createQuestion(productId, payload);
-                                    setAskOpen(false);
+                                    const success = await submitQuestion(productId, payload.body);
+                                    if (success) {
+                                        showToast("Question submitted!", "success");
+                                        await loadQuestions(0);
+                                        setAskOpen(false);
+                                    } else {
+                                        showToast("Failed to submit question.", "error");
+                                    }
                                 }}
                                 productName={data?.name}
                             />
@@ -366,8 +404,39 @@ export default function ProductDetails() {
                             ) : (
                                 <div>
                                     {questions.map(q => (
-                                        <QuestionCard key={q.id} question={q} />
+                                        <QuestionCard
+                                            key={q.id}
+                                            question={q}
+                                            onRefresh={() => loadQuestions(questionsPage)}
+                                            currentUserName={currentUser?.username}
+                                            isLoggedIn={isLoggedIn}
+                                            onRequireLogin={() => setShowLoginModal(true)}
+                                            onToast={showToast}
+                                        />
                                     ))}
+                                </div>
+                            )}
+                            {questionsTotalPages > 1 && (
+                                <div className="questions-pagination">
+                                    <button
+                                        type="button"
+                                        className="questions-page-button"
+                                        onClick={() => loadQuestions(Math.max(0, questionsPage - 1))}
+                                        disabled={questionsPage <= 0}
+                                    >
+                                        Previous
+                                    </button>
+                                    <span className="questions-page-info">
+                                        Page {questionsPage + 1} of {questionsTotalPages}
+                                    </span>
+                                    <button
+                                        type="button"
+                                        className="questions-page-button"
+                                        onClick={() => loadQuestions(Math.min(questionsTotalPages - 1, questionsPage + 1))}
+                                        disabled={questionsPage >= questionsTotalPages - 1}
+                                    >
+                                        Next
+                                    </button>
                                 </div>
                             )}
                         </div>

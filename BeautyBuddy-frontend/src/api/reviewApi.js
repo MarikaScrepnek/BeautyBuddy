@@ -63,6 +63,14 @@ export async function upvoteReview(reviewId) {
     return response.ok;
 }
 
+export async function removeUpvoteReview(reviewId) {
+    const response = await fetch(`http://localhost:8080/api/reviews/${reviewId}/upvote`, {
+        method: 'DELETE',
+        credentials: 'include'
+    });
+    return response.ok;
+}
+
 export async function reportReview(reviewId, reason) {
     const response = await fetch(`http://localhost:8080/api/reviews/${reviewId}/report`, {
         method: 'POST',
