@@ -6,10 +6,14 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 
 @Entity
 @Table(
-    name = "answer"
+    name = "answer",
+    uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"question_id", "account_id"})
+    }
 )
 public class Answer extends UserWrittenEntity{
     

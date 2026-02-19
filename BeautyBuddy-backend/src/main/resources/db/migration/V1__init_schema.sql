@@ -433,7 +433,9 @@ CREATE TABLE answer (
     CHECK (created_at <= updated_at),
     CHECK (deleted_at IS NULL OR deleted_at >= created_at),
 
-    CHECK (length(trim(text)) > 0)
+    CHECK (length(trim(text)) > 0),
+
+    UNIQUE (question_id, account_id)
 );
 CREATE INDEX idx_answer_question ON answer (question_id);
 CREATE INDEX idx_answer_account ON answer (account_id);
