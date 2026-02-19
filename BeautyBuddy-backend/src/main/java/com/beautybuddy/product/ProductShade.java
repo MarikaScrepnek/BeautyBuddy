@@ -23,7 +23,7 @@ public class ProductShade extends UpdatableEntity{
     private String shadeName;
 
     @Column (name = "shade_hex_code")
-    private String shadeHexCode;
+    private String hexCode;
 
     @Column (name = "shade_number")
     private int shadeNumber;
@@ -46,11 +46,11 @@ public class ProductShade extends UpdatableEntity{
     public void setShadeName(String shadeName) {
         this.shadeName = shadeName;
     }
-    public String getShadeHexCode() {
-        return shadeHexCode;
+    public String getHexCode() {
+        return hexCode;
     }
-    public void setShadeHexCode(String shadeHexCode) {
-        this.shadeHexCode = shadeHexCode;
+    public void setHexCode(String hexCode) {
+        this.hexCode = hexCode;
     }
 
     public int getShadeNumber() {

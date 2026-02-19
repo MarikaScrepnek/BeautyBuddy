@@ -48,6 +48,7 @@ public class DTOMapper {
     public static ProductShadeDTO toProductShadeDTO(ProductShade ps) {
         return new ProductShadeDTO(
                 ps.getShadeName(),
+                ps.getHexCode(),
                 ps.getImageLink(),
                 ps.getProductLink()
         );
