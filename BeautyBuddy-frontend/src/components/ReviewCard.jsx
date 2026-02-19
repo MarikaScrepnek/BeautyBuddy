@@ -54,6 +54,7 @@ export default function ReviewCard({
   onEdit,
   onDelete,
   onUpvote,
+  onReport,
 }) {
   return (
     <article key={reviewId ?? `${reviewerName}-${reviewDate}`} className="review-card">
@@ -104,17 +105,27 @@ export default function ReviewCard({
           </>
         ) : (
           <>
+            <div className="review-actions-left">
+              <button
+                type="button"
+                className="review-action-btn"
+                onClick={() => onUpvote?.(review)}
+                disabled={isPending}
+              >
+                {isUpvoted ? "Undo" : "Helpful"}
+              </button>
+              <span className="review-upvote-count">
+                {upvoteCount} helpful vote{upvoteCount !== 1 ? "s" : ""}
+              </span>
+            </div>
             <button
               type="button"
-              className="review-action-btn"
-              onClick={() => onUpvote?.(review)}
+              className="review-action-btn review-action-muted"
+              onClick={() => onReport?.(review)}
               disabled={isPending}
             >
-              {isUpvoted ? "Undo" : "Helpful"}
+              Report
             </button>
-            <span className="review-upvote-count">
-              {upvoteCount} helpful vote{upvoteCount !== 1 ? "s" : ""}
-            </span>
           </>
         )}
       </div>

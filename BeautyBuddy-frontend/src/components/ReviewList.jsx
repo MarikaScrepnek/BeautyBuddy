@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 
-import { deleteReview, getReviews, upvoteReview, removeUpvoteReview } from "../api/reviewApi";
+import { deleteReview, getReviews, upvoteReview, removeUpvoteReview, reportReview } from "../api/reviewApi";
 import { getCurrentUser } from "../api/authApi";
 
 import Toast from "./Toast";
 import ReviewCard from "./ReviewCard";
+import ReportReviewModal from "./ReportReviewModal";
 
 import "./ReviewList.css";
 
@@ -37,6 +38,8 @@ export default function ReviewList({ productId, refreshKey, onEditReview, onRequ
 	const [pendingId, setPendingId] = useState(null);
 	const [upvotedIds, setUpvotedIds] = useState(() => new Set());
     const [toast, setToast] = useState({ message: "", type: "info" });
+	const [reportOpen, setReportOpen] = useState(false);
+	const [reportTarget, setReportTarget] = useState(null);
 
 	const applyReviews = (data) => {
 		const nextReviews = normalizeReviews(data);
@@ -180,6 +183,39 @@ export default function ReviewList({ productId, refreshKey, onEditReview, onRequ
 		setReviews((items) => items.filter((item) => getReviewId(item) !== reviewId));
 	};
 
+	const handleReport = async (review) => {
+		setActionMessage("");
+
+		if (!currentUser) {
+			onRequireLogin?.();
+			return;
+		}
+
+		setReportTarget(review);
+		setReportOpen(true);
+	};
+
+	const submitReport = async (reason) => {
+		const reviewId = getReviewId(reportTarget);
+		if (!reviewId) {
+			setToast({ message: "Unable to report this review.", type: "error" });
+			return;
+		}
+
+		setPendingId(reviewId);
+		const success = await reportReview(reviewId, reason);
+		setPendingId(null);
+		if (!success) {
+			setToast({ message: "Unable to report this review right now.", type: "error" });
+			return;
+		}
+
+		setReportOpen(false);
+		setReportTarget(null);
+		setReviews((items) => items.filter((item) => getReviewId(item) !== reviewId));
+		setToast({ message: "Report submitted. Thanks for the feedback.", type: "success" });
+	};
+
 	if (loading) {
 		return <p className="review-loading">Loading reviews...</p>;
 	}
@@ -201,6 +237,17 @@ export default function ReviewList({ productId, refreshKey, onEditReview, onRequ
 
 	return (
 		<div className="review-list">
+			<ReportReviewModal
+				isOpen={reportOpen}
+				onClose={() => {
+					setReportOpen(false);
+					setReportTarget(null);
+				}}
+				reviewerName={reportTarget?.reviewerName}
+				onSubmit={async ({ reason }) => {
+					await submitReport(reason);
+				}}
+			/>
 			{toast.message ? (
 				<Toast
 					message={toast.message}
@@ -243,6 +290,7 @@ export default function ReviewList({ productId, refreshKey, onEditReview, onRequ
 						}
 						onDelete={handleDelete}
 						onUpvote={handleUpvote}
+						onReport={handleReport}
 					/>
 				);
 			})}

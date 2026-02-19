@@ -6,6 +6,8 @@ import com.beautybuddy.qa.dto.SubmitAnswerDTO;
 import com.beautybuddy.qa.dto.SubmitQuestionDTO;
 import com.beautybuddy.qa.dto.DisplayAnswerDTO;
 import com.beautybuddy.qa.dto.DisplayQuestionWithAnswersDTO;
+import com.beautybuddy.report.repo.AnswerReportRepository;
+import com.beautybuddy.report.repo.QuestionReportRepository;
 import com.beautybuddy.upvote.repo.AnswerUpvoteRepository;
 import com.beautybuddy.upvote.repo.QuestionUpvoteRepository;
 import com.beautybuddy.user.User;
@@ -16,10 +18,13 @@ import com.beautybuddy.product.ProductRepository;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
 @Service
@@ -30,15 +35,20 @@ public class QAService {
     private final AnswerRepository answerRepository;
     private final QuestionUpvoteRepository questionUpvoteRepository;
     private final AnswerUpvoteRepository answerUpvoteRepository;
+    private final QuestionReportRepository questionReportRepository;
+    private final AnswerReportRepository answerReportRepository;
     public QAService(UserRepository userRepository, ProductRepository productRepository,
                      QuestionRepository questionRepository, AnswerRepository answerRepository,
-                     QuestionUpvoteRepository questionUpvoteRepository, AnswerUpvoteRepository answerUpvoteRepository) {
+                     QuestionUpvoteRepository questionUpvoteRepository, AnswerUpvoteRepository answerUpvoteRepository,
+                     QuestionReportRepository questionReportRepository, AnswerReportRepository answerReportRepository) {
         this.userRepository = userRepository;
         this.productRepository = productRepository;
         this.questionRepository = questionRepository;
         this.answerRepository = answerRepository;
         this.questionUpvoteRepository = questionUpvoteRepository;
         this.answerUpvoteRepository = answerUpvoteRepository;
+        this.questionReportRepository = questionReportRepository;
+        this.answerReportRepository = answerReportRepository;
     }
 
     @Transactional
@@ -139,9 +149,24 @@ public class QAService {
                 PageRequest.of(page, size)
             );
 
-        return questions.map(question -> {
+        Set<Long> reportedQuestionIds = currentUser == null
+            ? Set.of()
+            : questionReportRepository.findAllByUser(currentUser).stream()
+                .map(report -> report.getQuestion().getId())
+                .collect(Collectors.toSet());
+
+        Set<Long> reportedAnswerIds = currentUser == null
+            ? Set.of()
+            : answerReportRepository.findAllByUser(currentUser).stream()
+                .map(report -> report.getAnswer().getId())
+                .collect(Collectors.toSet());
+
+        List<DisplayQuestionWithAnswersDTO> mapped = questions.getContent().stream()
+            .filter(question -> !reportedQuestionIds.contains(question.getId()))
+            .map(question -> {
             List<DisplayAnswerDTO> answers = question.getAnswers().stream()
                 .filter(answer -> answer.getDeletedAt() == null && answer.isApproved())
+                .filter(answer -> !reportedAnswerIds.contains(answer.getId()))
                 .sorted(Comparator.comparing(Answer::getCreatedAt))
                 .map(answer -> new DisplayAnswerDTO(
                     answer.getId(),
@@ -166,6 +191,9 @@ public class QAService {
                     && questionUpvoteRepository.findByUserAndQuestion(currentUser, question).isPresent(),
                 answers
             );
-        });
+        })
+            .toList();
+
+        return new PageImpl<>(mapped, questions.getPageable(), mapped.size());
     }
 }

@@ -49,6 +49,10 @@
 
 .review-meta {
   text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
 }
 
 .review-stars {
@@ -115,6 +119,13 @@
   gap: 10px;
   margin-top: 14px;
   align-items: center;
+  justify-content: space-between;
+}
+
+.review-actions-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .review-upvote-count {
@@ -151,6 +162,12 @@
   color: #a13b2f;
 }
 
+.review-action-muted {
+  border-color: #e2d6cc;
+  color: #6a5a4e;
+}
+
+
 @media (max-width: 640px) {
   .review-header {
     flex-direction: column;
@@ -159,5 +176,6 @@
 
   .review-meta {
     text-align: left;
+    align-items: flex-start;
   }
 }

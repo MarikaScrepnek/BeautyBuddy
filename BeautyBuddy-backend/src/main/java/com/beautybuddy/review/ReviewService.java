@@ -23,7 +23,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -32,6 +35,7 @@ public class ReviewService {
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
     private final ProductShadeRepository productShadeRepository;
+    private final ReviewReportRepository reviewReportRepository;
     private final ReviewUpvoteRepository reviewUpvoteRepository;
 
     public ReviewService(ReviewRepository reviewRepository, ReviewReportRepository reviewReportRepository, UserRepository userRepository, ProductRepository productRepository, ProductShadeRepository productShadeRepository, ReviewUpvoteRepository reviewUpvoteRepository) {
@@ -39,6 +43,7 @@ public class ReviewService {
         this.userRepository = userRepository;
         this.productRepository = productRepository;
         this.productShadeRepository = productShadeRepository;
+        this.reviewReportRepository = reviewReportRepository;
         this.reviewUpvoteRepository = reviewUpvoteRepository;
     }
 
@@ -148,7 +153,22 @@ public class ReviewService {
                 PageRequest.of(page, size)
             );
 
-        return reviewPage.map(review -> {
+        Set<Long> reportedReviewIds = currentUser == null
+            ? Set.of()
+            : reviewReportRepository.findAllByUser(currentUser).stream()
+                .map(report -> report.getReview().getId())
+                .collect(Collectors.toSet());
+
+        List<Review> filteredReviews = reviewPage.getContent().stream()
+            .filter(review -> !reportedReviewIds.contains(review.getId()))
+            .toList();
+
+        Page<Review> filteredPage = new PageImpl<>(
+            filteredReviews,
+            reviewPage.getPageable(),
+            filteredReviews.size()
+        );
+        return filteredPage.map(review -> {
             List<String> imageLinks = review.getReviewImages().stream()
                 .map(img -> img.getImageLink())
                 .toList();

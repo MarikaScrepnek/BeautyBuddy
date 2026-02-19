@@ -6,6 +6,7 @@ import com.beautybuddy.report.ReportService;
 import com.beautybuddy.review.dto.DisplayReviewDTO;
 import com.beautybuddy.review.dto.EditReviewDTO;
 import com.beautybuddy.review.dto.SubmitReviewDTO;
+import com.beautybuddy.report.ReportRequestDTO;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -64,12 +65,12 @@ public class ReviewController {
     }
 
     @PostMapping("/{reviewId}/report")
-    public ResponseEntity<Void> reportReview(@PathVariable Long reviewId, @RequestBody String reason, Authentication authentication) {
+    public ResponseEntity<Void> reportReview(@PathVariable Long reviewId, @RequestBody ReportRequestDTO reportDTO, Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.status(401).build();
         }
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        reportService.report(userDetails.getEmail(), reason, "review", reviewId);
+        reportService.report(userDetails.getEmail(), reportDTO.reason(), "review", reviewId);
         return ResponseEntity.ok().build();
     }
 

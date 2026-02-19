@@ -11,6 +11,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MappedSuperclass;
+import org.hibernate.annotations.ColumnTransformer;
 
 @MappedSuperclass
 public abstract class BaseReport extends BaseEntity{
@@ -23,7 +24,8 @@ public abstract class BaseReport extends BaseEntity{
 
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
-    private ReportStatus status;
+    @ColumnTransformer(write = "?::report_status_enum")
+    private ReportStatus status = ReportStatus.OPEN;
 
     @Column(name = "resolved_at", nullable = true)
     private LocalDateTime resolvedAt;
@@ -47,10 +49,6 @@ public abstract class BaseReport extends BaseEntity{
     }
     public void setStatus(ReportStatus status) {
         this.status = status;
-    }
-
-    public LocalDateTime getResolvedAt() {
-        return resolvedAt;
     }
     public void setResolvedAt(LocalDateTime resolvedAt) {
         this.resolvedAt = resolvedAt;
