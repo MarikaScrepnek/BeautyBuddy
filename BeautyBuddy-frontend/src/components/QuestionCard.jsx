@@ -49,6 +49,9 @@ export default function QuestionCard({
   const isAuthor = Boolean(
     currentUserName && question.authorName && currentUserName === question.authorName
   );
+  const hasUserAnswered = Boolean(
+    currentUserName && question.answers?.some((answer) => answer.authorName === currentUserName)
+  );
   const showEdit = isAuthor && canEdit;
   const showAnswer = !isAuthor;
   const askedAt = formatDateTime(question.createdAt);
@@ -121,6 +124,11 @@ export default function QuestionCard({
 
   const handleAnswerSubmit = async (event) => {
     event.preventDefault();
+    if (hasUserAnswered) {
+      setIsAnswering(false);
+      onToast?.("You already answered this question.", "info");
+      return;
+    }
     const trimmed = answerText.trim();
     if (trimmed.length < 2) {
       setAnswerError("Answer must be at least 2 characters.");
@@ -241,20 +249,24 @@ export default function QuestionCard({
             </button>
           ) : null}
           {showAnswer ? (
-            <button
-              type="button"
-              className="question-action-btn"
-              onClick={() => {
-                if (!isLoggedIn) {
-                  onRequireLogin?.();
-                  return;
-                }
-                setIsAnswering((value) => !value);
-                setAnswerError("");
-              }}
-            >
-              {isAnswering ? "Cancel answer" : "Answer"}
-            </button>
+            hasUserAnswered ? (
+              <span className="question-note">You answered this question!</span>
+            ) : (
+              <button
+                type="button"
+                className="question-action-btn"
+                onClick={() => {
+                  if (!isLoggedIn) {
+                    onRequireLogin?.();
+                    return;
+                  }
+                  setIsAnswering((value) => !value);
+                  setAnswerError("");
+                }}
+              >
+                {isAnswering ? "Cancel answer" : "Answer"}
+              </button>
+            )
           ) : null}
         </div>
       ) : null}
