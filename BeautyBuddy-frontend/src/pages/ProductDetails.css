@@ -217,6 +217,17 @@
   transition: color 0.2s ease;
 }
 
+.report-icon {
+  color: #d32f2f;
+}
+
+.report-icon svg {
+  width: 18px;
+  height: 18px;
+  display: block;
+  fill: currentColor;
+}
+
 .icon--active {
   color: rgb(231, 155, 219);
 }
@@ -262,6 +273,12 @@
 
 .product-link:active {
     transform: scale(0.99);
+}
+
+.product-report {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 1rem;
 }
 
 

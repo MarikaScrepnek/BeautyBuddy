@@ -13,7 +13,7 @@ import {
   removeUpvoteAnswer,
   removeUpvoteQuestion,
 } from "../api/qaApi";
-import ReportReviewModal from "./ReportModal";
+import ReportModal from "./ReportModal";
 
 const isWithinEditWindow = (createdAt) => {
   if (!createdAt) return false;
@@ -280,7 +280,7 @@ export default function QuestionCard({
 
   return (
     <div className="question-card">
-      <ReportReviewModal
+      <ReportModal
         isOpen={reportOpen}
         onClose={() => {
           setReportOpen(false);

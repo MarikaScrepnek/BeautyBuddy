@@ -5,7 +5,7 @@ import { getCurrentUser } from "../api/authApi";
 
 import Toast from "./Toast";
 import ReviewCard from "./ReviewCard";
-import ReportReviewModal from "./ReportModal";
+import ReportModal from "./ReportModal";
 
 import "./ReviewList.css";
 
@@ -237,7 +237,7 @@ export default function ReviewList({ productId, refreshKey, onEditReview, onRequ
 
 	return (
 		<div className="review-list">
-			<ReportReviewModal
+			<ReportModal
 				isOpen={reportOpen}
 				onClose={() => {
 					setReportOpen(false);

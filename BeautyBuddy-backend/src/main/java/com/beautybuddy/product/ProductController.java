@@ -6,6 +6,7 @@ import com.beautybuddy.common.DTOMapper;
 import com.beautybuddy.ingredient.MayContainIngredientDTO;
 import com.beautybuddy.ingredient.ProductIngredientDTO;
 import com.beautybuddy.report.ReportService;
+import com.beautybuddy.report.ReportRequestDTO;
 import com.beautybuddy.security.CustomUserDetails;
 
 import org.springframework.http.ResponseEntity;
@@ -64,12 +65,12 @@ public class ProductController {
     }
 
     @PostMapping("/{id}/report")
-    public ResponseEntity<Void> report(@PathVariable Long productId, @RequestBody String reason, Authentication authentication) {
+    public ResponseEntity<Void> report(@PathVariable("id") Long productId, @RequestBody ReportRequestDTO reportDTO, Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.status(401).build();
         }
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        reportService.report(userDetails.getEmail(), reason, "product", productId);
+        reportService.report(userDetails.getEmail(), reportDTO.reason(), "product", productId);
         return ResponseEntity.ok().build();
     }
 }

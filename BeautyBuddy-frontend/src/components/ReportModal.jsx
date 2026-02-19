@@ -2,7 +2,7 @@ import "./ReportModal.css";
 
 import { useEffect, useState } from "react";
 
-export default function ReportReviewModal({
+export default function ReportModal({
   isOpen,
   onClose,
   onSubmit,

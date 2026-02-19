@@ -9,12 +9,14 @@ import AskQuestionModal from "../components/AskQuestionModal";
 import QuestionCard from "../components/QuestionCard";
 import SubmitReviewModal from "../components/SubmitReviewModal";
 import ReviewList from "../components/ReviewList";
+import ReportModal from "../components/ReportModal";
 
 import './ProductDetails.css';
 import { getCurrentUser } from "../api/authApi";
 import Toast from "../components/Toast";
 
 import { deleteReview, getReviews, submitReview, editReview } from "../api/reviewApi";
+import { reportProduct } from "../api/productApi";
 import { getQuestionsForProduct, submitQuestion } from "../api/qaApi";
 
 export default function ProductDetails() {
@@ -50,6 +52,7 @@ export default function ProductDetails() {
     const [allReviews, setAllReviews] = useState([]);
         const [isShadeOpen, setIsShadeOpen] = useState(false);
         const shadeSelectRef = useRef(null);
+        const [reportOpen, setReportOpen] = useState(false);
     const [quickRating, setQuickRating] = useState(0);
     const [quickHoverRating, setQuickHoverRating] = useState(null);
     const [isSubmittingQuickRating, setIsSubmittingQuickRating] = useState(false);
@@ -293,6 +296,23 @@ export default function ProductDetails() {
         setReviewOpen(true);
     }
 
+    const handleReportProduct = async (payload) => {
+        if (!isLoggedIn) {
+            setShowLoginModal(true);
+            return;
+        }
+        const reason = payload?.reason?.trim();
+        if (!reason) return;
+
+        const success = await reportProduct(data.id, reason);
+        if (success) {
+            showToast("Report submitted. Thanks for the feedback.", "success");
+            setReportOpen(false);
+        } else {
+            showToast("Unable to report product right now.", "error");
+        }
+    };
+
     const ratingValue = Number(data?.rating ?? 0);
     const hasRating = Boolean(data?.rating);
     const reviewCount = allReviews.length;
@@ -394,6 +414,14 @@ export default function ProductDetails() {
                     }}
                 />
         )}
+        <ReportModal
+            isOpen={reportOpen}
+            onClose={() => setReportOpen(false)}
+            title="Report product"
+            subtitle={data?.name ? `About: ${data.name}` : ""}
+            placeholder="Tell us what is incorrect about this product's info..."
+            onSubmit={handleReportProduct}
+        />
         <div className="product-card">
             {/* Header: Name + Brand + Category */}
             <div className="product-header">
@@ -536,6 +564,16 @@ export default function ProductDetails() {
                         >
                         view product on site
                     </p>
+                    <div className="product-report">
+                        <div className="action-icon" onClick={() => setReportOpen(true)}>
+                            <span className="icon report-icon" aria-hidden="true">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="feather feather-flag">
+                                  <path d="M4 22V4a2 2 0 0 1 2-2h11.5a1.5 1.5 0 0 1 1.34 2.22L17 7l1.84 2.78A1.5 1.5 0 0 1 17.5 12H6" />
+                                </svg>
+                            </span>
+                            <span className="tooltip">Report something about this product's info</span>
+                        </div>
+                    </div>
                     
                 </div>
             </div>
