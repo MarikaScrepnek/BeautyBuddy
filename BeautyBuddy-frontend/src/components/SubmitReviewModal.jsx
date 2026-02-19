@@ -9,7 +9,6 @@ export default function AskQuestionModal({
   onSubmit,
   productName,
   shades,
-  selectedShadeName,
   initialValues,
   modalTitle = "Submit a review",
   submitLabel = "Submit review",
@@ -27,7 +26,7 @@ export default function AskQuestionModal({
   useEffect(() => {
     if (!isOpen) return;
 
-    const nextShade = initialValues?.shadeName ?? selectedShadeName ?? "";
+    const nextShade = initialValues?.shadeName ?? "";
     const nextRating = initialValues?.rating ?? 0;
 
     // reset when opened
@@ -45,7 +44,7 @@ export default function AskQuestionModal({
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [isOpen, onClose, initialValues, selectedShadeName]);
+  }, [isOpen, onClose, initialValues, ""]);
 
   if (!isOpen) return null;
 
