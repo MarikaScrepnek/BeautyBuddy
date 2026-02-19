@@ -42,6 +42,7 @@
 .rating-group {
   display: grid;
   grid-template-columns: auto auto auto;
+  grid-template-rows: auto auto;
   align-items: center;
   column-gap: 0.5rem;
 }
@@ -49,6 +50,8 @@
 .rating-label {
   font-weight: normal;
   color: #333;
+  grid-column: 1;
+  grid-row: 1;
 }
 
 .rating-stars {
@@ -58,6 +61,8 @@
   width: 110px;
   justify-content: center;
   justify-self: center;
+  grid-column: 2;
+  grid-row: 1;
 }
 
 .rating-star-btn {
@@ -126,9 +131,24 @@
 .rating-text {
   font-size: 0.95rem;
   color: #444;
+  grid-column: 3;
+  grid-row: 1;
 }
 
 .rating-empty {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #777;
+  grid-column: 2;
+  grid-row: 2;
+  justify-self: center;
+  text-align: center;
+  width: 110px;
+  white-space: nowrap;
+  overflow: visible;
+}
+
+.rating-count {
   margin: 0;
   font-size: 0.8rem;
   color: #777;
@@ -137,7 +157,17 @@
   text-align: center;
   width: 110px;
   white-space: nowrap;
-  overflow: visible;
+}
+
+.rating-count-left {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #777;
+  grid-column: 1;
+  grid-row: 2;
+  justify-self: center;
+  text-align: center;
+  white-space: nowrap;
 }
 
 /* Main section: Image left, Meta right */
@@ -294,11 +324,22 @@
 }
 
 .shade-selector {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto 220px;
   align-items: center;
-  gap: 0.5rem;
+  column-gap: 0.5rem;
+  row-gap: 0;
   margin-top: 0.5rem;
   font-family: 'Arial', sans-serif;
+}
+
+.shade-rating {
+  grid-column: 2;
+  margin: 0;
+  font-size: 0.8rem;
+  color: #777;
+  width: 220px;
+  text-align: center;
 }
 
 .shade-swatch {

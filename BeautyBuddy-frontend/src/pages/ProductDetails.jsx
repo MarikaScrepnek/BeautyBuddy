@@ -295,6 +295,7 @@ export default function ProductDetails() {
 
     const ratingValue = Number(data?.rating ?? 0);
     const hasRating = Boolean(data?.rating);
+    const reviewCount = allReviews.length;
     const ratingText = hasRating ? `${ratingValue.toFixed(1)}/5` : "";
     const ratingAria = hasRating ? `Rated ${ratingValue.toFixed(1)} out of 5` : "No ratings yet";
     const displayedRating = quickHoverRating ?? ratingValue;
@@ -411,6 +412,11 @@ export default function ProductDetails() {
                 <div className="product-meta">
                     <div className="rating-group" aria-label={ratingAria}>
                         <span className="rating-label">Overall Rating:</span>
+                        {hasRating && reviewCount > 0 && (
+                            <p className="rating-count-left">
+                                {reviewCount} review{reviewCount === 1 ? "" : "s"}
+                            </p>
+                        )}
                         <div className="rating-stars" role="radiogroup" aria-label="Rate this product">
                             {[1, 2, 3, 4, 5].map((i) => (
                                 <button
@@ -495,13 +501,12 @@ export default function ProductDetails() {
                                 </div>
                             )}
                         </div>
+                        <p className="shade-rating">
+                            {shadeRatingValue !== null
+                                ? `Shade rating: ${shadeRatingValue.toFixed(1)}/5`
+                                : "No ratings for this shade yet"}
+                        </p>
                     </div>
-                    <p className="shade-rating">
-                        Shade rating:{" "}
-                        {shadeRatingValue !== null
-                            ? `${shadeRatingValue.toFixed(1)}/5`
-                            : "No shade ratings yet"}
-                    </p>
 
                     <p className="price">
                         <span>Price:</span> {data.price ? `$${data.price}` : "N/A"}
