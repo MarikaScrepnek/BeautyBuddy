@@ -5,12 +5,15 @@ import {
   editAnswer,
   editQuestion,
   removeQuestion,
+  reportAnswer,
+  reportQuestion,
   submitAnswer,
   upvoteAnswer,
   upvoteQuestion,
   removeUpvoteAnswer,
   removeUpvoteQuestion,
 } from "../api/qaApi";
+import ReportReviewModal from "./ReportModal";
 
 const isWithinEditWindow = (createdAt) => {
   if (!createdAt) return false;
@@ -72,6 +75,10 @@ export default function QuestionCard({
   const [answerEditText, setAnswerEditText] = useState("");
   const [answerEditError, setAnswerEditError] = useState("");
   const [answerUpvotes, setAnswerUpvotes] = useState({});
+  const [reportOpen, setReportOpen] = useState(false);
+  const [reportTarget, setReportTarget] = useState(null);
+  const [hiddenAnswerIds, setHiddenAnswerIds] = useState(() => new Set());
+  const [isHidden, setIsHidden] = useState(false);
 
   useEffect(() => {
     setEditText(question.text ?? "");
@@ -215,6 +222,41 @@ export default function QuestionCard({
     }
   };
 
+  const openReportModal = (target) => {
+    if (!isLoggedIn) {
+      onRequireLogin?.();
+      return;
+    }
+    setReportTarget(target);
+    setReportOpen(true);
+  };
+
+  const handleReportSubmit = async ({ reason }) => {
+    if (!reportTarget) return;
+
+    const success = reportTarget.type === "question"
+      ? await reportQuestion(reportTarget.id, reason)
+      : await reportAnswer(reportTarget.id, reason);
+
+    if (success) {
+      if (reportTarget.type === "question") {
+        setIsHidden(true);
+      } else {
+        setHiddenAnswerIds((prev) => {
+          const next = new Set(prev);
+          next.add(reportTarget.id);
+          return next;
+        });
+      }
+      setReportOpen(false);
+      setReportTarget(null);
+      onRefresh?.();
+      onToast?.("Report submitted. Thanks for the feedback.", "success");
+    } else {
+      onToast?.("Unable to report right now.", "error");
+    }
+  };
+
   const handleQuestionDelete = async () => {
     if (!isLoggedIn) {
       onRequireLogin?.();
@@ -234,8 +276,25 @@ export default function QuestionCard({
     }
   };
 
+  if (isHidden) return null;
+
   return (
     <div className="question-card">
+      <ReportReviewModal
+        isOpen={reportOpen}
+        onClose={() => {
+          setReportOpen(false);
+          setReportTarget(null);
+        }}
+        title={reportTarget?.type === "answer" ? "Report answer" : "Report question"}
+        subtitle={reportTarget?.subtitle}
+        placeholder={
+          reportTarget?.type === "answer"
+            ? "Tell us why you are reporting this answer..."
+            : "Tell us why you are reporting this question..."
+        }
+        onSubmit={handleReportSubmit}
+      />
       <div className="question-card__header">
         <p className="question-text">{question.text}</p>
         <div className="question-header-actions">
@@ -249,6 +308,23 @@ export default function QuestionCard({
               onClick={handleQuestionUpvote}
             >
               {questionHasUpvoted ? "Undo" : "Upvote"}
+            </button>
+          ) : null}
+          {!isAuthor ? (
+            <button
+              type="button"
+              className="question-action-btn"
+              onClick={() =>
+                openReportModal({
+                  type: "question",
+                  id: question.id,
+                  subtitle: question.authorName
+                    ? `Asked by ${question.authorName}`
+                    : "",
+                })
+              }
+            >
+              Report
             </button>
           ) : null}
           <span className="question-upvotes">{questionUpvoteCount} upvotes</span>
@@ -341,7 +417,9 @@ export default function QuestionCard({
 
       {question.answers?.length ? (
         <div className="question-answers">
-          {question.answers.map((answer) => {
+          {question.answers
+            .filter((answer) => !hiddenAnswerIds.has(answer.id))
+            .map((answer) => {
             const isAnswerAuthor = Boolean(
               currentUserName && answer.authorName && currentUserName === answer.authorName
             );
@@ -383,6 +461,23 @@ export default function QuestionCard({
                         onClick={() => handleAnswerUpvote(answer.id, isAnswerAuthor)}
                       >
                         {answerUpvoteData.hasUpvoted ? "Undo" : "Upvote"}
+                      </button>
+                    ) : null}
+                    {!isAnswerAuthor ? (
+                      <button
+                        type="button"
+                        className="question-action-btn"
+                        onClick={() =>
+                          openReportModal({
+                            type: "answer",
+                            id: answer.id,
+                            subtitle: answer.authorName
+                              ? `Answered by ${answer.authorName}`
+                              : "",
+                          })
+                        }
+                      >
+                        Report
                       </button>
                     ) : null}
                     <span className="answer-upvotes">{answerUpvoteData.count} upvotes</span>

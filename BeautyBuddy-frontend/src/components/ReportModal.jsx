@@ -1,4 +1,4 @@
-import "./ReportReviewModal.css";
+import "./ReportModal.css";
 
 import { useEffect, useState } from "react";
 
@@ -7,6 +7,9 @@ export default function ReportReviewModal({
   onClose,
   onSubmit,
   reviewerName,
+  title = "Report review",
+  subtitle,
+  placeholder = "Tell us why you are reporting this review...",
 }) {
   const [reason, setReason] = useState("");
   const [error, setError] = useState("");
@@ -25,6 +28,8 @@ export default function ReportReviewModal({
   }, [isOpen, onClose]);
 
   if (!isOpen) return null;
+
+  const subtitleText = subtitle ?? (reviewerName ? `By: ${reviewerName}` : "");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -47,14 +52,12 @@ export default function ReportReviewModal({
         className="modal-card"
         role="dialog"
         aria-modal="true"
-        aria-label="Report review"
+        aria-label={title}
         onClick={stop}
       >
         <div className="modal-header">
-          <h2 className="modal-title">Report review</h2>
-          {reviewerName ? (
-            <p className="modal-subtitle">By: {reviewerName}</p>
-          ) : null}
+          <h2 className="modal-title">{title}</h2>
+          {subtitleText ? <p className="modal-subtitle">{subtitleText}</p> : null}
           <button className="modal-close" onClick={onClose} aria-label="Close">
             ✕
           </button>
@@ -66,7 +69,7 @@ export default function ReportReviewModal({
               className="modal-textarea"
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              placeholder="Tell us why you are reporting this review..."
+              placeholder={placeholder}
               rows={5}
               maxLength={500}
             />

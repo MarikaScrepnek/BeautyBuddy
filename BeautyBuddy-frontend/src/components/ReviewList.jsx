@@ -5,7 +5,7 @@ import { getCurrentUser } from "../api/authApi";
 
 import Toast from "./Toast";
 import ReviewCard from "./ReviewCard";
-import ReportReviewModal from "./ReportReviewModal";
+import ReportReviewModal from "./ReportModal";
 
 import "./ReviewList.css";
 

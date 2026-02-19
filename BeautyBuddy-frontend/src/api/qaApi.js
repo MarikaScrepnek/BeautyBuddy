@@ -100,3 +100,27 @@ export async function removeUpvoteAnswer(answerId) {
     });
     return res.ok;
 }
+
+export async function reportQuestion(questionId, reason) {
+    const res = await fetch(`http://localhost:8080/api/questions/${questionId}/report`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ targetId: questionId, reason, targetType: 'question' })
+    });
+    return res.ok;
+}
+
+export async function reportAnswer(answerId, reason) {
+    const res = await fetch(`http://localhost:8080/api/answers/${answerId}/report`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ targetId: answerId, reason, targetType: 'answer' })
+    });
+    return res.ok;
+}
