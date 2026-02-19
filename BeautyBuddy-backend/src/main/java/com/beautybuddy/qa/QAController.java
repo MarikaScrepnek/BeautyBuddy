@@ -76,12 +76,12 @@ public class QAController {
     }
 
     @DeleteMapping("/questions/{questionId}/upvote")
-    public ResponseEntity<Void> removeQuestionUpvote(@PathVariable Long targetId, Authentication authentication) {
+    public ResponseEntity<Void> removeQuestionUpvote(@PathVariable Long questionId, Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.status(401).build();
         }
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        upvoteService.removeUpvote(userDetails.getEmail(), "question", targetId);
+        upvoteService.removeUpvote(userDetails.getEmail(), "question", questionId);
         return ResponseEntity.ok().build();
     }
 
