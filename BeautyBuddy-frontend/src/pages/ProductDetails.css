@@ -39,6 +39,91 @@
     cursor: default;
 }
 
+.rating-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.rating-label {
+  font-weight: normal;
+  color: #333;
+}
+
+.rating-stars {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.rating-star-btn {
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  line-height: 1;
+  transition: transform 0.15s ease;
+  position: relative;
+}
+
+.rating-star-btn:hover {
+  transform: scale(1.12);
+}
+
+.rating-star-btn:active {
+  transform: scale(0.96);
+}
+
+.rating-star-btn:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.rating-star-btn .tooltip {
+  bottom: 130%;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  max-width: 220px;
+  white-space: normal;
+  line-height: 1.2;
+}
+
+.rating-star-btn:hover .tooltip {
+  opacity: 1;
+  transform: translateX(-50%) translateY(-5px);
+}
+
+.rating-star {
+  --fill: 0%;
+  display: inline-flex;
+  width: 18px;
+  height: 18px;
+}
+
+.rating-star svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.rating-star-outline {
+  fill: #e0e0e0;
+}
+
+.rating-star-fill {
+  clip-path: inset(0 calc(100% - var(--fill)) 0 0);
+}
+
+.rating-star-fill path {
+  fill: #f5b301;
+}
+
+.rating-text {
+  font-size: 0.95rem;
+  color: #444;
+}
+
 /* Main section: Image left, Meta right */
 .product-main {
     display: flex;
@@ -252,6 +337,12 @@
 /* Optional: smaller font for options */
 .custom-select select option {
   padding: 0.5rem;
+}
+
+.shade-rating {
+  margin: 0.25rem 0 0;
+  font-size: 0.9rem;
+  color: #555;
 }
 
 /* Reviews / Q&A */

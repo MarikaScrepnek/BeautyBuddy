@@ -46,6 +46,11 @@ export default function ProductDetails() {
         const [reviewRefreshKey, setReviewRefreshKey] = useState(0);
     const [editingReview, setEditingReview] = useState(null);
     const [userReviewsByShade, setUserReviewsByShade] = useState({});
+    const [shadeRatingValue, setShadeRatingValue] = useState(null);
+    const [allReviews, setAllReviews] = useState([]);
+    const [quickRating, setQuickRating] = useState(0);
+    const [quickHoverRating, setQuickHoverRating] = useState(null);
+    const [isSubmittingQuickRating, setIsSubmittingQuickRating] = useState(false);
 
   const showToast = (message, type = "success") => {
     setToast({ message, type});
@@ -121,23 +126,22 @@ export default function ProductDetails() {
         loadProduct();
     }, [productId]);
 
-    const loadUserReviews = async () => {
-        if (!productId || !currentUser?.username) {
-            setUserReviewsByShade({});
+    const normalizeReviews = (response) => {
+        if (Array.isArray(response?.content)) return response.content;
+        if (Array.isArray(response)) return response;
+        return [];
+    };
+
+    const loadAllReviews = async () => {
+        if (!productId) {
+            setAllReviews([]);
             return;
         }
         try {
-            const response = await getReviews(productId, 0, 100);
-            const reviews = Array.isArray(response?.content) ? response.content : response;
-            const nextByShade = {};
-            (reviews ?? []).forEach((review) => {
-                if (review?.reviewerName !== currentUser.username) return;
-                const key = review?.shadeName ?? "";
-                nextByShade[key] = review;
-            });
-            setUserReviewsByShade(nextByShade);
+            const response = await getReviews(productId, 0, 200);
+            setAllReviews(normalizeReviews(response));
         } catch {
-            setUserReviewsByShade({});
+            setAllReviews([]);
         }
     };
 
@@ -159,14 +163,49 @@ export default function ProductDetails() {
     }, [productId]);
 
     useEffect(() => {
-        loadUserReviews();
-    }, [productId, currentUser, reviewRefreshKey]);
+        loadAllReviews();
+    }, [productId, reviewRefreshKey]);
+
+    useEffect(() => {
+        if (!currentUser?.username) {
+            setUserReviewsByShade({});
+            return;
+        }
+        const nextByShade = {};
+        allReviews.forEach((review) => {
+            if (review?.reviewerName !== currentUser.username) return;
+            const key = review?.shadeName ?? "";
+            nextByShade[key] = review;
+        });
+        setUserReviewsByShade(nextByShade);
+    }, [allReviews, currentUser]);
+
+    useEffect(() => {
+        if (!selectedShade?.shadeName) {
+            setShadeRatingValue(null);
+            return;
+        }
+        const matching = allReviews.filter(
+            (review) => review?.shadeName === selectedShade.shadeName
+        );
+        const total = matching.reduce(
+            (sum, review) => sum + Number(review?.rating ?? 0),
+            0
+        );
+        const average = matching.length ? total / matching.length : null;
+        setShadeRatingValue(average);
+    }, [allReviews, selectedShade?.shadeName]);
 
     useEffect(() => {
     if (data?.shades?.length) {
         setSelectedShade(data.shades[0]);
     }
     }, [data]);
+
+    useEffect(() => {
+        setQuickRating(0);
+        setQuickHoverRating(null);
+    }, [productId, selectedShade?.shadeName]);
 
     const isInWishlist = Boolean(
         data && wishlistItems.some((item) => {
@@ -241,6 +280,82 @@ export default function ProductDetails() {
         setReviewOpen(true);
     }
 
+    const ratingValue = Number(data?.rating ?? 0);
+    const ratingText = data?.rating ? `${ratingValue.toFixed(1)}/5` : "Be the first to review!";
+    const ratingAria = data?.rating ? `Rated ${ratingValue.toFixed(1)} out of 5` : "No ratings yet";
+    const displayedRating = quickHoverRating ?? ratingValue;
+    const ratingDisplayText = ratingText;
+    const ratingTooltipValue = quickHoverRating ?? quickRating;
+    const ratingTooltipText = ratingTooltipValue
+        ? `Submit ${ratingTooltipValue.toFixed(1)} star review for the shade ${selectedShade?.shadeName ? ` ${selectedShade.shadeName}` : ""}`
+        : "";
+    const ratingFill = (index) => {
+        const delta = displayedRating - (index - 1);
+        const pct = Math.min(1, Math.max(0, delta)) * 100;
+        return `${pct}%`;
+    };
+
+    const getStarValueFromEvent = (e, starIndex1to5) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const isHalf = x < rect.width / 2;
+        return isHalf ? starIndex1to5 - 0.5 : starIndex1to5;
+    };
+
+    const handleQuickRating = async (e, index) => {
+        const nextRating = getStarValueFromEvent(e, index);
+        setQuickRating(nextRating);
+
+        if (!isLoggedIn) {
+            setShowLoginModal(true);
+            return;
+        }
+        if (!data || isSubmittingQuickRating) return;
+
+        setIsSubmittingQuickRating(true);
+
+        const shadeName = selectedShade?.shadeName ?? null;
+        const existingReview = userReviewsByShade?.[shadeName ?? ""] ?? null;
+        const existingReviewId = existingReview?.reviewId ?? existingReview?.id ?? null;
+        const existingTitle = existingReview?.reviewTitle ?? existingReview?.title ?? null;
+        const existingText = existingReview?.reviewText ?? existingReview?.text ?? null;
+        const existingImages = existingReview?.imageLinks ?? existingReview?.images ?? [];
+
+        const success = existingReviewId
+            ? await editReview(
+                existingReviewId,
+                shadeName,
+                nextRating,
+                existingTitle,
+                existingText,
+                existingImages
+            )
+            : await submitReview(
+                productId,
+                shadeName,
+                nextRating,
+                null,
+                null,
+                []
+            );
+
+        if (success) {
+            showToast(
+                existingReviewId
+                    ? "Rating updated successfully!"
+                    : "Rating submitted successfully!",
+                "success"
+            );
+            loadProduct();
+            setReviewRefreshKey((value) => value + 1);
+            setQuickHoverRating(null);
+        } else {
+            showToast("Failed to submit rating. Please try again.", "error");
+        }
+
+        setIsSubmittingQuickRating(false);
+    };
+
   if (loading) return <p className="loading">Loading product details...</p>;
   if (!data) return <p className="error">Product not found</p>;
 
@@ -280,9 +395,40 @@ export default function ProductDetails() {
                 />
 
                 <div className="product-meta">
-                    <p className="rating">
-                        <span>Rating:</span> {data.rating ? `${data.rating}/5` : "Be the first to review!"}
-                    </p>
+                    <div className="rating-row" aria-label={ratingAria}>
+                        <span className="rating-label">Overall Rating:</span>
+                        <div className="rating-stars" role="radiogroup" aria-label="Rate this product">
+                            {[1, 2, 3, 4, 5].map((i) => (
+                                <button
+                                    key={i}
+                                    type="button"
+                                    className="rating-star-btn"
+                                    aria-label={`Rate ${i} star${i > 1 ? "s" : ""}`}
+                                    onMouseMove={(e) => setQuickHoverRating(getStarValueFromEvent(e, i))}
+                                    onMouseEnter={(e) => setQuickHoverRating(getStarValueFromEvent(e, i))}
+                                    onMouseLeave={() => setQuickHoverRating(null)}
+                                    onClick={(e) => handleQuickRating(e, i)}
+                                    disabled={isSubmittingQuickRating}
+                                >
+                                    <span className="rating-star" style={{ "--fill": ratingFill(i) }}>
+                                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                                            <path
+                                                className="rating-star-outline"
+                                                d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"
+                                            />
+                                            <g className="rating-star-fill">
+                                                <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                                            </g>
+                                        </svg>
+                                    </span>
+                                    <span className="tooltip rating-tooltip">
+                                        {ratingTooltipText}
+                                    </span>
+                                </button>
+                            ))}
+                        </div>
+                        <span className="rating-text">{ratingDisplayText}</span>
+                    </div>
                     <p className="price">
                         <span>Price:</span> {data.price ? `$${data.price}` : "N/A"}
                     </p>
@@ -306,6 +452,12 @@ export default function ProductDetails() {
                             </select>
                         </div>
                     </div>
+                    <p className="shade-rating">
+                        Shade rating:{" "}
+                        {shadeRatingValue !== null
+                            ? `${shadeRatingValue.toFixed(1)}/5`
+                            : "No shade ratings yet"}
+                    </p>
 
                     <div className="product-actions">
                         <div className="action-icon" onClick={handleToggleWishlist}>
