@@ -11,6 +11,11 @@ import SubmitReviewModal from "../components/SubmitReviewModal";
 import ReviewList from "../components/ReviewList";
 import ReportModal from "../components/ReportModal";
 
+import { searchReviews } from "../api/reviewApi";
+import { searchQuestions } from "../api/qaApi";
+
+import ReviewCard from "../components/ReviewCard";
+
 import './ProductDetails.css';
 import { getCurrentUser } from "../api/authApi";
 import Toast from "../components/Toast";
@@ -20,42 +25,45 @@ import { reportProduct } from "../api/productApi";
 import { getQuestionsForProduct, submitQuestion } from "../api/qaApi";
 
 export default function ProductDetails() {
-  const { productId } = useParams();
+    const { productId } = useParams();
 
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [selectedShade, setSelectedShade] = useState(null);
+    const [data, setData] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [selectedShade, setSelectedShade] = useState(null);
 
-  const [ingredientsOpen, setIngredientsOpen] = useState(false);
-  const [reviewsOpen, setReviewsOpen] = useState(true);
-  const [questionsOpen, setQuestionsOpen] = useState(true);
+    const [ingredientsOpen, setIngredientsOpen] = useState(false);
+    const [reviewsOpen, setReviewsOpen] = useState(true);
+    const [questionsOpen, setQuestionsOpen] = useState(true);
 
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [currentUser, setCurrentUser] = useState(null);
-  const [wishlistItems, setWishlistItems] = useState([]);
-  const [isTogglingWishlist, setIsTogglingWishlist] = useState(false);
+    const [wishlistItems, setWishlistItems] = useState([]);
+    const [isTogglingWishlist, setIsTogglingWishlist] = useState(false);
 
-  const [showLoginModal, setShowLoginModal] = useState(false);
+    const [showLoginModal, setShowLoginModal] = useState(false);
 
-  const [toast, setToast] = useState(null);
+    const [toast, setToast] = useState(null);
 
-  const [questions, setQuestions] = useState([]);
+    const [questions, setQuestions] = useState([]);
     const [questionsPage, setQuestionsPage] = useState(0);
     const [questionsTotalPages, setQuestionsTotalPages] = useState(0);
-  const [askOpen, setAskOpen] = useState(false);
+    const [askOpen, setAskOpen] = useState(false);
 
-  const [reviewOpen, setReviewOpen] = useState(false);
-        const [reviewRefreshKey, setReviewRefreshKey] = useState(0);
+    const [reviewOpen, setReviewOpen] = useState(false);
+    const [reviewRefreshKey, setReviewRefreshKey] = useState(0);
     const [editingReview, setEditingReview] = useState(null);
     const [userReviewsByShade, setUserReviewsByShade] = useState({});
     const [shadeRatingValue, setShadeRatingValue] = useState(null);
     const [allReviews, setAllReviews] = useState([]);
-        const [isShadeOpen, setIsShadeOpen] = useState(false);
-        const shadeSelectRef = useRef(null);
-        const [reportOpen, setReportOpen] = useState(false);
+    const [isShadeOpen, setIsShadeOpen] = useState(false);
+    const shadeSelectRef = useRef(null);
+    const [reportOpen, setReportOpen] = useState(false);
     const [quickRating, setQuickRating] = useState(0);
     const [quickHoverRating, setQuickHoverRating] = useState(null);
     const [isSubmittingQuickRating, setIsSubmittingQuickRating] = useState(false);
+
+    const[searchQuery, setSearchQuery] = useState("");
+    const [searchResults, setSearchResults] = useState({ reviews: [], questions: [] });
 
   const showToast = (message, type = "success") => {
     setToast({ message, type});
@@ -391,6 +399,37 @@ export default function ProductDetails() {
         setIsSubmittingQuickRating(false);
     };
 
+    useEffect(() => {
+        if (!searchQuery) {
+            setSearchResults({ reviews: [], questions: [] });
+            return;
+        }
+        async function performSearch() {
+            try {
+                const [reviewsResult, questionsResult] = await Promise.all([
+                    searchReviews(productId, searchQuery, 0, 5),
+                    searchQuestions(productId, searchQuery, 0, 5)
+                ]);
+                setSearchResults({
+                    reviews: reviewsResult.content || [],
+                    questions: questionsResult.content || []
+                });
+            } catch (error) {
+                setSearchResults({ reviews: [], questions: [] });
+            }
+        }
+        performSearch();
+    }, [searchQuery, productId]);
+
+    function highlightText(text, term) {
+        if (!term) return text;
+        const regex = new RegExp(`(${term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, "gi");
+        return text.split(regex).map((part, i) =>
+            regex.test(part) ? <span key={i} style={{ background: "yellow" }}>{part}</span> : part
+        );
+    }
+            
+
   if (loading) return <p className="loading">Loading product details...</p>;
   if (!data) return <p className="error">Product not found</p>;
 
@@ -612,20 +651,49 @@ export default function ProductDetails() {
             </section>
 
             <div className="reviews-search-container">
-                    <input
-                        type="text"
-                        className="reviews-search-bar"
-                        placeholder="Search reviews and questions..."
+                <input
+                    type="text"
+                    className="reviews-search-bar"
+                    placeholder="Search reviews and questions..."
+                    value = {searchQuery}
+                    onChange={e => setSearchQuery(e.target.value)}
+                />
+    
+                <button
+                    type="button"
+                    className="reviews-search-button"
+                    aria-label="Search"
+                >
+                    <FaSearch />
+                </button>
+            </div>
+
+            {searchQuery && (
+                <div className="search-results">
+                    {searchResults.questions.map(q => (
+                    <QuestionCard key={q.id} question={q} searchTerm={searchQuery} /* other props */ />
+                    ))}
+                    {searchResults.reviews.map(review => (
+                    <ReviewCard
+                        key={review.reviewId || review.id}
+                        review={review}
+                        reviewId={review.reviewId || review.id}
+                        reviewerName={review.reviewerName}
+                        reviewTitle={review.reviewTitle}
+                        reviewText={review.reviewText}
+                        reviewDate={review.createdAt}
+                        avatar={review.reviewerProfilePicture}
+                        upvoteCount={review.upvoteCount}
+                        isUpvoted={review.hasUpvoted}
+                        searchTerm={searchQuery}
+                        // ...other props as needed
                     />
-        
-                    <button
-                        type="button"
-                        className="reviews-search-button"
-                        aria-label="Search"
-                    >
-                        <FaSearch />
-                    </button>
+                    ))}
+                    {searchResults.reviews.length === 0 && searchResults.questions.length === 0 && (
+                    <div>No results found.</div>
+                    )}
                 </div>
+            )}
                 
 
             {/* Reviews / Questions */}

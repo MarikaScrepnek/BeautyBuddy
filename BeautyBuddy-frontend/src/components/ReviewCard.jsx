@@ -1,4 +1,13 @@
+
 import "./ReviewCard.css";
+
+function highlightText(text, term) {
+  if (!term || !text) return text;
+  const regex = new RegExp(`(${term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, "gi");
+  return text.split(regex).map((part, i) =>
+    regex.test(part) ? <span key={i} style={{ background: "yellow" }}>{part}</span> : part
+  );
+}
 
 const getRatingNumber = (rating) => {
   const num = Number(rating);
@@ -55,20 +64,22 @@ export default function ReviewCard({
   onDelete,
   onUpvote,
   onReport,
+  searchTerm,
 }) {
   return (
     <article key={reviewId ?? `${reviewerName}-${reviewDate}`} className="review-card">
+
       <header className="review-header">
         <div className="reviewer">
           <div className="review-avatar">
             {avatar ? (
               <img src={avatar} alt={reviewerName} />
             ) : (
-              <span>{reviewerName.slice(0, 1).toUpperCase()}</span>
+              <span>{reviewerName ? reviewerName.slice(0, 1).toUpperCase() : "?"}</span>
             )}
           </div>
           <div>
-            <div className="reviewer-name">{reviewerName}</div>
+            <div className="reviewer-name">{highlightText(reviewerName, searchTerm)}</div>
             {review?.shadeName ? (
               <div className="review-shade">Shade: {review.shadeName}</div>
             ) : null}
@@ -80,8 +91,8 @@ export default function ReviewCard({
         </div>
       </header>
 
-      {reviewTitle ? <h3 className="review-title">{reviewTitle}</h3> : null}
-      {reviewText ? <p className="review-text">{reviewText}</p> : null}
+      {reviewTitle ? <h3 className="review-title">{highlightText(reviewTitle, searchTerm)}</h3> : null}
+      {reviewText ? <p className="review-text">{highlightText(reviewText, searchTerm)}</p> : null}
 
       <div className="review-actions">
         {isOwner ? (

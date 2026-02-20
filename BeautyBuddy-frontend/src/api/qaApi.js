@@ -124,3 +124,10 @@ export async function reportAnswer(answerId, reason) {
     });
     return res.ok;
 }
+
+export async function searchQuestions(productId, query, page = 0, size = 10) {
+    const response = await fetch(`http://localhost:8080/api/questions/${productId}/search?query=${encodeURIComponent(query)}&page=${page}&size=${size}`, {
+        credentials: 'include'
+    });
+    return response.json();
+}

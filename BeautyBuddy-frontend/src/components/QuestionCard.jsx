@@ -1,6 +1,14 @@
 import "./QuestionCard.css";
 
 import { useEffect, useMemo, useState } from "react";
+
+function highlightText(text, term) {
+  if (!term || !text) return text;
+  const regex = new RegExp(`(${term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, "gi");
+  return text.split(regex).map((part, i) =>
+    regex.test(part) ? <span key={i} style={{ background: "yellow" }}>{part}</span> : part
+  );
+}
 import {
   editAnswer,
   editQuestion,
@@ -43,6 +51,7 @@ export default function QuestionCard({
   isLoggedIn,
   onRequireLogin,
   onToast,
+  searchTerm,
 }) {
   if (!question) return null;
 
@@ -56,15 +65,8 @@ export default function QuestionCard({
   const hasUserAnswered = Boolean(
     currentUserName && question.answers?.some((answer) => answer.authorName === currentUserName)
   );
-  const showEdit = isAuthor && canEdit;
-  const showAnswer = !isAuthor;
-  const askedAt = formatDateTime(question.createdAt);
-  const [questionUpvoteCount, setQuestionUpvoteCount] = useState(
-    Number(question.upvoteCount ?? 0)
-  );
-  const [questionHasUpvoted, setQuestionHasUpvoted] = useState(
-    Boolean(question.hasUpvoted)
-  );
+
+  // State declarations
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(question.text ?? "");
   const [editError, setEditError] = useState("");
@@ -74,50 +76,51 @@ export default function QuestionCard({
   const [editingAnswerId, setEditingAnswerId] = useState(null);
   const [answerEditText, setAnswerEditText] = useState("");
   const [answerEditError, setAnswerEditError] = useState("");
-  const [answerUpvotes, setAnswerUpvotes] = useState({});
+  const [questionHasUpvoted, setQuestionHasUpvoted] = useState(Boolean(question.hasUpvoted));
+  const [questionUpvoteCount, setQuestionUpvoteCount] = useState(Number(question.upvoteCount ?? 0));
+  const [answerUpvotes, setAnswerUpvotes] = useState(() => {
+    const upvotes = {};
+    question.answers?.forEach((a) => {
+      upvotes[a.id] = {
+        count: Number(a.upvoteCount ?? 0),
+        hasUpvoted: Boolean(a.hasUpvoted),
+      };
+    });
+    return upvotes;
+  });
   const [reportOpen, setReportOpen] = useState(false);
   const [reportTarget, setReportTarget] = useState(null);
-  const [hiddenAnswerIds, setHiddenAnswerIds] = useState(() => new Set());
   const [isHidden, setIsHidden] = useState(false);
+  const [hiddenAnswerIds, setHiddenAnswerIds] = useState(new Set());
+  const askedAt = formatDateTime(question.createdAt);
+
+  // Show edit/answer buttons only if within edit window or not answered
+  const showEdit = isAuthor && canEdit;
+  const showAnswer = isLoggedIn && !isAuthor;
 
   useEffect(() => {
     setEditText(question.text ?? "");
-  }, [question.text]);
-
-  useEffect(() => {
-    setQuestionUpvoteCount(Number(question.upvoteCount ?? 0));
     setQuestionHasUpvoted(Boolean(question.hasUpvoted));
-  }, [question.id, question.upvoteCount, question.hasUpvoted]);
-
-  useEffect(() => {
-    const nextUpvotes = {};
-    (question.answers ?? []).forEach((answer) => {
-      nextUpvotes[answer.id] = {
-        count: Number(answer.upvoteCount ?? 0),
-        hasUpvoted: Boolean(answer.hasUpvoted),
-      };
+    setQuestionUpvoteCount(Number(question.upvoteCount ?? 0));
+    setAnswerUpvotes(() => {
+      const upvotes = {};
+      question.answers?.forEach((a) => {
+        upvotes[a.id] = {
+          count: Number(a.upvoteCount ?? 0),
+          hasUpvoted: Boolean(a.hasUpvoted),
+        };
+      });
+      return upvotes;
     });
-    setAnswerUpvotes(nextUpvotes);
-  }, [question.answers]);
-
-  useEffect(() => {
-    if (!editingAnswerId) return;
-    const answer = question.answers?.find((item) => item.id === editingAnswerId);
-    if (!answer) {
-      setEditingAnswerId(null);
-      setAnswerEditText("");
-      setAnswerEditError("");
-    }
-  }, [editingAnswerId, question.answers]);
+  }, [question]);
 
   const handleEditSubmit = async (event) => {
     event.preventDefault();
     const trimmed = editText.trim();
-    if (trimmed.length < 10) {
-      setEditError("Question must be at least 10 characters.");
+    if (trimmed.length < 2) {
+      setEditError("Question must be at least 2 characters.");
       return;
     }
-
     setEditError("");
     const success = await editQuestion(question.id, trimmed);
     if (success) {
@@ -132,17 +135,11 @@ export default function QuestionCard({
 
   const handleAnswerSubmit = async (event) => {
     event.preventDefault();
-    if (hasUserAnswered) {
-      setIsAnswering(false);
-      onToast?.("You already answered this question.", "info");
-      return;
-    }
     const trimmed = answerText.trim();
     if (trimmed.length < 2) {
       setAnswerError("Answer must be at least 2 characters.");
       return;
     }
-
     setAnswerError("");
     const success = await submitAnswer(question.id, trimmed);
     if (success) {
@@ -383,6 +380,9 @@ export default function QuestionCard({
         ) : null}
         {askedAt ? <span>{askedAt}</span> : null}
       </div>
+      {/* Highlighted question text */}
+      <div className="question-text">{highlightText(question.text, searchTerm)}</div>
+
       {isEditing ? (
         <form className="question-edit-form" onSubmit={handleEditSubmit}>
           <textarea
@@ -433,7 +433,7 @@ export default function QuestionCard({
             return (
               <div key={answer.id} className="question-answer">
                 <div className="question-answer__header">
-                  <p className="answer-text">{answer.text}</p>
+                  <p className="answer-text">{highlightText(answer.text, searchTerm)}</p>
                   <div className="question-answer-actions">
                     {isAnswerAuthor ? (
                       <button

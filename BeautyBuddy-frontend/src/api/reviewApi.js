@@ -82,3 +82,10 @@ export async function reportReview(reviewId, reason) {
     });
     return response.ok;
 }
+
+export async function searchReviews(productId, query, page = 0, size = 10) {
+    const response = await fetch(`http://localhost:8080/api/reviews/${productId}/search?query=${encodeURIComponent(query)}&page=${page}&size=${size}`, {
+        credentials: 'include'
+    });
+    return response.json();
+}
