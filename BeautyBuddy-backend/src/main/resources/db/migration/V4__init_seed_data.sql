@@ -61,7 +61,7 @@ INSERT INTO product (name, brand_id, category_id, price, image_link, product_lin
 ('Telescopic Original Mascara', 
  (SELECT id FROM brand WHERE name='L''Oréal Paris'),
  (SELECT id FROM category WHERE name='Mascara'),
- NULL, 
+ 17.99, 
  'https://www.lorealparis.ca/-/media/project/loreal/brand-sites/oap/americas/ca/products/makeup/eyes/telescopic-original/blackest-black/071249104743_01.png',
  'https://www.lorealparis.ca/en-ca/telescopic-eye-collection/telescopic-original-mascara-blackest-black',
  NULL,
