@@ -31,7 +31,7 @@ export default function ProductDetails() {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [selectedShade, setSelectedShade] = useState(null);
-    const [ingredientsOpen, setIngredientsOpen] = useState(false);
+    const [ingredientsOpen, setIngredientsOpen] = useState(true);
     const [reviewsOpen, setReviewsOpen] = useState(true);
     const [questionsOpen, setQuestionsOpen] = useState(true);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
