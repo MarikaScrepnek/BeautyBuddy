@@ -14,3 +14,11 @@ export async function reportProduct(productId, reason) {
   });
   return response.ok;
 }
+
+export async function getExchangeRate(targetCurrency) {
+  if (targetCurrency === "CAD") return 1;
+  const res = await fetch(`https://api.frankfurter.app/latest?from=CAD&to=${targetCurrency}`);
+  const data = await res.json();
+  if (!data.rates || !data.rates[targetCurrency]) return 1;
+  return data.rates[targetCurrency];
+}

@@ -25,30 +25,25 @@ import { reportProduct } from "../api/productApi";
 import { getQuestionsForProduct, submitQuestion } from "../api/qaApi";
 
 export default function ProductDetails() {
-    const { productId } = useParams();
 
+    // --- All hooks at the very top ---
+    const { productId } = useParams();
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [selectedShade, setSelectedShade] = useState(null);
-
     const [ingredientsOpen, setIngredientsOpen] = useState(false);
     const [reviewsOpen, setReviewsOpen] = useState(true);
     const [questionsOpen, setQuestionsOpen] = useState(true);
-
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [currentUser, setCurrentUser] = useState(null);
     const [wishlistItems, setWishlistItems] = useState([]);
     const [isTogglingWishlist, setIsTogglingWishlist] = useState(false);
-
     const [showLoginModal, setShowLoginModal] = useState(false);
-
     const [toast, setToast] = useState(null);
-
     const [questions, setQuestions] = useState([]);
     const [questionsPage, setQuestionsPage] = useState(0);
     const [questionsTotalPages, setQuestionsTotalPages] = useState(0);
     const [askOpen, setAskOpen] = useState(false);
-
     const [reviewOpen, setReviewOpen] = useState(false);
     const [reviewRefreshKey, setReviewRefreshKey] = useState(0);
     const [editingReview, setEditingReview] = useState(null);
@@ -61,9 +56,48 @@ export default function ProductDetails() {
     const [quickRating, setQuickRating] = useState(0);
     const [quickHoverRating, setQuickHoverRating] = useState(null);
     const [isSubmittingQuickRating, setIsSubmittingQuickRating] = useState(false);
-
-    const[searchQuery, setSearchQuery] = useState("");
+    const [searchQuery, setSearchQuery] = useState("");
     const [searchResults, setSearchResults] = useState({ reviews: [], questions: [] });
+    const [exchangeRate, setExchangeRate] = useState(1);
+    const [formattedPrice, setFormattedPrice] = useState("");
+
+    // --- Currency localization logic below all hooks ---
+    const localeCurrencyMap = {
+        "en-US": "USD",
+        "en-GB": "GBP",
+        "en-CA": "CAD",
+        "en-AU": "AUD",
+        "fr-FR": "EUR",
+        "de-DE": "EUR",
+        "ja-JP": "JPY",
+        "zh-CN": "CNY",
+        // Add more mappings as needed
+    };
+    const userLocale = navigator.language || "en-US";
+    const userCurrency = localeCurrencyMap[userLocale] || "USD";
+
+    useEffect(() => {
+        async function fetchRateAndFormat() {
+            if (!data?.price) {
+                setFormattedPrice("");
+                return;
+            }
+            try {
+                const rate = await getExchangeRate(userCurrency);
+                setExchangeRate(rate);
+                const priceCad = Number(data.price);
+                const priceInUserCurrency = priceCad * (Number(rate) || 1);
+                const formatted = new Intl.NumberFormat(userLocale, {
+                    style: "currency",
+                    currency: userCurrency,
+                }).format(priceInUserCurrency);
+                setFormattedPrice(formatted);
+            } catch {
+                setFormattedPrice("");
+            }
+        }
+        fetchRateAndFormat();
+    }, [data, userCurrency, userLocale]);
 
   const showToast = (message, type = "success") => {
     setToast({ message, type});
@@ -576,7 +610,7 @@ export default function ProductDetails() {
                     </div>
 
                     <p className="price">
-                        <span>Price:</span> {data.price ? `$${data.price}` : "N/A"}
+                        <span>Price: ≈</span> {formattedPrice ? `≈ ${formattedPrice}` : (data.price ? `$${data.price}` : "N/A")}
                     </p>
 
                     <div className="product-actions">
