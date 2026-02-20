@@ -293,7 +293,7 @@ export default function QuestionCard({
         onSubmit={handleReportSubmit}
       />
       <div className="question-card__header">
-        <p className="question-text">{question.text}</p>
+        <div className="question-text">{highlightText(question.text, searchTerm)}</div>
         <div className="question-header-actions">
           {question.answers?.length ? (
             <span className="question-status">Answered</span>
@@ -338,7 +338,7 @@ export default function QuestionCard({
                 setEditError("");
               }}
             >
-              {isEditing ? "Cancel edit" : "Edit question"}
+              {isEditing ? "Cancel edit" : "Edit"}
             </button>
           ) : null}
           {isAuthor ? (
@@ -347,7 +347,7 @@ export default function QuestionCard({
               className="question-action-btn question-action-danger"
               onClick={handleQuestionDelete}
             >
-              Delete question
+              Delete
             </button>
           ) : null}
           {showAnswer ? (
@@ -380,8 +380,6 @@ export default function QuestionCard({
         ) : null}
         {askedAt ? <span>{askedAt}</span> : null}
       </div>
-      {/* Highlighted question text */}
-      <div className="question-text">{highlightText(question.text, searchTerm)}</div>
 
       {isEditing ? (
         <form className="question-edit-form" onSubmit={handleEditSubmit}>
