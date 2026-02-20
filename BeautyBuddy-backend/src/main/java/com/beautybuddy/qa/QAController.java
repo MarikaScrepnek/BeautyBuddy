@@ -169,4 +169,20 @@ public class QAController {
         }
         return ResponseEntity.ok(qaService.getQuestionsAndAnswersForProduct(productId, page, size, email));
     }
+
+    @GetMapping("/questions/{productId}/search")
+    public ResponseEntity<Page<DisplayQuestionWithAnswersDTO>> searchQuestionsForProduct(
+        @PathVariable Long productId,
+        @RequestParam String query,
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size,
+        Authentication authentication
+    ) {
+        String email = null;
+        if (authentication != null && authentication.isAuthenticated()) {
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            email = userDetails.getEmail();
+        }
+        return ResponseEntity.ok(qaService.searchQuestionsAndAnswersForProduct(productId, query, page, size, email));
+    }
 }

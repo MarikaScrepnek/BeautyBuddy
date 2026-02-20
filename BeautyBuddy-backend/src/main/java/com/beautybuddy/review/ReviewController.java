@@ -116,4 +116,21 @@ public class ReviewController {
         return ResponseEntity.ok(reviews);
     }
 
+    @GetMapping("/{productId}/search")
+    public ResponseEntity<Page<DisplayReviewDTO>> searchReviewsForProduct(
+        @PathVariable Long productId,
+        @RequestParam String query,
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size,
+        Authentication authentication
+    ) {
+        String email = null;
+        if (authentication != null && authentication.isAuthenticated()) {
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            email = userDetails.getEmail();
+        }
+        Page<DisplayReviewDTO> reviews = reviewService.searchReviewsForProduct(productId, query, page, size, email);
+        return ResponseEntity.ok(reviews);
+    }
+
 }

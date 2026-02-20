@@ -196,4 +196,58 @@ public class ReviewService {
             );
         });
     }
+
+    public Page<DisplayReviewDTO> searchReviewsForProduct(Long productId, String query, int page, int size, String userEmail) {
+        final User currentUser = userEmail != null
+            ? userRepository.findByEmail(userEmail).orElse(null)
+            : null;
+        Page<Review> reviewPage = reviewRepository.searchByProductAndText(
+            productId,
+            query,
+            PageRequest.of(page, size)
+        );
+
+        Set<Long> reportedReviewIds = currentUser == null
+            ? Set.of()
+            : reviewReportRepository.findAllByUser(currentUser).stream()
+                .map(report -> report.getReview().getId())
+                .collect(Collectors.toSet());
+
+        List<Review> filteredReviews = reviewPage.getContent().stream()
+            .filter(review -> !reportedReviewIds.contains(review.getId()))
+            .toList();
+
+        Page<Review> filteredPage = new PageImpl<>(
+            filteredReviews,
+            reviewPage.getPageable(),
+            filteredReviews.size()
+        );
+        return filteredPage.map(review -> {
+            List<String> imageLinks = review.getReviewImages().stream()
+                .map(img -> img.getImageLink())
+                .toList();
+
+            String shadeName = review.getProductShade() != null
+                ? review.getProductShade().getShadeName()
+                : null;
+
+            boolean hasUpvoted = currentUser != null
+                && reviewUpvoteRepository.findByUserAndReview(currentUser, review).isPresent();
+
+            return new DisplayReviewDTO(
+                review.getId(),
+                review.getUser().getUsername(),
+                review.getUser().getAvatarLink(),
+                review.getRating(),
+                review.getCreatedAt(),
+                review.getProduct().getId(),
+                shadeName,
+                review.getTitle(),
+                review.getText(),
+                imageLinks,
+                review.getUpvoteCount(),
+                hasUpvoted
+            );
+        });
+    }
 }

@@ -196,4 +196,63 @@ public class QAService {
 
         return new PageImpl<>(mapped, questions.getPageable(), mapped.size());
     }
+
+    public Page<DisplayQuestionWithAnswersDTO> searchQuestionsAndAnswersForProduct(Long productId, String query, int page, int size, String userEmail) {
+        final User currentUser = userEmail != null
+            ? userRepository.findByEmail(userEmail).orElse(null)
+            : null;
+        Page<Question> questions = questionRepository
+            .searchQuestionsByProductAndQuery(
+                productId,
+                query,
+                PageRequest.of(page, size)
+            );
+
+        Set<Long> reportedQuestionIds = currentUser == null
+            ? Set.of()
+            : questionReportRepository.findAllByUser(currentUser).stream()
+                .map(report -> report.getQuestion().getId())
+                .collect(Collectors.toSet());
+
+        Set<Long> reportedAnswerIds = currentUser == null
+            ? Set.of()
+            : answerReportRepository.findAllByUser(currentUser).stream()
+                .map(report -> report.getAnswer().getId())
+                .collect(Collectors.toSet());
+
+        List<DisplayQuestionWithAnswersDTO> mapped = questions.getContent().stream()
+            .filter(question -> !reportedQuestionIds.contains(question.getId()))
+            .map(question -> {
+                List<DisplayAnswerDTO> answers = question.getAnswers().stream()
+                    .filter(answer -> answer.getDeletedAt() == null && answer.isApproved())
+                    .filter(answer -> !reportedAnswerIds.contains(answer.getId()))
+                    .sorted(Comparator.comparing(Answer::getCreatedAt))
+                    .map(answer -> new DisplayAnswerDTO(
+                        answer.getId(),
+                        question.getId(),
+                        answer.getText(),
+                        answer.getUser().getUsername(),
+                        answer.getCreatedAt(),
+                        answer.getUpvoteCount(),
+                        currentUser != null
+                            && answerUpvoteRepository.findByUserAndAnswer(currentUser, answer).isPresent()
+                    ))
+                    .toList();
+
+                return new DisplayQuestionWithAnswersDTO(
+                    question.getId(),
+                    question.getProduct().getId(),
+                    question.getText(),
+                    question.getUser().getUsername(),
+                    question.getCreatedAt(),
+                    question.getUpvoteCount(),
+                    currentUser != null
+                        && questionUpvoteRepository.findByUserAndQuestion(currentUser, question).isPresent(),
+                    answers
+                );
+            })
+            .toList();
+
+        return new PageImpl<>(mapped, questions.getPageable(), mapped.size());
+    }
 }
