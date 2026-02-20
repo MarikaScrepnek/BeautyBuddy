@@ -589,3 +589,9 @@
   color: #777;
   text-align: center;
 }
+
+.section-divider {
+  border: none;
+  border-top: 1px solid #f0cef0;
+  opacity: 0.3;
+}

@@ -684,6 +684,8 @@ export default function ProductDetails() {
                 )}
             </section>
 
+            <hr className="section-divider" />
+
             <div className="reviews-search-container">
                 <input
                     type="text"
@@ -728,7 +730,8 @@ export default function ProductDetails() {
                     )}
                 </div>
             )}
-                
+
+            <hr className="section-divider" />  
 
             {/* Reviews / Questions */}
             <section className="questions-section">
@@ -812,6 +815,8 @@ export default function ProductDetails() {
                         </div>
                     )}
             </section>
+
+            <hr className="section-divider" />
 
             <section className="reviews-section">
                 <h2 className="reviews-dropdown-header">
