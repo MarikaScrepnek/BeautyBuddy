@@ -686,11 +686,13 @@ export default function ProductDetails() {
 
             <hr className="section-divider" />
 
+            <h2 className="reviews-and-questions-header">Search Reviews and Questions</h2>
+
             <div className="reviews-search-container">
                 <input
                     type="text"
                     className="reviews-search-bar"
-                    placeholder="Search reviews and questions..."
+                    placeholder="Enter terms here..."
                     value = {searchQuery}
                     onChange={e => setSearchQuery(e.target.value)}
                 />
