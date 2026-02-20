@@ -358,7 +358,12 @@ export default function ProductDetails() {
     const ratingValue = Number(data?.rating ?? 0);
     const hasRating = Boolean(data?.rating);
     const reviewCount = allReviews.length;
-    const ratingText = hasRating ? `${ratingValue.toFixed(1)}/5` : "";
+    let ratingText = "";
+    if (hasRating) {
+        ratingText = Number.isInteger(ratingValue)
+            ? `${ratingValue}/5`
+            : `${ratingValue.toFixed(1)}/5`;
+    }
     const ratingAria = hasRating ? `Rated ${ratingValue.toFixed(1)} out of 5` : "No ratings yet";
     const displayedRating = quickHoverRating ?? ratingValue;
     const ratingDisplayText = ratingText;
@@ -604,7 +609,7 @@ export default function ProductDetails() {
                         </div>
                         <p className="shade-rating">
                             {shadeRatingValue !== null
-                                ? `Shade rating: ${shadeRatingValue.toFixed(1)}/5`
+                                ? `Shade rating: ${Number.isInteger(shadeRatingValue) ? shadeRatingValue : shadeRatingValue.toFixed(1)}/5`
                                 : "No ratings for this shade yet"}
                         </p>
                     </div>
@@ -686,7 +691,7 @@ export default function ProductDetails() {
 
             <hr className="section-divider" />
 
-            <h2 className="reviews-and-questions-header">Search Reviews and Questions</h2>
+            <h2 className="reviews-and-questions-header">Search Questions and Reviews</h2>
 
             <div className="reviews-search-container">
                 <input

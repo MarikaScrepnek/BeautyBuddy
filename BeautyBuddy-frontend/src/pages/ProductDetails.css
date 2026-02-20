@@ -353,7 +353,7 @@
 
 .shade-rating {
   grid-column: 2;
-  margin: 0;
+  margin-top: 2px;
   font-size: 0.8rem;
   color: #777;
   width: 220px;
