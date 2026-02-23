@@ -18,12 +18,12 @@ public class DiscussionCommentUpvote extends BaseUpvote {
 
     @ManyToOne
     @JoinColumn(name = "discussion_comment_id", nullable = false)
-    private DiscussionComment discussionAnswer;
+    private DiscussionComment discussionComment;
 
     public DiscussionComment getDiscussionComment() {
-        return discussionAnswer;
+        return discussionComment;
     }
-    public void setDiscussionComment(DiscussionComment discussionAnswer) {
-        this.discussionAnswer = discussionAnswer;
+    public void setDiscussionComment(DiscussionComment discussionComment) {
+        this.discussionComment = discussionComment;
     }
 }
