@@ -1,4 +1,4 @@
-package com.beautybuddy.discussion;
+package com.beautybuddy.discussion.entity;
 
 import java.util.HashSet;
 import java.util.Set;
