@@ -442,14 +442,14 @@ RETURNS TRIGGER AS $$
 DECLARE
     v_parent_comment_id INT;
 BEGIN
-    v_parent_comment_id := COALESCE(NEW.parent_comment_id, OLD.parent_comment_id);
+    v_parent_comment_id := COALESCE(NEW.parent_discussion_comment_id, OLD.parent_discussion_comment_id);
     
     IF v_parent_comment_id IS NOT NULL THEN
         UPDATE discussion_comment
         SET reply_count = (
             SELECT COUNT(*) 
             FROM discussion_comment 
-            WHERE parent_comment_id = v_parent_comment_id 
+            WHERE parent_discussion_comment_id = v_parent_discussion_comment_id 
             AND deleted_at IS NULL
         )
         WHERE id = v_parent_comment_id;
