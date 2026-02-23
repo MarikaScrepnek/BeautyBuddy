@@ -478,7 +478,7 @@ CREATE TABLE discussion_comment (
     id BIGSERIAL PRIMARY KEY,
     discussion_id BIGINT NOT NULL REFERENCES discussion(id) ON DELETE CASCADE,
     account_id BIGINT REFERENCES account(id) ON DELETE SET NULL,
-    parent_discussion_comment_id INT,
+    parent_discussion_comment_id BIGINT REFERENCES discussion_comment(id) ON DELETE SET NULL,
     text TEXT NOT NULL,
     upvote_count INT NOT NULL DEFAULT 0,
     reply_count INT NOT NULL DEFAULT 0,
