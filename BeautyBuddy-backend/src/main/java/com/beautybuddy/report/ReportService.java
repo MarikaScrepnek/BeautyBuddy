@@ -4,8 +4,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.beautybuddy.user.User;
-import com.beautybuddy.discussion.Discussion;
-import com.beautybuddy.discussion.DiscussionComment;
+import com.beautybuddy.discussion.entity.Discussion;
+import com.beautybuddy.discussion.entity.DiscussionComment;
 import com.beautybuddy.discussion.repo.DiscussionCommentRepository;
 import com.beautybuddy.discussion.repo.DiscussionRepository;
 import com.beautybuddy.product.Product;

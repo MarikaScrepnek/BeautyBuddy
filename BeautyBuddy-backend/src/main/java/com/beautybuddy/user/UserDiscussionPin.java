@@ -1,7 +1,7 @@
 package com.beautybuddy.user;
 
 import com.beautybuddy.common.entity.BaseEntity;
-import com.beautybuddy.discussion.Discussion;
+import com.beautybuddy.discussion.entity.Discussion;
 
 import jakarta.persistence.UniqueConstraint;
 import jakarta.persistence.Table;

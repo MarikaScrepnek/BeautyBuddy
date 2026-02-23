@@ -1,6 +1,6 @@
 package com.beautybuddy.notification.entity;
 
-import com.beautybuddy.discussion.Discussion;
+import com.beautybuddy.discussion.entity.Discussion;
 import com.beautybuddy.notification.BaseNotificationType;
 
 import jakarta.persistence.Entity;

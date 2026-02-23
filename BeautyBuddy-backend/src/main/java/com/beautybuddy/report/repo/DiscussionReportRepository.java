@@ -1,7 +1,7 @@
 package com.beautybuddy.report.repo;
 
+import com.beautybuddy.discussion.entity.Discussion;
 import com.beautybuddy.report.entity.DiscussionReport;
-import com.beautybuddy.discussion.Discussion;
 import com.beautybuddy.user.User;
 
 import org.springframework.data.jpa.repository.JpaRepository;

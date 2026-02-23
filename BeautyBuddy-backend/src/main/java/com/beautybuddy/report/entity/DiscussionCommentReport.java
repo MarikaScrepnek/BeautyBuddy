@@ -1,6 +1,6 @@
 package com.beautybuddy.report.entity;
 
-import com.beautybuddy.discussion.DiscussionComment;
+import com.beautybuddy.discussion.entity.DiscussionComment;
 import com.beautybuddy.report.BaseReport;
 
 import jakarta.persistence.Entity;
