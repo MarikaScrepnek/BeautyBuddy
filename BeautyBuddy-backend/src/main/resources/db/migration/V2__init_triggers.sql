@@ -411,7 +411,7 @@ CREATE TRIGGER trigger_update_discussion_reply_count
 
 
 -- ================================================================
--- Maintain discussion_comment upvote_count
+-- Maintain discussion_comment upvote_count and reply_count
 -- ================================================================
 
 CREATE OR REPLACE FUNCTION update_discussion_comment_upvote_count()
@@ -437,6 +437,32 @@ CREATE TRIGGER trigger_update_discussion_comment_upvote_count
     AFTER INSERT OR DELETE ON discussion_comment_upvote
     FOR EACH ROW EXECUTE FUNCTION update_discussion_comment_upvote_count();
 
+CREATE OR REPLACE FUNCTION update_discussion_comment_reply_count()
+RETURNS TRIGGER AS $$
+DECLARE
+    v_parent_comment_id INT;
+BEGIN
+    v_parent_comment_id := COALESCE(NEW.parent_comment_id, OLD.parent_comment_id);
+    
+    IF v_parent_comment_id IS NOT NULL THEN
+        UPDATE discussion_comment
+        SET reply_count = (
+            SELECT COUNT(*) 
+            FROM discussion_comment 
+            WHERE parent_comment_id = v_parent_comment_id 
+            AND deleted_at IS NULL
+        )
+        WHERE id = v_parent_comment_id;
+    END IF;
+    
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_update_discussion_comment_reply_count
+    AFTER INSERT OR UPDATE OR DELETE ON discussion_comment
+    FOR EACH ROW EXECUTE FUNCTION update_discussion_comment_reply_count();
+
 
 -- ================================================================
 -- Update wishlist.updated_at when items change
@@ -447,7 +473,7 @@ RETURNS TRIGGER AS $$
 BEGIN
     UPDATE wishlist 
     SET updated_at = NOW() 
-    WHERE account_id = COALESCE(NEW.wishlist_id, OLD.wishlist_id);
+    WHERE id = COALESCE(NEW.wishlist_id, OLD.wishlist_id);
     
     RETURN NULL;
 END;
