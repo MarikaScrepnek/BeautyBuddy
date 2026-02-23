@@ -44,4 +44,11 @@ public class Discussion extends UserWrittenEntity{
         orphanRemoval = true
     )
     private Set<DiscussionComment> comments = new HashSet<>();
+
+    public Set<DiscussionComment> getComments() {
+        return comments;
+    }
+    public void setComments(Set<DiscussionComment> comments) {
+        this.comments = comments;
+    }
 }
