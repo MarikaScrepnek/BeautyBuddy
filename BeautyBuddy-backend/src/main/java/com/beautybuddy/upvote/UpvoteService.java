@@ -3,11 +3,27 @@ package com.beautybuddy.upvote;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.beautybuddy.upvote.entity.AnswerUpvote;
+import com.beautybuddy.upvote.entity.DiscussionCommentUpvote;
+import com.beautybuddy.upvote.entity.DiscussionUpvote;
+import com.beautybuddy.upvote.entity.QuestionUpvote;
 import com.beautybuddy.upvote.entity.ReviewUpvote;
 import com.beautybuddy.user.User;
+import com.beautybuddy.discussion.Discussion;
+import com.beautybuddy.discussion.DiscussionComment;
+import com.beautybuddy.discussion.repo.DiscussionCommentRepository;
+import com.beautybuddy.discussion.repo.DiscussionRepository;
+import com.beautybuddy.qa.Answer;
+import com.beautybuddy.qa.AnswerRepository;
+import com.beautybuddy.qa.Question;
+import com.beautybuddy.qa.QuestionRepository;
 import com.beautybuddy.review.ReviewRepository;
 import com.beautybuddy.review.entity.Review;
 import com.beautybuddy.user.UserRepository;
+import com.beautybuddy.upvote.repo.AnswerUpvoteRepository;
+import com.beautybuddy.upvote.repo.DiscussionCommentUpvoteRepository;
+import com.beautybuddy.upvote.repo.DiscussionUpvoteRepository;
+import com.beautybuddy.upvote.repo.QuestionUpvoteRepository;
 import com.beautybuddy.upvote.repo.ReviewUpvoteRepository;
 
 @Service
@@ -15,11 +31,27 @@ public class UpvoteService {
     private final ReviewRepository reviewRepository;
     private final UserRepository userRepository;
     private final ReviewUpvoteRepository reviewUpvoteRepository;
+    private final QuestionRepository questionRepository;
+    private final QuestionUpvoteRepository questionUpvoteRepository;
+    private final AnswerRepository answerRepository;
+    private final AnswerUpvoteRepository answerUpvoteRepository;
+    private final DiscussionRepository discussionRepository;
+    private final DiscussionUpvoteRepository discussionUpvoteRepository;
+    private final DiscussionCommentRepository discussionCommentRepository;
+    private final DiscussionCommentUpvoteRepository discussionCommentUpvoteRepository;
 
-    public UpvoteService(ReviewRepository reviewRepository, UserRepository userRepository, ReviewUpvoteRepository reviewUpvoteRepository) {
+    public UpvoteService(ReviewRepository reviewRepository, UserRepository userRepository, ReviewUpvoteRepository reviewUpvoteRepository, QuestionRepository questionRepository, QuestionUpvoteRepository questionUpvoteRepository, AnswerRepository answerRepository, AnswerUpvoteRepository answerUpvoteRepository, DiscussionRepository discussionRepository, DiscussionUpvoteRepository discussionUpvoteRepository, DiscussionCommentRepository discussionCommentRepository, DiscussionCommentUpvoteRepository discussionCommentUpvoteRepository) {
         this.reviewRepository = reviewRepository;
         this.userRepository = userRepository;
         this.reviewUpvoteRepository = reviewUpvoteRepository;
+        this.questionRepository = questionRepository;
+        this.questionUpvoteRepository = questionUpvoteRepository;
+        this.answerRepository = answerRepository;
+        this.answerUpvoteRepository = answerUpvoteRepository;
+        this.discussionRepository = discussionRepository;
+        this.discussionUpvoteRepository = discussionUpvoteRepository;
+        this.discussionCommentRepository = discussionCommentRepository;
+        this.discussionCommentUpvoteRepository = discussionCommentUpvoteRepository;
     }
 
     @Transactional
@@ -40,16 +72,55 @@ public class UpvoteService {
             reviewUpvoteRepository.save(newUpvote);
         }
         else if (targetType.equals("question")) {
-            // Handle comment upvote logic here
+            Question question = questionRepository.findById(targetId)
+                .orElseThrow(() -> new RuntimeException("Question not found"));
+            if (questionUpvoteRepository.findByUserAndQuestion(user, question).isPresent()) {
+                return;
+            }
+        
+            QuestionUpvote newUpvote = new QuestionUpvote();
+            newUpvote.setUser(user);
+            newUpvote.setQuestion(question);
+
+            questionUpvoteRepository.save(newUpvote);
         }
         else if (targetType.equals("answer")) {
-            // Handle answer upvote logic here
+            Answer answer = answerRepository.findById(targetId)
+                .orElseThrow(() -> new RuntimeException("Answer not found"));
+            if (answerUpvoteRepository.findByUserAndAnswer(user, answer).isPresent()) {
+                return;
+            }
+            AnswerUpvote newUpvote = new AnswerUpvote();
+            newUpvote.setUser(user);
+            newUpvote.setAnswer(answer);
+
+            answerUpvoteRepository.save(newUpvote);
         }
         else if (targetType.equals("discussion")) {
-            // Handle discussion upvote logic here
+            Discussion discussion = discussionRepository.findById(targetId)
+                .orElseThrow(() -> new RuntimeException("Discussion not found"));
+            if (discussionUpvoteRepository.findByUserAndDiscussion(user, discussion).isPresent()) {
+                return;
+            }
+
+            DiscussionUpvote newUpvote = new DiscussionUpvote();
+            newUpvote.setUser(user);
+            newUpvote.setDiscussion(discussion);
+
+            discussionUpvoteRepository.save(newUpvote);
         }
         else if (targetType.equals("discussion_comment")) {
-            // Handle discussion comment upvote logic here
+            DiscussionComment comment = discussionCommentRepository.findById(targetId)
+                .orElseThrow(() -> new RuntimeException("Discussion comment not found"));
+            if (discussionCommentUpvoteRepository.findByUserAndDiscussionComment(user, comment).isPresent()) {
+                return;
+            }
+
+            DiscussionCommentUpvote newUpvote = new DiscussionCommentUpvote();
+            newUpvote.setUser(user);
+            newUpvote.setDiscussionComment(comment);
+
+            discussionCommentUpvoteRepository.save(newUpvote);
         }
         else {
             throw new RuntimeException("Invalid target type");
@@ -70,16 +141,37 @@ public class UpvoteService {
             reviewUpvoteRepository.delete(existingUpvote);
         }
         else if (targetType.equals("question")) {
-            // Handle comment upvote logic here
+           Question question = questionRepository.findById(targetId)
+                .orElseThrow(() -> new RuntimeException("Question not found"));
+        
+            QuestionUpvote existingUpvote = questionUpvoteRepository.findByUserAndQuestion(user, question)
+                .orElseThrow(() -> new RuntimeException("Upvote not found"));
+
+            questionUpvoteRepository.delete(existingUpvote);
         }
         else if (targetType.equals("answer")) {
-            // Handle answer upvote logic here
+            Answer answer = answerRepository.findById(targetId)
+                .orElseThrow(() -> new RuntimeException("Answer not found"));
+            AnswerUpvote existingUpvote = answerUpvoteRepository.findByUserAndAnswer(user, answer)
+                .orElseThrow(() -> new RuntimeException("Upvote not found"));
+            
+            answerUpvoteRepository.delete(existingUpvote);
         }
         else if (targetType.equals("discussion")) {
-            // Handle discussion upvote logic here
+            Discussion discussion = discussionRepository.findById(targetId)
+                .orElseThrow(() -> new RuntimeException("Discussion not found"));
+            DiscussionUpvote existingUpvote = discussionUpvoteRepository.findByUserAndDiscussion(user, discussion)
+                .orElseThrow(() -> new RuntimeException("Upvote not found"));
+            
+            discussionUpvoteRepository.delete(existingUpvote);
         }
         else if (targetType.equals("discussion_comment")) {
-            // Handle discussion comment upvote logic here
+            DiscussionComment comment = discussionCommentRepository.findById(targetId)
+                .orElseThrow(() -> new RuntimeException("Discussion comment not found"));
+            DiscussionCommentUpvote existingUpvote = discussionCommentUpvoteRepository.findByUserAndDiscussionComment(user, comment)
+                .orElseThrow(() -> new RuntimeException("Upvote not found"));
+
+            discussionCommentUpvoteRepository.delete(existingUpvote);
         }
         else {
             throw new RuntimeException("Invalid target type");
