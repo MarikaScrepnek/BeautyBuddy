@@ -20,10 +20,10 @@ public class DiscussionCommentUpvote extends BaseUpvote {
     @JoinColumn(name = "discussion_comment_id", nullable = false)
     private DiscussionComment discussionAnswer;
 
-    public DiscussionComment getDiscussionAnswer() {
+    public DiscussionComment getDiscussionComment() {
         return discussionAnswer;
     }
-    public void setDiscussionAnswer(DiscussionComment discussionAnswer) {
+    public void setDiscussionComment(DiscussionComment discussionAnswer) {
         this.discussionAnswer = discussionAnswer;
     }
 }
