@@ -69,14 +69,17 @@ public class QAService {
     public void editQuestion(String email, EditQuestionDTO question) {
         Question oldQuestion = questionRepository.findById(question.questionId())
             .orElseThrow(() -> new RuntimeException("Question not found"));
-        if (oldQuestion.getCreatedAt().isBefore(LocalDateTime.now().minusMinutes(15))) {
-            throw new RuntimeException("Cannot edit a question older than 15 minutes");
-        }
         User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new RuntimeException("User not found"));
-        if (!oldQuestion.getUser().equals(user)) {
+
+        if (!oldQuestion.getUser().getId().equals(user.getId())) {
             throw new RuntimeException("User is not authorized to edit this question");
         }
+
+        if (oldQuestion.isAnswered()) {
+            throw new RuntimeException("Cannot edit question with answers");
+        }
+
         oldQuestion.setText(question.text());
         questionRepository.save(oldQuestion);
     }
@@ -87,7 +90,7 @@ public class QAService {
             .orElseThrow(() -> new RuntimeException("Question not found"));
         User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new RuntimeException("User not found"));
-        if (!question.getUser().equals(user)) {
+        if (!question.getUser().getId().equals(user.getId())) {
             throw new RuntimeException("User is not authorized to delete this question");
         }
         question.setDeletedAt(LocalDateTime.now());
@@ -118,7 +121,7 @@ public class QAService {
             .orElseThrow(() -> new RuntimeException("Answer not found"));
         User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new RuntimeException("User not found"));
-        if (!oldAnswer.getUser().equals(user)) {
+        if (!oldAnswer.getUser().getId().equals(user.getId())) {
             throw new RuntimeException("User is not authorized to edit this answer");
         }
         oldAnswer.setText(answer.text());
@@ -131,7 +134,7 @@ public class QAService {
             .orElseThrow(() -> new RuntimeException("Answer not found"));
         User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new RuntimeException("User not found"));
-        if (!answer.getUser().equals(user)) {
+        if (!answer.getUser().getId().equals(user.getId())) {
             throw new RuntimeException("User is not authorized to delete this answer");
         }
         answer.setDeletedAt(LocalDateTime.now());
