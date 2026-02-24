@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.beautybuddy.discussion.dto.AddDiscussionCommentDTO;
 import com.beautybuddy.discussion.dto.AddDiscussionDTO;
 import com.beautybuddy.discussion.dto.DisplayDiscussionDTO;
 import com.beautybuddy.report.ReportRequestDTO;
@@ -62,17 +63,17 @@ public class DiscussionController {
     }
 
     @PostMapping("/{discussionId}/comment")
-        public ResponseEntity<Void> addComment(@PathVariable Long discussionId, @RequestBody com.beautybuddy.discussion.dto.AddDiscussionCommentDTO commentDTO, Authentication authentication) {
+        public ResponseEntity<Void> addComment(@PathVariable Long discussionId, @RequestBody AddDiscussionCommentDTO commentDTO, Authentication authentication) {
             if (authentication == null || !authentication.isAuthenticated()) {
                 return ResponseEntity.status(401).build();
             }
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-            discussionService.addComment(userDetails.getEmail(), commentDTO);
+            discussionService.addComment(userDetails.getEmail(), discussionId, commentDTO);
             return ResponseEntity.ok().build();
     }
 
     @PostMapping("/{discussionId}/edit")
-        public ResponseEntity<Void> editDiscussion(@PathVariable Long discussionId, @RequestBody com.beautybuddy.discussion.dto.AddDiscussionDTO updatedDiscussionDTO, Authentication authentication) {
+        public ResponseEntity<Void> editDiscussion(@PathVariable Long discussionId, @RequestBody AddDiscussionDTO updatedDiscussionDTO, Authentication authentication) {
             if (authentication == null || !authentication.isAuthenticated()) {
                 return ResponseEntity.status(401).build();
             }
@@ -82,7 +83,7 @@ public class DiscussionController {
     }
 
     @PostMapping("/{discussionId}/comment/{commentId}/edit")
-        public ResponseEntity<Void> editComment(@PathVariable Long discussionId, @PathVariable Long commentId, @RequestBody com.beautybuddy.discussion.dto.AddDiscussionCommentDTO updatedCommentDTO, Authentication authentication) {
+        public ResponseEntity<Void> editComment(@PathVariable Long discussionId, @PathVariable Long commentId, @RequestBody AddDiscussionCommentDTO updatedCommentDTO, Authentication authentication) {
             if (authentication == null || !authentication.isAuthenticated()) {
                 return ResponseEntity.status(401).build();
             }
