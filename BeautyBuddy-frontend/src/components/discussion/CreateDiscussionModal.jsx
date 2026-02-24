@@ -1,41 +1,41 @@
 import { useState } from "react";
+
+import { createDiscussion } from "../../api/DiscussionApi";
+
 import "./CreateDiscussionModal.css";
 
-export default function CreateDiscussionModal({ isOpen, onClose, onSubmit }) {
+export default function CreateDiscussionModal({ open, onClose, onCreate }) {
   const [title, setTitle] = useState("");
-  const [body, setBody] = useState("");
-  const [error, setError] = useState("");
+  const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  if (!isOpen) return null;
+  if (!open) return null;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (title.trim().length < 3) {
-      setError("Title must be at least 3 characters.");
-      return;
-    }
-    if (body.trim().length < 5) {
-      setError("Body must be at least 5 characters.");
-      return;
-    }
-    setError("");
     setLoading(true);
-    const success = await onSubmit(title.trim(), body.trim());
-    setLoading(false);
-    if (success) {
+    setError(null);
+    try {
+      const created = await createDiscussion(title, text);
       setTitle("");
-      setBody("");
+      setText("");
+      if (onCreate) {
+        onCreate(created || { title, text });
+      }
       onClose();
-    } else {
-      setError("Failed to create discussion. Please try again.");
+    } catch (err) {
+      setError("Failed to create discussion");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-card" onClick={e => e.stopPropagation()}>
-        <h2>Create Discussion</h2>
+    <div className="modal-backdrop">
+      <div className="modal-content">
+        <button className="modal-close" onClick={onClose}>&times;</button>
+        <h2>Start a New Discussion</h2>
         <form onSubmit={handleSubmit}>
           <label>
             Title
@@ -43,26 +43,25 @@ export default function CreateDiscussionModal({ isOpen, onClose, onSubmit }) {
               type="text"
               value={title}
               onChange={e => setTitle(e.target.value)}
-              maxLength={120}
-              autoFocus
               required
+              maxLength={80}
+              placeholder="Enter a discussion title"
             />
           </label>
           <label>
             Body
             <textarea
-              value={body}
-              onChange={e => setBody(e.target.value)}
-              rows={5}
-              maxLength={800}
+              value={text}
+              onChange={e => setText(e.target.value)}
               required
+              rows={5}
+              placeholder="What's on your mind?"
             />
           </label>
           {error && <div className="modal-error">{error}</div>}
-          <div className="modal-actions">
-            <button type="button" onClick={onClose} disabled={loading}>Cancel</button>
-            <button type="submit" disabled={loading}>{loading ? "Posting..." : "Create"}</button>
-          </div>
+          <button type="submit" className="modal-submit" disabled={loading}>
+            {loading ? "Posting..." : "Create Discussion"}
+          </button>
         </form>
       </div>
     </div>

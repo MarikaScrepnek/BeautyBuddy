@@ -142,6 +142,7 @@ public class DiscussionService {
         return discussionRepository.findAll(PageRequest.of(page, size))
             .map(discussion -> new DisplayDiscussionDTO(
                 discussion.getId(),
+                discussion.getCreatedAt(),
                 discussion.getTitle(),
                 discussion.getText(),
                 discussion.getUser().getUsername(),
@@ -166,6 +167,7 @@ public class DiscussionService {
             .filter(discussion -> discussion.getTitle().toLowerCase().contains(query.toLowerCase()) || discussion.getText().toLowerCase().contains(query.toLowerCase()))
             .map(discussion -> new DisplayDiscussionDTO(
                 discussion.getId(),
+                discussion.getCreatedAt(),
                 discussion.getTitle(),
                 discussion.getText(),
                 discussion.getUser().getUsername(),

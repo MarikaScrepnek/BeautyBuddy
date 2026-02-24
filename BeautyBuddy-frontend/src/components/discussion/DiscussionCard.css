@@ -1,50 +1,77 @@
+/* DiscussionCard.css */
+.discussions-container {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
 .discussion-card {
-  background: #fff;
-  border-radius: 10px;
   border: 1px solid #e7e2dc;
-  margin-bottom: 24px;
-  padding: 20px 24px;
-  box-shadow: 0 2px 8px rgba(24,12,3,0.07);
+  border-radius: 16px;
+  padding: 18px 20px;
+  background: #fffaf6;
+  box-shadow: 0 10px 25px rgba(24, 12, 3, 0.08);
+  margin-bottom: 1.5rem;
+  transition: box-shadow 0.2s, transform 0.2s;
 }
-.discussion-card header {
-  margin-bottom: 8px;
+
+.discussion-card:hover {
+  box-shadow: 0 16px 32px rgba(24, 12, 3, 0.13);
+  transform: translateY(-2px) scale(1.01);
 }
+
+.discussion-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
 .discussion-card__title {
-  font-size: 1.3rem;
-  font-weight: 700;
-  color: #7b4b27;
-  margin: 0 0 2px 0;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #2c1b10;
+  margin: 0;
 }
+
 .discussion-card__meta {
-  color: #a08b7b;
-  font-size: 0.98rem;
+  font-size: 0.92rem;
+  color: #7f6b5b;
 }
+
 .discussion-card__body {
-  margin: 12px 0 16px 0;
   color: #3d2b1f;
-  font-size: 1.05rem;
+  margin: 0.5rem 0 0.2rem 0;
+  font-size: 1rem;
 }
+
+.discussion-card__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  font-size: 0.9rem;
+  color: #a08b7b;
+}
+
 .discussion-action-btn {
-  background: #f7ede2;
-  color: #7b4b27;
-  border: none;
-  border-radius: 6px;
+  border: 1px solid #d7b9a1;
+  border-radius: 999px;
   padding: 6px 14px;
-  margin-top: 8px;
+  background: #fff;
+  color: #6b3f1f;
+  font-weight: 600;
   cursor: pointer;
-  font-size: 1rem;
-  transition: background 0.15s;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
+
 .discussion-action-btn:hover {
-  background: #e7e2dc;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(107, 63, 31, 0.12);
 }
-.discussion-comment-form textarea,
-.discussion-comment-textarea {
-  width: 100%;
-  border-radius: 8px;
-  border: 1px solid #e7e2dc;
-  padding: 10px;
-  font-size: 1rem;
-  margin-bottom: 6px;
-  resize: vertical;
+
+.discussion-action-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+  box-shadow: none;
+  transform: none;
 }

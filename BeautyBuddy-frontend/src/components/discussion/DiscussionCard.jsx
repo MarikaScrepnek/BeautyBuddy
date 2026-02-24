@@ -1,8 +1,10 @@
+import { createComment, getDiscussions } from "../../api/DiscussionApi";
 import "./DiscussionCard.css";
-import { useState } from "react";
-import { createComment } from "../../api/DiscussionApi";
 
-export default function DiscussionCard({ id, title, body, author, createdAt, repliesCount, comments = [] }) {
+
+import { useState } from "react";
+
+export default function DiscussionCard({ id, createdAt, title, text, author, upvoteCount, commentCount, comments = [] }) {
   const [showLeaveComment, setShowLeaveComment] = useState(false);
   const [commentText, setCommentText] = useState("");
   const [commentError, setCommentError] = useState("");
@@ -15,49 +17,37 @@ export default function DiscussionCard({ id, title, body, author, createdAt, rep
 
   // Helper to refresh comments from backend
   const refreshComments = async () => {
-    // This should call getDiscussions and update localComments for this discussion
-    // For now, just clear the form
-    setCommentText("");
-    setReplyText("");
-    setReplyingTo(null);
+    const discussions = await getDiscussions();
+    const discussion = (Array.isArray(discussions) ? discussions : discussions.content || []).find(d => d.id === id);
+    setLocalComments(discussion?.comments || []);
   };
 
-  const handleCommentSubmit = async (e) => {
+  const handleReply = async (e, {
+    text,
+    setText,
+    setError,
+    setLoading,
+    parentId = null,
+    afterSubmit = () => {}
+  }) => {
     e.preventDefault();
-    const trimmed = commentText.trim();
+    const trimmed = text.trim();
     if (trimmed.length < 2) {
-      setCommentError("Comment must be at least 2 characters.");
+      setError("Reply must be at least 2 characters.");
       return;
     }
-    setCommentError("");
-    setCommentLoading(true);
-    const success = await createComment(id, trimmed, null);
+    setError("");
+    setLoading(true);
+    const success = await createComment(id, parentId, trimmed);
     if (!success) {
-      setCommentError("Failed to post comment. Please try again.");
-      setCommentLoading(false);
+      setError("Failed to post reply. Please try again.");
+      setLoading(false);
       return;
     }
     await refreshComments();
-    setCommentLoading(false);
-  };
-
-  const handleReplySubmit = async (e) => {
-    e.preventDefault();
-    const trimmed = replyText.trim();
-    if (trimmed.length < 2) {
-      setReplyError("Reply must be at least 2 characters.");
-      return;
-    }
-    setReplyError("");
-    setReplyLoading(true);
-    const success = await createComment(id, trimmed, replyingTo);
-    if (!success) {
-      setReplyError("Failed to post reply. Please try again.");
-      setReplyLoading(false);
-      return;
-    }
-    await refreshComments();
-    setReplyLoading(false);
+    setText("");
+    afterSubmit();
+    setLoading(false);
   };
 
   // Helper to build nested comment tree
@@ -78,20 +68,73 @@ export default function DiscussionCard({ id, title, body, author, createdAt, rep
   // Recursive render for nested comments
   function renderComment(comment, depth = 0) {
     return (
-      <li key={comment.id} style={{ marginLeft: depth * 32 }}>
-        <div>{comment.authorUsername || 'Anonymous'} <span>{comment.createdAt ? new Date(comment.createdAt).toLocaleString() : ''}</span></div>
+      <li key={comment.id} style={{
+        background: '#fff',
+        borderRadius: 8,
+        border: '1px solid #e7e2dc',
+        marginBottom: 8,
+        padding: '10px 12px',
+        color: '#3d2b1f',
+        fontSize: '0.98rem',
+        marginLeft: depth * 32,
+        boxShadow: depth > 0 ? '0 2px 8px rgba(24,12,3,0.07)' : undefined,
+      }}>
+        <div style={{ fontWeight: 600, color: '#7f6b5b', marginBottom: 2 }}>{comment.authorUsername || 'Anonymous'} <span style={{ fontWeight: 400, color: '#a08b7b', fontSize: '0.92rem' }}>{comment.createdAt ? new Date(comment.createdAt).toLocaleString() : ''}</span></div>
         <div>{comment.text}</div>
-        <button onClick={() => { setReplyingTo(comment.id); setReplyText(""); setReplyError(""); }}>Comment on this</button>
+        <button
+          className="discussion-action-btn"
+          style={{ marginTop: 6, fontSize: '0.95rem' }}
+          onClick={() => {
+            setReplyingTo(comment.id);
+            setReplyText("");
+            setReplyError("");
+          }}
+        >
+          Reply
+        </button>
         {replyingTo === comment.id && (
-          <form onSubmit={handleReplySubmit}>
-            <textarea value={replyText} onChange={e => setReplyText(e.target.value)} rows={2} maxLength={800} placeholder="Write your reply..." disabled={replyLoading} />
-            {replyError && <div>{replyError}</div>}
-            <button type="submit" disabled={replyLoading}>{replyLoading ? 'Posting...' : 'Submit reply'}</button>
-            <button type="button" onClick={() => setReplyingTo(null)} disabled={replyLoading}>Cancel</button>
+          <form
+            onSubmit={e => handleReply(e, {
+              text: replyText,
+              setText: setReplyText,
+              setError: setReplyError,
+              setLoading: setReplyLoading,
+              parentId: replyingTo,
+              afterSubmit: () => setReplyingTo(null)
+            })}
+            style={{ marginTop: 8 }}
+          >
+            <textarea
+              value={replyText}
+              onChange={e => setReplyText(e.target.value)}
+              rows={2}
+              maxLength={800}
+              placeholder="Write your reply..."
+              style={{ width: '100%', borderRadius: 8, border: '1px solid #e7e2dc', padding: 8, fontSize: '0.98rem', marginBottom: 4 }}
+              disabled={replyLoading}
+            />
+            {replyError && <div style={{ color: '#b94a48', marginBottom: 4 }}>{replyError}</div>}
+            <button
+              type="submit"
+              className="discussion-action-btn"
+              style={{ background: '#7b4b27', color: '#fff', marginTop: 2 }}
+              disabled={replyLoading}
+            >
+              {replyLoading ? 'Posting...' : 'Submit reply'}
+            </button>
+            <button
+              type="button"
+              className="discussion-action-btn"
+              style={{ marginLeft: 8 }}
+              onClick={() => setReplyingTo(null)}
+              disabled={replyLoading}
+            >
+              Cancel
+            </button>
           </form>
         )}
         {comment.replies.length > 0 && (
-          <ul>
+          <ul style={{ listStyle: 'none', padding: 0, margin: '8px 0 0 0' }}>
             {comment.replies.map(r => renderComment(r, depth + 1))}
           </ul>
         )}
@@ -100,35 +143,71 @@ export default function DiscussionCard({ id, title, body, author, createdAt, rep
   }
 
   return (
-    <article>
-      <header>
-        <h2>{title}</h2>
-        <span>{author} • {new Date(createdAt).toLocaleDateString()}</span>
+    <div className="discussions-container">
+    <article className="discussion-card">
+      <header className="discussion-card__header">
+        <h2 className="discussion-card__title">{title}</h2>
+        <span className="discussion-card__meta">
+          {author} • {new Date(createdAt).toLocaleDateString()}
+        </span>
       </header>
-      <div>
-        {body}
-        <button onClick={() => setShowLeaveComment((v) => !v)}>{showLeaveComment ? "Cancel" : "Comment"}</button>
+      <div className="discussion-card__body">
+        <p> {text} </p>
+        <button
+          className="discussion-action-btn"
+          onClick={() => setShowLeaveComment((v) => !v)}
+        >
+          {showLeaveComment ? "Cancel" : "Reply"}
+        </button>
         {showLeaveComment && (
-          <form onSubmit={handleCommentSubmit}>
-            <textarea value={commentText} onChange={e => setCommentText(e.target.value)} rows={3} maxLength={800} placeholder="Write your comment..." disabled={commentLoading} />
-            {commentError && <div>{commentError}</div>}
-            <button type="submit" disabled={commentLoading}>{commentLoading ? "Posting..." : "Submit comment"}</button>
+          <form
+            className="discussion-comment-form"
+            onSubmit={e => handleReply(e, {
+              text: commentText,
+              setText: setCommentText,
+              setError: setCommentError,
+              setLoading: setCommentLoading,
+              parentId: null,
+              afterSubmit: () => setShowLeaveComment(false)
+            })}
+            style={{ marginTop: 16 }}
+          >
+            <textarea
+              className="discussion-comment-textarea"
+              value={commentText}
+              onChange={e => setCommentText(e.target.value)}
+              rows={3}
+              maxLength={800}
+              placeholder="Write your comment..."
+              style={{ width: "100%", borderRadius: 8, border: "1px solid #e7e2dc", padding: 10, fontSize: "1rem", marginBottom: 6 }}
+              disabled={commentLoading}
+            />
+            {commentError && <div style={{ color: "#b94a48", marginBottom: 6 }}>{commentError}</div>}
+            <button
+              type="submit"
+              className="discussion-action-btn"
+              style={{ background: "#7b4b27", color: "#fff", marginTop: 2 }}
+              disabled={commentLoading}
+            >
+              {commentLoading ? "Posting..." : "Submit comment"}
+            </button>
           </form>
         )}
       </div>
-      <div>
-        <strong>Comments</strong>
+      <div style={{ marginTop: 18 }}>
+        <strong style={{ color: '#7b4b27', fontSize: '1rem' }}>Comments</strong>
         {localComments.length === 0 ? (
-          <div>No comments yet.</div>
+          <div style={{ color: '#a08b7b', margin: '8px 0' }}>No comments yet.</div>
         ) : (
-          <ul>
+          <ul style={{ listStyle: 'none', padding: 0, margin: '8px 0' }}>
             {buildCommentTree(localComments).map(c => renderComment(c))}
           </ul>
         )}
       </div>
-      <footer>
-        <span>{repliesCount} replies</span>
+      <footer className="discussion-card__footer">
+        <span>{commentCount} replies</span>
       </footer>
     </article>
+    </div>
   );
 }

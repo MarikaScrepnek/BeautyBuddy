@@ -1,37 +1,26 @@
-// DiscussionApi.js
-
-const API_BASE_URL = 'http://localhost:8080/api/discussions';
-
-export async function getDiscussions() {
-  const res = await fetch(`${API_BASE_URL}/all`, {
-    credentials: 'include',
-  });
-  return res.json();
+export async function getDiscussions(page = 0, size = 10) {
+    const res = await fetch(`http://localhost:8080/api/discussions?page=${page}&size=${size}`, {
+        credentials: 'include'
+    });
+    return res.json();
 }
 
-export async function getComments(discussionId) {
-  const res = await fetch(`${API_BASE_URL}/${discussionId}/comments`, {
-    credentials: 'include',
-  });
-  return res.json();
+export async function createDiscussion( title, text ) {
+    const response = await fetch(`http://localhost:8080/api/discussions`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ title, text }),
+    });
+    return response.ok;
 }
 
-export async function createComment(discussionId, text, parentCommentId = null) {
-  const res = await fetch(`${API_BASE_URL}/${discussionId}/comments`, {
-    method: 'POST',
-    credentials: 'include',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ text, parentCommentId }),
-  });
-  return res.ok;
-}
-
-export async function createDiscussion(title, body) {
-  const res = await fetch(`${API_BASE_URL}`, {
-    method: 'POST',
-    credentials: 'include',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ title, body }),
-  });
-  return res.ok;
+export async function createComment(discussionId, parentDiscussionCommentId, text) {
+    const response = await fetch(`http://localhost:8080/api/discussions/${discussionId}/comment`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ parentDiscussionCommentId, text }),
+    });
+    return response.ok;
 }

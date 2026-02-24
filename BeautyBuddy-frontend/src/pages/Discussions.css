@@ -1,0 +1,95 @@
+.discussions-header-container {
+  width: 100%;
+  max-width: 650px;
+  margin: 20px auto;
+}
+
+.discussions-button-row {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+.create-discussion-action-icon {
+  position: relative;
+  display: inline-block;
+  z-index: 1001;
+}
+
+.plus-sign {
+  color: rgb(231, 155, 219);
+  border: white solid;
+  border-radius: 50%;
+  padding: 3px 8px;
+  background-color: white;
+
+  font-size: 20px;
+  font-weight: bold;
+  transition: color 0.2s;
+}
+
+.create-discussion-action-icon:hover {
+  transform: scale(1.1);
+  cursor: pointer;
+}
+
+.create-discussion-action-icon:active {
+  transform: scale(0.99);
+}
+
+.tooltip {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  min-width: 120px;
+  text-align: center;
+}
+
+.create-discussion-action-icon:hover .tooltip {
+  opacity: 1;  
+  
+  transform: translateX(-120%) translateY(25px);
+}
+
+.discussions-search-center {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-top: 12px;
+  margin-bottom: 12px;
+}
+
+.discussions-search-container {
+    display: flex;
+    justify-content: center;
+    width: 700px;
+}
+
+.discussions-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+
+}
+
+.discussions-search-bar {
+  width: 100%;         /* ← fills container */
+  padding: 6px 36px 6px 12px; /* room for icon */
+  font-size: 1rem;
+  border-radius: 4px;
+  border: 1px solid #333131;
+}
+
+.discussions-search-button {
+  position: absolute;
+  right: 6px;
+  top: 9px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #777;
+  font-size: 0.9rem;
+}
+
+.discussions-search-button:hover {
+  color: #444;
+}

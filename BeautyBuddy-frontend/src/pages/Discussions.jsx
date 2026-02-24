@@ -3,10 +3,15 @@ import { getDiscussions, createDiscussion } from "../api/DiscussionApi";
 import DiscussionCard from "../components/discussion/DiscussionCard";
 import CreateDiscussionModal from "../components/discussion/CreateDiscussionModal";
 
+import { FaSearch } from "react-icons/fa";
+
+import "./Discussions.css";
+
 export default function Discussions() {
   const [discussions, setDiscussions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const refreshDiscussions = () => {
     setLoading(true);
@@ -15,24 +20,50 @@ export default function Discussions() {
       setLoading(false);
     });
   };
-
+  
   useEffect(() => {
     refreshDiscussions();
   }, []);
 
-  const handleCreateDiscussion = async (title, body) => {
-    const success = await createDiscussion(title, body);
-    if (success) {
-      refreshDiscussions();
-      return true;
-    }
-    return false;
+  const handleCreateDiscussion = async (title, text) => {
+    const success = await createDiscussion(title, text);
+      if (success) {
+        refreshDiscussions();
+        return true;
+      }
+      return false;
   };
 
   return (
     <div>
-      <h1>Discussions</h1>
-      <button onClick={() => setShowModal(true)} style={{marginBottom: 18}}>Create Discussion</button>
+      <div className="discussions-header-container">
+        <div className="discussions-button-row">
+          <div className="create-discussion-action-icon" onClick={() => setShowModal(true)}>
+            <span className="plus-sign">+</span>
+            <span className="tooltip">Create Discussion</span>
+          </div>
+        </div>
+        <div className="discussions-search-center">
+          <div className="discussions-search-container">
+            <div className="discussions-search">
+              <input
+                  type="text"
+                  className="discussions-search-bar"
+                  placeholder="Enter terms here..."
+                  value = {searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+              />
+              <button
+                  type="button"
+                  className="discussions-search-button"
+                  aria-label="Search"
+              >
+                  <FaSearch />
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
       {loading ? (
         <div>Loading...</div>
       ) : discussions.length === 0 ? (
@@ -43,9 +74,12 @@ export default function Discussions() {
         ))
       )}
       <CreateDiscussionModal
-        isOpen={showModal}
-        onClose={() => setShowModal(false)}
-        onSubmit={handleCreateDiscussion}
+        open={showModal}
+        onClose={() => {
+          setShowModal(false);
+          refreshDiscussions();
+        }}
+        onCreate={handleCreateDiscussion}
       />
     </div>
   );

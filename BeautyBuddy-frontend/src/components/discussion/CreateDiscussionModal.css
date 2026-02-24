@@ -1,66 +1,85 @@
-.modal-overlay {
+.modal-backdrop {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(60, 40, 20, 0.18);
+  background: rgba(44, 27, 16, 0.18);
   z-index: 1000;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.modal-card {
-  background: #fff;
-  border-radius: 12px;
-  padding: 28px 32px;
-  box-shadow: 0 4px 24px rgba(24,12,3,0.13);
+
+.modal-content {
+  background: #fffaf6;
+  border-radius: 18px;
+  box-shadow: 0 10px 32px rgba(24, 12, 3, 0.13);
+  padding: 2.2rem 2rem 1.5rem 2rem;
   min-width: 340px;
   max-width: 95vw;
+  position: relative;
 }
-.modal-card h2 {
+
+.modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1.2rem;
+  background: none;
+  border: none;
+  font-size: 1.7rem;
+  color: #a08b7b;
+  cursor: pointer;
+}
+
+.modal-content h2 {
   margin-top: 0;
-  color: #7b4b27;
-  font-size: 1.25rem;
-  margin-bottom: 18px;
+  color: #2c1b10;
+  font-weight: 700;
+  margin-bottom: 1.2rem;
 }
-.modal-card label {
+
+.modal-content label {
   display: block;
-  margin-bottom: 14px;
-  color: #3d2b1f;
+  margin-bottom: 1rem;
+  color: #7f6b5b;
   font-weight: 500;
 }
-.modal-card input,
-.modal-card textarea {
+
+.modal-content input,
+.modal-content textarea {
   width: 100%;
-  border-radius: 7px;
+  padding: 0.7rem;
+  border-radius: 8px;
   border: 1px solid #e7e2dc;
-  padding: 8px 10px;
+  background: #fff;
+  margin-top: 0.3rem;
   font-size: 1rem;
-  margin-top: 4px;
-  margin-bottom: 2px;
-  background: #f7ede2;
+  color: #2c1b10;
+  resize: none;
 }
-.modal-card textarea {
-  resize: vertical;
+
+.modal-content textarea {
+  min-height: 90px;
 }
+
+.modal-submit {
+  background: #7b4b27;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.7rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  transition: background 0.18s;
+}
+
+.modal-submit:disabled {
+  background: #cbb7a1;
+  cursor: not-allowed;
+}
+
 .modal-error {
   color: #b94a48;
-  margin-bottom: 10px;
-}
-.modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 10px;
-}
-.modal-actions button {
-  background: #f7ede2;
-  color: #7b4b27;
-  border: none;
-  border-radius: 6px;
-  padding: 7px 18px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background 0.15s;
-}
-.modal-actions button:hover {
-  background: #e7e2dc;
+  margin-bottom: 0.5rem;
+  font-size: 0.97rem;
 }
