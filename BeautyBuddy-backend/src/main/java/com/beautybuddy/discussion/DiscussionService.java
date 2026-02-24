@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import com.beautybuddy.discussion.dto.AddDiscussionCommentDTO;
 import com.beautybuddy.discussion.dto.AddDiscussionDTO;
 import com.beautybuddy.discussion.dto.DisplayDiscussionDTO;
+import com.beautybuddy.discussion.dto.DisplayCommentDTO;
 import com.beautybuddy.discussion.entity.Discussion;
 import com.beautybuddy.discussion.entity.DiscussionComment;
 import com.beautybuddy.discussion.repo.DiscussionCommentRepository;
@@ -84,10 +85,10 @@ public class DiscussionService {
     }
 
     @Transactional
-    public void addComment(String userEmail, AddDiscussionCommentDTO commentDTO) {
+    public void addComment(String userEmail, Long discussionId, AddDiscussionCommentDTO commentDTO) {
         User user = userRepository.findByEmail(userEmail)
             .orElseThrow(() -> new RuntimeException("User not found"));
-        Discussion discussion = discussionRepository.findById(commentDTO.discussionId())
+        Discussion discussion = discussionRepository.findById(discussionId)
             .orElseThrow(() -> new RuntimeException("Discussion not found"));
         
         DiscussionComment comment = new DiscussionComment();
@@ -95,6 +96,11 @@ public class DiscussionService {
         comment.setText(commentDTO.text());
         comment.setUser(user);
         comment.setDiscussion(discussion);
+        if (commentDTO.parentDiscussionCommentId() != null) {
+            DiscussionComment parentComment = discussionCommentRepository.findById(commentDTO.parentDiscussionCommentId())
+                .orElseThrow(() -> new RuntimeException("Parent comment not found"));
+            comment.setParentDiscussionComment(parentComment);
+        }
         discussionCommentRepository.save(comment);
     }
 
@@ -133,14 +139,24 @@ public class DiscussionService {
     }
 
     public Page<DisplayDiscussionDTO> getDiscussions(int page, int size) {
-        return discussionRepository.findAll(org.springframework.data.domain.PageRequest.of(page, size))
+        return discussionRepository.findAll(PageRequest.of(page, size))
             .map(discussion -> new DisplayDiscussionDTO(
                 discussion.getId(),
                 discussion.getTitle(),
                 discussion.getText(),
                 discussion.getUser().getUsername(),
-                null, // upvoteCount: implement if upvote tracking exists
-                (long) discussion.getComments().size()
+                discussion.getUpvoteCount(),
+                discussion.getComments().size(),
+                discussion.getComments().stream()
+                    .map(comment -> new DisplayCommentDTO(
+                        comment.getParentDiscussionComment() != null ? comment.getParentDiscussionComment().getId() : null,
+                        comment.getId(),
+                        comment.getText(),
+                        comment.getUser().getUsername(),
+                        comment.getUpvoteCount(),
+                        comment.getReplyCount()
+                    ))
+                    .toList()
             ));
     }
 
@@ -153,8 +169,18 @@ public class DiscussionService {
                 discussion.getTitle(),
                 discussion.getText(),
                 discussion.getUser().getUsername(),
-                null,
-                (long) discussion.getComments().size()
+                discussion.getUpvoteCount(),
+                discussion.getComments().size(),
+                discussion.getComments().stream()
+                    .map(comment -> new DisplayCommentDTO(
+                        comment.getParentDiscussionComment() != null ? comment.getParentDiscussionComment().getId() : null,
+                        comment.getId(),
+                        comment.getText(),
+                        comment.getUser().getUsername(),
+                        comment.getUpvoteCount(),
+                        comment.getReplyCount()
+                    ))
+                    .toList()
             ))
             .toList();
         return new PageImpl<>(filtered, PageRequest.of(page, size), filtered.size());
