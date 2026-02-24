@@ -1,0 +1,66 @@
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(60, 40, 20, 0.18);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 28px 32px;
+  box-shadow: 0 4px 24px rgba(24,12,3,0.13);
+  min-width: 340px;
+  max-width: 95vw;
+}
+.modal-card h2 {
+  margin-top: 0;
+  color: #7b4b27;
+  font-size: 1.25rem;
+  margin-bottom: 18px;
+}
+.modal-card label {
+  display: block;
+  margin-bottom: 14px;
+  color: #3d2b1f;
+  font-weight: 500;
+}
+.modal-card input,
+.modal-card textarea {
+  width: 100%;
+  border-radius: 7px;
+  border: 1px solid #e7e2dc;
+  padding: 8px 10px;
+  font-size: 1rem;
+  margin-top: 4px;
+  margin-bottom: 2px;
+  background: #f7ede2;
+}
+.modal-card textarea {
+  resize: vertical;
+}
+.modal-error {
+  color: #b94a48;
+  margin-bottom: 10px;
+}
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 10px;
+}
+.modal-actions button {
+  background: #f7ede2;
+  color: #7b4b27;
+  border: none;
+  border-radius: 6px;
+  padding: 7px 18px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.modal-actions button:hover {
+  background: #e7e2dc;
+}
