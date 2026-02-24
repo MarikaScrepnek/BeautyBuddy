@@ -12,6 +12,7 @@ export default function Discussions() {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [activeSearchTerm, setActiveSearchTerm] = useState("");
 
   const refreshDiscussions = () => {
     setLoading(true);
@@ -36,12 +37,14 @@ export default function Discussions() {
 
   const handleSearchDiscussions = () => {
     if (!searchQuery.trim()) {
+      setActiveSearchTerm("");
       refreshDiscussions();
       return;
     }
     setLoading(true);
     searchDiscussions(searchQuery).then((data) => {
       setDiscussions(Array.isArray(data) ? data : data.content || []);
+      setActiveSearchTerm(searchQuery);
       setLoading(false);
     });
   };
@@ -62,8 +65,11 @@ export default function Discussions() {
                   type="text"
                   className="discussions-search-bar"
                   placeholder="Enter terms here..."
-                  value = {searchQuery}
+                  value={searchQuery}
                   onChange={e => setSearchQuery(e.target.value)}
+                  onKeyDown={e => {
+                      if (e.key === "Enter") handleSearchDiscussions();
+                  }}
               />
               <button
                   type="button"
@@ -83,7 +89,7 @@ export default function Discussions() {
         <div>No discussions yet.</div>
       ) : (
         discussions.map((d) => (
-          <DiscussionCard key={d.id} {...d} />
+          <DiscussionCard key={d.id} {...d} searchTerm={activeSearchTerm} />
         ))
       )}
       <CreateDiscussionModal

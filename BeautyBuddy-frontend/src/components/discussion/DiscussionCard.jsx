@@ -1,10 +1,21 @@
-import { createComment, getDiscussions } from "../../api/DiscussionApi";
+import { createComment, getDiscussions } from "../../api/discussionApi";
 import "./DiscussionCard.css";
 
 
 import { useState } from "react";
 
-export default function DiscussionCard({ id, createdAt, title, text, author, upvoteCount, commentCount, comments = [] }) {
+// Helper to highlight search term
+function highlightText(text, term) {
+  if (!term || !text) return text;
+  const regex = new RegExp(`(${term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+  return text.split(regex).map((part, i) =>
+    regex.test(part)
+      ? <mark key={i} style={{ background: '#ffe066', color: '#7b4b27', padding: '0 2px', borderRadius: '3px' }}>{part}</mark>
+      : part
+  );
+}
+
+export default function DiscussionCard({ id, createdAt, title, text, author, upvoteCount, commentCount, comments = [], searchTerm }) {
   const [showLeaveComment, setShowLeaveComment] = useState(false);
   const [commentText, setCommentText] = useState("");
   const [commentError, setCommentError] = useState("");
@@ -146,13 +157,13 @@ export default function DiscussionCard({ id, createdAt, title, text, author, upv
     <div className="discussions-container">
     <article className="discussion-card">
       <header className="discussion-card__header">
-        <h2 className="discussion-card__title">{title}</h2>
+        <h2 className="discussion-card__title">{highlightText(title, searchTerm)}</h2>
         <span className="discussion-card__meta">
           {author} • {new Date(createdAt).toLocaleDateString()}
         </span>
       </header>
       <div className="discussion-card__body">
-        <p> {text} </p>
+        <p> {highlightText(text, searchTerm)} </p>
         <button
           className="discussion-action-btn"
           onClick={() => setShowLeaveComment((v) => !v)}
