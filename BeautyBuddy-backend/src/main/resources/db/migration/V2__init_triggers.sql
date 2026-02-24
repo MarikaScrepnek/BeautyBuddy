@@ -449,7 +449,7 @@ BEGIN
         SET reply_count = (
             SELECT COUNT(*) 
             FROM discussion_comment 
-            WHERE parent_discussion_comment_id = v_parent_discussion_comment_id 
+            WHERE parent_discussion_comment_id = v_parent_comment_id 
             AND deleted_at IS NULL
         )
         WHERE id = v_parent_comment_id;
