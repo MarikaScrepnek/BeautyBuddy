@@ -5,6 +5,13 @@ export async function getDiscussions(page = 0, size = 10) {
     return res.json();
 }
 
+export async function searchDiscussions(query) {
+    const res = await fetch(`http://localhost:8080/api/discussions/search?query=${encodeURIComponent(query)}`, {
+        credentials: 'include'
+    });
+    return res.json();
+}
+
 export async function createDiscussion( title, text ) {
     const response = await fetch(`http://localhost:8080/api/discussions`, {
         method: "POST",

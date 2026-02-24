@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getDiscussions, createDiscussion } from "../api/DiscussionApi";
+import { getDiscussions, createDiscussion, searchDiscussions } from "../api/discussionApi";
 import DiscussionCard from "../components/discussion/DiscussionCard";
 import CreateDiscussionModal from "../components/discussion/CreateDiscussionModal";
 
@@ -34,6 +34,18 @@ export default function Discussions() {
       return false;
   };
 
+  const handleSearchDiscussions = () => {
+    if (!searchQuery.trim()) {
+      refreshDiscussions();
+      return;
+    }
+    setLoading(true);
+    searchDiscussions(searchQuery).then((data) => {
+      setDiscussions(Array.isArray(data) ? data : data.content || []);
+      setLoading(false);
+    });
+  };
+
   return (
     <div>
       <div className="discussions-header-container">
@@ -57,6 +69,7 @@ export default function Discussions() {
                   type="button"
                   className="discussions-search-button"
                   aria-label="Search"
+                  onClick={handleSearchDiscussions}
               >
                   <FaSearch />
               </button>
