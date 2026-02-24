@@ -152,6 +152,7 @@ public class DiscussionService {
                     .map(comment -> new DisplayCommentDTO(
                         comment.getParentDiscussionComment() != null ? comment.getParentDiscussionComment().getId() : null,
                         comment.getId(),
+                        comment.getCreatedAt(),
                         comment.getText(),
                         comment.getUser().getUsername(),
                         comment.getUpvoteCount(),
@@ -177,6 +178,7 @@ public class DiscussionService {
                     .map(comment -> new DisplayCommentDTO(
                         comment.getParentDiscussionComment() != null ? comment.getParentDiscussionComment().getId() : null,
                         comment.getId(),
+                        comment.getCreatedAt(),
                         comment.getText(),
                         comment.getUser().getUsername(),
                         comment.getUpvoteCount(),
