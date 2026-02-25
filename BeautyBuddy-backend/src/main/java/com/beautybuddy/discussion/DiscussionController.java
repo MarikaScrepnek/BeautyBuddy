@@ -95,12 +95,12 @@ public class DiscussionController {
     }
 
     @PostMapping("/comments/{commentId}/edit")
-        public ResponseEntity<Void> editComment(@PathVariable Long discussionId, @PathVariable Long commentId, @RequestBody String text, Authentication authentication) {
+        public ResponseEntity<Void> editComment(@PathVariable Long commentId, @RequestBody AddDiscussionCommentDTO commentDTO, Authentication authentication) {
             if (authentication == null || !authentication.isAuthenticated()) {
                 return ResponseEntity.status(401).build();
             }
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-            discussionService.editComment(userDetails.getEmail(), commentId, text);
+            discussionService.editComment(userDetails.getEmail(), commentId, commentDTO.text());
             return ResponseEntity.ok().build();
     }
 
