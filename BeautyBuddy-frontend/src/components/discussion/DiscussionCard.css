@@ -4,12 +4,11 @@
   padding: 0 20px;
 }
 
-
-/* Ensure text wraps and breaks long words */
 .discussion-card, .comment-card {
   word-break: break-word;
   white-space: pre-line;
 }
+
 .discussion-card {
   border: 1px solid #e7e2dc;
   border-radius:16px;

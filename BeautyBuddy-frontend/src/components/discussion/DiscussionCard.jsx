@@ -1,5 +1,5 @@
 
-import { createComment, getDiscussions, upvoteDiscussion, removeUpvoteDiscussion, upvoteComment, removeUpvoteComment, reportDiscussion, reportComment } from "../../api/discussionApi";
+import { createComment, getDiscussions, upvoteDiscussion, removeUpvoteDiscussion, upvoteComment, removeUpvoteComment, reportDiscussion, reportComment, editComment, editDiscussion } from "../../api/discussionApi";
 import "./DiscussionCard.css";
 import { useState, useEffect } from "react";
 import AuthModal from "../AuthModal";
@@ -16,6 +16,19 @@ function highlightText(text, term) {
   );
 }
 
+const formatDateTime = (value) => {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  return date.toLocaleString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+};
+
 function PostCard({ post, isDiscussion, currentUser, isLoggedIn, onReport, onUpvote, onRemoveUpvote, onReply, onEdit, upvoteState, replyState, searchTerm }) {
   const isOwn = currentUser && post.authorUsername && currentUser.username === post.authorUsername;
   const canEdit = isOwn && (!post.replies || post.replies.length === 0);
@@ -23,77 +36,221 @@ function PostCard({ post, isDiscussion, currentUser, isLoggedIn, onReport, onUpv
   // Unified card style for both discussion and comment
   const cardStyle = {
     marginBottom: 16,
-    background: '#fff',
+    background: isDiscussion ? '#e9e3f5' : '#faf1f4',
     borderRadius: 16,
     border: '1px solid #e7e2dc',
     boxShadow: '0 2px 8px rgba(24,12,3,0.07)',
     padding: '10px 12px',
   };
+  const [editMode, setEditMode] = useState(false);
+  const [editTitle, setEditTitle] = useState(post.title || "");
+  const [editText, setEditText] = useState(post.text || "");
+  const [editLoading, setEditLoading] = useState(false);
+  const [editError, setEditError] = useState("");
+
+  async function handleEditSubmit(e) {
+    e.preventDefault();
+    setEditLoading(true);
+    setEditError("");
+    let success = false;
+    if (isDiscussion) {
+      success = await editDiscussion(post.id, editTitle, editText);
+    } else {
+      success = await editComment(post.id, editText);
+    }
+    setEditLoading(false);
+    if (!success) {
+      setEditError("Failed to edit. Please try again.");
+      return;
+    }
+    // Update local post state immediately
+    if (isDiscussion) {
+      post.title = editTitle;
+      post.text = editText;
+    } else {
+      post.text = editText;
+    }
+    setEditMode(false);
+    onEdit && onEdit(post); // trigger parent refresh
+  }
+
   return (
     <div className={isDiscussion ? "discussion-card" : "comment-card"} style={cardStyle}>
-      {/* Title moved to parent for discussion */}
-      <div style={{ fontWeight: 600, color: '#7f6b5b', marginBottom: 2 }}>
-        <span style={{ fontWeight: 400, color: '#a08b7b', fontSize: '0.92rem' }}>
-          Posted by {post.authorUsername || 'Anonymous'} on {post.createdAt ? new Date(post.createdAt).toLocaleString() : ''}
-        </span>
+      <div style={{ marginBottom: 6, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1, minWidth: 0 }}>
+          <span style={{ fontWeight: 400, color: '#a08b7b', fontSize: '0.92rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            Posted by {post.authorUsername || 'Anonymous'} on {formatDateTime(post.createdAt)}
+          </span>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          {!isOwn && !isDiscussion && (
+            <>
+              <button
+                className="discussion-action-btn"
+                type="button"
+                style={{ fontSize: '0.75rem' }}
+                onClick={() => {
+                  if (upvoteState[post.id]) {
+                    onRemoveUpvote(post);
+                  } else {
+                    onUpvote(post);
+                  }
+                }}
+              >
+                {upvoteState[post.id] ? 'Undo' : 'Upvote'}
+              </button>
+            </>
+          )}
+          {!isDiscussion && (
+            <span className={isDiscussion ? "discussion-upvotes" : "reply-upvotes"}>
+              {post.upvotes || 0} {post.upvotes === 1 ? 'upvote' : 'upvotes'}
+            </span>
+          )}
+        </div>
       </div>
-      <div style={{ marginBottom: 8 }}>{highlightText(post.text, searchTerm)}</div>
-      <div style={{ display: 'flex', gap: 8, marginTop: 6 }}>
-        <button
-          className="discussion-action-btn"
-          style={{ fontSize: '0.95rem' }}
-          onClick={() => {
-            if (!isLoggedIn) {
-              replyState.setShowLoginModal(true);
-              return;
-            }
-            replyState.setReplyingTo(post.id);
-            replyState.setReplyText("");
-            replyState.setReplyError("");
-          }}
-        >
-          Reply
-        </button>
-        {isOwn && (
+      {editMode ? (
+        <form onSubmit={handleEditSubmit} style={{ margin: '8px 0' }}>
+          {isDiscussion && (
+            <input
+              type="text"
+              value={editTitle}
+              onChange={e => setEditTitle(e.target.value)}
+              placeholder="Edit title"
+              style={{ width: '100%', borderRadius: 8, border: '1px solid #e7e2dc', padding: 8, fontSize: '1rem', marginBottom: 6 }}
+              disabled={editLoading}
+            />
+          )}
+          <textarea
+            value={editText}
+            onChange={e => setEditText(e.target.value)}
+            rows={3}
+            maxLength={800}
+            placeholder="Edit text"
+            style={{ width: '100%', borderRadius: 8, border: '1px solid #e7e2dc', padding: 8, fontSize: '1rem', marginBottom: 6, resize: 'none' }}
+            disabled={editLoading}
+          />
+          {editError && <div style={{ color: '#b94a48', marginBottom: 4 }}>{editError}</div>}
           <button
+            type="submit"
             className="discussion-action-btn"
-            type="button"
-            style={{ fontSize: '0.95rem', borderColor: '#7b4b27', color: canEdit ? '#7b4b27' : '#a08b7b', background: canEdit ? undefined : '#f7f7f7', cursor: canEdit ? 'pointer' : 'not-allowed' }}
-            disabled={!canEdit}
-            title={!canEdit ? 'cant edit post with replies' : undefined}
-            onClick={() => { if (canEdit) onEdit(post); }}
+            style={{ background: '#7b4b27', color: '#fff', marginRight: 8 }}
+            disabled={editLoading}
           >
-            Edit
+            {editLoading ? 'Saving...' : 'Save'}
           </button>
-        )}
-        {!isOwn && (
-          <>
-            <button
-              className="discussion-action-btn"
-              type="button"
-              style={{ borderColor: '#b94a48', color: '#b94a48', fontSize: '0.75rem' }}
-              onClick={() => onReport(post)}
-            >
-              Report
-            </button>
-            <button
-              className="discussion-action-btn"
-              type="button"
-              style={{ fontSize: '0.75rem' }}
-              onClick={() => {
-                if (upvoteState[post.id]) {
-                  onRemoveUpvote(post);
-                } else {
-                  onUpvote(post);
-                }
-              }}
-            >
-              {upvoteState[post.id] ? 'Undo' : 'Upvote'}
-            </button>
-          </>
-        )}
-        <span className={isDiscussion ? "discussion-upvotes" : "reply-upvotes"}>{post.upvotes || 0} upvotes</span>
-      </div>
+          <button
+            type="button"
+            className="discussion-action-btn"
+            onClick={() => setEditMode(false)}
+            disabled={editLoading}
+          >
+            Cancel
+          </button>
+        </form>
+      ) : (
+        <div style={{ display: 'flex', gap: 8 }}>
+          <div style={{ flex: 1, minWidth: 0, wordBreak: 'break-word', marginLeft: 8 }}>{highlightText(post.text, searchTerm)}</div>
+          {!isDiscussion && (
+            <span className="reply-upvotes">
+            {post.replyCount || 0} {post.replyCount === 1 ? 'reply' : 'replies'}
+          </span>
+          )}
+        </div>
+      )}
+      {!editMode && (
+        <>
+          <div style={{ display: 'flex', gap: 8, marginTop: 6, marginLeft: 0 }}>
+            {replyState.replyingTo && replyState.replyingTo.id === post.id && ((isDiscussion && replyState.replyingTo.type === 'discussion') || (!isDiscussion && replyState.replyingTo.type === 'comment')) ? (
+              <button
+                className="discussion-action-btn"
+                style={{ fontSize: '0.75rem' }}
+                onClick={() => replyState.setReplyingTo(null)}
+                disabled={replyState.replyLoading}
+              >
+                Cancel
+              </button>
+            ) : (
+              <button
+                className="discussion-action-btn"
+                style={{ fontSize: '0.75rem' }}
+                onClick={() => {
+                  if (!isLoggedIn) {
+                    replyState.setShowLoginModal(true);
+                    return;
+                  }
+                  replyState.setReplyingTo({
+                    type: isDiscussion ? 'discussion' : 'comment',
+                    id: post.id
+                  });
+                  replyState.setReplyText("");
+                  replyState.setReplyError("");
+                }}
+                disabled={replyState.replyLoading}
+              >
+                Reply
+              </button>
+            )}
+            {isOwn && (
+              <button
+                className="discussion-action-btn"
+                type="button"
+                style={{ fontSize: '0.75rem', borderColor: '#7b4b27', color: canEdit ? '#7b4b27' : '#a08b7b', background: canEdit ? undefined : '#f7f7f7', cursor: canEdit ? 'pointer' : 'not-allowed' }}
+                disabled={!canEdit}
+                title={!canEdit ? 'cant edit post with replies' : undefined}
+                onClick={() => { if (canEdit) setEditMode(true); }}
+              >
+                Edit
+              </button>
+            )}
+            {!isOwn && (
+              <button
+                className="discussion-action-btn"
+                type="button"
+                style={{ borderColor: '#b94a48', color: '#b94a48', fontSize: '0.75rem' }}
+                onClick={() => onReport(post)}
+              >
+                Report
+              </button>
+            )}
+          </div>
+        </>
+      )}
+      {/* Render reply form directly below the card being replied to */}
+      {replyState.replyingTo &&
+        replyState.replyingTo.id === post.id &&
+        ((isDiscussion && replyState.replyingTo.type === 'discussion') || (!isDiscussion && replyState.replyingTo.type === 'comment')) && (
+        <form
+          onSubmit={e => replyState.handleReply(e, {
+            text: replyState.replyText,
+            setText: replyState.setReplyText,
+            setError: replyState.setReplyError,
+            setLoading: replyState.setReplyLoading,
+            parentId: post.id,
+            afterSubmit: () => replyState.setReplyingTo(null)
+          })}
+          style={{ marginTop: 8 }}
+        >
+          <textarea
+            value={replyState.replyText}
+            onChange={e => replyState.setReplyText(e.target.value)}
+            rows={2}
+            maxLength={800}
+            placeholder="Write your reply..."
+            style={{ width: '100%', borderRadius: 8, border: '1px solid #e7e2dc', padding: 8, fontSize: '0.75rem', marginBottom: 4, resize: 'none' }}
+            disabled={replyState.replyLoading}
+          />
+          {replyState.replyError && <div style={{ color: '#b94a48', marginBottom: 4 }}>{replyState.replyError}</div>}
+          <button
+            type="submit"
+            className="discussion-action-btn"
+            style={{ background: '#7b4b27', color: '#fff', marginTop: 2, fontSize: '0.75rem' }}
+            disabled={replyState.replyLoading}
+          >
+            {replyState.replyLoading ? 'Posting...' : 'Submit reply'}
+          </button>
+          {/* Cancel button removed from form, handled above */}
+        </form>
+      )}
     </div>
   );
 }
@@ -106,6 +263,7 @@ export default function DiscussionCard({ id, createdAt, title, text, authorUsern
   const [commentError, setCommentError] = useState("");
   const [commentLoading, setCommentLoading] = useState(false);
   const [localComments, setLocalComments] = useState(comments);
+  // replyingTo: { type: 'discussion'|'comment', id: number } | null
   const [replyingTo, setReplyingTo] = useState(null);
   const [replyText, setReplyText] = useState("");
   const [replyError, setReplyError] = useState("");
@@ -120,6 +278,9 @@ export default function DiscussionCard({ id, createdAt, title, text, authorUsern
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
+  // Add local state for discussion title and text
+  const [localTitle, setLocalTitle] = useState(title);
+  const [localText, setLocalText] = useState(text);
   useEffect(() => {
     getCurrentUser()
       .then(user => {
@@ -230,7 +391,9 @@ export default function DiscussionCard({ id, createdAt, title, text, authorUsern
     }
     setError("");
     setLoading(true);
-    const success = await createComment(id, parentId, trimmed);
+    // If replying to main discussion, parentId should be null
+    const isMainDiscussion = !parentId || (replyingTo && replyingTo.type === 'discussion');
+    const success = await createComment(id, isMainDiscussion ? null : parentId, trimmed);
     if (!success) {
       setError("Failed to post reply. Please try again.");
       setLoading(false);
@@ -268,57 +431,22 @@ export default function DiscussionCard({ id, createdAt, title, text, authorUsern
           onReport={handleReport}
           onUpvote={handleUpvote}
           onRemoveUpvote={handleRemoveUpvote}
-          onReply={() => {
-            setReplyingTo(comment.id);
-            setReplyText("");
-            setReplyError("");
-          }}
           onEdit={() => {/* TODO: open edit modal for comment */}}
           upvoteState={commentUpvoteStates}
-          replyState={{ setShowLoginModal, setReplyingTo, setReplyText, setReplyError }}
+          replyState={{
+            setShowLoginModal,
+            setReplyingTo,
+            setReplyText,
+            setReplyError,
+            setReplyLoading: () => {}, // dummy function for comments
+            replyText,
+            replyError,
+            replyLoading,
+            replyingTo,
+            handleReply,
+          }}
           searchTerm={searchTerm}
         />
-        {replyingTo === comment.id && (
-          <form
-            onSubmit={e => handleReply(e, {
-              text: replyText,
-              setText: setReplyText,
-              setError: setReplyError,
-              setLoading: setReplyLoading,
-              parentId: replyingTo,
-              afterSubmit: () => setReplyingTo(null)
-            })}
-            style={{ marginTop: 8 }}
-          >
-            <textarea
-              value={replyText}
-              onChange={e => setReplyText(e.target.value)}
-              rows={2}
-              maxLength={800}
-              placeholder="Write your reply..."
-              style={{ width: '100%', borderRadius: 8, border: '1px solid #e7e2dc', padding: 8, fontSize: '0.98rem', marginBottom: 4 }}
-              disabled={replyLoading}
-            />
-            {replyError && <div style={{ color: '#b94a48', marginBottom: 4 }}>{replyError}</div>}
-            <button
-              type="submit"
-              className="discussion-action-btn"
-              style={{ background: '#7b4b27', color: '#fff', marginTop: 2 }}
-              disabled={replyLoading}
-            >
-              {replyLoading ? 'Posting...' : 'Submit reply'}
-            </button>
-            <button
-              type="button"
-              className="discussion-action-btn"
-              style={{ marginLeft: 8 }}
-              onClick={() => setReplyingTo(null)}
-              disabled={replyLoading}
-            >
-              Cancel
-            </button>
-          </form>
-        )}
         {comment.replies.length > 0 && (
           <ul style={{ listStyle: 'none', padding: 0, margin: '8px 0 0 0' }}>
             {comment.replies.map(r => renderComment(r, depth + 1))}
@@ -361,55 +489,61 @@ export default function DiscussionCard({ id, createdAt, title, text, authorUsern
         padding: '18px 18px 8px 18px',
         marginBottom: 24
       }}>
-        <h2 className="discussion-card__title" style={{marginTop: 0, marginBottom: 12}}>{highlightText(title, searchTerm)}</h2>
+        <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', marginBottom: 12 }}>
+          <h2 className="discussion-card__title" style={{margin: 0, textAlign: 'center', width: '100%', textDecoration: 'underline', textDecorationColor: '#d8c8f8', textDecorationThickness: '2px'}}>{highlightText(localTitle, searchTerm)}</h2>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginLeft: 'auto', marginTop: 8 }}>
+            <button
+              className="discussion-action-btn"
+              type="button"
+              style={{ fontSize: '0.75rem', padding: '4px 12px' }}
+              onClick={() => {
+                if (isUpvoted) {
+                  handleRemoveUpvote({ id, title: localTitle });
+                } else {
+                  handleUpvote({ id, title: localTitle });
+                }
+              }}
+            >
+              {isUpvoted ? 'Undo' : 'Upvote'}
+            </button>
+            <span className="discussion-upvotes">
+              {localUpvoteCount || 0} {localUpvoteCount === 1 ? 'upvote' : 'upvotes'}
+            </span>
+            <span className="reply-upvotes">
+              {localComments.length || 0} {localComments.length === 1 ? 'reply' : 'replies'}
+            </span>
+          </div>
+        </div>
         <PostCard
-          post={{ id, createdAt, title, text, authorUsername, upvotes: localUpvoteCount, commentCount }}
+          post={{ id, createdAt, title: localTitle, text: localText, authorUsername, upvotes: localUpvoteCount, commentCount, replyCount: localComments.length }}
           isDiscussion={true}
           currentUser={currentUser}
           isLoggedIn={isLoggedIn}
           onReport={handleReport}
           onUpvote={handleUpvote}
           onRemoveUpvote={handleRemoveUpvote}
-          onReply={() => setShowLeaveComment(v => !v)}
-          onEdit={() => {/* TODO: open edit modal for discussion */}}
+          onEdit={(updatedPost) => {
+            // If discussion, update local title/text
+            if (updatedPost && updatedPost.title !== undefined && updatedPost.text !== undefined) {
+              setLocalTitle(updatedPost.title);
+              setLocalText(updatedPost.text);
+            }
+          }}
           upvoteState={{ [id]: isUpvoted }}
-          replyState={{ setShowLoginModal, setReplyingTo, setReplyText, setReplyError }}
+          replyState={{
+            setShowLoginModal,
+            setReplyingTo,
+            setReplyText,
+            setReplyError,
+            setReplyLoading,
+            replyText,
+            replyError,
+            replyLoading,
+            replyingTo,
+            handleReply,
+          }}
           searchTerm={searchTerm}
         />
-        {showLeaveComment && (
-          <form
-            className="discussion-comment-form"
-            onSubmit={e => handleReply(e, {
-              text: commentText,
-              setText: setCommentText,
-              setError: setCommentError,
-              setLoading: setCommentLoading,
-              parentId: null,
-              afterSubmit: () => setShowLeaveComment(false)
-            })}
-            style={{ marginTop: 16 }}
-          >
-            <textarea
-              className="discussion-comment-textarea"
-              value={commentText}
-              onChange={e => setCommentText(e.target.value)}
-              rows={3}
-              maxLength={800}
-              placeholder="Write your comment..."
-              style={{ width: "100%", borderRadius: 8, border: "1px solid #e7e2dc", padding: 10, fontSize: "1rem", marginBottom: 6 }}
-              disabled={commentLoading}
-            />
-            {commentError && <div style={{ color: "#b94a48", marginBottom: 6 }}>{commentError}</div>}
-            <button
-              type="submit"
-              className="discussion-action-btn"
-              style={{ background: "#7b4b27", color: "#fff", marginTop: 2 }}
-              disabled={commentLoading}
-            >
-              {commentLoading ? "Posting..." : "Submit comment"}
-            </button>
-          </form>
-        )}
         <ul style={{ listStyle: 'none', padding: 0, margin: '18px 0 0 0' }}>
           {localComments.length > 0 && buildCommentTree(localComments).map(c => renderComment(c))}
         </ul>
