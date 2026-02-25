@@ -75,3 +75,40 @@
   box-shadow: none;
   transform: none;
 }
+
+.reply-upvotes,
+.discussion-upvotes {
+  font-size: 0.8rem;
+  color: #444;
+  background: #f4f4f4;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  white-space: nowrap;
+  vertical-align: bottom;
+}
+
+.discussion-replies {
+  font-size: 0.8rem;
+  color: #444;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.discussion-meta {
+  margin: 0.5rem 0;
+  font-size: 0.92rem;
+  color: #7f6b5b;
+}
+
+.reply-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.reply-top-right {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}

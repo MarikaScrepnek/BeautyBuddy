@@ -1,4 +1,4 @@
-import { createComment, getDiscussions } from "../../api/discussionApi";
+import { createComment, getDiscussions, upvoteDiscussion, removeUpvoteDiscussion, upvoteComment, removeUpvoteComment, reportDiscussion, reportComment } from "../../api/discussionApi";
 import "./DiscussionCard.css";
 
 
@@ -15,7 +15,7 @@ function highlightText(text, term) {
   );
 }
 
-export default function DiscussionCard({ id, createdAt, title, text, author, upvoteCount, commentCount, comments = [], searchTerm }) {
+export default function DiscussionCard({ id, createdAt, title, text, authorUsername, upvoteCount, commentCount, comments = [], searchTerm }) {
   const [showLeaveComment, setShowLeaveComment] = useState(false);
   const [commentText, setCommentText] = useState("");
   const [commentError, setCommentError] = useState("");
@@ -25,6 +25,7 @@ export default function DiscussionCard({ id, createdAt, title, text, author, upv
   const [replyText, setReplyText] = useState("");
   const [replyError, setReplyError] = useState("");
   const [replyLoading, setReplyLoading] = useState(false);
+  const [isUpvoted, setIsUpvoted] = useState(false); // This should ideally come from props/backend
 
   // Helper to refresh comments from backend
   const refreshComments = async () => {
@@ -32,6 +33,55 @@ export default function DiscussionCard({ id, createdAt, title, text, author, upv
     const discussion = (Array.isArray(discussions) ? discussions : discussions.content || []).find(d => d.id === id);
     setLocalComments(discussion?.comments || []);
   };
+
+  const handleReport = async (targetType) => {
+    const reason = prompt("Please enter a reason for reporting this discussion:");
+    if (reason) {
+      const success = await reportDiscussion(id, reason);
+      if (success) {
+        alert("Reported discussion successfully!");
+      } else {
+        alert("Failed to report discussion.");
+      }
+    }
+  }
+
+  const handleUpvote = async (targetType) => {
+    if (targetType === 'discussion') {
+      const success = await upvoteDiscussion(id);
+      if (success) {
+        alert("Upvoted discussion successfully!");
+        setIsUpvoted(true);
+      } else {
+        alert("Failed to upvote discussion.");
+      }
+    } else if (targetType === 'comment') {
+      const success = await upvoteComment(id);
+      if (success) {
+        alert("Upvoted comment successfully!");
+      } else {
+        alert("Failed to upvote comment.");
+      }
+    }
+  }
+
+  const handleRemoveUpvote = async (targetType) => {
+    if (targetType === 'discussion') {
+      const success = await removeUpvoteDiscussion(id);
+      if (success) {
+        alert("Removed upvote successfully!");
+      } else {
+        alert("Failed to remove upvote.");
+      }
+    } else if (targetType === 'comment') {
+      const success = await removeUpvoteComment(id);
+      if (success) {
+        alert("Removed upvote from comment successfully!");
+      } else {
+        alert("Failed to remove upvote from comment.");
+      }
+    }
+  }
 
   const handleReply = async (e, {
     text,
@@ -90,8 +140,35 @@ export default function DiscussionCard({ id, createdAt, title, text, author, upv
         marginLeft: depth * 32,
         boxShadow: depth > 0 ? '0 2px 8px rgba(24,12,3,0.07)' : undefined,
       }}>
-        <div style={{ fontWeight: 600, color: '#7f6b5b', marginBottom: 2 }}>{comment.authorUsername || 'Anonymous'} <span style={{ fontWeight: 400, color: '#a08b7b', fontSize: '0.92rem' }}>{comment.createdAt ? new Date(comment.createdAt).toLocaleString() : ''}</span></div>
-        <div>{comment.text}</div>
+        <div className="reply-header">
+          <div>{comment.text}</div>
+          <div className="reply-top-right">
+            <button
+              className="discussion-action-btn"
+              style={{ marginTop: 6, fontSize: '0.75rem', borderColor: '#b94a48', color: '#b94a48' }}
+              onClick={() => {
+                handleReport('comment');
+              }}
+            >
+              Report
+            </button>
+            <button
+              className="discussion-action-btn"
+              style={{ marginTop: 6, fontSize: '0.75rem' }}
+              onClick={() => {
+                handleUpvote('comment');
+              }}
+            >
+              Upvote
+            </button>
+            <span className="reply-upvotes">{comment.upvotes || 0} upvotes</span>
+          </div>
+        </div>
+        <div style={{ fontWeight: 600, color: '#7f6b5b', marginBottom: 2 }}>
+          <span style={{ fontWeight: 400, color: '#a08b7b', fontSize: '0.92rem' }}>
+            Posted by {comment.authorUsername || 'Anonymous'} on {comment.createdAt ? new Date(comment.createdAt).toLocaleString() : ''}
+          </span>
+        </div>
         <button
           className="discussion-action-btn"
           style={{ marginTop: 6, fontSize: '0.95rem' }}
@@ -103,6 +180,7 @@ export default function DiscussionCard({ id, createdAt, title, text, author, upv
         >
           Reply
         </button>
+        <p>{comment.replyCount} comments</p>
         {replyingTo === comment.id && (
           <form
             onSubmit={e => handleReply(e, {
@@ -159,17 +237,41 @@ export default function DiscussionCard({ id, createdAt, title, text, author, upv
       <header className="discussion-card__header">
         <h2 className="discussion-card__title">{highlightText(title, searchTerm)}</h2>
         <span className="discussion-card__meta">
-          {author} • {new Date(createdAt).toLocaleDateString()}
+            <button
+                className="discussion-action-btn"
+                style={{ marginTop: 6, fontSize: '0.75rem', borderColor: '#b94a48', color: '#b94a48' }}
+                onClick={() => {
+                  handleReport('discussion');
+                }}
+              >
+                Report
+            </button>
+            <button
+              className="discussion-action-btn"
+              style={{ marginTop: 6, fontSize: '0.75rem' }}
+              onClick={() => {
+                if (isUpvoted) {
+                  handleRemoveUpvote('discussion');
+                } else {
+                  handleUpvote('discussion');
+                }
+              }}
+            >
+              Upvote
+            </button>
+          <span className="discussion-upvotes">{upvoteCount} upvotes</span>
         </span>
       </header>
       <div className="discussion-card__body">
         <p> {highlightText(text, searchTerm)} </p>
+        <p className="discussion-meta">Posted by {authorUsername} on {new Date(createdAt).toLocaleDateString()}</p>
         <button
           className="discussion-action-btn"
           onClick={() => setShowLeaveComment((v) => !v)}
         >
           {showLeaveComment ? "Cancel" : "Reply"}
         </button>
+        <span className="discussion-replies">{commentCount} replies</span>
         {showLeaveComment && (
           <form
             className="discussion-comment-form"
@@ -206,9 +308,9 @@ export default function DiscussionCard({ id, createdAt, title, text, author, upv
         )}
       </div>
       <div style={{ marginTop: 18 }}>
-        <strong style={{ color: '#7b4b27', fontSize: '1rem' }}>Comments</strong>
+        <strong style={{ color: '#7b4b27', fontSize: '1rem' }}>Replies</strong>
         {localComments.length === 0 ? (
-          <div style={{ color: '#a08b7b', margin: '8px 0' }}>No comments yet.</div>
+          <div style={{ color: '#a08b7b', margin: '8px 0' }}>No replies yet.</div>
         ) : (
           <ul style={{ listStyle: 'none', padding: 0, margin: '8px 0' }}>
             {buildCommentTree(localComments).map(c => renderComment(c))}
@@ -216,7 +318,6 @@ export default function DiscussionCard({ id, createdAt, title, text, author, upv
         )}
       </div>
       <footer className="discussion-card__footer">
-        <span>{commentCount} replies</span>
       </footer>
     </article>
     </div>

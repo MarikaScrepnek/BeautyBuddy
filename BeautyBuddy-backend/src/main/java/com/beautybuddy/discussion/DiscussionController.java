@@ -132,7 +132,7 @@ public class DiscussionController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/{discussionId}/comment/{commentId}/upvote")
+    @PostMapping("/comments/{commentId}/upvote")
     public ResponseEntity<Void> upvoteComment(@PathVariable Long commentId, Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.status(401).build();
@@ -142,7 +142,7 @@ public class DiscussionController {
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/{discussionId}/comment/{commentId}/upvote")
+    @DeleteMapping("/comments/{commentId}/upvote")
     public ResponseEntity<Void> removeUpvoteComment(@PathVariable Long commentId, Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.status(401).build();
@@ -162,7 +162,7 @@ public class DiscussionController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/{discussionId}/comment/{commentId}/report")
+    @PostMapping("/comments/{commentId}/report")
     public ResponseEntity<Void> reportComment(@PathVariable Long commentId, @RequestBody ReportRequestDTO reportRequestDTO, Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.status(401).build();

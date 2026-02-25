@@ -31,3 +31,55 @@ export async function createComment(discussionId, parentDiscussionCommentId, tex
     });
     return response.ok;
 }
+
+export async function upvoteDiscussion(discussionId) {
+    const response = await fetch(`http://localhost:8080/api/discussions/${discussionId}/upvote`, {
+        method: "POST",
+        credentials: "include",
+    });
+    return response.ok;
+}
+
+export async function removeUpvoteDiscussion(discussionId) {
+    const response = await fetch(`http://localhost:8080/api/discussions/${discussionId}/upvote`, {
+        method: "DELETE",
+        credentials: "include",
+    });
+    return response.ok;
+}
+
+export async function upvoteComment(commentId) {
+    const response = await fetch(`http://localhost:8080/api/discussions/comments/${commentId}/upvote`, {
+        method: "POST",
+        credentials: "include",
+    });
+    return response.ok;
+}
+
+export async function removeUpvoteComment(commentId) {
+    const response = await fetch(`http://localhost:8080/api/discussions/comments/${commentId}/upvote`, {
+        method: "DELETE",
+        credentials: "include",
+    });
+    return response.ok;
+}
+
+export async function reportDiscussion(discussionId, reason) {
+    const response = await fetch(`http://localhost:8080/api/discussions/${discussionId}/report`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ reason }),
+    });
+    return response.ok;
+}
+
+export async function reportComment(commentId, reason) {
+    const response = await fetch(`http://localhost:8080/api/discussions/comments/${commentId}/report`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ reason }),
+    });
+    return response.ok;
+}
