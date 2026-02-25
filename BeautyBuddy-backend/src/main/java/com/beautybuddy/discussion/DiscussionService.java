@@ -16,6 +16,8 @@ import com.beautybuddy.discussion.entity.Discussion;
 import com.beautybuddy.discussion.entity.DiscussionComment;
 import com.beautybuddy.discussion.repo.DiscussionCommentRepository;
 import com.beautybuddy.discussion.repo.DiscussionRepository;
+import com.beautybuddy.upvote.repo.DiscussionCommentUpvoteRepository;
+import com.beautybuddy.upvote.repo.DiscussionUpvoteRepository;
 import com.beautybuddy.user.User;
 import com.beautybuddy.user.UserRepository;
 
@@ -27,10 +29,15 @@ public class DiscussionService {
     private final DiscussionRepository discussionRepository;
     private final DiscussionCommentRepository discussionCommentRepository;
 
-    public DiscussionService(UserRepository userRepository, DiscussionRepository discussionRepository, DiscussionCommentRepository discussionCommentRepository) {
+    private final DiscussionUpvoteRepository discussionUpvoteRepository;
+    private final DiscussionCommentUpvoteRepository discussionCommentUpvoteRepository;
+
+    public DiscussionService(UserRepository userRepository, DiscussionRepository discussionRepository, DiscussionCommentRepository discussionCommentRepository, DiscussionUpvoteRepository discussionUpvoteRepository, DiscussionCommentUpvoteRepository discussionCommentUpvoteRepository) {
         this.userRepository = userRepository;
         this.discussionRepository = discussionRepository;
         this.discussionCommentRepository = discussionCommentRepository;
+        this.discussionUpvoteRepository = discussionUpvoteRepository;
+        this.discussionCommentUpvoteRepository = discussionCommentUpvoteRepository;
     }
 
     @Transactional
@@ -138,7 +145,8 @@ public class DiscussionService {
         discussionCommentRepository.save(comment);
     }
 
-    public Page<DisplayDiscussionDTO> getDiscussions(int page, int size) {
+    public Page<DisplayDiscussionDTO> getDiscussions(String userEmail, int page, int size) {
+        User currentUser = userRepository.findByEmail(userEmail).orElse(null);
         return discussionRepository.findAll(PageRequest.of(page, size))
             .map(discussion -> new DisplayDiscussionDTO(
                 discussion.getId(),
@@ -156,13 +164,16 @@ public class DiscussionService {
                         comment.getText(),
                         comment.getUser().getUsername(),
                         comment.getUpvoteCount(),
-                        comment.getReplyCount()
+                        comment.getReplyCount(),
+                        discussionCommentUpvoteRepository.findByUserAndDiscussionComment(currentUser, comment).isPresent()
                     ))
-                    .toList()
+                    .toList(),
+                discussionUpvoteRepository.findByUserAndDiscussion(currentUser, discussion).isPresent()
             ));
     }
 
-    public Page<DisplayDiscussionDTO> searchDiscussions(String query, int page, int size) {
+    public Page<DisplayDiscussionDTO> searchDiscussions(String userEmail, String query, int page, int size) {
+        User currentUser = userRepository.findByEmail(userEmail).orElse(null);
         Page<Discussion> results = discussionRepository.findAll(PageRequest.of(page, size));
         List<DisplayDiscussionDTO> filtered = results.getContent().stream()
             .filter(discussion -> discussion.getTitle().toLowerCase().contains(query.toLowerCase()) || discussion.getText().toLowerCase().contains(query.toLowerCase()))
@@ -182,9 +193,12 @@ public class DiscussionService {
                         comment.getText(),
                         comment.getUser().getUsername(),
                         comment.getUpvoteCount(),
-                        comment.getReplyCount()
+                        comment.getReplyCount(),
+                        discussionCommentUpvoteRepository.findByUserAndDiscussionComment(currentUser, comment).isPresent()
                     ))
-                    .toList()
+                    .toList(),
+                discussionUpvoteRepository.findByUserAndDiscussion(currentUser, discussion).isPresent()
+                
             ))
             .toList();
         return new PageImpl<>(filtered, PageRequest.of(page, size), filtered.size());

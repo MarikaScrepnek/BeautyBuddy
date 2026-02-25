@@ -11,5 +11,6 @@ public record DisplayDiscussionDTO(
     String authorUsername,
     Integer upvoteCount,
     Integer commentCount,
-    List<DisplayCommentDTO> comments
+    List<DisplayCommentDTO> comments,
+    boolean hasUpvoted
 ) {}

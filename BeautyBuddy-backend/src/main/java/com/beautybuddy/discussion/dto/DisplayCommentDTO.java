@@ -9,7 +9,8 @@ public record DisplayCommentDTO(
     String text,
     String authorUsername,
     Integer upvoteCount,
-    Integer replyCount
+    Integer replyCount,
+    Boolean hasUpvoted
 ) {
     
 }

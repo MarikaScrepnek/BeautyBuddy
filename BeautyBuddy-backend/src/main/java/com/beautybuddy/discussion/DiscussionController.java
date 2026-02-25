@@ -36,9 +36,14 @@ public class DiscussionController {
     @GetMapping
     public ResponseEntity<Page<DisplayDiscussionDTO>> getDiscussions(
         @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "10") int size
+        @RequestParam(defaultValue = "10") int size,
+        Authentication authentication
     ) {
-        Page<DisplayDiscussionDTO> discussions = discussionService.getDiscussions(page, size);
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(401).build();
+        }
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        Page<DisplayDiscussionDTO> discussions = discussionService.getDiscussions(userDetails.getEmail(), page, size);
         return ResponseEntity.ok(discussions);
     }
 
@@ -46,9 +51,14 @@ public class DiscussionController {
     public ResponseEntity<Page<DisplayDiscussionDTO>> searchDiscussions(
         @RequestParam String query,
         @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "10") int size
+        @RequestParam(defaultValue = "10") int size,
+        Authentication authentication
     ) {
-        Page<DisplayDiscussionDTO> discussions = discussionService.searchDiscussions(query, page, size);
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(401).build();
+        }
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        Page<DisplayDiscussionDTO> discussions = discussionService.searchDiscussions(userDetails.getEmail(), query, page, size);
         return ResponseEntity.ok(discussions);
     }
 
