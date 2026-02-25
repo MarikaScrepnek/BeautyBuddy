@@ -421,6 +421,28 @@ export default function DiscussionCard({ id, createdAt, title, text, authorUsern
     return roots;
   }
 
+  // Filter comment tree recursively by search term
+  function filterCommentTree(comments, term) {
+    if (!term || !term.trim()) return comments;
+    const lowerTerm = term.toLowerCase();
+    function matches(comment) {
+      return (
+        (comment.text && comment.text.toLowerCase().includes(lowerTerm)) ||
+        (comment.authorUsername && comment.authorUsername.toLowerCase().includes(lowerTerm))
+      );
+    }
+    function filterRecursive(comment) {
+      // Filter replies recursively
+      const filteredReplies = (comment.replies || []).map(filterRecursive).filter(Boolean);
+      // If this comment matches or any reply matches, keep it
+      if (matches(comment) || filteredReplies.length > 0) {
+        return { ...comment, replies: filteredReplies };
+      }
+      return null;
+    }
+    return comments.map(filterRecursive).filter(Boolean);
+  }
+
   function renderComment(comment, depth = 0) {
     const indent = depth <= 6 ? '25px' : '0px';
     return (
@@ -547,7 +569,7 @@ export default function DiscussionCard({ id, createdAt, title, text, authorUsern
           searchTerm={searchTerm}
         />
         <ul style={{ listStyle: 'none', padding: 0, margin: '18px 0 0 0' }}>
-          {localComments.length > 0 && buildCommentTree(localComments).map(c => renderComment(c))}
+          {localComments.length > 0 && filterCommentTree(buildCommentTree(localComments), searchTerm).map(c => renderComment(c))}
         </ul>
       </div>
       {showLoginModal && (
