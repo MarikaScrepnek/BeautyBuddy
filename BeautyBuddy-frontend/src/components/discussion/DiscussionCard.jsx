@@ -2,7 +2,9 @@ import { createComment, getDiscussions, upvoteDiscussion, removeUpvoteDiscussion
 import "./DiscussionCard.css";
 
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import AuthModal from "../AuthModal";
+import { getCurrentUser } from "../../api/authApi";
 
 import ReportModal from "../ReportModal";
 
@@ -38,6 +40,23 @@ export default function DiscussionCard({ id, createdAt, title, text, authorUsern
     return map;
   });
 
+  // Auth state
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  useEffect(() => {
+    getCurrentUser()
+      .then(() => setIsLoggedIn(true))
+      .catch(() => setIsLoggedIn(false));
+    const handleAuthLogin = () => setIsLoggedIn(true);
+    const handleAuthLogout = () => setIsLoggedIn(false);
+    window.addEventListener("auth:login", handleAuthLogin);
+    window.addEventListener("auth:logout", handleAuthLogout);
+    return () => {
+      window.removeEventListener("auth:login", handleAuthLogin);
+      window.removeEventListener("auth:logout", handleAuthLogout);
+    };
+  }, []);
+
   // Helper to refresh comments from backend
   const refreshComments = async () => {
     const discussions = await getDiscussions();
@@ -52,6 +71,10 @@ export default function DiscussionCard({ id, createdAt, title, text, authorUsern
   };
 
   const handleReport = async (targetType) => {
+    if (!isLoggedIn) {
+      setShowLoginModal(true);
+      return;
+    }
     if (targetType === 'discussion') {
       setReportTarget({ type: 'discussion', id, subtitle: authorUsername ? `Posted by ${authorUsername}` : '' });
       setReportModalOpen(true);
@@ -62,6 +85,10 @@ export default function DiscussionCard({ id, createdAt, title, text, authorUsern
   }
 
   const handleUpvote = async (targetType) => {
+    if (!isLoggedIn) {
+      setShowLoginModal(true);
+      return;
+    }
     if (targetType.type === 'discussion') {
       const success = await upvoteDiscussion(id);
       if (success) {
@@ -199,6 +226,10 @@ export default function DiscussionCard({ id, createdAt, title, text, authorUsern
           className="discussion-action-btn"
           style={{ marginTop: 6, fontSize: '0.95rem' }}
           onClick={() => {
+            if (!isLoggedIn) {
+              setShowLoginModal(true);
+              return;
+            }
             setReplyingTo(comment.id);
             setReplyText("");
             setReplyError("");
@@ -319,7 +350,13 @@ export default function DiscussionCard({ id, createdAt, title, text, authorUsern
             <p className="discussion-meta">Posted by {authorUsername} on {new Date(createdAt).toLocaleDateString()}</p>
             <button
               className="discussion-action-btn"
-              onClick={() => setShowLeaveComment((v) => !v)}
+              onClick={() => {
+                if (!isLoggedIn) {
+                  setShowLoginModal(true);
+                  return;
+                }
+                setShowLeaveComment((v) => !v);
+              }}
             >
               {showLeaveComment ? "Cancel" : "Reply"}
             </button>
@@ -373,6 +410,15 @@ export default function DiscussionCard({ id, createdAt, title, text, authorUsern
           </footer>
         </article>
       </div>
+    {showLoginModal && (
+      <AuthModal
+        onClose={() => setShowLoginModal(false)}
+        onLoginSuccess={() => {
+          setShowLoginModal(false);
+          setIsLoggedIn(true);
+        }}
+      />
+    )}
     </>
   );
 }

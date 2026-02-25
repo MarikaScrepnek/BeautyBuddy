@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import AuthModal from "../components/AuthModal";
+import { getCurrentUser } from "../api/authApi";
 import { getDiscussions, createDiscussion, searchDiscussions } from "../api/discussionApi";
 import DiscussionCard from "../components/discussion/DiscussionCard";
 import CreateDiscussionModal from "../components/discussion/CreateDiscussionModal";
@@ -13,6 +15,22 @@ export default function Discussions() {
   const [showModal, setShowModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeSearchTerm, setActiveSearchTerm] = useState("");
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    getCurrentUser()
+      .then(() => setIsLoggedIn(true))
+      .catch(() => setIsLoggedIn(false));
+    const handleAuthLogin = () => setIsLoggedIn(true);
+    const handleAuthLogout = () => setIsLoggedIn(false);
+    window.addEventListener("auth:login", handleAuthLogin);
+    window.addEventListener("auth:logout", handleAuthLogout);
+    return () => {
+      window.removeEventListener("auth:login", handleAuthLogin);
+      window.removeEventListener("auth:logout", handleAuthLogout);
+    };
+  }, []);
 
   const refreshDiscussions = () => {
     setLoading(true);
@@ -27,12 +45,16 @@ export default function Discussions() {
   }, []);
 
   const handleCreateDiscussion = async (title, text) => {
-    const success = await createDiscussion(title, text);
-      if (success) {
-        refreshDiscussions();
-        return true;
-      }
+    if (!isLoggedIn) {
+      setShowLoginModal(true);
       return false;
+    }
+    const success = await createDiscussion(title, text);
+    if (success) {
+      refreshDiscussions();
+      return true;
+    }
+    return false;
   };
 
   const handleSearchDiscussions = () => {
@@ -53,7 +75,13 @@ export default function Discussions() {
     <div>
       <div className="discussions-header-container">
         <div className="discussions-button-row">
-          <div className="create-discussion-action-icon" onClick={() => setShowModal(true)}>
+          <div className="create-discussion-action-icon" onClick={() => {
+            if (!isLoggedIn) {
+              setShowLoginModal(true);
+              return;
+            }
+            setShowModal(true);
+          }}>
             <span className="plus-sign">+</span>
             <span className="tooltip">Create Discussion</span>
           </div>
@@ -100,6 +128,15 @@ export default function Discussions() {
         }}
         onCreate={handleCreateDiscussion}
       />
+      {showLoginModal && (
+        <AuthModal
+          onClose={() => setShowLoginModal(false)}
+          onLoginSuccess={() => {
+            setShowLoginModal(false);
+            setIsLoggedIn(true);
+          }}
+        />
+      )}
     </div>
   );
 }
