@@ -4,6 +4,12 @@
   padding: 0 20px;
 }
 
+
+/* Ensure text wraps and breaks long words */
+.discussion-card, .comment-card {
+  word-break: break-word;
+  white-space: pre-line;
+}
 .discussion-card {
   border: 1px solid #e7e2dc;
   border-radius:16px;
@@ -15,7 +21,13 @@
   border: 1px solid #e7e2dc;
 }
 
-.discussion-card:hover {
+.comment-card {
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+
+.discussion-card:hover,
+.comment-card:hover {
   box-shadow: 0 16px 32px rgba(24, 12, 3, 0.13);
   transform: translateY(-2px) scale(1.01);
 }

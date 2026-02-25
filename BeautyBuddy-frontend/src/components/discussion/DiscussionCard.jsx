@@ -1,17 +1,14 @@
+
 import { createComment, getDiscussions, upvoteDiscussion, removeUpvoteDiscussion, upvoteComment, removeUpvoteComment, reportDiscussion, reportComment } from "../../api/discussionApi";
 import "./DiscussionCard.css";
-
-
 import { useState, useEffect } from "react";
 import AuthModal from "../AuthModal";
 import { getCurrentUser } from "../../api/authApi";
-
 import ReportModal from "../ReportModal";
 
-// Helper to highlight search term
 function highlightText(text, term) {
   if (!term || !text) return text;
-  const regex = new RegExp(`(${term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+  const regex = new RegExp(`(${term.replace(/[.*+?^${}()|[\]\\]/g, '\$&')})`, 'gi');
   return text.split(regex).map((part, i) =>
     regex.test(part)
       ? <mark key={i} style={{ background: '#ffe066', color: '#7b4b27', padding: '0 2px', borderRadius: '3px' }}>{part}</mark>
@@ -19,34 +16,120 @@ function highlightText(text, term) {
   );
 }
 
+function PostCard({ post, isDiscussion, currentUser, isLoggedIn, onReport, onUpvote, onRemoveUpvote, onReply, onEdit, upvoteState, replyState, searchTerm }) {
+  const isOwn = currentUser && post.authorUsername && currentUser.username === post.authorUsername;
+  const canEdit = isOwn && (!post.replies || post.replies.length === 0);
+  // Add card background and border for comments
+  // Unified card style for both discussion and comment
+  const cardStyle = {
+    marginBottom: 16,
+    background: '#fff',
+    borderRadius: 16,
+    border: '1px solid #e7e2dc',
+    boxShadow: '0 2px 8px rgba(24,12,3,0.07)',
+    padding: '10px 12px',
+  };
+  return (
+    <div className={isDiscussion ? "discussion-card" : "comment-card"} style={cardStyle}>
+      {/* Title moved to parent for discussion */}
+      <div style={{ fontWeight: 600, color: '#7f6b5b', marginBottom: 2 }}>
+        <span style={{ fontWeight: 400, color: '#a08b7b', fontSize: '0.92rem' }}>
+          Posted by {post.authorUsername || 'Anonymous'} on {post.createdAt ? new Date(post.createdAt).toLocaleString() : ''}
+        </span>
+      </div>
+      <div style={{ marginBottom: 8 }}>{highlightText(post.text, searchTerm)}</div>
+      <div style={{ display: 'flex', gap: 8, marginTop: 6 }}>
+        <button
+          className="discussion-action-btn"
+          style={{ fontSize: '0.95rem' }}
+          onClick={() => {
+            if (!isLoggedIn) {
+              replyState.setShowLoginModal(true);
+              return;
+            }
+            replyState.setReplyingTo(post.id);
+            replyState.setReplyText("");
+            replyState.setReplyError("");
+          }}
+        >
+          Reply
+        </button>
+        {isOwn && (
+          <button
+            className="discussion-action-btn"
+            type="button"
+            style={{ fontSize: '0.95rem', borderColor: '#7b4b27', color: canEdit ? '#7b4b27' : '#a08b7b', background: canEdit ? undefined : '#f7f7f7', cursor: canEdit ? 'pointer' : 'not-allowed' }}
+            disabled={!canEdit}
+            title={!canEdit ? 'cant edit post with replies' : undefined}
+            onClick={() => { if (canEdit) onEdit(post); }}
+          >
+            Edit
+          </button>
+        )}
+        {!isOwn && (
+          <>
+            <button
+              className="discussion-action-btn"
+              type="button"
+              style={{ borderColor: '#b94a48', color: '#b94a48', fontSize: '0.75rem' }}
+              onClick={() => onReport(post)}
+            >
+              Report
+            </button>
+            <button
+              className="discussion-action-btn"
+              type="button"
+              style={{ fontSize: '0.75rem' }}
+              onClick={() => {
+                if (upvoteState[post.id]) {
+                  onRemoveUpvote(post);
+                } else {
+                  onUpvote(post);
+                }
+              }}
+            >
+              {upvoteState[post.id] ? 'Undo' : 'Upvote'}
+            </button>
+          </>
+        )}
+        <span className={isDiscussion ? "discussion-upvotes" : "reply-upvotes"}>{post.upvotes || 0} upvotes</span>
+      </div>
+    </div>
+  );
+}
+
 export default function DiscussionCard({ id, createdAt, title, text, authorUsername, upvoteCount, commentCount, comments = [], hasUpvoted, searchTerm }) {
-    const [reportModalOpen, setReportModalOpen] = useState(false);
-    const [reportTarget, setReportTarget] = useState(null);
+  const [reportModalOpen, setReportModalOpen] = useState(false);
+  const [reportTarget, setReportTarget] = useState(null);
   const [showLeaveComment, setShowLeaveComment] = useState(false);
   const [commentText, setCommentText] = useState("");
   const [commentError, setCommentError] = useState("");
   const [commentLoading, setCommentLoading] = useState(false);
   const [localComments, setLocalComments] = useState(comments);
-  const [replyingTo, setReplyingTo] = useState(null); // comment id
+  const [replyingTo, setReplyingTo] = useState(null);
   const [replyText, setReplyText] = useState("");
   const [replyError, setReplyError] = useState("");
   const [replyLoading, setReplyLoading] = useState(false);
   const [isUpvoted, setIsUpvoted] = useState(hasUpvoted);
   const [localUpvoteCount, setLocalUpvoteCount] = useState(upvoteCount);
-  // Track upvote state for comments
   const [commentUpvoteStates, setCommentUpvoteStates] = useState(() => {
     const map = {};
     (comments || []).forEach(c => { map[c.id] = c.hasUpvoted; });
     return map;
   });
-
-  // Auth state
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
   useEffect(() => {
     getCurrentUser()
-      .then(() => setIsLoggedIn(true))
-      .catch(() => setIsLoggedIn(false));
+      .then(user => {
+        setIsLoggedIn(true);
+        setCurrentUser(user);
+      })
+      .catch(() => {
+        setIsLoggedIn(false);
+        setCurrentUser(null);
+      });
     const handleAuthLogin = () => setIsLoggedIn(true);
     const handleAuthLogout = () => setIsLoggedIn(false);
     window.addEventListener("auth:login", handleAuthLogin);
@@ -57,78 +140,79 @@ export default function DiscussionCard({ id, createdAt, title, text, authorUsern
     };
   }, []);
 
-  // Helper to refresh comments from backend
   const refreshComments = async () => {
     const discussions = await getDiscussions();
     const discussion = (Array.isArray(discussions) ? discussions : discussions.content || []).find(d => d.id === id);
     setLocalComments(discussion?.comments || []);
-    // Update upvote states for comments
     const map = {};
     (discussion?.comments || []).forEach(c => { map[c.id] = c.hasUpvoted; });
     setCommentUpvoteStates(map);
-    // Update discussion upvote state
     if (typeof discussion?.hasUpvoted === 'boolean') setIsUpvoted(discussion.hasUpvoted);
   };
 
-  const handleReport = async (targetType) => {
+  const handleReport = (post) => {
     if (!isLoggedIn) {
       setShowLoginModal(true);
       return;
     }
-    if (targetType === 'discussion') {
+    if (post.title) {
       setReportTarget({ type: 'discussion', id, subtitle: authorUsername ? `Posted by ${authorUsername}` : '' });
       setReportModalOpen(true);
-    } else if (targetType.type === 'comment') {
-      setReportTarget({ type: 'comment', id: targetType.id, subtitle: targetType.authorUsername ? `Posted by ${targetType.authorUsername}` : '' });
+    } else {
+      setReportTarget({ type: 'comment', id: post.id, subtitle: post.authorUsername ? `Posted by ${post.authorUsername}` : '' });
       setReportModalOpen(true);
     }
-  }
+  };
 
-  const handleUpvote = async (targetType) => {
+  const handleUpvote = (post) => {
     if (!isLoggedIn) {
       setShowLoginModal(true);
       return;
     }
-    if (targetType.type === 'discussion') {
-      const success = await upvoteDiscussion(id);
-      if (success) {
-        setIsUpvoted(true);
-        setLocalUpvoteCount(count => count + 1);
-        await refreshComments();
-      } else {
-        alert("Failed to upvote discussion.");
-      }
-    } else if (targetType.type === 'comment') {
-      const success = await upvoteComment(targetType.id);
-      if (success) {
-        setCommentUpvoteStates(states => ({ ...states, [targetType.id]: true }));
-        await refreshComments();
-      } else {
-        alert("Failed to upvote comment.");
-      }
+    if (post.title) {
+      upvoteDiscussion(id).then(success => {
+        if (success) {
+          setIsUpvoted(true);
+          setLocalUpvoteCount(count => count + 1);
+          refreshComments();
+        } else {
+          alert("Failed to upvote discussion.");
+        }
+      });
+    } else {
+      upvoteComment(post.id).then(success => {
+        if (success) {
+          setCommentUpvoteStates(states => ({ ...states, [post.id]: true }));
+          refreshComments();
+        } else {
+          alert("Failed to upvote comment.");
+        }
+      });
     }
-  }
+  };
 
-  const handleRemoveUpvote = async (targetType) => {
-    if (targetType.type === 'discussion') {
-      const success = await removeUpvoteDiscussion(id);
-      if (success) {
-        setIsUpvoted(false);
-        setLocalUpvoteCount(count => Math.max(0, count - 1));
-        await refreshComments();
-      } else {
-        alert("Failed to remove upvote.");
-      }
-    } else if (targetType.type === 'comment') {
-      const success = await removeUpvoteComment(targetType.id);
-      if (success) {
-        setCommentUpvoteStates(states => ({ ...states, [targetType.id]: false }));
-        await refreshComments();
-      } else {
-        alert("Failed to remove upvote from comment.");
-      }
+  const handleRemoveUpvote = (post) => {
+    if (post.title) {
+      removeUpvoteDiscussion(id).then(success => {
+        if (success) {
+          setIsUpvoted(false);
+          setLocalUpvoteCount(count => Math.max(0, count - 1));
+          refreshComments();
+        } else {
+          alert("Failed to remove upvote.");
+        }
+      });
+    } else {
+      removeUpvoteComment(post.id).then(success => {
+        if (success) {
+          setCommentUpvoteStates(states => ({ ...states, [post.id]: false }));
+          refreshComments();
+        } else {
+          alert("Failed to remove upvote from comment.");
+        }
+      });
     }
-  }
+  };
 
   const handleReply = async (e, {
     text,
@@ -158,7 +242,6 @@ export default function DiscussionCard({ id, createdAt, title, text, authorUsern
     setLoading(false);
   };
 
-  // Helper to build nested comment tree
   function buildCommentTree(comments) {
     const map = {};
     comments.forEach(c => { map[c.id] = { ...c, replies: [] }; });
@@ -173,71 +256,28 @@ export default function DiscussionCard({ id, createdAt, title, text, authorUsern
     return roots;
   }
 
-  // Recursive render for nested comments
   function renderComment(comment, depth = 0) {
+    const indent = depth <= 6 ? '25px' : '0px';
     return (
-      <li key={comment.id} style={{
-        background: '#fff',
-        borderRadius: 16,
-        border: '1px solid #e7e2dc',
-        marginBottom: 8,
-        padding: '10px 12px',
-        color: '#000000',
-        fontSize: '0.98rem',
-        marginLeft: depth * 32,
-        boxShadow: depth > 0 ? '0 2px 8px rgba(24,12,3,0.07)' : undefined,
-      }}>
-        <div className="reply-header">
-          <div>{comment.text}</div>
-          <div className="reply-top-right">
-            <button
-              className="discussion-action-btn"
-              type="button"
-              style={{ borderColor: '#b94a48', color: '#b94a48', fontSize: '0.75rem' }}
-              onClick={() => {
-                handleReport({ type: 'comment', id: comment.id, authorUsername: comment.authorUsername });
-              }}
-            >
-              Report
-            </button>
-            <button
-              className="discussion-action-btn"
-              type="button"
-              style={{fontSize: '0.75rem' }}
-              onClick={() => {
-                if (commentUpvoteStates[comment.id]) {
-                  handleRemoveUpvote({ type: 'comment', id: comment.id });
-                } else {
-                  handleUpvote({ type: 'comment', id: comment.id });
-                }
-              }}
-            >
-              {commentUpvoteStates[comment.id] ? 'Undo' : 'Upvote'}
-            </button>
-            <span className="reply-upvotes">{comment.upvotes || 0} upvotes</span>
-          </div>
-        </div>
-        <div style={{ fontWeight: 600, color: '#7f6b5b', marginBottom: 2 }}>
-          <span style={{ fontWeight: 400, color: '#a08b7b', fontSize: '0.92rem' }}>
-            Posted by {comment.authorUsername || 'Anonymous'} on {comment.createdAt ? new Date(comment.createdAt).toLocaleString() : ''}
-          </span>
-        </div>
-        <button
-          className="discussion-action-btn"
-          style={{ marginTop: 6, fontSize: '0.95rem' }}
-          onClick={() => {
-            if (!isLoggedIn) {
-              setShowLoginModal(true);
-              return;
-            }
+      <li key={comment.id} style={{ marginLeft: indent }}>
+        <PostCard
+          post={comment}
+          isDiscussion={false}
+          currentUser={currentUser}
+          isLoggedIn={isLoggedIn}
+          onReport={handleReport}
+          onUpvote={handleUpvote}
+          onRemoveUpvote={handleRemoveUpvote}
+          onReply={() => {
             setReplyingTo(comment.id);
             setReplyText("");
             setReplyError("");
           }}
-        >
-          Reply
-        </button>
-        <p>{comment.replyCount} comments</p>
+          onEdit={() => {/* TODO: open edit modal for comment */}}
+          upvoteState={commentUpvoteStates}
+          replyState={{ setShowLoginModal, setReplyingTo, setReplyText, setReplyError }}
+          searchTerm={searchTerm}
+        />
         {replyingTo === comment.id && (
           <form
             onSubmit={e => handleReply(e, {
@@ -313,112 +353,76 @@ export default function DiscussionCard({ id, createdAt, title, text, authorUsern
           }
         }}
       />
-      <div className="discussions-container">
-        <article className="discussion-card">
-          <header className="discussion-card__header">
-            <h2 className="discussion-card__title">{highlightText(title, searchTerm)}</h2>
-            <span className="discussion-card__meta">
-              <button
-                className="discussion-action-btn"
-                type="button"
-                style={{ borderColor: '#b94a48', color: '#b94a48', fontSize: '0.75rem' }}
-                onClick={() => {
-                  handleReport('discussion');
-                }}
-              >
-                Report
-              </button>
-              <button
-                className="discussion-action-btn"
-                type="button"
-                style={{fontSize: '0.75rem' }}
-                onClick={() => {
-                  if (isUpvoted) {
-                    handleRemoveUpvote({ type: 'discussion' });
-                  } else {
-                    handleUpvote({ type: 'discussion' });
-                  }
-                }}
-              >
-                {isUpvoted ? 'Undo' : 'Upvote'}
-              </button>
-              <span className="discussion-upvotes">{localUpvoteCount} upvotes</span>
-            </span>
-          </header>
-          <div className="discussion-card__body">
-            <p> {highlightText(text, searchTerm)} </p>
-            <p className="discussion-meta">Posted by {authorUsername} on {new Date(createdAt).toLocaleDateString()}</p>
+      <div className="discussions-container" style={{
+        background: '#fff',
+        borderRadius: 16,
+        border: '1px solid #e7e2dc',
+        boxShadow: '0 2px 8px rgba(24,12,3,0.07)',
+        padding: '18px 18px 8px 18px',
+        marginBottom: 24
+      }}>
+        <h2 className="discussion-card__title" style={{marginTop: 0, marginBottom: 12}}>{highlightText(title, searchTerm)}</h2>
+        <PostCard
+          post={{ id, createdAt, title, text, authorUsername, upvotes: localUpvoteCount, commentCount }}
+          isDiscussion={true}
+          currentUser={currentUser}
+          isLoggedIn={isLoggedIn}
+          onReport={handleReport}
+          onUpvote={handleUpvote}
+          onRemoveUpvote={handleRemoveUpvote}
+          onReply={() => setShowLeaveComment(v => !v)}
+          onEdit={() => {/* TODO: open edit modal for discussion */}}
+          upvoteState={{ [id]: isUpvoted }}
+          replyState={{ setShowLoginModal, setReplyingTo, setReplyText, setReplyError }}
+          searchTerm={searchTerm}
+        />
+        {showLeaveComment && (
+          <form
+            className="discussion-comment-form"
+            onSubmit={e => handleReply(e, {
+              text: commentText,
+              setText: setCommentText,
+              setError: setCommentError,
+              setLoading: setCommentLoading,
+              parentId: null,
+              afterSubmit: () => setShowLeaveComment(false)
+            })}
+            style={{ marginTop: 16 }}
+          >
+            <textarea
+              className="discussion-comment-textarea"
+              value={commentText}
+              onChange={e => setCommentText(e.target.value)}
+              rows={3}
+              maxLength={800}
+              placeholder="Write your comment..."
+              style={{ width: "100%", borderRadius: 8, border: "1px solid #e7e2dc", padding: 10, fontSize: "1rem", marginBottom: 6 }}
+              disabled={commentLoading}
+            />
+            {commentError && <div style={{ color: "#b94a48", marginBottom: 6 }}>{commentError}</div>}
             <button
+              type="submit"
               className="discussion-action-btn"
-              onClick={() => {
-                if (!isLoggedIn) {
-                  setShowLoginModal(true);
-                  return;
-                }
-                setShowLeaveComment((v) => !v);
-              }}
+              style={{ background: "#7b4b27", color: "#fff", marginTop: 2 }}
+              disabled={commentLoading}
             >
-              {showLeaveComment ? "Cancel" : "Reply"}
+              {commentLoading ? "Posting..." : "Submit comment"}
             </button>
-            <span className="discussion-replies">{commentCount} replies</span>
-            {showLeaveComment && (
-              <form
-                className="discussion-comment-form"
-                onSubmit={e => handleReply(e, {
-                  text: commentText,
-                  setText: setCommentText,
-                  setError: setCommentError,
-                  setLoading: setCommentLoading,
-                  parentId: null,
-                  afterSubmit: () => setShowLeaveComment(false)
-                })}
-                style={{ marginTop: 16 }}
-              >
-                <textarea
-                  className="discussion-comment-textarea"
-                  value={commentText}
-                  onChange={e => setCommentText(e.target.value)}
-                  rows={3}
-                  maxLength={800}
-                  placeholder="Write your comment..."
-                  style={{ width: "100%", borderRadius: 8, border: "1px solid #e7e2dc", padding: 10, fontSize: "1rem", marginBottom: 6 }}
-                  disabled={commentLoading}
-                />
-                {commentError && <div style={{ color: "#b94a48", marginBottom: 6 }}>{commentError}</div>}
-                <button
-                  type="submit"
-                  className="discussion-action-btn"
-                  style={{ background: "#7b4b27", color: "#fff", marginTop: 2 }}
-                  disabled={commentLoading}
-                >
-                  {commentLoading ? "Posting..." : "Submit comment"}
-                </button>
-              </form>
-            )}
-          </div>
-          <div style={{ marginTop: 18 }}>
-            <strong style={{ color: '#7b4b27', fontSize: '1rem' }}>Replies</strong>
-            {localComments.length === 0 ? (
-              <div style={{ color: '#a08b7b', margin: '8px 0' }}>No replies yet.</div>
-            ) : (
-              <ul style={{ listStyle: 'none', padding: 0, margin: '8px 0' }}>
-                {buildCommentTree(localComments).map(c => renderComment(c))}
-              </ul>
-            )}
-          </div>
-          <footer className="discussion-card__footer">
-          </footer>
-        </article>
+          </form>
+        )}
+        <ul style={{ listStyle: 'none', padding: 0, margin: '18px 0 0 0' }}>
+          {localComments.length > 0 && buildCommentTree(localComments).map(c => renderComment(c))}
+        </ul>
       </div>
-    {showLoginModal && (
-      <AuthModal
-        onClose={() => setShowLoginModal(false)}
-        onLoginSuccess={() => {
-          setShowLoginModal(false);
-          setIsLoggedIn(true);
-        }}
-      />
-    )}
+      {showLoginModal && (
+        <AuthModal
+          onClose={() => setShowLoginModal(false)}
+          onLoginSuccess={() => {
+            setShowLoginModal(false);
+            setIsLoggedIn(true);
+          }}
+        />
+      )}
     </>
   );
 }
