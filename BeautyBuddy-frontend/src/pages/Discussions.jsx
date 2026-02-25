@@ -64,7 +64,7 @@ export default function Discussions() {
               <input
                   type="text"
                   className="discussions-search-bar"
-                  placeholder="Enter terms here..."
+                  placeholder="Search discussions..."
                   value={searchQuery}
                   onChange={e => setSearchQuery(e.target.value)}
                   onKeyDown={e => {

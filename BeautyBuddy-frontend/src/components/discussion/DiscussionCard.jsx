@@ -15,7 +15,7 @@ function highlightText(text, term) {
   );
 }
 
-export default function DiscussionCard({ id, createdAt, title, text, authorUsername, upvoteCount, commentCount, comments = [], searchTerm }) {
+export default function DiscussionCard({ id, createdAt, title, text, authorUsername, upvoteCount, commentCount, comments = [], hasUpvoted, searchTerm }) {
   const [showLeaveComment, setShowLeaveComment] = useState(false);
   const [commentText, setCommentText] = useState("");
   const [commentError, setCommentError] = useState("");
@@ -25,13 +25,26 @@ export default function DiscussionCard({ id, createdAt, title, text, authorUsern
   const [replyText, setReplyText] = useState("");
   const [replyError, setReplyError] = useState("");
   const [replyLoading, setReplyLoading] = useState(false);
-  const [isUpvoted, setIsUpvoted] = useState(false); // This should ideally come from props/backend
+  const [isUpvoted, setIsUpvoted] = useState(hasUpvoted);
+  const [localUpvoteCount, setLocalUpvoteCount] = useState(upvoteCount);
+  // Track upvote state for comments
+  const [commentUpvoteStates, setCommentUpvoteStates] = useState(() => {
+    const map = {};
+    (comments || []).forEach(c => { map[c.id] = c.hasUpvoted; });
+    return map;
+  });
 
   // Helper to refresh comments from backend
   const refreshComments = async () => {
     const discussions = await getDiscussions();
     const discussion = (Array.isArray(discussions) ? discussions : discussions.content || []).find(d => d.id === id);
     setLocalComments(discussion?.comments || []);
+    // Update upvote states for comments
+    const map = {};
+    (discussion?.comments || []).forEach(c => { map[c.id] = c.hasUpvoted; });
+    setCommentUpvoteStates(map);
+    // Update discussion upvote state
+    if (typeof discussion?.hasUpvoted === 'boolean') setIsUpvoted(discussion.hasUpvoted);
   };
 
   const handleReport = async (targetType) => {
@@ -47,18 +60,20 @@ export default function DiscussionCard({ id, createdAt, title, text, authorUsern
   }
 
   const handleUpvote = async (targetType) => {
-    if (targetType === 'discussion') {
+    if (targetType.type === 'discussion') {
       const success = await upvoteDiscussion(id);
       if (success) {
-        alert("Upvoted discussion successfully!");
         setIsUpvoted(true);
+        setLocalUpvoteCount(count => count + 1);
+        await refreshComments();
       } else {
         alert("Failed to upvote discussion.");
       }
-    } else if (targetType === 'comment') {
-      const success = await upvoteComment(id);
+    } else if (targetType.type === 'comment') {
+      const success = await upvoteComment(targetType.id);
       if (success) {
-        alert("Upvoted comment successfully!");
+        setCommentUpvoteStates(states => ({ ...states, [targetType.id]: true }));
+        await refreshComments();
       } else {
         alert("Failed to upvote comment.");
       }
@@ -66,17 +81,20 @@ export default function DiscussionCard({ id, createdAt, title, text, authorUsern
   }
 
   const handleRemoveUpvote = async (targetType) => {
-    if (targetType === 'discussion') {
+    if (targetType.type === 'discussion') {
       const success = await removeUpvoteDiscussion(id);
       if (success) {
-        alert("Removed upvote successfully!");
+        setIsUpvoted(false);
+        setLocalUpvoteCount(count => Math.max(0, count - 1));
+        await refreshComments();
       } else {
         alert("Failed to remove upvote.");
       }
-    } else if (targetType === 'comment') {
-      const success = await removeUpvoteComment(id);
+    } else if (targetType.type === 'comment') {
+      const success = await removeUpvoteComment(targetType.id);
       if (success) {
-        alert("Removed upvote from comment successfully!");
+        setCommentUpvoteStates(states => ({ ...states, [targetType.id]: false }));
+        await refreshComments();
       } else {
         alert("Failed to remove upvote from comment.");
       }
@@ -154,12 +172,16 @@ export default function DiscussionCard({ id, createdAt, title, text, authorUsern
             </button>
             <button
               className="discussion-action-btn"
-              style={{ marginTop: 6, fontSize: '0.75rem' }}
+              type="button"
               onClick={() => {
-                handleUpvote('comment');
+                if (commentUpvoteStates[comment.id]) {
+                  handleRemoveUpvote({ type: 'comment', id: comment.id });
+                } else {
+                  handleUpvote({ type: 'comment', id: comment.id });
+                }
               }}
             >
-              Upvote
+              {commentUpvoteStates[comment.id] ? 'Undo' : 'Upvote'}
             </button>
             <span className="reply-upvotes">{comment.upvotes || 0} upvotes</span>
           </div>
@@ -238,28 +260,28 @@ export default function DiscussionCard({ id, createdAt, title, text, authorUsern
         <h2 className="discussion-card__title">{highlightText(title, searchTerm)}</h2>
         <span className="discussion-card__meta">
             <button
-                className="discussion-action-btn"
-                style={{ marginTop: 6, fontSize: '0.75rem', borderColor: '#b94a48', color: '#b94a48' }}
-                onClick={() => {
-                  handleReport('discussion');
-                }}
-              >
-                Report
+              className="discussion-action-btn"
+              type="button"
+              onClick={() => {
+                handleReport('discussion');
+              }}
+            >
+              Report
             </button>
             <button
               className="discussion-action-btn"
-              style={{ marginTop: 6, fontSize: '0.75rem' }}
+              type="button"
               onClick={() => {
                 if (isUpvoted) {
-                  handleRemoveUpvote('discussion');
+                  handleRemoveUpvote({ type: 'discussion' });
                 } else {
-                  handleUpvote('discussion');
+                  handleUpvote({ type: 'discussion' });
                 }
               }}
             >
-              Upvote
+              {isUpvoted ? 'Undo' : 'Upvote'}
             </button>
-          <span className="discussion-upvotes">{upvoteCount} upvotes</span>
+          <span className="discussion-upvotes">{localUpvoteCount} upvotes</span>
         </span>
       </header>
       <div className="discussion-card__body">
