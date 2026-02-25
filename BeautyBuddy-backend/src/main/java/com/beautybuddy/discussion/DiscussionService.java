@@ -175,8 +175,14 @@ public class DiscussionService {
     public Page<DisplayDiscussionDTO> searchDiscussions(String userEmail, String query, int page, int size) {
         User currentUser = userRepository.findByEmail(userEmail).orElse(null);
         Page<Discussion> results = discussionRepository.findAll(PageRequest.of(page, size));
+        String lowerQuery = query == null ? "" : query.toLowerCase();
         List<DisplayDiscussionDTO> filtered = results.getContent().stream()
-            .filter(discussion -> discussion.getTitle().toLowerCase().contains(query.toLowerCase()) || discussion.getText().toLowerCase().contains(query.toLowerCase()))
+            .filter(discussion -> {
+                boolean discussionMatches = discussion.getTitle().toLowerCase().contains(lowerQuery) || discussion.getText().toLowerCase().contains(lowerQuery);
+                boolean commentMatches = discussion.getComments().stream()
+                    .anyMatch(comment -> comment.getText().toLowerCase().contains(lowerQuery) || (comment.getUser() != null && comment.getUser().getUsername() != null && comment.getUser().getUsername().toLowerCase().contains(lowerQuery)));
+                return discussionMatches || commentMatches;
+            })
             .map(discussion -> new DisplayDiscussionDTO(
                 discussion.getId(),
                 discussion.getCreatedAt(),
@@ -198,7 +204,6 @@ public class DiscussionService {
                     ))
                     .toList(),
                 discussionUpvoteRepository.findByUserAndDiscussion(currentUser, discussion).isPresent()
-                
             ))
             .toList();
         return new PageImpl<>(filtered, PageRequest.of(page, size), filtered.size());
