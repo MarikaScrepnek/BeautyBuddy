@@ -31,7 +31,9 @@ const formatDateTime = (value) => {
 
 function PostCard({ post, isDiscussion, currentUser, isLoggedIn, onReport, onUpvote, onRemoveUpvote, onReply, onEdit, upvoteState, replyState, searchTerm }) {
   const isOwn = currentUser && post.authorUsername && currentUser.username === post.authorUsername;
-  const canEdit = isOwn && (!post.replies || post.replies.length === 0);
+  const canEdit = isDiscussion
+    ? isOwn && (!post.replyCount || post.replyCount === 0)
+    : isOwn && (!post.replies || post.replies.length === 0);
   // Add card background and border for comments
   // Unified card style for both discussion and comment
   const cardStyle = {
