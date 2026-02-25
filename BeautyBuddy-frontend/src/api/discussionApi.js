@@ -47,7 +47,7 @@ export async function editComment(commentId, text) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ text }),
+        body: JSON.stringify({ parentDiscussionCommentId: null, text }),
     });
     return response.ok;
 }
