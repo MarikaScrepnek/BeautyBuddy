@@ -4,6 +4,8 @@ import "./DiscussionCard.css";
 
 import { useState } from "react";
 
+import ReportModal from "../ReportModal";
+
 // Helper to highlight search term
 function highlightText(text, term) {
   if (!term || !text) return text;
@@ -16,6 +18,8 @@ function highlightText(text, term) {
 }
 
 export default function DiscussionCard({ id, createdAt, title, text, authorUsername, upvoteCount, commentCount, comments = [], hasUpvoted, searchTerm }) {
+    const [reportModalOpen, setReportModalOpen] = useState(false);
+    const [reportTarget, setReportTarget] = useState(null);
   const [showLeaveComment, setShowLeaveComment] = useState(false);
   const [commentText, setCommentText] = useState("");
   const [commentError, setCommentError] = useState("");
@@ -48,14 +52,12 @@ export default function DiscussionCard({ id, createdAt, title, text, authorUsern
   };
 
   const handleReport = async (targetType) => {
-    const reason = prompt("Please enter a reason for reporting this discussion:");
-    if (reason) {
-      const success = await reportDiscussion(id, reason);
-      if (success) {
-        alert("Reported discussion successfully!");
-      } else {
-        alert("Failed to report discussion.");
-      }
+    if (targetType === 'discussion') {
+      setReportTarget({ type: 'discussion', id, subtitle: authorUsername ? `Posted by ${authorUsername}` : '' });
+      setReportModalOpen(true);
+    } else if (targetType.type === 'comment') {
+      setReportTarget({ type: 'comment', id: targetType.id, subtitle: targetType.authorUsername ? `Posted by ${targetType.authorUsername}` : '' });
+      setReportModalOpen(true);
     }
   }
 
@@ -149,11 +151,11 @@ export default function DiscussionCard({ id, createdAt, title, text, authorUsern
     return (
       <li key={comment.id} style={{
         background: '#fff',
-        borderRadius: 8,
+        borderRadius: 16,
         border: '1px solid #e7e2dc',
         marginBottom: 8,
         padding: '10px 12px',
-        color: '#3d2b1f',
+        color: '#000000',
         fontSize: '0.98rem',
         marginLeft: depth * 32,
         boxShadow: depth > 0 ? '0 2px 8px rgba(24,12,3,0.07)' : undefined,
@@ -163,9 +165,10 @@ export default function DiscussionCard({ id, createdAt, title, text, authorUsern
           <div className="reply-top-right">
             <button
               className="discussion-action-btn"
-              style={{ marginTop: 6, fontSize: '0.75rem', borderColor: '#b94a48', color: '#b94a48' }}
+              type="button"
+              style={{ borderColor: '#b94a48', color: '#b94a48', fontSize: '0.75rem' }}
               onClick={() => {
-                handleReport('comment');
+                handleReport({ type: 'comment', id: comment.id, authorUsername: comment.authorUsername });
               }}
             >
               Report
@@ -173,6 +176,7 @@ export default function DiscussionCard({ id, createdAt, title, text, authorUsern
             <button
               className="discussion-action-btn"
               type="button"
+              style={{fontSize: '0.75rem' }}
               onClick={() => {
                 if (commentUpvoteStates[comment.id]) {
                   handleRemoveUpvote({ type: 'comment', id: comment.id });
@@ -254,94 +258,121 @@ export default function DiscussionCard({ id, createdAt, title, text, authorUsern
   }
 
   return (
-    <div className="discussions-container">
-    <article className="discussion-card">
-      <header className="discussion-card__header">
-        <h2 className="discussion-card__title">{highlightText(title, searchTerm)}</h2>
-        <span className="discussion-card__meta">
+    <>
+      <ReportModal
+        isOpen={reportModalOpen}
+        onClose={() => { setReportModalOpen(false); setReportTarget(null); }}
+        title={reportTarget?.type === 'comment' ? 'Report comment' : 'Report discussion'}
+        subtitle={reportTarget?.subtitle}
+        placeholder={reportTarget?.type === 'comment' ? 'Tell us why you are reporting this comment...' : 'Tell us why you are reporting this discussion...'}
+        onSubmit={async ({ reason }) => {
+          if (!reportTarget) return;
+          let success = false;
+          if (reportTarget.type === 'discussion') {
+            success = await reportDiscussion(id, reason);
+          } else if (reportTarget.type === 'comment') {
+            success = await reportComment(reportTarget.id, reason);
+          }
+          setReportModalOpen(false);
+          setReportTarget(null);
+          if (success) {
+            alert('Report submitted. Thank you!');
+          } else {
+            alert('Failed to submit report.');
+          }
+        }}
+      />
+      <div className="discussions-container">
+        <article className="discussion-card">
+          <header className="discussion-card__header">
+            <h2 className="discussion-card__title">{highlightText(title, searchTerm)}</h2>
+            <span className="discussion-card__meta">
+              <button
+                className="discussion-action-btn"
+                type="button"
+                style={{ borderColor: '#b94a48', color: '#b94a48', fontSize: '0.75rem' }}
+                onClick={() => {
+                  handleReport('discussion');
+                }}
+              >
+                Report
+              </button>
+              <button
+                className="discussion-action-btn"
+                type="button"
+                style={{fontSize: '0.75rem' }}
+                onClick={() => {
+                  if (isUpvoted) {
+                    handleRemoveUpvote({ type: 'discussion' });
+                  } else {
+                    handleUpvote({ type: 'discussion' });
+                  }
+                }}
+              >
+                {isUpvoted ? 'Undo' : 'Upvote'}
+              </button>
+              <span className="discussion-upvotes">{localUpvoteCount} upvotes</span>
+            </span>
+          </header>
+          <div className="discussion-card__body">
+            <p> {highlightText(text, searchTerm)} </p>
+            <p className="discussion-meta">Posted by {authorUsername} on {new Date(createdAt).toLocaleDateString()}</p>
             <button
               className="discussion-action-btn"
-              type="button"
-              onClick={() => {
-                handleReport('discussion');
-              }}
+              onClick={() => setShowLeaveComment((v) => !v)}
             >
-              Report
+              {showLeaveComment ? "Cancel" : "Reply"}
             </button>
-            <button
-              className="discussion-action-btn"
-              type="button"
-              onClick={() => {
-                if (isUpvoted) {
-                  handleRemoveUpvote({ type: 'discussion' });
-                } else {
-                  handleUpvote({ type: 'discussion' });
-                }
-              }}
-            >
-              {isUpvoted ? 'Undo' : 'Upvote'}
-            </button>
-          <span className="discussion-upvotes">{localUpvoteCount} upvotes</span>
-        </span>
-      </header>
-      <div className="discussion-card__body">
-        <p> {highlightText(text, searchTerm)} </p>
-        <p className="discussion-meta">Posted by {authorUsername} on {new Date(createdAt).toLocaleDateString()}</p>
-        <button
-          className="discussion-action-btn"
-          onClick={() => setShowLeaveComment((v) => !v)}
-        >
-          {showLeaveComment ? "Cancel" : "Reply"}
-        </button>
-        <span className="discussion-replies">{commentCount} replies</span>
-        {showLeaveComment && (
-          <form
-            className="discussion-comment-form"
-            onSubmit={e => handleReply(e, {
-              text: commentText,
-              setText: setCommentText,
-              setError: setCommentError,
-              setLoading: setCommentLoading,
-              parentId: null,
-              afterSubmit: () => setShowLeaveComment(false)
-            })}
-            style={{ marginTop: 16 }}
-          >
-            <textarea
-              className="discussion-comment-textarea"
-              value={commentText}
-              onChange={e => setCommentText(e.target.value)}
-              rows={3}
-              maxLength={800}
-              placeholder="Write your comment..."
-              style={{ width: "100%", borderRadius: 8, border: "1px solid #e7e2dc", padding: 10, fontSize: "1rem", marginBottom: 6 }}
-              disabled={commentLoading}
-            />
-            {commentError && <div style={{ color: "#b94a48", marginBottom: 6 }}>{commentError}</div>}
-            <button
-              type="submit"
-              className="discussion-action-btn"
-              style={{ background: "#7b4b27", color: "#fff", marginTop: 2 }}
-              disabled={commentLoading}
-            >
-              {commentLoading ? "Posting..." : "Submit comment"}
-            </button>
-          </form>
-        )}
+            <span className="discussion-replies">{commentCount} replies</span>
+            {showLeaveComment && (
+              <form
+                className="discussion-comment-form"
+                onSubmit={e => handleReply(e, {
+                  text: commentText,
+                  setText: setCommentText,
+                  setError: setCommentError,
+                  setLoading: setCommentLoading,
+                  parentId: null,
+                  afterSubmit: () => setShowLeaveComment(false)
+                })}
+                style={{ marginTop: 16 }}
+              >
+                <textarea
+                  className="discussion-comment-textarea"
+                  value={commentText}
+                  onChange={e => setCommentText(e.target.value)}
+                  rows={3}
+                  maxLength={800}
+                  placeholder="Write your comment..."
+                  style={{ width: "100%", borderRadius: 8, border: "1px solid #e7e2dc", padding: 10, fontSize: "1rem", marginBottom: 6 }}
+                  disabled={commentLoading}
+                />
+                {commentError && <div style={{ color: "#b94a48", marginBottom: 6 }}>{commentError}</div>}
+                <button
+                  type="submit"
+                  className="discussion-action-btn"
+                  style={{ background: "#7b4b27", color: "#fff", marginTop: 2 }}
+                  disabled={commentLoading}
+                >
+                  {commentLoading ? "Posting..." : "Submit comment"}
+                </button>
+              </form>
+            )}
+          </div>
+          <div style={{ marginTop: 18 }}>
+            <strong style={{ color: '#7b4b27', fontSize: '1rem' }}>Replies</strong>
+            {localComments.length === 0 ? (
+              <div style={{ color: '#a08b7b', margin: '8px 0' }}>No replies yet.</div>
+            ) : (
+              <ul style={{ listStyle: 'none', padding: 0, margin: '8px 0' }}>
+                {buildCommentTree(localComments).map(c => renderComment(c))}
+              </ul>
+            )}
+          </div>
+          <footer className="discussion-card__footer">
+          </footer>
+        </article>
       </div>
-      <div style={{ marginTop: 18 }}>
-        <strong style={{ color: '#7b4b27', fontSize: '1rem' }}>Replies</strong>
-        {localComments.length === 0 ? (
-          <div style={{ color: '#a08b7b', margin: '8px 0' }}>No replies yet.</div>
-        ) : (
-          <ul style={{ listStyle: 'none', padding: 0, margin: '8px 0' }}>
-            {buildCommentTree(localComments).map(c => renderComment(c))}
-          </ul>
-        )}
-      </div>
-      <footer className="discussion-card__footer">
-      </footer>
-    </article>
-    </div>
+    </>
   );
 }
