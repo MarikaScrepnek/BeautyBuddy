@@ -112,7 +112,7 @@ public class DiscussionService {
     }
 
     @Transactional
-    public void editComment(String userEmail, Long commentId, AddDiscussionCommentDTO commentDTO) {
+    public void editComment(String userEmail, Long commentId, String text) {
         User user = userRepository.findByEmail(userEmail)
             .orElseThrow(() -> new RuntimeException("User not found"));
         DiscussionComment comment = discussionCommentRepository.findById(commentId)
@@ -126,7 +126,7 @@ public class DiscussionService {
             throw new RuntimeException("Cannot edit comment with replies");
         }
 
-        comment.setText(commentDTO.text());
+        comment.setText(text);
         comment.setUpdatedAt(LocalDateTime.now());
         discussionCommentRepository.save(comment);
     }
