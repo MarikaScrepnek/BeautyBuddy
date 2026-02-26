@@ -34,7 +34,11 @@ export async function getCurrentUser() {
     if (!res.ok) {
         throw new Error('Failed to fetch current user');
     }
-    return res.json();
+    const data = await res.json();
+    if (!data) {
+        return null;
+    }
+    return data;
 }
 
 export async function logoutUser() {
