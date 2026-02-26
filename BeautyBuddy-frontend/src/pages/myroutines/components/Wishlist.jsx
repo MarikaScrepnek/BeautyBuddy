@@ -1,10 +1,12 @@
 import { useEffect } from "react";
 import { useState } from "react";
+import { FaSearch } from "react-icons/fa";
 
 import { getWishlist, removeFromWishlist } from "../../../api/wishlistApi";
 
 import Toast from "../../../components/Toast";
 import Tooltip from "../../../components/common/Tooltip";
+import Searchbar from "../../../components/common/Searchbar";
 
 import "./Wishlist.css";
 
@@ -36,20 +38,29 @@ export default function Wishlist(isLoggedIn) {
 
   return (
     <div>
+
     {showToast && 
     <Toast message="Item removed from wishlist" type="success" duration={toastTime} onClose={() => setShowToast(false)} />
     }
-      <h1>Wishlist♥</h1>
-      {!isLoggedIn ? (
+
+    <div className="wishlist-header">
+        <h1>Wishlist♥</h1>
+        <span className="wishlist-search">
+            <Searchbar placeholder="Search wishlist..." />
+        </span>
+    </div>
+
+    {!isLoggedIn ? (
+
         <p>Please log in to see your wishlist.</p>
-      ) : (
+    
+    ) : (
         <div className="wishlist-container">
             {wishlist.map((item) => (
-            <div key={item.id}>
-                <div className="wishlist-item-card">
+            <div className="wishlist-item-card" key={item.id}>
 
                     <div className="wishlist-item-header">
-                        <h2 style={{fontSize: "1.25rem"}}>
+                        <h2 style={{fontSize: "1.25rem", textAlign: "center", justifyContent: "center"}}>
                             {item.productName}
                         </h2>
                         <p style={{textAlign: "center"}}>
@@ -82,9 +93,8 @@ export default function Wishlist(isLoggedIn) {
                         </Tooltip>
 
                     </div>
-
+                    
                 </div>
-            </div>
             ))}
         </div>
       )}

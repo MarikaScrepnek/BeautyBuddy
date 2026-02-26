@@ -9,7 +9,7 @@
 .searchbar-container {
   display: flex;
   justify-content: center;
-  width: 700px;
+  width: 100%;
 }
 
 .searchbar {

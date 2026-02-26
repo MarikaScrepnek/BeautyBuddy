@@ -26,13 +26,11 @@ export default function MyRoutines() {
   <div className='routines-page-container'>
     <div className='routines-page-card'>
 
-      <div style={{textAlign: "center", textDecoration: "underline", textDecorationColor: "#f0cef0" }}>
+      <div style={{textAlign: "center", textDecoration: "underline", textDecorationColor: "#f0cef0", padding: "1rem"}}>
         {isLoggedIn ? <p>Welcome back, {username}!</p> : <p>Please log in to view your routines.</p>}
       </div>
-
-      <div className='wishlist-container'>
-          <Wishlist isLoggedIn={isLoggedIn} />
-      </div>
+      
+      <Wishlist isLoggedIn={isLoggedIn} />
 
       <div className='routine-container'>
         <h1>Routines</h1>
