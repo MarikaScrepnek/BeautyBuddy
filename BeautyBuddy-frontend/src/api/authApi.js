@@ -31,12 +31,9 @@ export async function getCurrentUser() {
         method: 'GET',
         credentials: 'include',
     });
-    if (!res.ok) {
-        throw new Error('Failed to fetch current user');
-    }
     const data = await res.json();
-    if (!data) {
-        return null;
+    if (!res.ok || data === null) {
+        throw new Error('Failed to fetch current user');
     }
     return data;
 }
