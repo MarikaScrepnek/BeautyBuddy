@@ -473,7 +473,7 @@ RETURNS TRIGGER AS $$
 BEGIN
     UPDATE wishlist 
     SET updated_at = NOW() 
-    WHERE id = COALESCE(NEW.wishlist_id, OLD.wishlist_id);
+    WHERE account_id = COALESCE(NEW.wishlist_id, OLD.wishlist_id);
     
     RETURN NULL;
 END;

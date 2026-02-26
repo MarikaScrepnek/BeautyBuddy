@@ -2,7 +2,7 @@ import { Routes, Route } from 'react-router-dom';
 import { useState } from 'react';
 
 import Home from './pages/Home';
-import MyRoutines from './pages/MyRoutines';
+import MyRoutines from './pages/myroutines/MyRoutines';
 import Community from './pages/Community';
 import Discussions from './pages/Discussions'; 
 import NavigationBar from './components/NavigationBar';
