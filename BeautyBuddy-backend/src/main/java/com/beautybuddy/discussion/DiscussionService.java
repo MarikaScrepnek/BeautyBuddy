@@ -16,6 +16,8 @@ import com.beautybuddy.discussion.entity.Discussion;
 import com.beautybuddy.discussion.entity.DiscussionComment;
 import com.beautybuddy.discussion.repo.DiscussionCommentRepository;
 import com.beautybuddy.discussion.repo.DiscussionRepository;
+import com.beautybuddy.report.repo.DiscussionCommentReportRepository;
+import com.beautybuddy.report.repo.DiscussionReportRepository;
 import com.beautybuddy.upvote.repo.DiscussionCommentUpvoteRepository;
 import com.beautybuddy.upvote.repo.DiscussionUpvoteRepository;
 import com.beautybuddy.user.User;
@@ -32,12 +34,17 @@ public class DiscussionService {
     private final DiscussionUpvoteRepository discussionUpvoteRepository;
     private final DiscussionCommentUpvoteRepository discussionCommentUpvoteRepository;
 
-    public DiscussionService(UserRepository userRepository, DiscussionRepository discussionRepository, DiscussionCommentRepository discussionCommentRepository, DiscussionUpvoteRepository discussionUpvoteRepository, DiscussionCommentUpvoteRepository discussionCommentUpvoteRepository) {
+    private final DiscussionReportRepository discussionReportRepository;
+    private final DiscussionCommentReportRepository discussionCommentReportRepository;
+
+    public DiscussionService(UserRepository userRepository, DiscussionRepository discussionRepository, DiscussionCommentRepository discussionCommentRepository, DiscussionUpvoteRepository discussionUpvoteRepository, DiscussionCommentUpvoteRepository discussionCommentUpvoteRepository, DiscussionReportRepository discussionReportRepository, DiscussionCommentReportRepository discussionCommentReportRepository) {
         this.userRepository = userRepository;
         this.discussionRepository = discussionRepository;
         this.discussionCommentRepository = discussionCommentRepository;
         this.discussionUpvoteRepository = discussionUpvoteRepository;
         this.discussionCommentUpvoteRepository = discussionCommentUpvoteRepository;
+        this.discussionReportRepository = discussionReportRepository;
+        this.discussionCommentReportRepository = discussionCommentReportRepository;
     }
 
     @Transactional
@@ -165,10 +172,12 @@ public class DiscussionService {
                         comment.getUser().getUsername(),
                         comment.getUpvoteCount(),
                         comment.getReplyCount(),
-                        discussionCommentUpvoteRepository.findByUserAndDiscussionComment(currentUser, comment).isPresent()
+                        discussionCommentUpvoteRepository.findByUserAndDiscussionComment(currentUser, comment).isPresent(),
+                        discussionCommentReportRepository.findByUserAndDiscussionComment(currentUser, comment).isPresent()
                     ))
                     .toList(),
-                discussionUpvoteRepository.findByUserAndDiscussion(currentUser, discussion).isPresent()
+                discussionUpvoteRepository.findByUserAndDiscussion(currentUser, discussion).isPresent(),
+                discussionReportRepository.findByUserAndDiscussion(currentUser, discussion).isPresent()
             ));
     }
 
@@ -200,10 +209,12 @@ public class DiscussionService {
                         comment.getUser().getUsername(),
                         comment.getUpvoteCount(),
                         comment.getReplyCount(),
-                        discussionCommentUpvoteRepository.findByUserAndDiscussionComment(currentUser, comment).isPresent()
+                        discussionCommentUpvoteRepository.findByUserAndDiscussionComment(currentUser, comment).isPresent(),
+                        discussionCommentReportRepository.findByUserAndDiscussionComment(currentUser, comment).isPresent()
                     ))
                     .toList(),
-                discussionUpvoteRepository.findByUserAndDiscussion(currentUser, discussion).isPresent()
+                discussionUpvoteRepository.findByUserAndDiscussion(currentUser, discussion).isPresent(),
+                discussionReportRepository.findByUserAndDiscussion(currentUser, discussion).isPresent()
             ))
             .toList();
         return new PageImpl<>(filtered, PageRequest.of(page, size), filtered.size());

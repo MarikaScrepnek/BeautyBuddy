@@ -10,7 +10,8 @@ public record DisplayCommentDTO(
     String authorUsername,
     Integer upvoteCount,
     Integer replyCount,
-    Boolean hasUpvoted
+    Boolean hasUpvoted,
+    boolean isReported //by person who fetched
 ) {
     
 }
