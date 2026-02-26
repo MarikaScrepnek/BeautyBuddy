@@ -13,5 +13,5 @@ public record DisplayDiscussionDTO(
     Integer replyCount,
     List<DisplayCommentDTO> comments,
     boolean hasUpvoted,
-    boolean isReported //by person who fetched
+    boolean hasReported //by person who fetched
 ) {}

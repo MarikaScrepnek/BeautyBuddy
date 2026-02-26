@@ -1,4 +1,3 @@
-
 import { createComment, getDiscussions, upvoteDiscussion, removeUpvoteDiscussion, upvoteComment, removeUpvoteComment, reportDiscussion, reportComment, editComment, editDiscussion } from "../../api/discussionApi";
 import "./DiscussionCard.css";
 import { useState, useEffect } from "react";
@@ -30,6 +29,44 @@ const formatDateTime = (value) => {
 };
 
 function PostCard({ post, isDiscussion, currentUser, isLoggedIn, onReport, onUpvote, onRemoveUpvote, onReply, onEdit, upvoteState, replyState, searchTerm }) {
+    if (post.isReported) {
+      return (
+        <>
+          <div className={isDiscussion ? "discussion-card" : "comment-card"} style={{
+            marginBottom: 16,
+            background: isDiscussion ? '#e9e3f5' : '#faf1f4',
+            borderRadius: 16,
+            border: '1px solid #e7e2dc',
+            boxShadow: '0 2px 8px rgba(24,12,3,0.07)',
+            padding: '10px 12px',
+          }}>
+            <div style={{ color: '#b94a48', fontWeight: 600, fontSize: '1.1rem', padding: '12px 0' }}>*You reported this post*</div>
+          </div>
+          {/* Render replies if any, outside the reported card */}
+          {post.replies && post.replies.length > 0 && (
+            <ul style={{ listStyle: 'none', padding: 0, margin: '8px 0 0 0' }}>
+              {post.replies.map((r, idx) => (
+                <li key={r.id || idx}>
+                  <PostCard
+                    post={r}
+                    isDiscussion={false}
+                    currentUser={currentUser}
+                    isLoggedIn={isLoggedIn}
+                    onReport={onReport}
+                    onUpvote={onUpvote}
+                    onRemoveUpvote={onRemoveUpvote}
+                    onEdit={onEdit}
+                    upvoteState={upvoteState}
+                    replyState={replyState}
+                    searchTerm={searchTerm}
+                  />
+                </li>
+              ))}
+            </ul>
+          )}
+        </>
+      );
+    }
   const isOwn = currentUser && post.authorUsername && currentUser.username === post.authorUsername;
   const canEdit = isDiscussion
     ? isOwn && (!post.replyCount || post.replyCount === 0)
@@ -257,7 +294,7 @@ function PostCard({ post, isDiscussion, currentUser, isLoggedIn, onReport, onUpv
   );
 }
 
-export default function DiscussionCard({ id, createdAt, title, text, authorUsername, upvoteCount, commentCount, comments = [], hasUpvoted, searchTerm }) {
+export default function DiscussionCard({ id, createdAt, title, text, authorUsername, upvoteCount, commentCount, comments = [], hasUpvoted, hasReported, searchTerm }) {
   const [reportModalOpen, setReportModalOpen] = useState(false);
   const [reportTarget, setReportTarget] = useState(null);
   const [showLeaveComment, setShowLeaveComment] = useState(false);
@@ -271,6 +308,7 @@ export default function DiscussionCard({ id, createdAt, title, text, authorUsern
   const [replyError, setReplyError] = useState("");
   const [replyLoading, setReplyLoading] = useState(false);
   const [isUpvoted, setIsUpvoted] = useState(hasUpvoted);
+  const [isReported, setIsReported] = useState(hasReported);
   const [localUpvoteCount, setLocalUpvoteCount] = useState(upvoteCount);
   const [commentUpvoteStates, setCommentUpvoteStates] = useState(() => {
     const map = {};
@@ -311,6 +349,7 @@ export default function DiscussionCard({ id, createdAt, title, text, authorUsern
     (discussion?.comments || []).forEach(c => { map[c.id] = c.hasUpvoted; });
     setCommentUpvoteStates(map);
     if (typeof discussion?.hasUpvoted === 'boolean') setIsUpvoted(discussion.hasUpvoted);
+    if (typeof discussion?.hasReported === 'boolean') setIsReported(discussion.hasReported);
   };
 
   const handleReport = (post) => {
@@ -448,7 +487,7 @@ export default function DiscussionCard({ id, createdAt, title, text, authorUsern
     return (
       <li key={comment.id} style={{ marginLeft: indent }}>
         <PostCard
-          post={comment}
+          post={{ ...comment, isReported: comment.hasReported }}
           isDiscussion={false}
           currentUser={currentUser}
           isLoggedIn={isLoggedIn}
@@ -493,8 +532,17 @@ export default function DiscussionCard({ id, createdAt, title, text, authorUsern
           let success = false;
           if (reportTarget.type === 'discussion') {
             success = await reportDiscussion(id, reason);
+            if (success) {
+              setIsReported(true); // Immediately mark as reported
+            }
           } else if (reportTarget.type === 'comment') {
             success = await reportComment(reportTarget.id, reason);
+            if (success) {
+              // Remove comment from UI
+              setLocalComments(prev => prev.map(c =>
+                c.id === reportTarget.id ? { ...c, hasReported: true } : c
+              ));
+            }
           }
           setReportModalOpen(false);
           setReportTarget(null);
@@ -538,36 +586,38 @@ export default function DiscussionCard({ id, createdAt, title, text, authorUsern
             </span>
           </div>
         </div>
-        <PostCard
-          post={{ id, createdAt, title: localTitle, text: localText, authorUsername, upvotes: localUpvoteCount, commentCount, replyCount: localComments.length }}
-          isDiscussion={true}
-          currentUser={currentUser}
-          isLoggedIn={isLoggedIn}
-          onReport={handleReport}
-          onUpvote={handleUpvote}
-          onRemoveUpvote={handleRemoveUpvote}
-          onEdit={(updatedPost) => {
-            // If discussion, update local title/text
-            if (updatedPost && updatedPost.title !== undefined && updatedPost.text !== undefined) {
-              setLocalTitle(updatedPost.title);
-              setLocalText(updatedPost.text);
-            }
-          }}
-          upvoteState={{ [id]: isUpvoted }}
-          replyState={{
-            setShowLoginModal,
-            setReplyingTo,
-            setReplyText,
-            setReplyError,
-            setReplyLoading,
-            replyText,
-            replyError,
-            replyLoading,
-            replyingTo,
-            handleReply,
-          }}
-          searchTerm={searchTerm}
-        />
+        {localTitle && localText && (
+          <PostCard
+            post={{ id, createdAt, title: localTitle, text: localText, authorUsername, upvotes: localUpvoteCount, commentCount, replyCount: localComments.length, isReported: isReported }}
+            isDiscussion={true}
+            currentUser={currentUser}
+            isLoggedIn={isLoggedIn}
+            onReport={handleReport}
+            onUpvote={handleUpvote}
+            onRemoveUpvote={handleRemoveUpvote}
+            onEdit={(updatedPost) => {
+              // If discussion, update local title/text
+              if (updatedPost && updatedPost.title !== undefined && updatedPost.text !== undefined) {
+                setLocalTitle(updatedPost.title);
+                setLocalText(updatedPost.text);
+              }
+            }}
+            upvoteState={{ [id]: isUpvoted }}
+            replyState={{
+              setShowLoginModal,
+              setReplyingTo,
+              setReplyText,
+              setReplyError,
+              setReplyLoading,
+              replyText,
+              replyError,
+              replyLoading,
+              replyingTo,
+              handleReply,
+            }}
+            searchTerm={searchTerm}
+          />
+        )}
         <ul style={{ listStyle: 'none', padding: 0, margin: '18px 0 0 0' }}>
           {localComments.length > 0 && filterCommentTree(buildCommentTree(localComments), searchTerm).map(c => renderComment(c))}
         </ul>

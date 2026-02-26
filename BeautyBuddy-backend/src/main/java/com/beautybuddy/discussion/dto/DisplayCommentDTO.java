@@ -11,7 +11,7 @@ public record DisplayCommentDTO(
     Integer upvoteCount,
     Integer replyCount,
     Boolean hasUpvoted,
-    boolean isReported //by person who fetched
+    boolean hasReported //by person who fetched
 ) {
     
 }
