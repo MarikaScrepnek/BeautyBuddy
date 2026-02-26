@@ -65,8 +65,11 @@ public class WishlistService {
                 item.getId(),
                 product.getId(),
                 product.getName(),
+                product.getBrand().getName(),
                 shadeName,
-                imageLink
+                imageLink,
+                product.getPrice(),
+                product.getRating()
             ));
         }
 
