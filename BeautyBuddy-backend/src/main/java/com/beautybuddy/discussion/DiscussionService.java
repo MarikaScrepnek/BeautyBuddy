@@ -20,8 +20,8 @@ import com.beautybuddy.report.repo.DiscussionCommentReportRepository;
 import com.beautybuddy.report.repo.DiscussionReportRepository;
 import com.beautybuddy.upvote.repo.DiscussionCommentUpvoteRepository;
 import com.beautybuddy.upvote.repo.DiscussionUpvoteRepository;
-import com.beautybuddy.user.User;
 import com.beautybuddy.user.UserRepository;
+import com.beautybuddy.user.entity.User;
 
 import jakarta.transaction.Transactional;
 

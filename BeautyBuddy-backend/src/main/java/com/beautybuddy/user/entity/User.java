@@ -1,4 +1,4 @@
-package com.beautybuddy.user;
+package com.beautybuddy.user.entity;
 
 import com.beautybuddy.common.entity.SoftDeletableEntity;
 import com.beautybuddy.wishlist.Wishlist;

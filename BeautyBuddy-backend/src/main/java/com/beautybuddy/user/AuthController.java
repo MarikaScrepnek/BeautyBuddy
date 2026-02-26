@@ -18,6 +18,7 @@ import java.util.Map;
 
 import com.beautybuddy.security.CustomUserDetails;
 import com.beautybuddy.security.JwtUtil;
+import com.beautybuddy.user.dto.UserDTO;
 
 
 @RestController
@@ -79,7 +80,7 @@ public class AuthController {
     @GetMapping("/me")
     public ResponseEntity<UserDTO> getCurrentUser(Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            return ResponseEntity.ok(null);
         }
 
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();

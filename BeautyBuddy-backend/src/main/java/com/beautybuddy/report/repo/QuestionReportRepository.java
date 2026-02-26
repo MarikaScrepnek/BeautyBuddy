@@ -1,8 +1,8 @@
 package com.beautybuddy.report.repo;
 
 import com.beautybuddy.report.entity.QuestionReport;
+import com.beautybuddy.user.entity.User;
 import com.beautybuddy.qa.Question;
-import com.beautybuddy.user.User;
 
 import java.util.List;
 import java.util.Optional;

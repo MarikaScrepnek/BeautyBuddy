@@ -4,8 +4,8 @@ import com.beautybuddy.product.Product;
 import com.beautybuddy.product.ProductRepository;
 import com.beautybuddy.product.ProductShade;
 import com.beautybuddy.product.ProductShadeRepository;
-import com.beautybuddy.user.User;
 import com.beautybuddy.user.UserRepository;
+import com.beautybuddy.user.entity.User;
 
 import java.util.ArrayList;
 import java.util.List;

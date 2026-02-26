@@ -1,7 +1,7 @@
 package com.beautybuddy.upvote;
 
 import com.beautybuddy.common.entity.BaseEntity;
-import com.beautybuddy.user.User;
+import com.beautybuddy.user.entity.User;
 
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;

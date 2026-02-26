@@ -10,9 +10,9 @@ import com.beautybuddy.report.repo.AnswerReportRepository;
 import com.beautybuddy.report.repo.QuestionReportRepository;
 import com.beautybuddy.upvote.repo.AnswerUpvoteRepository;
 import com.beautybuddy.upvote.repo.QuestionUpvoteRepository;
-import com.beautybuddy.user.User;
 import com.beautybuddy.product.Product;
 import com.beautybuddy.user.UserRepository;
+import com.beautybuddy.user.entity.User;
 import com.beautybuddy.product.ProductRepository;
 
 import java.time.LocalDateTime;

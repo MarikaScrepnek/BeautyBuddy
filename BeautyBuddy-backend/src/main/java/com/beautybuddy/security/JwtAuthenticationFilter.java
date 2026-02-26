@@ -6,8 +6,8 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import com.beautybuddy.user.User;
 import com.beautybuddy.user.UserRepository;
+import com.beautybuddy.user.entity.User;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;

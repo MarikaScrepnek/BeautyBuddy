@@ -3,7 +3,6 @@ package com.beautybuddy.report;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.beautybuddy.user.User;
 import com.beautybuddy.discussion.entity.Discussion;
 import com.beautybuddy.discussion.entity.DiscussionComment;
 import com.beautybuddy.discussion.repo.DiscussionCommentRepository;
@@ -29,6 +28,7 @@ import com.beautybuddy.report.repo.ReviewReportRepository;
 import com.beautybuddy.review.ReviewRepository;
 import com.beautybuddy.review.entity.Review;
 import com.beautybuddy.user.UserRepository;
+import com.beautybuddy.user.entity.User;
 
 @Service
 public class ReportService {

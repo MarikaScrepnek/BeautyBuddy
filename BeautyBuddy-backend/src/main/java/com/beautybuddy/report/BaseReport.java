@@ -3,7 +3,7 @@ package com.beautybuddy.report;
 import java.time.LocalDateTime;
 
 import com.beautybuddy.common.entity.BaseEntity;
-import com.beautybuddy.user.User;
+import com.beautybuddy.user.entity.User;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EnumType;

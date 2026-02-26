@@ -1,7 +1,7 @@
 package com.beautybuddy.routine;
 
 import com.beautybuddy.common.entity.SoftDeletableEntity;
-import com.beautybuddy.user.User;
+import com.beautybuddy.user.entity.User;
 import com.beautybuddy.category.Category;
 
 import jakarta.persistence.Column;

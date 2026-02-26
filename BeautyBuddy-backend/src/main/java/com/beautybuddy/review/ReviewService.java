@@ -8,13 +8,13 @@ import com.beautybuddy.review.dto.SubmitReviewDTO;
 import com.beautybuddy.review.entity.Review;
 import com.beautybuddy.review.entity.ReviewImage;
 import com.beautybuddy.user.UserRepository;
+import com.beautybuddy.user.entity.User;
 import com.beautybuddy.upvote.repo.ReviewUpvoteRepository;
 import com.beautybuddy.review.dto.EditReviewDTO;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.beautybuddy.user.User;
 import com.beautybuddy.product.Product;
 import com.beautybuddy.product.ProductShade;
 

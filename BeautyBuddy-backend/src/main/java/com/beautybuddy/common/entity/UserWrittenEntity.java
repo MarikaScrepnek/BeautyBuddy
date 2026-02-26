@@ -1,6 +1,6 @@
 package com.beautybuddy.common.entity;
 
-import com.beautybuddy.user.User;
+import com.beautybuddy.user.entity.User;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.JoinColumn;

@@ -1,7 +1,7 @@
 package com.beautybuddy.wishlist;
 
 import com.beautybuddy.common.entity.ForeignKeyIdEntity;
-import com.beautybuddy.user.User;
+import com.beautybuddy.user.entity.User;
 
 import jakarta.persistence.Table;
 import jakarta.persistence.Column;

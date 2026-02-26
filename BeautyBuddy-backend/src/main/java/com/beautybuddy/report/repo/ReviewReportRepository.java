@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.beautybuddy.report.entity.ReviewReport;
 import com.beautybuddy.review.entity.Review;
-import com.beautybuddy.user.User;
+import com.beautybuddy.user.entity.User;
 
 public interface ReviewReportRepository extends JpaRepository<ReviewReport, Long> {
     Optional<ReviewReport> findByUserAndReview(User user, Review review);
