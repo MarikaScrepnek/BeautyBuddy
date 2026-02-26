@@ -3,8 +3,10 @@ import { useState } from "react";
 
 import { getWishlist, removeFromWishlist } from "../../../api/wishlistApi";
 
-import "./Wishlist.css";
 import Toast from "../../../components/Toast";
+import Tooltip from "../../../components/common/Tooltip";
+
+import "./Wishlist.css";
 
 export default function Wishlist(isLoggedIn) {
     const [showToast, setShowToast] = useState(false);
@@ -64,18 +66,20 @@ export default function Wishlist(isLoggedIn) {
                             <span>Price: ${item.price}</span>
                         </div>
 
-                        <button
-                            className="remove-button"
-                            onClick={() => {
-                                removeFromWishlist(item.productId, item.shadeName).then(() => {
-                                    loadWishlist();
-                                    setShowToast(true);
-                                    setTimeout(() => setShowToast(false), toastTime);
-                                });
-                            }}
-                        >
-                            -
-                        </button>
+                        <Tooltip message="Remove from wishlist" position="top">
+                            <button
+                                className="remove-button"
+                                onClick={() => {
+                                    removeFromWishlist(item.productId, item.shadeName).then(() => {
+                                        loadWishlist();
+                                        setShowToast(true);
+                                        setTimeout(() => setShowToast(false), toastTime);
+                                    });
+                                }}
+                            >
+                                -
+                            </button>
+                        </Tooltip>
 
                     </div>
 
