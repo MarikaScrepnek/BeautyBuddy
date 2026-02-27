@@ -57,7 +57,7 @@ export default function Wishlist({isLoggedIn}) {
             if (e.deltaY !== 0) {
                 e.preventDefault();
                 container.scrollBy({
-                    left: e.deltaY * 3.5, // adjust multiplier for sensitivity
+                    left: e.deltaY * 3, // adjust multiplier for sensitivity
                     behavior: 'smooth'
                 });
             }
@@ -98,6 +98,9 @@ export default function Wishlist({isLoggedIn}) {
                         </h2>
                         <p style={{textAlign: "center"}}>
                             {item.brandName}
+                        </p>
+                        <p style={{textAlign: "center"}}>
+                            in {item.shadeName}
                         </p>
                     </div>
 
