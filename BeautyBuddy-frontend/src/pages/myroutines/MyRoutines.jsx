@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { getCurrentUser } from '../../api/authApi';
 
 import Wishlist from './components/Wishlist';
+import Routines from './components/Routines';
 
 import "./MyRoutines.css";
 
@@ -25,15 +26,13 @@ export default function MyRoutines() {
   return (
   <div className='routines-page-container'>
 
-      <div style={{textAlign: "center", textDecoration: "underline", textDecorationColor: "#f0cef0", padding: "1rem"}}>
+      <div style={{textAlign: "center", textDecoration: "underline", textDecorationColor: "#f0cef0"}}>
         {isLoggedIn ? <p>Welcome back, {username}!</p> : <p>Please log in to view your routines.</p>}
       </div>
       
       <Wishlist isLoggedIn={isLoggedIn} />
 
-      <div className='routine-container'>
-        <h1>Routines</h1>
-      </div>
+      <Routines isLoggedIn={isLoggedIn} />
 
   </div>
   );

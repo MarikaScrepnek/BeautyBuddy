@@ -1,0 +1,16 @@
+.routines-header {
+    display: flex;
+    gap: 1rem;
+}
+
+.add-routine-button {
+    background-color: #f0cef0;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    color: #333;
+
+    margin: 0, auto;
+}
