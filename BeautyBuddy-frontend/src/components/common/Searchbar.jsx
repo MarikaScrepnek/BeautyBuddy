@@ -1,8 +1,24 @@
-import React from "react";
+import React, { useState } from "react";
 import { FaSearch } from "react-icons/fa";
 import "./Searchbar.css";
 
-export default function Searchbar({ placeholder = "Search..." , value, onChange, onSearch, onKeyDown }) {
+export default function Searchbar({ placeholder = "Search...", onSearch }) {
+    const [inputValue, setInputValue] = useState("");
+
+    const handleInputChange = (e) => {
+        setInputValue(e.target.value);
+    };
+
+    const handleSearchClick = () => {
+        if (onSearch) onSearch(inputValue);
+    };
+
+    const handleKeyDown = (e) => {
+        if (e.key === "Enter" && onSearch) {
+            onSearch(inputValue);
+        }
+    };
+
     return (
         <div className="searchbar-center">
             <div className="searchbar-container">
@@ -11,15 +27,15 @@ export default function Searchbar({ placeholder = "Search..." , value, onChange,
                         type="text"
                         className="searchbar-input"
                         placeholder={placeholder}
-                        value={value}
-                        onChange={onChange}
-                        onKeyDown={onKeyDown}
+                        value={inputValue}
+                        onChange={handleInputChange}
+                        onKeyDown={handleKeyDown}
                     />
                     <button
                         type="button"
                         className="searchbar-button"
                         aria-label="Search"
-                        onClick={onSearch}
+                        onClick={handleSearchClick}
                     >
                         <FaSearch />
                     </button>

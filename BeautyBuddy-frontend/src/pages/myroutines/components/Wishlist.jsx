@@ -1,8 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useState } from "react";
-import { FaSearch } from "react-icons/fa";
 
-import { getWishlist, removeFromWishlist } from "../../../api/wishlistApi";
+import { getWishlist, removeFromWishlist, searchWishlist } from "../../../api/wishlistApi";
 
 import Toast from "../../../components/Toast";
 import Tooltip from "../../../components/common/Tooltip";
@@ -34,21 +33,31 @@ export default function Wishlist({isLoggedIn}) {
     }
     };
 
+    async function handleSearch(query) {
+        if (query.trim() === "") {
+            loadWishlist();
+        } else {
+            try {
+                const results = await searchWishlist(query);    
+                setWishlist(results);
+            } catch (err) {
+                setWishlistError("Search failed.");
+            }
+        }
+    }
+
     useEffect(() => {
         loadWishlist();
     }, []);
 
-
-    // Attach wheel event with passive: false to prevent page scroll
     useEffect(() => {
         const container = wishlistContainerRef.current;
         if (!container) return;
         const handleWheel = (e) => {
             if (e.deltaY !== 0) {
                 e.preventDefault();
-                // Use scrollBy with smooth behavior for a natural feel
                 container.scrollBy({
-                    left: e.deltaY * 1.2, // adjust multiplier for sensitivity
+                    left: e.deltaY * 3.5, // adjust multiplier for sensitivity
                     behavior: 'smooth'
                 });
             }
@@ -68,7 +77,7 @@ export default function Wishlist({isLoggedIn}) {
         <div className="wishlist-header">
             <h1>Wishlist♥</h1>
             <span className="wishlist-search">
-                <Searchbar placeholder="Search wishlist..." />
+                <Searchbar placeholder="Search wishlist..." onSearch={handleSearch} />
             </span>
         </div>
 
