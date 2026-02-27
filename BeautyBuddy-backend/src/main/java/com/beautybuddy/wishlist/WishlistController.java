@@ -7,6 +7,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -51,5 +52,15 @@ public class WishlistController {
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         List<WishlistItemDTO> wishlistItems = wishlistService.getWishlistItems(userDetails.getEmail());
         return ResponseEntity.ok(wishlistItems);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<WishlistItemDTO>> searchWishlist(@RequestParam String query, Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(401).build();
+        }
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        List<WishlistItemDTO> searchResults = wishlistService.searchWishlistItems(userDetails.getEmail(), query);
+        return ResponseEntity.ok(searchResults);
     }
 }

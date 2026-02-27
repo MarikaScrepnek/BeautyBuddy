@@ -80,6 +80,38 @@ public class WishlistService {
         return result;
     }
 
+    public List<WishlistItemDTO> searchWishlistItems(String username, String query) {
+        List<WishlistItem> items = wishlistItemRepository.findByWishlist_User_Email(username);
+        List<WishlistItemDTO> result = new ArrayList<>();
+
+        for (WishlistItem item : items) {
+            Product product = item.getProduct();
+            if (product.getName().toLowerCase().contains(query.toLowerCase()) ||
+                product.getBrand().getName().toLowerCase().contains(query.toLowerCase()) ||
+                item.getShade() != null && item.getShade().getShadeName().toLowerCase().contains(query.toLowerCase())) {
+                
+                ProductShade shade = item.getShade();
+                String shadeName = shade != null ? shade.getShadeName() : null;
+                String imageLink = shade != null && shade.getImageLink() != null
+                    ? shade.getImageLink()
+                    : product.getImageLink();
+
+                result.add(new WishlistItemDTO(
+                    item.getId(),
+                    product.getId(),
+                    product.getName(),
+                    product.getBrand().getName(),
+                    shadeName,
+                    imageLink,
+                    product.getPrice(),
+                    product.getRating()
+                ));
+            }
+        }
+
+        return result;
+    }
+
     @Transactional
     public void removeFromWishlist(String email, AddToWishlistRequestDTO request) {
         List<WishlistItem> items = wishlistItemRepository.findByWishlist_User_Email(email);
