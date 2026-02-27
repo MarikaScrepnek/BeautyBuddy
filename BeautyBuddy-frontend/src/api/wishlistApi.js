@@ -32,3 +32,14 @@ export async function getWishlist() {
     }
     return res.json();
 }
+
+export async function searchWishlist(query) {
+    const res = await fetch(`http://localhost:8080/api/wishlist/search?query=${encodeURIComponent(query)}`, {
+        method: "GET",
+        credentials: "include",
+    });
+    if (!res.ok) {
+        throw new Error("Failed to search wishlist");
+    }
+    return res.json();
+}
