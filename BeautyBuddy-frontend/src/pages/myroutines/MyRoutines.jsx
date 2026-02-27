@@ -24,7 +24,6 @@ export default function MyRoutines() {
 
   return (
   <div className='routines-page-container'>
-    <div className='routines-page-card'>
 
       <div style={{textAlign: "center", textDecoration: "underline", textDecorationColor: "#f0cef0", padding: "1rem"}}>
         {isLoggedIn ? <p>Welcome back, {username}!</p> : <p>Please log in to view your routines.</p>}
@@ -36,7 +35,6 @@ export default function MyRoutines() {
         <h1>Routines</h1>
       </div>
 
-    </div>
   </div>
   );
 }

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useState } from "react";
 import { FaSearch } from "react-icons/fa";
 
@@ -10,13 +10,15 @@ import Searchbar from "../../../components/common/Searchbar";
 
 import "./Wishlist.css";
 
-export default function Wishlist(isLoggedIn) {
+export default function Wishlist({isLoggedIn}) {
     const [showToast, setShowToast] = useState(false);
     const toastTime = 1000;
 
     const [wishlist, setWishlist] = useState([]);
     const [wishlistLoading, setWishlistLoading] = useState(false);
     const [wishlistError, setWishlistError] = useState("");
+
+    const wishlistContainerRef = useRef(null);
 
     async function loadWishlist() {
     setWishlistLoading(true);
@@ -36,28 +38,50 @@ export default function Wishlist(isLoggedIn) {
         loadWishlist();
     }, []);
 
-  return (
-    <div>
 
-    {showToast && 
-    <Toast message="Item removed from wishlist" type="success" duration={toastTime} onClose={() => setShowToast(false)} />
-    }
+    // Attach wheel event with passive: false to prevent page scroll
+    useEffect(() => {
+        const container = wishlistContainerRef.current;
+        if (!container) return;
+        const handleWheel = (e) => {
+            if (e.deltaY !== 0) {
+                e.preventDefault();
+                // Use scrollBy with smooth behavior for a natural feel
+                container.scrollBy({
+                    left: e.deltaY * 1.2, // adjust multiplier for sensitivity
+                    behavior: 'smooth'
+                });
+            }
+        };
+        container.addEventListener('wheel', handleWheel, { passive: false });
+        return () => {
+            container.removeEventListener('wheel', handleWheel);
+        };
+    }, []);
 
-    <div className="wishlist-header">
-        <h1>Wishlist♥</h1>
-        <span className="wishlist-search">
-            <Searchbar placeholder="Search wishlist..." />
-        </span>
-    </div>
+    return (
+        <>
+        {showToast && 
+        <Toast message="Item removed from wishlist" type="success" duration={toastTime} onClose={() => setShowToast(false)} />
+        }
 
-    {!isLoggedIn ? (
+        <div className="wishlist-header">
+            <h1>Wishlist♥</h1>
+            <span className="wishlist-search">
+                <Searchbar placeholder="Search wishlist..." />
+            </span>
+        </div>
 
-        <p>Please log in to see your wishlist.</p>
-    
-    ) : (
-        <div className="wishlist-container">
-            {wishlist.map((item) => (
-            <div className="wishlist-item-card" key={item.id}>
+        {!isLoggedIn ? (
+            <p>Please log in to see your wishlist.</p>
+        ) : (
+            <div
+                className="wishlist-container"
+                ref={wishlistContainerRef}
+                style={{scrollBehavior: 'smooth'}}
+            >
+                {wishlist.map((item) => (
+                    <div className="wishlist-item-card" key={item.id}>
 
                     <div className="wishlist-item-header">
                         <h2 style={{fontSize: "1.25rem", textAlign: "center", justifyContent: "center"}}>
@@ -96,8 +120,8 @@ export default function Wishlist(isLoggedIn) {
                     
                 </div>
             ))}
-        </div>
-      )}
-    </div>
-  );
+            </div>
+        )}
+        </>
+    );
 }
