@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import com.beautybuddy.security.CustomUserDetails;
+import com.beautybuddy.wishlist.dto.AddToWishlistRequestDTO;
+import com.beautybuddy.wishlist.dto.WishlistItemDTO;
 
 @RestController
 @RequestMapping("/api/wishlist")

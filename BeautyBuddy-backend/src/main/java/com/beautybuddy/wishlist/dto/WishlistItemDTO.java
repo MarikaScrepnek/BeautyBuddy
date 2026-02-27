@@ -1,4 +1,4 @@
-package com.beautybuddy.wishlist;
+package com.beautybuddy.wishlist.dto;
 
 import java.math.BigDecimal;
 

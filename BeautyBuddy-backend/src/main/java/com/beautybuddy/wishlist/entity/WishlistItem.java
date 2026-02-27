@@ -1,4 +1,4 @@
-package com.beautybuddy.wishlist;
+package com.beautybuddy.wishlist.entity;
 
 import com.beautybuddy.common.entity.BaseEntity;
 import com.beautybuddy.product.Product;

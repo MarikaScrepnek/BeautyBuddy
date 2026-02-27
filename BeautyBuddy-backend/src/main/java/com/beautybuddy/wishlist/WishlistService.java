@@ -6,6 +6,10 @@ import com.beautybuddy.product.ProductShade;
 import com.beautybuddy.product.ProductShadeRepository;
 import com.beautybuddy.user.UserRepository;
 import com.beautybuddy.user.entity.User;
+import com.beautybuddy.wishlist.dto.AddToWishlistRequestDTO;
+import com.beautybuddy.wishlist.dto.WishlistItemDTO;
+import com.beautybuddy.wishlist.entity.Wishlist;
+import com.beautybuddy.wishlist.entity.WishlistItem;
 
 import java.util.ArrayList;
 import java.util.List;

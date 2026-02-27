@@ -1,7 +1,7 @@
 package com.beautybuddy.user;
 
 import com.beautybuddy.user.entity.User;
-import com.beautybuddy.wishlist.Wishlist;
+import com.beautybuddy.wishlist.entity.Wishlist;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;

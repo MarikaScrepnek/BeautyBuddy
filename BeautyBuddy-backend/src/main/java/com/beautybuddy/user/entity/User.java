@@ -1,7 +1,7 @@
 package com.beautybuddy.user.entity;
 
 import com.beautybuddy.common.entity.SoftDeletableEntity;
-import com.beautybuddy.wishlist.Wishlist;
+import com.beautybuddy.wishlist.entity.Wishlist;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

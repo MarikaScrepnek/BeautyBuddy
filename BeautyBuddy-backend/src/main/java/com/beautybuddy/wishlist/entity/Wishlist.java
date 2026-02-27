@@ -1,4 +1,4 @@
-package com.beautybuddy.wishlist;
+package com.beautybuddy.wishlist.entity;
 
 import com.beautybuddy.common.entity.ForeignKeyIdEntity;
 import com.beautybuddy.user.entity.User;
