@@ -12,46 +12,17 @@
 
 .wishlist-container {
     display: flex;
+    flex-wrap: wrap;
     flex-direction: row;
     gap: 10px;
+    justify-content: center;
 
-    overflow-x: auto;
+    overflow-y: scroll;
+    overflow-x: hidden;
     padding-bottom: 10px;
     /* Custom scrollbar for Chrome, Edge, Safari */
     scrollbar-width: thin; /* Firefox */
     scrollbar-color: #e0e0e0 #fafafa; /* Firefox */
-    /* Hide scrollbar buttons/arrows in Webkit browsers */
-    scrollbar-gutter: stable;
-}
-
-.wishlist-container::-webkit-scrollbar {
-    height: 10px;
-    background: #fafafa;
-    border-radius: 999px;
-}
-
-.wishlist-container::-webkit-scrollbar-thumb {
-    background: #e0e0e0;
-    border-radius: 999px;
-    min-width: 40px;
-    min-height: 40px;
-    border: 2px solid #fafafa;
-    transition: background 0.2s;
-}
-
-.wishlist-container::-webkit-scrollbar-thumb:hover {
-    background: #bdbdbd;
-}
-
-.wishlist-container::-webkit-scrollbar-corner {
-    background: transparent;
-}
-
-/* Hide scrollbar arrows/buttons in Webkit browsers */
-.wishlist-container::-webkit-scrollbar-button {
-    display: none;
-    width: 0;
-    height: 0;
 }
 
 .wishlist-item-card {
