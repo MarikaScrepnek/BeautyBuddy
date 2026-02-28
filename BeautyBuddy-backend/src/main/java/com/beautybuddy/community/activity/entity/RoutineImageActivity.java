@@ -1,7 +1,7 @@
 package com.beautybuddy.community.activity.entity;
 
 import com.beautybuddy.community.activity.BaseActivityType;
-import com.beautybuddy.routine.RoutineImage;
+import com.beautybuddy.routine.entity.RoutineImage;
 
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;

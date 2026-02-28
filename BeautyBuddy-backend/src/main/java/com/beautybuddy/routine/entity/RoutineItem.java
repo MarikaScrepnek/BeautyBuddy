@@ -1,4 +1,4 @@
-package com.beautybuddy.routine;
+package com.beautybuddy.routine.entity;
 
 import com.beautybuddy.common.entity.BaseEntity;
 import com.beautybuddy.product.Product;

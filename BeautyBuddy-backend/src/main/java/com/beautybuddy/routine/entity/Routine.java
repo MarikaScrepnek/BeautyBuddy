@@ -1,4 +1,4 @@
-package com.beautybuddy.routine;
+package com.beautybuddy.routine.entity;
 
 import com.beautybuddy.common.entity.SoftDeletableEntity;
 import com.beautybuddy.user.entity.User;
