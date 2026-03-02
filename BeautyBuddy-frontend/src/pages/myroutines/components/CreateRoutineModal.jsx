@@ -33,46 +33,60 @@ export default function CreateRoutineModal( {onClose}) {
 
                 <h2>Create a Routine</h2>
 
-                <p>Routine name: </p>
-                <input type="text" placeholder="Enter routine name" />
+                <div className='modal-input-container'>
 
-                <p>Category: </p>
-                <select value={category} onChange={(e) => setCategory(e.target.value)}>
-                    <option value="">Select category</option>
-                    <option value="skincare">Skincare</option>
-                    <option value="makeup">Makeup</option>
-                    <option value="haircare">Haircare</option>
-                    <option value="bodycare">Bodycare</option>
-                </select>
+                    <div className='modal-input-section'>
+                        <p className='modal-header-text'>Routine name: </p>
+                        <input className="modal-input" type="text" placeholder="Enter routine name"/>
+                    </div>
 
-                {category === "skincare" && (
-                    <>
-                    <p>Time of Day: </p>
-                    <select>
-                        <option value="">Select time of day</option>
-                        <option value="morning">Morning</option>
-                        <option value="afternoon">Afternoon</option>
-                        <option value="evening">Evening</option>
-                    </select>
-                    </>
-                )}
+                    <div className='modal-input-section'>
+                        <p className='modal-header-text'>Category: </p>
+                        <select className="modal-selector" value={category} onChange={(e) => setCategory(e.target.value)}>
+                            <option value="">Select category...</option>
+                            <option value="skincare">Skincare</option>
+                            <option value="makeup">Makeup</option>
+                            <option value="haircare">Haircare</option>
+                            <option value="bodycare">Bodycare</option>
+                        </select>
+                    </div>
 
-                {category === "makeup" && (
-                    <>
-                    <p>Occasion: </p>
-                    <select>
-                        <option value="">Select occasion</option>
-                        <option value="work">Everyday</option>
-                        <option value="casual">Casual</option>
-                        <option value="formal">Glam</option>
-                    </select>
-                    </>
-                )}
+                    <div className='modal-input-section'>
+                        {category === "skincare" && (
+                            <>
+                            <p className='modal-header-text'>Time of Day: </p>
+                            <select className="modal-selector">
+                                <option value="">Select time of day...</option>
+                                <option value="morning">Morning</option>
+                                <option value="afternoon">Afternoon</option>
+                                <option value="evening">Evening</option>
+                            </select>
+                            </>
+                        )}
 
-                <p>Notes: </p>
-                <textarea placeholder="Additional notes about your routine..."></textarea>
+                        {category === "makeup" && (
+                            <>
+                            <p className='modal-header-text'>Occasion: </p>
+                            <select className="modal-selector">
+                                <option value="">Select occasion</option>
+                                <option value="work">Everyday</option>
+                                <option value="casual">Casual</option>
+                                <option value="formal">Glam</option>
+                            </select>
+                            </>
+                        )}
+                    </div>
 
-                <button className="save-button" onClick={handleCreateRoutine}>Save Routine</button>
+                    <div className='modal-input-section'>
+                        <p className='modal-header-text'>Notes: </p>
+                        <textarea className="modal-textarea" placeholder="Additional notes about your routine..."></textarea>
+                    </div>
+
+                </div>
+                    
+                <div style={{display: 'flex', justifyContent: 'center'}}>
+                    <button className="save-button" onClick={handleCreateRoutine}>Save Routine</button>
+                </div>
 
             </div>
         </div>

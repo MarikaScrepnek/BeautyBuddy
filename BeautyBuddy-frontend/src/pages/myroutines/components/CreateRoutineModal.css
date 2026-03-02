@@ -7,6 +7,51 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
+.modal-input-container {
+    display: flex;
+    flex-direction: column;
+
+    margin-top: 30px;
+    margin-bottom: 30px;
+
+    gap: 20px;
+}
+
+.modal-input-section {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.modal-header-text {
+    font-weight: 600;
+    margin-top: 15px;
+    margin-bottom: 5px;
+}
+
+.modal-input {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 100%;
+}
+
+.modal-selector {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 100%;
+}
+
+.modal-textarea {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 100%;
+    height: 100px;
+    resize: vertical;
+}
+
 .close-button {
     background-color: transparent;
     border: none;
@@ -15,4 +60,14 @@
     position: absolute;
     top: 10px;
     right: 10px;
+}
+
+.save-button {
+    background-color: #f0cef0;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
 }

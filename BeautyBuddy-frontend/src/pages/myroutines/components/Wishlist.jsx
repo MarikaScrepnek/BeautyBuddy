@@ -76,9 +76,11 @@ export default function Wishlist({isLoggedIn}) {
 
         <div className="wishlist-header">
             <h1>Wishlist♥</h1>
-            <span className="wishlist-search">
-                <Searchbar placeholder="Search wishlist..." onSearch={handleSearch} />
-            </span>
+            {isLoggedIn && (
+                <span className="wishlist-search">
+                    <Searchbar placeholder="Search wishlist..." onSearch={handleSearch} />
+                </span>
+            )}
         </div>
 
         {!isLoggedIn ? (
