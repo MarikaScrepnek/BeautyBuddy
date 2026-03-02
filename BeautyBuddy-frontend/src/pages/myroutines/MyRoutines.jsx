@@ -26,9 +26,9 @@ export default function MyRoutines() {
   return (
   <div className='routines-page-container'>
 
-      <div style={{textAlign: "center", textDecoration: "underline", textDecorationColor: "#f0cef0"}}>
-        {isLoggedIn ? <p>Welcome back, {username}!</p> : <p>Please log in to view your routines.</p>}
-      </div>
+    {isLoggedIn && (
+      <p style={{textAlign: "center", textDecoration: "underline", textDecorationColor: "#f0cef0"}}>Welcome back, {username}!</p>
+    )}
       
       <Wishlist isLoggedIn={isLoggedIn} />
 
