@@ -4,15 +4,24 @@
 
 -- Insert brands
 INSERT INTO brand(name) VALUES
-('L''Oréal Paris')
+('Elf'),
+('La Roche-Posay'),
+('Vanicream'),
+
+('L''Oréal Paris'),
+('Maybelline'),
+('Nyx Professional Makeup'),
+('Quo'),
+('Fenty Beauty'),
+('Physicians Formula'),
+('Wet n Wild')
 ON CONFLICT (name) DO NOTHING;
 
 -- Insert top-level categories
 INSERT INTO category (name, parent_category_id) VALUES
 ('Makeup', NULL),
 ('Skincare', NULL),
-('Haircare', NULL),
-('Bodycare', NULL)
+('Haircare', NULL)
 ON CONFLICT (name) DO NOTHING;
 
 -- Insert subcategories
@@ -34,7 +43,12 @@ INSERT INTO category (name, parent_category_id) VALUES
 ('Lip Gloss', (SELECT id FROM category WHERE name='Makeup')),
 ('Lip Balm', (SELECT id FROM category WHERE name='Makeup')),
 ('Setting Spray', (SELECT id FROM category WHERE name='Makeup')),
-('Mascara', (SELECT id FROM category WHERE name='Makeup'))
+('Mascara', (SELECT id FROM category WHERE name='Makeup')),
+
+('Cleansing Balm', (SELECT id FROM category WHERE name='Skincare')),
+('Cleanser', (SELECT id FROM category WHERE name='Skincare')),
+('Moisturizer', (SELECT id FROM category WHERE name='Skincare')),
+('Sunscreen', (SELECT id FROM category WHERE name='Skincare'))
 ON CONFLICT (name) DO NOTHING;
 
 -- Insert canonical ingredients (base names)
@@ -58,6 +72,49 @@ ON CONFLICT (name) DO NOTHING;
 
 -- Insert product
 INSERT INTO product (name, brand_id, category_id, price, image_link, product_link, rating, raw_ingredients, may_contain_raw_ingredients) VALUES
+('Holy Hydration! Makeup Melting Cleansing Balm', 
+ (SELECT id FROM brand WHERE name='Elf'),
+ (SELECT id FROM category WHERE name='Cleansing Balm'),
+ 15.00, 
+ 'https://www.elfcosmetics.com/dw/image/v2/BBXC_PRD/on/demandware.static/-/Sites-elf-master/default/dw44d0f80d/2022/HolyHydration!NewPackaging/59910_SCREM_Closed_R.jpg?sfrm=png&sw=780&q=90&strip=false',
+ 'https://www.elfcosmetics.com/en_CA/holy-hydration-makeup-melting-cleansing-balm/59910.html',
+ NULL,
+ 'cetyl ethylhexanoate, caprylic/capric triglyceride, hydrogenated polydecene, peg-20 glyceryl triisostearate, peg-10 isostearate, helianthus annuus (sunflower) seed oil, hydrogenated sunflower seed oil, palmitoyl tripeptide-1, palmitoyl tetrapeptide-7, ceramide 3, ceramide 6 ii, ceramide 1, hydrolyzed sodium hyaluronate, phytosphingosine, glycerin, butylene glycol, water (aqua), polysorbate 20, carbomer, xanthan gum, cholesterol, sodium lauroyl lactylate, phenoxyethanol, ethylhexylglycerin, caprylyl glycol, geraniol, linalool, fragrance (parfum)',
+ NULL
+),
+(
+    'Toleriane Dermo-Cleanser',
+    (SELECT id FROM brand WHERE name='La Roche-Posay'),
+    (SELECT id FROM category WHERE name='Cleanser'),
+    27.00,
+    'https://www.laroche-posay.ca/dw/image/v2/AATL_PRD/on/demandware.static/-/Sites-larocheposay-master-catalog/default/dwd991da26/2022/3433422406599/lrp-toleriane-dermo-cleanser-200ml-3433422406599-00.jpg?sw=720&sh=720&sm=cut&sfrm=jpg&q=70',
+    'https://www.laroche-posay.ca/en_CA/face-care/face-skin-concerns/skincare-for-dry-skin/toleriane-dermo-cleanser/toleriane-dermo-cleanser.html?dwvar_toleriane-dermo-cleanser_size=200_ml',
+    NULL,
+    'Aqua, Ethylhexyl Palmitate, Glycerine, Dipropylene Glycol, Carbomer, Sodium Hydroxide, Ethylhexylglycerin, Capryl Glycol',
+    NULL
+),
+(
+    'Daily Facial Moisturizer ',
+    (SELECT id FROM brand WHERE name='Vanicream'),
+    (SELECT id FROM category WHERE name='Moisturizer'),
+    15.00,
+    'https://www.vanicream.com/dynamic-media/product/images/dfm-at24g-front-2671-ret-crop.jpg?gravity=center&v=galleryZoom&k=mvaGy9Fmo84Lz5jINUACoA',
+    'https://www.vanicream.com/product/vanicream-daily-facial-moisturizer',
+    NULL,
+    'water, squalane, glycerin, pentylene glycol, polyglyceryl-2 stearate, glyceryl stearate, stearyl alcohol, hyaluronic acid, ceramide EOP, ceramide NG, ceramide NP, ceramide AS, ceramide AP, carnosine, hydrogenated lecithin, phytosterols, caprylyl glycol, polyacrylate crosspolymer-11, 1,2-hexanediol',
+    NULL
+),
+(
+    'Anthelios Ultra-Fluid SPF 50+ Facial Sunscreen',
+    (SELECT id FROM brand WHERE name='La Roche-Posay'),
+    (SELECT id FROM category WHERE name='Sunscreen'),
+    35.95,
+    'https://www.laroche-posay.ca/dw/image/v2/AATL_PRD/on/demandware.static/-/Sites-larocheposay-master-catalog/default/dw4e525f92/2021/03337875709361/LRP-Sun-Protection-Anthelios-Ultra-Fluid-Face-Lotion-SPF50+-50ml-03337875709361.jpg?sw=720&sh=720&sm=cut&sfrm=jpg&q=70',
+    'https://www.laroche-posay.ca/en_CA/sunscreen/sun-product-type/sun-fluid/anthelios-ultra-fluid-spf-50-facial-sunscreen/3337875709361.html',
+    NULL,
+    'Aqua, Dicaprylyl Carbonate, Alcohol Denat., Ethylhexyl Salicylate, Diethylamino Hydroxybenzoyl Hexyl Benzoate, Bis-Ethylhexyloxyphenol Methoxyphenyl Triazine, Glycerin, Butylene Glycol, C12-15 Alkyl Benzoate, Dimethicone, Polyglyceryl-3 Methylglucose Distearate, Caprylyl Glycol, Sodium Hydroxide, Phenoxyethanol, Disodium EDTA',
+    NULL
+),
 ('Telescopic Original Mascara', 
  (SELECT id FROM brand WHERE name='L''Oréal Paris'),
  (SELECT id FROM category WHERE name='Mascara'),
