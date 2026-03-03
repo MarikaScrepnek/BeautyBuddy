@@ -65,6 +65,7 @@ export default function NavigationBar({ searchQuery, setSearchQuery }) {
             <NavLink to="/" className={({ isActive }) => isActive ? 'active-link' : undefined}>Home</NavLink>
             <NavLink to="/my-routines" className={({ isActive }) => isActive ? 'active-link' : undefined}>My Routines</NavLink>
             <NavLink to="/discussions" className={({ isActive }) => isActive ? 'active-link' : undefined}>Discussions</NavLink>
+            <NavLink to="/feed" className={({ isActive }) => isActive ? 'active-link' : undefined}>Feed</NavLink>
           </nav>
 
           <div className="search-container">

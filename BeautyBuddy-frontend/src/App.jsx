@@ -6,6 +6,7 @@ import MyRoutines from './pages/myroutines/MyRoutines';
 import Discussions from './pages/Discussions'; 
 import NavigationBar from './components/NavigationBar';
 import ProductDetails from './pages/ProductDetails';
+import Feed from './pages/feed/Feed';
 
 function App() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -17,6 +18,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/my-routines" element={<MyRoutines />} />
           <Route path="/discussions" element={<Discussions />} />
+          <Route path="/feed" element={<Feed />} />
           <Route path='/:productId' element={<ProductDetails />} />
         </Route>
       </Routes>
