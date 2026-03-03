@@ -253,7 +253,7 @@ WHERE shade_id IS NULL;
 
 CREATE TYPE time_of_day_enum AS ENUM ('AM', 'PM');
 
-CREATE TYPE occasion_enum AS ENUM ('EVERYDAY', 'CASUAL', 'FORMAL');
+CREATE TYPE occasion_enum AS ENUM ('EVERYDAY', 'CASUAL', 'GLAM');
 
 CREATE TABLE routine (
     id BIGSERIAL PRIMARY KEY,
@@ -355,8 +355,6 @@ CREATE INDEX idx_skincare_routine_item_shade ON skincare_routine_item (shade_id)
 CREATE TABLE haircare_routine (
     routine_id BIGINT PRIMARY KEY REFERENCES routine(id) ON DELETE CASCADE,
     account_id BIGINT UNIQUE NOT NULL REFERENCES account(id) ON DELETE CASCADE,
-
-    notes TEXT
 );
 CREATE INDEX idx_haircare_routine_account ON haircare_routine (account_id);
 
