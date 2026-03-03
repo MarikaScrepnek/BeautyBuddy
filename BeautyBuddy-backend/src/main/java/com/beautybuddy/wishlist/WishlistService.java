@@ -38,17 +38,18 @@ public class WishlistService {
         Product product = productRepository.findById(request.productId())
             .orElseThrow(() -> new RuntimeException("Product not found"));
 
-        ProductShade shade = shadeRepository.findByProductAndShadeName(product, request.shadeName())
-            .orElseThrow(() -> new RuntimeException("Shade not found"));
+        ProductShade shade = null;
+        if (request.shadeName() != null) {
+            shade = shadeRepository.findByProductAndShadeName(product, request.shadeName())
+                .orElseThrow(() -> new RuntimeException("Shade not found"));
+        }
 
         Wishlist wishlist = user.getWishlist();
 
         WishlistItem item = new WishlistItem();
         item.setWishlist(wishlist);
         item.setProduct(product);
-        if (shade != null) {
-            item.setShade(shade);
-        }
+        item.setShade(shade);
 
         wishlistItemRepository.save(item);
     }
