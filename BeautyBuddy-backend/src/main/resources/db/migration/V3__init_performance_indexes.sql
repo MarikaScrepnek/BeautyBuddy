@@ -155,14 +155,14 @@ ON activity (type, created_at DESC);
 -- ================================================================
 
 -- Current routine items by product (for "who uses this product?")
-CREATE INDEX idx_routine_item_product_current 
+/* CREATE INDEX idx_routine_item_product_current 
 ON routine_item (product_id) 
 WHERE valid_to IS NULL;
 
 -- Current routine items sorted by step
 CREATE INDEX idx_routine_item_current_steps 
 ON routine_item (routine_id, step_order) 
-WHERE valid_to IS NULL;
+WHERE valid_to IS NULL; */
 
 
 -- ================================================================

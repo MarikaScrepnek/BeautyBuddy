@@ -250,70 +250,48 @@ ON wishlist_item (wishlist_id, product_id)
 WHERE shade_id IS NULL;
 
 -------------------------------------------------------------------
+
+CREATE TYPE time_of_day_enum AS ENUM ('AM', 'PM');
+
+CREATE TYPE occasion_enum AS ENUM ('EVERYDAY', 'CASUAL', 'FORMAL');
+
 CREATE TABLE routine (
     id BIGSERIAL PRIMARY KEY,
-    account_id BIGINT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
-    name TEXT NOT NULL,
+    category_id BIGINT NOT NULL REFERENCES category(id) ON DELETE CASCADE,
+
     notes TEXT,
-    category_id BIGINT NOT NULL REFERENCES category(id),
 
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    deleted_at TIMESTAMPTZ NULL,
+    deleted_at TIMESTAMPTZ DEFAULT NULL,
 
-    CHECK (length(trim(name)) > 0),
-    CHECK (notes IS NULL OR length(trim(notes)) > 0),
-
-    UNIQUE (account_id, name)
-);
-CREATE INDEX idx_routine_account ON routine (account_id);
-CREATE INDEX idx_routine_category ON routine (category_id);
-
-CREATE TABLE routine_item (
-    id BIGSERIAL PRIMARY KEY,
-    routine_id BIGINT NOT NULL REFERENCES routine(id) ON DELETE CASCADE,
-
-    product_id BIGINT NOT NULL REFERENCES product(id) ON DELETE CASCADE,
-    shade_id BIGINT,
-
-    step_order INT NOT NULL,
-    notes TEXT,
-
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     valid_from TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    valid_to   TIMESTAMPTZ NULL, -- NULL = current version
-
-    CHECK (step_order >= 1),
-    CHECK (valid_to IS NULL OR valid_to > valid_from),
-    CHECK (shade_id IS NULL OR product_id IS NOT NULL),
-
-    FOREIGN KEY (shade_id, product_id)
-    REFERENCES product_shade(id, product_id)
-    ON DELETE SET NULL
+    valid_to TIMESTAMPTZ DEFAULT NULL
 );
-CREATE INDEX idx_routine_item_routine ON routine_item (routine_id);
-CREATE INDEX idx_routine_item_product ON routine_item (product_id);
 
-CREATE UNIQUE INDEX uniq_current_step_per_routine
-ON routine_item (routine_id, step_order)
-WHERE valid_to IS NULL;
+-- Trigger function to enforce only base categories
+CREATE OR REPLACE FUNCTION check_base_category_for_routine()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF EXISTS (
+        SELECT 1 FROM category WHERE id = NEW.category_id AND parent_category_id IS NOT NULL
+    ) THEN
+        RAISE EXCEPTION 'Routine category_id % must be a base category (parent_category_id IS NULL)', NEW.category_id;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
 
-CREATE UNIQUE INDEX uq_current_routine_item_product_noshade
-ON routine_item (routine_id, product_id)
-WHERE valid_to IS NULL AND shade_id IS NULL;
-
-CREATE UNIQUE INDEX uq_current_routine_item_product_shade
-ON routine_item (routine_id, product_id, shade_id)
-WHERE valid_to IS NULL AND shade_id IS NOT NULL;
---When someone “removes” an item: you just set valid_to = now() (no special removed_at column needed)
---When they “add” it again later: you insert a new row with a new valid_from
+CREATE TRIGGER routine_base_category_check
+BEFORE INSERT OR UPDATE ON routine
+FOR EACH ROW EXECUTE FUNCTION check_base_category_for_routine();
 
 CREATE TABLE routine_image (
     id BIGSERIAL PRIMARY KEY,
     routine_id BIGINT NOT NULL REFERENCES routine(id) ON DELETE CASCADE,
     image_link TEXT NOT NULL,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     display_order INT NOT NULL DEFAULT 1,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
     UNIQUE (routine_id, image_link),
 
@@ -321,11 +299,84 @@ CREATE TABLE routine_image (
 );
 CREATE INDEX idx_routine_image_routine ON routine_image (routine_id);
 
---add routine item schedules later
+CREATE TABLE makeup_routine (
+    routine_id BIGINT PRIMARY KEY REFERENCES routine(id) ON DELETE CASCADE,
+    account_id BIGINT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
+    occasion occasion_enum NOT NULL,
+    name TEXT
+);
+CREATE INDEX idx_makeup_routine_account ON makeup_routine (account_id);
 
+CREATE TABLE makeup_routine_item (
+    id BIGSERIAL PRIMARY KEY,
+    routine_id BIGINT NOT NULL REFERENCES makeup_routine(routine_id) ON DELETE CASCADE,
+    product_id BIGINT NOT NULL REFERENCES product(id) ON DELETE CASCADE,
+    shade_id BIGINT REFERENCES product_shade(id) ON DELETE SET NULL,
 
+    step_order INT NOT NULL,
+    notes TEXT,
 
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    valid_from TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    valid_to TIMESTAMPTZ DEFAULT NULL
+);
+CREATE INDEX idx_makeup_routine_item_routine ON makeup_routine_item (routine_id);
+CREATE INDEX idx_makeup_routine_item_product ON makeup_routine_item (product_id);
+CREATE INDEX idx_makeup_routine_item_shade ON makeup_routine_item (shade_id);
 
+CREATE TABLE skincare_routine (
+    routine_id BIGINT PRIMARY KEY REFERENCES routine(id) ON DELETE CASCADE,
+    account_id BIGINT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
+
+    time_of_day time_of_day_enum NOT NULL,
+
+    UNIQUE (account_id, time_of_day)
+);
+CREATE INDEX idx_skincare_routine_account ON skincare_routine (account_id);
+
+CREATE TABLE skincare_routine_item (
+    id BIGSERIAL PRIMARY KEY,
+    routine_id BIGINT NOT NULL REFERENCES skincare_routine(routine_id) ON DELETE CASCADE,
+    product_id BIGINT NOT NULL REFERENCES product(id) ON DELETE CASCADE,
+    shade_id BIGINT REFERENCES product_shade(id) ON DELETE SET NULL,
+
+    step_order INT NOT NULL,
+    occurrence TEXT,
+    notes TEXT,
+
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    valid_from TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    valid_to TIMESTAMPTZ DEFAULT NULL
+);
+CREATE INDEX idx_skincare_routine_item_routine ON skincare_routine_item (routine_id);
+CREATE INDEX idx_skincare_routine_item_product ON skincare_routine_item (product_id);
+CREATE INDEX idx_skincare_routine_item_shade ON skincare_routine_item (shade_id);
+
+CREATE TABLE haircare_routine (
+    routine_id BIGINT PRIMARY KEY REFERENCES routine(id) ON DELETE CASCADE,
+    account_id BIGINT UNIQUE NOT NULL REFERENCES account(id) ON DELETE CASCADE,
+
+    notes TEXT
+);
+CREATE INDEX idx_haircare_routine_account ON haircare_routine (account_id);
+
+CREATE TABLE haircare_routine_item (
+    id BIGSERIAL PRIMARY KEY,
+    routine_id BIGINT NOT NULL REFERENCES haircare_routine(routine_id) ON DELETE CASCADE,
+    product_id BIGINT NOT NULL REFERENCES product(id) ON DELETE CASCADE,
+    shade_id BIGINT REFERENCES product_shade(id) ON DELETE SET NULL,
+
+    step_order INT NOT NULL,
+    occurrence TEXT,
+    notes TEXT,
+
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    valid_from TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    valid_to TIMESTAMPTZ DEFAULT NULL
+);
+CREATE INDEX idx_haircare_routine_item_routine ON haircare_routine_item (routine_id);
+CREATE INDEX idx_haircare_routine_item_product ON haircare_routine_item (product_id);
+CREATE INDEX idx_haircare_routine_item_shade ON haircare_routine_item (shade_id);
 
 --================================================================
 -- Product Page Content: Reviews, Q&A
@@ -766,28 +817,6 @@ CREATE INDEX idx_discussion_comment_upvoted_notification_discussion_comment ON d
 
 
 
-
-
--- ===========================================================================
--- Community Posts: Public
--- ===========================================================================
-
-CREATE TABLE public_community_post (
-    id BIGSERIAL PRIMARY KEY,
-    title TEXT NOT NULL,
-    content TEXT NOT NULL,
-    media JSONB,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    deleted_at TIMESTAMPTZ NULL,
-
-    CHECK (length(trim(title)) > 0),
-    CHECK (length(trim(content)) > 0)
-);
-
-
-
-
 -- ===========================================================================
 -- Activity Feed (followed accounts only)
 -- ===========================================================================
@@ -817,11 +846,23 @@ CREATE TABLE review_activity (
 );
 CREATE INDEX idx_review_activity_review ON review_activity (review_id);
 
-CREATE TABLE routine_item_activity (
+CREATE TABLE skincare_routine_item_activity (
     activity_id BIGINT PRIMARY KEY REFERENCES activity(id) ON DELETE CASCADE,
-    routine_item_id BIGINT NOT NULL REFERENCES routine_item(id) ON DELETE CASCADE
+    routine_item_id BIGINT NOT NULL REFERENCES skincare_routine_item(id) ON DELETE CASCADE
 );
-CREATE INDEX idx_routine_item_activity_routine_item ON routine_item_activity (routine_item_id);
+CREATE INDEX idx_skincare_routine_item_activity_routine_item ON skincare_routine_item_activity (routine_item_id);
+
+CREATE TABLE makeup_routine_item_activity (
+    activity_id BIGINT PRIMARY KEY REFERENCES activity(id) ON DELETE CASCADE,
+    routine_item_id BIGINT NOT NULL REFERENCES makeup_routine_item(id) ON DELETE CASCADE
+);
+CREATE INDEX idx_makeup_routine_item_activity_routine_item ON makeup_routine_item_activity (routine_item_id);
+
+CREATE TABLE haircare_routine_item_activity (
+    activity_id BIGINT PRIMARY KEY REFERENCES activity(id) ON DELETE CASCADE,
+    routine_item_id BIGINT NOT NULL REFERENCES haircare_routine_item(id) ON DELETE CASCADE
+);
+CREATE INDEX idx_haircare_routine_item_activity_routine_item ON haircare_routine_item_activity (routine_item_id);
 
 CREATE TABLE routine_image_activity (
     activity_id BIGINT PRIMARY KEY REFERENCES activity(id) ON DELETE CASCADE,

@@ -141,10 +141,6 @@ CREATE TRIGGER trigger_update_discussion_comment_updated_at
     )
     EXECUTE FUNCTION update_updated_at_column();
 
-CREATE TRIGGER trigger_update_public_community_post_updated_at
-    BEFORE UPDATE ON public_community_post
-    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
 CREATE OR REPLACE FUNCTION update_product_purchase_on_repurchase()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -488,7 +484,7 @@ CREATE TRIGGER trigger_update_wishlist_on_item_change
 -- Update routine.updated_at when items or images change
 -- ================================================================
 
-CREATE OR REPLACE FUNCTION update_routine_on_change()
+/* CREATE OR REPLACE FUNCTION update_routine_on_change()
 RETURNS TRIGGER AS $$
 BEGIN
     UPDATE routine 
@@ -505,7 +501,7 @@ CREATE TRIGGER trigger_update_routine_on_item_change
 
 CREATE TRIGGER trigger_update_routine_on_image_change
     AFTER INSERT OR UPDATE OR DELETE ON routine_image
-    FOR EACH ROW EXECUTE FUNCTION update_routine_on_change();
+    FOR EACH ROW EXECUTE FUNCTION update_routine_on_change(); */
 
 
 -- ================================================================
