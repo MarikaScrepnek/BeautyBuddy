@@ -101,9 +101,11 @@ export default function Wishlist({isLoggedIn}) {
                         <p style={{textAlign: "center"}}>
                             {item.brandName}
                         </p>
-                        <p style={{textAlign: "center"}}>
-                            in {item.shadeName}
-                        </p>
+                        {item.shadeName && (
+                            <p style={{textAlign: "center"}}>
+                                in {item.shadeName}
+                            </p>
+                        )}
                     </div>
 
                     <img src={item.imageLink} alt="Product" style={{"height": "250px"}} />
