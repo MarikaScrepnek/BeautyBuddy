@@ -354,7 +354,7 @@ CREATE INDEX idx_skincare_routine_item_shade ON skincare_routine_item (shade_id)
 
 CREATE TABLE haircare_routine (
     routine_id BIGINT PRIMARY KEY REFERENCES routine(id) ON DELETE CASCADE,
-    account_id BIGINT UNIQUE NOT NULL REFERENCES account(id) ON DELETE CASCADE,
+    account_id BIGINT UNIQUE NOT NULL REFERENCES account(id) ON DELETE CASCADE
 );
 CREATE INDEX idx_haircare_routine_account ON haircare_routine (account_id);
 
