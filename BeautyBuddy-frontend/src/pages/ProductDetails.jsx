@@ -675,16 +675,19 @@ export default function ProductDetails() {
                         <span key={idx} className="tag">{i.name}</span>
                         ))}
                     </div>
-
-                    <div className="may-contain-list">
-                        <div className="may-contain-header">May Contain</div>
-                        {data.mayContainIngredients.map((i, idx) => (
-                        <span key={i.name}>
-                            {i.name}
-                            {idx < data.mayContainIngredients.length - 1 && ", "}
-                        </span>
-                        ))}
-                    </div>
+                    
+                    {data.mayContainIngredients?.length > 0 && (
+                        <div className="may-contain-list">
+                            <div className="may-contain-header">May Contain</div>
+                            {data.mayContainIngredients.map((i, idx) => (
+                                <span key={i.name}>
+                                    {i.name}
+                                    {idx < data.mayContainIngredients.length - 1 && ", "}
+                                </span>
+                            ))}
+                        </div>
+                    )
+                    }
                     </>
                 )}
             </section>
