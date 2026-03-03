@@ -79,14 +79,18 @@ export default function ProductList({ searchQuery, onLoadingChange }) {
           {p.image_link && (
             <img src={p.image_link} alt={p.name} className="product-image-home" />
           )}
-          <h3>{p.name} by {p.brand?.name}</h3>
-          <p className="shade-count">
-            {p.shades?.length > 1 ? `${p.shades.length} shades` : "\u00A0"}
-          </p>
-          <p>Rating: {p.rating ? `${p.rating}/5` : "N/A"}</p>
-          <p>
-            Price: {p.price ? `≈ ${priceMap[p.id]}` : "N/A"}
-          </p>
+          <div className="product-card-content">
+            <h3 className="product-card-title">{p.name} by {p.brand?.name}</h3>
+            <div className="product-card-bottom">
+              <p className="shade-count">
+                {p.shades?.length > 1 ? `${p.shades.length} shades` : "\u00A0"}
+              </p>
+              <p>Rating: {p.rating ? `${p.rating}/5` : "N/A"}</p>
+              <p className="product-card-price">
+                Price: {p.price ? `≈ ${priceMap[p.id]}` : "N/A"}
+              </p>
+            </div>
+          </div>
         </div>
       ))}
     </div>
