@@ -6,11 +6,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.beautybuddy.routine.dto.AddToRoutineRequestDTO;
 import com.beautybuddy.routine.dto.CreateMakeupRoutineRequestDTO;
 import com.beautybuddy.routine.dto.DisplayRoutineDTO;
 import com.beautybuddy.security.CustomUserDetails;
@@ -50,7 +53,7 @@ public class RoutineController {
     }
 
     @PostMapping("/makeup")
-    public ResponseEntity<Void> createMakeupRoutine(Authentication authentication, CreateMakeupRoutineRequestDTO request) {
+    public ResponseEntity<Void> createMakeupRoutine(Authentication authentication, @RequestBody CreateMakeupRoutineRequestDTO request) {
         if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.status(401).build();
         }
@@ -70,8 +73,13 @@ public class RoutineController {
     }
 
     @PostMapping("/{id}/add-product")
-    public String addProductToRoutine() {
-        return "This will add a product to the routine with the given ID.";
+    public ResponseEntity<Void> addProductToRoutine(Authentication authentication, @PathVariable Long id, @RequestBody AddToRoutineRequestDTO request) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(401).build();
+        }
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        routineService.addProductToRoutine(userDetails.getEmail(), id, request);
+        return ResponseEntity.ok().build();
     }
 
     @PutMapping("/{id}/update-product")

@@ -22,7 +22,7 @@ public class Routine extends SoftDeletableEntity {
     private String notes;
 
     @Column(name = "valid_from", nullable = false)
-    private LocalDateTime validFrom;
+    private LocalDateTime validFrom = LocalDateTime.now();
 
     @Column(name = "valid_to", nullable = true)
     private LocalDateTime validTo;
