@@ -6,6 +6,7 @@ import Wishlist from './components/Wishlist';
 import Routines from './components/Routines';
 
 import "./MyRoutines.css";
+import Searchbar from '../../components/common/Searchbar';
 
 export default function MyRoutines() {
   // log in
@@ -54,6 +55,10 @@ export default function MyRoutines() {
               {item}
             </li>
           ))}
+          <li>
+            <Searchbar placeholder="Enter a date..." onSearch={(query) => console.log("Searching for:", query)} />
+            <p>Enter a date and we will show what products were in your routine:</p>
+          </li>
         </ul>
       </aside>
       
