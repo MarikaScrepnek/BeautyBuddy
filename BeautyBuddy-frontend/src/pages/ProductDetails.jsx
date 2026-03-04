@@ -10,6 +10,7 @@ import QuestionCard from "../components/QuestionCard";
 import SubmitReviewModal from "../components/SubmitReviewModal";
 import ReviewList from "../components/ReviewList";
 import ReportModal from "../components/ReportModal";
+import AddToRoutineModal from "./productdetails/AddToRoutineModal";
 
 import { searchReviews } from "../api/reviewApi";
 import { searchQuestions } from "../api/qaApi";
@@ -60,6 +61,8 @@ export default function ProductDetails() {
     const [searchResults, setSearchResults] = useState({ reviews: [], questions: [] });
     const [exchangeRate, setExchangeRate] = useState(1);
     const [formattedPrice, setFormattedPrice] = useState("");
+
+    const[addToRoutineOpen, setAddToRoutineOpen] = useState(false);
 
     // --- Currency localization logic below all hooks ---
     const localeCurrencyMap = {
@@ -313,7 +316,7 @@ export default function ProductDetails() {
             setShowLoginModal(true);
             return;
         }
-        // Logic to add to routine
+        setAddToRoutineOpen(true);
     };
 
     const handleAskQuestion = async () => {
@@ -936,6 +939,15 @@ export default function ProductDetails() {
             </section>
 
         </div>
+        {addToRoutineOpen && (
+            <AddToRoutineModal
+                baseCategory={data.category}
+                productName={data.name}
+                productId={data.id}
+                shadeName={selectedShade?.shadeName ?? ""}
+                onClose={() => setAddToRoutineOpen(false)}
+            />
+        )}
     </div>
   );
 }
