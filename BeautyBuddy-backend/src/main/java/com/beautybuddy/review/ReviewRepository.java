@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import java.util.Optional;
 
 import com.beautybuddy.review.entity.Review;
 
@@ -16,6 +17,8 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
         Long productId,
         Pageable pageable
     );
+
+    Optional<Review> findByProduct_IdAndProductShade_IdAndUser_Id(Long productId, Long shadeId, Long userId);
 
     @Query("""
         SELECT AVG(r.rating)
