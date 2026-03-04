@@ -12,6 +12,10 @@ export default function MyRoutines() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState("");
 
+  // sidebar state
+  const [selected, setSelected] = useState("Haircare");
+  const menuItems = ["Haircare", "Makeup", "Skincare", "Wishlist"];
+
   // on mount
   useEffect(() => {
 
@@ -29,10 +33,38 @@ export default function MyRoutines() {
     {isLoggedIn && (
       <p style={{textAlign: "center", textDecoration: "underline", textDecorationColor: "#f0cef0"}}>Welcome back, {username}!</p>
     )}
-      
-      <Wishlist isLoggedIn={isLoggedIn} />
 
-      <Routines isLoggedIn={isLoggedIn} />
+    <div style={{display: "flex", flexDirection: "row", minHeight: "80vh"}}>
+      
+      <aside className='routines-sidebar' style={{ width: "200px", background: "#f7f7f7", padding: "1rem 0", borderRight: "1px solid #eee" }}>
+        <h2 style={{textAlign: "center"}}>My Routines</h2>
+        <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+          {menuItems.map((item) => (
+            <li
+              key={item}
+              onClick={() => setSelected(item)}
+              style={{
+                padding: "1rem",
+                cursor: "pointer",
+                background: selected === item ? "#e0e0e0" : "transparent",
+                fontWeight: selected === item ? "bold" : "normal",
+                borderLeft: selected === item ? "4px solid #6c63ff" : "4px solid transparent"
+              }}
+            >
+              {item}
+            </li>
+          ))}
+        </ul>
+      </aside>
+      
+      <main style={{ flex: 1, padding: "2rem" }}>
+        {selected === "Haircare" && <div>Haircare routine content goes here.</div>}
+        {selected === "Makeup" && <div>Makeup routine content goes here.</div>}
+        {selected === "Skincare" && <div>Skincare routine content goes here.</div>}
+        {selected === "Wishlist" && <Wishlist isLoggedIn={isLoggedIn} />}
+        {/* You can replace the above divs with your actual components */}
+      </main>
+    </div>
 
   </div>
   );
