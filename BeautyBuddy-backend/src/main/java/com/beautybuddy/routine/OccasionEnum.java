@@ -1,7 +1,7 @@
 package com.beautybuddy.routine;
 
 public enum OccasionEnum {
-    EVERDAY,
+    EVERYDAY,
     CASUAL,
     GLAM
 }
