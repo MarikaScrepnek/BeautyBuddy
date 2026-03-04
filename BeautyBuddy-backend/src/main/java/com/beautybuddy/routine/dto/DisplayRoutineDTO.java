@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public record DisplayRoutineDTO(
+    Long routineId,
     String name, //can be null
     String author,
     LocalDateTime updatedAt,
