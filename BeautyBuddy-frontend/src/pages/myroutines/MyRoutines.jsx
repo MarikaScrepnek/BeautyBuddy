@@ -13,8 +13,8 @@ export default function MyRoutines() {
   const [username, setUsername] = useState("");
 
   // sidebar state
-  const [selected, setSelected] = useState("Haircare");
-  const menuItems = ["Haircare", "Makeup", "Skincare", "Wishlist"];
+  const [selected, setSelected] = useState("Wishlist");
+  const menuItems = ["Wishlist", "Makeup", "Skincare", "Haircare"];
 
   // on mount
   useEffect(() => {
@@ -58,11 +58,28 @@ export default function MyRoutines() {
       </aside>
       
       <main style={{ flex: 1, padding: "2rem" }}>
-        {selected === "Haircare" && <div>Haircare routine content goes here.</div>}
-        {selected === "Makeup" && <div>Makeup routine content goes here.</div>}
-        {selected === "Skincare" && <div>Skincare routine content goes here.</div>}
-        {selected === "Wishlist" && <Wishlist isLoggedIn={isLoggedIn} />}
-        {/* You can replace the above divs with your actual components */}
+
+        {selected === "Haircare" && 
+        <div>
+          Haircare routine content goes here.
+        </div>
+        }
+
+        {selected === "Makeup" && 
+        <div>
+          Makeup routine content goes here.
+        </div>}
+
+        {selected === "Skincare" && 
+        <div>
+          Skincare routine content goes here.
+        </div>
+        }
+
+        {selected === "Wishlist" && 
+        <Wishlist isLoggedIn={isLoggedIn} />
+        }
+
       </main>
     </div>
 
