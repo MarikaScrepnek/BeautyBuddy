@@ -6,12 +6,12 @@ import com.beautybuddy.common.entity.BaseEntity;
 import com.beautybuddy.user.entity.User;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MappedSuperclass;
-import org.hibernate.annotations.ColumnTransformer;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 @MappedSuperclass
 public abstract class BaseReport extends BaseEntity{
@@ -22,9 +22,9 @@ public abstract class BaseReport extends BaseEntity{
     @Column(name = "reason", nullable = true)
     private String reason;
 
-    @Column(name = "status", nullable = false)
-    @Enumerated(EnumType.STRING)
-    @ColumnTransformer(write = "?::report_status_enum")
+    @Enumerated
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+    @Column(columnDefinition = "report_status_enum", name = "status", nullable = false)
     private ReportStatus status = ReportStatus.OPEN;
 
     @Column(name = "resolved_at", nullable = true)
