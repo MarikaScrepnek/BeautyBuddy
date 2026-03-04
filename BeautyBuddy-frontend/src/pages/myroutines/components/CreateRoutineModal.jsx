@@ -2,12 +2,22 @@ import { useEffect } from 'react';
 import { useState } from 'react';
 
 import './CreateRoutineModal.css';
+import { createMakeupRoutine } from '../../../api/routineApi';
 
-export default function CreateRoutineModal( {onClose}) {
-    const [category, setCategory] = useState("skincare");
+export default function CreateRoutineModal( {onClose} ) {
+    const [occasion, setOccasion] = useState("CASUAL");
+    const [name, setName] = useState("");
+    const [notes, setNotes] = useState("");
 
     async function handleCreateRoutine() {
-        onClose();
+        createMakeupRoutine(occasion, name, notes)
+            .then((data) => {
+                console.log("Routine created:", data);
+                onClose();
+            })
+            .catch((error) => {
+                console.error("Error creating routine:", error);
+            });
     }
 
     //escape to close modal
@@ -37,22 +47,22 @@ export default function CreateRoutineModal( {onClose}) {
 
                     <div className='modal-input-section'>
                         <p className='modal-header-text'>Occasion: </p>
-                        <select className="modal-selector">
+                        <select className="modal-selector" value={occasion} onChange={(e) => setOccasion(e.target.value)}>
                             <option value="">Select occasion...</option>
-                            <option value="work">Everyday</option>
-                            <option value="casual">Casual</option>
-                            <option value="formal">Glam</option>
+                            <option value="EVERYDAY">Everyday</option>
+                            <option value="CASUAL">Casual</option>
+                            <option value="GLAM">Glam</option>
                         </select>
                     </div>
 
                     <div className='modal-input-section'>
-                        <p className='modal-header-text'>Routine name: </p>
-                        <input className="modal-input" type="text" placeholder="Enter routine name"/>
+                        <p className='modal-header-text'>Routine name (optional): </p>
+                        <input className="modal-input" type="text" placeholder="Enter routine name" value={name} onChange={(e) => setName(e.target.value)}/>
                     </div>
 
                     <div className='modal-input-section'>
-                        <p className='modal-header-text'>Notes: </p>
-                        <textarea className="modal-textarea" placeholder="Additional notes about your routine..."></textarea>
+                        <p className='modal-header-text'>Notes (optional): </p>
+                        <textarea className="modal-textarea" placeholder="Additional notes about your routine..." value={notes} onChange={(e) => setNotes(e.target.value)}></textarea>
                     </div>
 
                 </div>
