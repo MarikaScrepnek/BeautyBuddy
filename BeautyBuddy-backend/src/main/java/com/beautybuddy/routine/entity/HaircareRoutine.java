@@ -2,9 +2,11 @@ package com.beautybuddy.routine.entity;
 
 import com.beautybuddy.user.entity.User;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
@@ -16,8 +18,12 @@ import jakarta.persistence.UniqueConstraint;
 )
 public class HaircareRoutine {
     @Id
+    @Column(name = "routine_id")
+    private Long routineId;
+
     @OneToOne
-    @JoinColumn(name = "routine_id", nullable = false)
+    @MapsId
+    @JoinColumn(name = "routine_id")
     private Routine routine;
 
     @OneToOne

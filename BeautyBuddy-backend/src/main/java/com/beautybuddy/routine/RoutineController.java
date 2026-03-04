@@ -1,11 +1,19 @@
 package com.beautybuddy.routine;
 
+import java.util.List;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.beautybuddy.routine.dto.CreateMakeupRoutineRequestDTO;
+import com.beautybuddy.routine.dto.DisplayRoutineDTO;
+import com.beautybuddy.security.CustomUserDetails;
 
 @RestController
 @RequestMapping("/api/routines")
@@ -16,9 +24,24 @@ public class RoutineController {
         this.routineService = routineService;
     }
 
-    @GetMapping
-    public String getRoutines() {
-        return "This will return the user's routines.";
+    @GetMapping("/makeup")
+    public ResponseEntity<List<DisplayRoutineDTO>> getMakeupRoutines(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(401).build();
+        }
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        List<DisplayRoutineDTO> routines = routineService.getMakeupRoutines(userDetails.getEmail());
+        return ResponseEntity.ok(routines);
+    }
+
+    @GetMapping("/skincare")
+    public String getSkincareRoutines() {
+        return "This will return the user's skincare routines.";
+    }
+
+    @GetMapping("/haircare")
+    public String getHaircareRoutines() {
+        return "This will return the user's haircare routines.";
     }
 
     @GetMapping("/search")
@@ -26,9 +49,14 @@ public class RoutineController {
         return "This will return routines matching the search query.";
     }
 
-    @PostMapping
-    public String createRoutine() {
-        return "This will create a new routine for the user.";
+    @PostMapping("/makeup")
+    public ResponseEntity<Void> createMakeupRoutine(Authentication authentication, CreateMakeupRoutineRequestDTO request) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(401).build();
+        }
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        routineService.createMakeupRoutine(userDetails.getEmail(), request);
+        return ResponseEntity.ok().build();
     }
 
     @PutMapping("/{id}")
@@ -37,8 +65,8 @@ public class RoutineController {
     }
 
     @DeleteMapping("/{id}")
-    public String deleteRoutine() {
-        return "This will soft delete the routine with the given ID.";
+    public String deleteMakeupRoutine() {
+        return "This will soft delete the makeup routine with the given ID.";
     }
 
     @PostMapping("/{id}/add-product")

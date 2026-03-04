@@ -10,6 +10,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
@@ -21,8 +22,12 @@ import jakarta.persistence.UniqueConstraint;
 )
 public class SkincareRoutine {
     @Id
+    @Column(name = "routine_id")
+    private Long routineId;
+
     @OneToOne
-    @JoinColumn(name = "routine_id", nullable = false)
+    @MapsId
+    @JoinColumn(name = "routine_id")
     private Routine routine;
 
     @ManyToOne
