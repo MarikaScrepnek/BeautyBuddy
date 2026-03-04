@@ -7,6 +7,7 @@ import Routines from './components/Routines';
 
 import "./MyRoutines.css";
 import Searchbar from '../../components/common/Searchbar';
+import MakeupRoutines from './components/MakeupRoutines';
 
 export default function MyRoutines() {
   // log in
@@ -38,7 +39,7 @@ export default function MyRoutines() {
     <div style={{display: "flex", flexDirection: "row", minHeight: "80vh"}}>
       
       <aside className='routines-sidebar' style={{ width: "200px", background: "#f7f7f7", padding: "1rem 0", borderRight: "1px solid #eee" }}>
-        <h2 style={{textAlign: "center"}}>My Routines</h2>
+        <h2 style={{textAlign: "center"}}>All Lists</h2>
         <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
           {menuItems.map((item) => (
             <li
@@ -70,10 +71,9 @@ export default function MyRoutines() {
         </div>
         }
 
-        {selected === "Makeup" && 
-        <div>
-          Makeup routine content goes here.
-        </div>}
+        {selected === "Makeup" &&
+          <MakeupRoutines />
+        }
 
         {selected === "Skincare" && 
         <div>
