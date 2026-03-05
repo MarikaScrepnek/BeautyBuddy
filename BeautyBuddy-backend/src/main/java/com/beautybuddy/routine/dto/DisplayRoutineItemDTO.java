@@ -11,6 +11,7 @@ public record DisplayRoutineItemDTO(
     String category,
     String productImageUrl,
     String productNotes, //can be null
-    BigDecimal rating //can be null
+    BigDecimal rating, //can be null
     //add occurence
+    Integer order
 ) {}

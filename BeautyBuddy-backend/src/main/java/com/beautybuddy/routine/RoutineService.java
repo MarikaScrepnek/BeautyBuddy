@@ -66,7 +66,8 @@ public class RoutineService {
                         i.getProduct().getId(),
                         i.getShade().getId(),
                         user.getId()
-                    ).map(Review::getRating).orElse(null)
+                    ).map(Review::getRating).orElse(null),
+                    i.getStepOrder()
                 ))
                 .toList()
             ))
