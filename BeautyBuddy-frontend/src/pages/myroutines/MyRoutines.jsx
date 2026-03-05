@@ -8,6 +8,7 @@ import Routines from './components/Routines';
 import "./MyRoutines.css";
 import Searchbar from '../../components/common/Searchbar';
 import MakeupRoutines from './components/MakeupRoutines';
+import { getMakeupRoutines } from '../../api/routineApi';
 
 export default function MyRoutines() {
   // log in
@@ -16,7 +17,9 @@ export default function MyRoutines() {
 
   // sidebar state
   const [selected, setSelected] = useState("Wishlist");
+  const [selectedRoutine, setSelectedRoutine] = useState(null);
   const menuItems = ["Wishlist", "Makeup", "Skincare", "Haircare"];
+  const [makeupRoutines, setMakeupRoutines] = useState([]);
 
   // on mount
   useEffect(() => {
@@ -27,6 +30,13 @@ export default function MyRoutines() {
         setUsername(user.username);
       })
       .catch(() => setIsLoggedIn(false));
+
+    getMakeupRoutines()
+      .then((data) => {
+        console.log("Makeup routines:", data);
+        setMakeupRoutines(data);
+      })
+      .catch((err) => console.error("Error fetching makeup routines:", err));
   }, []);
 
   return (
@@ -41,25 +51,61 @@ export default function MyRoutines() {
       <aside className='routines-sidebar' style={{ width: "200px", background: "#f7f7f7", padding: "1rem 0", borderRight: "1px solid #eee" }}>
         <h2 style={{textAlign: "center"}}>All Lists</h2>
         <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
-          {menuItems.map((item) => (
             <li
-              key={item}
-              onClick={() => setSelected(item)}
+              onClick={() => { setSelected("Wishlist"); setSelectedRoutine(null); }}
               style={{
                 padding: "1rem",
                 cursor: "pointer",
-                background: selected === item ? "#e0e0e0" : "transparent",
-                fontWeight: selected === item ? "bold" : "normal",
-                borderLeft: selected === item ? "4px solid #6c63ff" : "4px solid transparent"
+                background: selected === "Wishlist" ? "#e0e0e0" : "transparent",
+                fontWeight: selected === "Wishlist" ? "bold" : "normal",
+                borderLeft: selected === "Wishlist" ? "4px solid #6c63ff" : "4px solid transparent"
               }}
             >
-              {item}
+              Wishlist
             </li>
-          ))}
-          <li>
-            <Searchbar placeholder="Enter a date..." onSearch={(query) => console.log("Searching for:", query)} />
-            <p>Enter a date and we will show what products were in your routine:</p>
-          </li>
+            <li style={{padding: "1rem", fontWeight: "bold", fontSize: "1.1rem", color: "#6c63ff", background: "transparent"}}>
+              Makeup
+            </li>
+            {makeupRoutines.map((routine) => (
+              <li
+                key={routine.routineId}
+                onClick={() => { setSelected(routine.routineId); setSelectedRoutine(routine); }}
+                style={{
+                  padding: "0.5rem 1.5rem",
+                  cursor: "pointer",
+                  color: "#333",
+                  textDecoration: "underline",
+                  background: selected === routine.routineId ? "#e0e0e0" : "transparent",
+                  borderLeft: selected === routine.routineId ? "4px solid #6c63ff" : "4px solid transparent"
+                }}
+              >
+                {routine.name || routine.occasion}
+              </li>
+            ))}
+            <li
+              onClick={() => setSelected("Skincare")}
+              style={{
+                padding: "1rem",
+                cursor: "pointer",
+                background: selected === "Skincare" ? "#e0e0e0" : "transparent",
+                fontWeight: selected === "Skincare" ? "bold" : "normal",
+                borderLeft: selected === "Skincare" ? "4px solid #6c63ff" : "4px solid transparent"
+              }}
+            >
+              Skincare
+            </li>
+            <li
+              onClick={() => setSelected("Haircare")}
+              style={{
+                padding: "1rem",
+                cursor: "pointer",
+                background: selected === "Haircare" ? "#e0e0e0" : "transparent",
+                fontWeight: selected === "Haircare" ? "bold" : "normal",
+                borderLeft: selected === "Haircare" ? "4px solid #6c63ff" : "4px solid transparent"
+              }}
+            >
+              Haircare
+            </li>
         </ul>
       </aside>
       
@@ -71,8 +117,8 @@ export default function MyRoutines() {
         </div>
         }
 
-        {selected === "Makeup" &&
-          <MakeupRoutines />
+        {makeupRoutines.some(r => r.routineId === selected) && selectedRoutine &&
+          <MakeupRoutines userName={username} routine={selectedRoutine} />
         }
 
         {selected === "Skincare" && 
