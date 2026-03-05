@@ -3,6 +3,7 @@ package com.beautybuddy.routine.dto;
 import java.math.BigDecimal;
 
 public record DisplayRoutineItemDTO(
+    Long id,
     Long productId,
     String productName,
     String productBrand,
