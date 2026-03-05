@@ -52,6 +52,7 @@ public class RoutineService {
         return routines.stream()
             .map(r -> new DisplayRoutineDTO(r.getRoutine().getId(), r.getName(), user.getUsername(), r.getRoutine().getUpdatedAt(), r.getOccasion().name(), r.getRoutine().getNotes(), r.getItems().stream()
                 .map(i -> new DisplayRoutineItemDTO(
+                    i.getId(),
                     i.getProduct().getId(),
                     i.getProduct().getName(),
                     i.getProduct().getBrand().getName(),
