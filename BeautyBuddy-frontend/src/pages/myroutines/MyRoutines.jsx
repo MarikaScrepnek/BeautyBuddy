@@ -10,6 +10,8 @@ import Searchbar from '../../components/common/Searchbar';
 import MakeupRoutines from './components/MakeupRoutines';
 import { getMakeupRoutines } from '../../api/routineApi';
 
+import CreateRoutineModal from './components/CreateRoutineModal';
+
 export default function MyRoutines() {
   // log in
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -18,8 +20,9 @@ export default function MyRoutines() {
   // sidebar state
   const [selected, setSelected] = useState("Wishlist");
   const [selectedRoutine, setSelectedRoutine] = useState(null);
-  const menuItems = ["Wishlist", "Makeup", "Skincare", "Haircare"];
   const [makeupRoutines, setMakeupRoutines] = useState([]);
+
+  const[createModalOpen, setCreateModalOpen] = useState(false);
 
   // on mount
   useEffect(() => {
@@ -82,6 +85,9 @@ export default function MyRoutines() {
                 {routine.name || routine.occasion}
               </li>
             ))}
+            <button className="create-button" onClick={() => setCreateModalOpen(true)} style={{margin: "1rem", width: "calc(100% - 2rem)"}}>
+                + New Routine
+            </button>
             <li
               onClick={() => setSelected("Skincare")}
               style={{
@@ -133,6 +139,8 @@ export default function MyRoutines() {
 
       </main>
     </div>
+
+    {createModalOpen && <CreateRoutineModal onClose={() => setCreateModalOpen(false)} />}
 
   </div>
   );
