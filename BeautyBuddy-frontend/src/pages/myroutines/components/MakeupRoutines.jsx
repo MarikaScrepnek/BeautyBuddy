@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react';
 
 import { getMakeupRoutines } from '../../../api/routineApi';
-import CreateRoutineModal from './CreateRoutineModal';
 
 import './MakeupRoutines.css';
 
 export default function MakeupRoutines( { userName, routine } ) {
-    const[createModalOpen, setCreateModalOpen] = useState(false);
+    const[editModalOpen, setEditModalOpen] = useState(false);
 
     return (
         <div className="routine-card">
@@ -18,7 +17,7 @@ export default function MakeupRoutines( { userName, routine } ) {
                 </div>
                 <p style={{ margin: 'auto 0' }}>Updated at {new Date(routine.updatedAt).toLocaleString()}</p>
 
-                <button className="edit-button" onClick={() => setCreateModalOpen(true)}>Edit Routine</button>
+                <button className="edit-button" onClick={() => setEditModalOpen(true)}>Edit Routine</button>
 
                 {routine.notes && (
                     <div className="routine-notes">
@@ -46,7 +45,7 @@ export default function MakeupRoutines( { userName, routine } ) {
             )}
 
 
-            {createModalOpen && <CreateRoutineModal onClose={() => setCreateModalOpen(false)} />}
+            {/* {editModalOpen && <CreateRoutineModal onClose={() => setEditModalOpen(false)} />} */}
         </div>
     );
 }
