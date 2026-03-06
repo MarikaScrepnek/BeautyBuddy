@@ -80,7 +80,7 @@ export default function AddToRoutineModal({ baseCategory, productName, productId
                 <h2>to a Routine</h2>
                 {makeupRoutines.map(routine => (
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }} key={routine.routineId} className="routine-option">
-                        <p>{routine.name || routine.occasion}</p>
+                        <p>{routine.name || (routine.occasion.charAt(0).toUpperCase() + routine.occasion.slice(1).toLowerCase())}</p>
                         <button className="add-button"
                          onClick={() => handleAddToRoutine(routine.routineId, productId, shadeName)}
                         >

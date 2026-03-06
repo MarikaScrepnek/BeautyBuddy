@@ -82,7 +82,7 @@ export default function MyRoutines() {
                   borderLeft: selected === routine.routineId ? "4px solid #6c63ff" : "4px solid transparent"
                 }}
               >
-                {routine.name || routine.occasion}
+                {routine.name || (routine.occasion.charAt(0).toUpperCase() + routine.occasion.slice(1).toLowerCase())}
               </li>
             ))}
             <button className="create-button" onClick={() => setCreateModalOpen(true)} style={{margin: "1rem", width: "calc(100% - 2rem)"}}>
