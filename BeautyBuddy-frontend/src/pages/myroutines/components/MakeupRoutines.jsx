@@ -30,7 +30,10 @@ export default function MakeupRoutines( { userName, routine } ) {
 
             {routine.items && routine.items.length > 0 ? (
                 <ul>
-                    {routine.items.map(item => (
+                    {routine.items
+                        .slice() // copy array to avoid mutating original
+                        .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+                        .map(item => (
                         <div className="routine-item" key={item.id}>
                             <p>{item.productName}</p>
                             <p>{item.productShadeName}</p>
