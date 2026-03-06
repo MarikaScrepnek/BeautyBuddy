@@ -80,6 +80,10 @@ public class RoutineService {
 
         User user = userRepository.findByEmail(userEmail)
             .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (request.occasion() == OccasionEnum.CASUAL || request.occasion() == OccasionEnum.GLAM) {
+            throw new RuntimeException("Cannot create routine for this occasion");
+        }
         
         Routine baseRoutine  = new Routine();
         baseRoutine.setCategory(category);
