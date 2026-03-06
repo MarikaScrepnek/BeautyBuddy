@@ -10,6 +10,10 @@ export default function CreateRoutineModal( {onClose} ) {
     const [notes, setNotes] = useState("");
 
     async function handleCreateRoutine() {
+        if (!name) {
+            alert("Please enter a routine name.");
+            return;
+        }
         createMakeupRoutine(occasion, name, notes)
             .then((data) => {
                 console.log("Routine created:", data);
@@ -49,19 +53,15 @@ export default function CreateRoutineModal( {onClose} ) {
                         <p className='modal-header-text'>Occasion: </p>
                         <select className="modal-selector" value={occasion} onChange={(e) => setOccasion(e.target.value)}>
                             <option value="">Select occasion...</option>
-                            <option value="CASUAL">Casual</option>
-                            <option value="GLAM">Glam</option>
                             <option value="EVENT">Event</option>
                             <option value="OTHER">Other</option>
                         </select>
                     </div>
 
-                    {(occasion === "EVENT" || occasion === "OTHER") && (
-                        <div className='modal-input-section'>
-                            <p className='modal-header-text'>Routine name: </p>
-                            <input className="modal-input" type="text" placeholder="Enter routine name" value={name} onChange={(e) => setName(e.target.value)}/>
-                        </div>
-                    )}
+                    <div className='modal-input-section'>
+                        <p className='modal-header-text'>Routine name: </p>
+                        <input className="modal-input" type="text" placeholder="Enter routine name" value={name} onChange={(e) => setName(e.target.value)}/>
+                    </div>
 
                     <div className='modal-input-section'>
                         <p className='modal-header-text'>Notes (optional): </p>
