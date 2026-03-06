@@ -118,11 +118,14 @@ public class RoutineService {
             if (!makeupRoutine.getUser().getId().equals(user.getId())) {
                 throw new RuntimeException("Unauthorized");
             }
+
+            Integer stepOrder = makeupRoutine.getItems().size() + 1;
              
             MakeupRoutineItem item = new MakeupRoutineItem();
             item.setMakeupRoutine(makeupRoutine);
             item.setProduct(product);
             item.setShade(shade);
+            item.setStepOrder(stepOrder);
 
             makeupRoutine.getItems().add(item);
             makeupRoutineRepository.save(makeupRoutine);
