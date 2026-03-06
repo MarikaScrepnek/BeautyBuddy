@@ -253,7 +253,7 @@ WHERE shade_id IS NULL;
 
 CREATE TYPE time_of_day_enum AS ENUM ('AM', 'PM');
 
-CREATE TYPE occasion_enum AS ENUM ('EVERYDAY', 'CASUAL', 'GLAM');
+CREATE TYPE occasion_enum AS ENUM ('CASUAL', 'GLAM', 'EVENT', 'OTHER');
 
 CREATE TABLE routine (
     id BIGSERIAL PRIMARY KEY,
