@@ -11,8 +11,21 @@ export default function MakeupRoutines( { userName, routine } ) {
     return (
         <div className="routine-card">
             <div className="makeup-routine-header">
-                <h1> {routine.name || routine.occasion} </h1>
-                <p>Created by: {userName}</p>
+                <div className="routine-name" style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                    <p>{userName}'s</p>
+                    <h1> {routine.name || routine.occasion} </h1>
+                    <p>Makeup Routine</p>
+                </div>
+                <p style={{ margin: 'auto 0' }}>Updated at {new Date(routine.updatedAt).toLocaleString()}</p>
+
+                <button className="edit-button" onClick={() => setCreateModalOpen(true)}>Edit Routine</button>
+
+                {routine.notes && (
+                    <div className="routine-notes">
+                        <h3>Notes:</h3>
+                        <p>{routine.notes}</p>
+                    </div>
+                )}
             </div>
             
 
