@@ -2,11 +2,14 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    
+    width: 100%;
+    max-width: 900px;
     background-color: #fff;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     margin-bottom: 20px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .makeup-routine-header {
@@ -89,6 +92,14 @@
     padding: 10px 20px;
 }
 
+.routine-items-list {
+    width: 100%;
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 2rem;
+    list-style: none;
+}
+
 .routine-item {
     display: flex;
     align-items: center;
@@ -99,6 +110,7 @@
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
     background: #fafaff;
     transition: box-shadow 0.2s;
+    width: 100%;
 }
 .routine-item:hover {
     box-shadow: 0 4px 12px rgba(108, 99, 255, 0.12);

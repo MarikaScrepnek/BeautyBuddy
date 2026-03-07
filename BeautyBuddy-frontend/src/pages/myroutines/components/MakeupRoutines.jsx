@@ -38,26 +38,27 @@ export default function MakeupRoutines( { userName, routine } ) {
                 </div>
             )}
 
+            <ul className="routine-items-list">
             {routine.items && routine.items.length > 0 ? (
-                <ul>
-                    {routine.items
-                        .slice() // copy array to avoid mutating original
-                        .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
-                        .map(item => (
-                        <div className="routine-item" key={item.id}>
-                            <img src={item.productImageUrl} alt={item.productName} className="routine-item-img" />
-                            <div className="routine-item-info">
-                                <p className="routine-item-name">{item.productName}</p>
-                                <p>{item.productShadeName}</p>
-                                <p>{item.productBrand}</p>
-                                <p>{item.category}</p>
-                            </div>
-                            </div>
-                    ))}
-                </ul>
+                routine.items
+                    .slice() // copy array to avoid mutating original
+                    .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+                    .map(item => (
+                    <li className="routine-item" key={item.id}>
+                        <img src={item.productImageUrl} alt={item.productName} className="routine-item-img" />
+                        <div className="routine-item-info">
+                            <p className="routine-item-name">{item.productName}</p>
+                            <p>{item.productBrand}</p>
+                            {item.productShadeName && (
+                                <p>in {item.productShadeName}</p>
+                            )}
+                        </div>
+                    </li>
+                ))
             ) : (
                 <p>No items in this routine.</p>
             )}
+            </ul>
 
             {/* {editModalOpen && <CreateRoutineModal onClose={() => setEditModalOpen(false)} />} */}
         </div>
