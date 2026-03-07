@@ -114,6 +114,7 @@
 }
 .routine-item:hover {
     box-shadow: 0 4px 12px rgba(108, 99, 255, 0.12);
+    cursor: pointer;
 }
 
 .routine-item-img {

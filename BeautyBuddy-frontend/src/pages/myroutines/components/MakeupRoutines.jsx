@@ -44,7 +44,7 @@ export default function MakeupRoutines( { userName, routine } ) {
                     .slice() // copy array to avoid mutating original
                     .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
                     .map(item => (
-                    <li className="routine-item" key={item.id}>
+                    <li className="routine-item" key={item.id} onClick={() => window.open(`/${item.productId}`, '_blank')}>
                         <img src={item.productImageUrl} alt={item.productName} className="routine-item-img" />
                         <div className="routine-item-info">
                             <p className="routine-item-name">{item.productName}</p>
