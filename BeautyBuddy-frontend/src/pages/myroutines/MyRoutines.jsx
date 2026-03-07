@@ -115,7 +115,7 @@ export default function MyRoutines() {
         </ul>
       </aside>
       
-      <main style={{ flex: 1, padding: "2rem" }}>
+      <main style={{ flex: 1, padding: "0 2rem" }}>
 
         {selected === "Haircare" && 
         <div>
