@@ -101,7 +101,7 @@ INSERT INTO product (name, brand_id, category_id, price, image_link, product_lin
     'https://www.vanicream.com/dynamic-media/product/images/dfm-at24g-front-2671-ret-crop.jpg?gravity=center&v=galleryZoom&k=mvaGy9Fmo84Lz5jINUACoA',
     'https://www.vanicream.com/product/vanicream-daily-facial-moisturizer',
     NULL,
-    'water, squalane, glycerin, pentylene glycol, polyglyceryl-2 stearate, glyceryl stearate, stearyl alcohol, hyaluronic acid, ceramide EOP, ceramide NG, ceramide NP, ceramide AS, ceramide AP, carnosine, hydrogenated lecithin, phytosterols, caprylyl glycol, polyacrylate crosspolymer-11, 12-hexanediol',
+    'water, squalane, glycerin, pentylene glycol, polyglyceryl-2 stearate, glyceryl stearate, stearyl alcohol, hyaluronic acid, ceramide EOP, ceramide NG, ceramide NP, ceramide AS, ceramide AP, carnosine, hydrogenated lecithin, phytosterols, caprylyl glycol, polyacrylate crosspolymer-11, 1 2-hexanediol',
     NULL
 ),
 (
