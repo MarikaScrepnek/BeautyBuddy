@@ -141,6 +141,7 @@ public class RoutineService {
             routine.getItems().add(newItem);
         }
 
+        routine.setName(request.name());
         routine.setNotes(request.notes());
         routine.setUpdatedAt(now);
         routineRepository.save(routine);
