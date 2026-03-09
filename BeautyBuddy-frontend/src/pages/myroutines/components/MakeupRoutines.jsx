@@ -62,6 +62,7 @@ export default function MakeupRoutines( { userName, routine } ) {
 
     useEffect(() => {
         setEditedRoutine(routine);
+        setIsEditingRoutine(false);
     }, [routine]);
 
     return (
