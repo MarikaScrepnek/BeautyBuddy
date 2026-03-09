@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 
 import { updateRoutine } from '../../../api/routineApi';
 
+import { GiTrashCan } from "react-icons/gi";
+
 import './MakeupRoutines.css';
 
 export default function MakeupRoutines( { userName, routine } ) {
@@ -100,7 +102,7 @@ export default function MakeupRoutines( { userName, routine } ) {
                                     }}
                                 />
                             ) : (
-                                <h1 style={{ fontSize: '2rem', fontWeight: 'bold', textAlign: 'center', textTransform: 'uppercase' }}>
+                                <h1 style={{ fontSize: '2rem', fontWeight: 'bold', textAlign: 'center'}}>
                                     {editedRoutine.name || editedRoutine.occasion}
                                 </h1>
                             )}
@@ -168,7 +170,7 @@ export default function MakeupRoutines( { userName, routine } ) {
                     >
                         {isEditingRoutine && (
                             <div className="delete-item-button" onClick={(e) => {e.stopPropagation(); handleDeleteItem(item.id);}}>
-                                <span>Delete</span>
+                                <GiTrashCan />
                             </div>
                         )}
                         <img draggable="false" src={item.productImageUrl} alt={item.productName} className="routine-item-img" />
@@ -209,7 +211,9 @@ export default function MakeupRoutines( { userName, routine } ) {
                     </li>
                 ))
             ) : (
-                <p style={{justifyContent: "center"}}>No items have been added to this routine.</p>
+                <div style={{ display: "flex", justifyContent: "center", alignItems: "center"}}>
+                    <p style={{ fontStyle: "italic", color: "#888" }}>No products have been added to this routine yet.</p>
+                </div>
             )}
             </ul>
         </div>
