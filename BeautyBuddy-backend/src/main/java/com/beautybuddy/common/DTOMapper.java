@@ -14,7 +14,17 @@ import com.beautybuddy.product.Product;
 import com.beautybuddy.product.ProductDTO;
 import com.beautybuddy.product.ProductShade;
 import com.beautybuddy.product.ProductShadeDTO;
+import com.beautybuddy.review.ReviewRepository;
+import com.beautybuddy.review.entity.Review;
+import com.beautybuddy.routine.dto.DisplayRoutineDTO;
+import com.beautybuddy.routine.dto.DisplayRoutineItemDTO;
+import com.beautybuddy.routine.entity.Routine;
+import com.beautybuddy.routine.entity.RoutineItem;
+import com.beautybuddy.user.entity.User;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -82,6 +92,58 @@ public class DTOMapper {
                 ingredients,
                 mayContain,
                 shades
+        );
+    }
+
+    public static DisplayRoutineDTO toDisplayRoutineDTO(Routine routine, ReviewRepository reviewRepository) {
+        User user = routine.getUser();
+        LocalDateTime now = LocalDateTime.now();
+
+        List<RoutineItem> validItems = routine.getItems().stream()
+            .filter(item -> item.getValidFrom().isBefore(now) && (item.getValidTo() == null || item.getValidTo().isAfter(now)))
+            .sorted(Comparator.comparingInt(RoutineItem::getStepOrder))
+            .toList();
+
+        List<DisplayRoutineItemDTO> itemDTOs = new ArrayList<>();
+        for (RoutineItem item : validItems) {
+            BigDecimal rating = null;
+            if (item.getShade() != null) {
+                rating = reviewRepository
+                    .findByProduct_IdAndProductShade_IdAndUser_Id(
+                        item.getProduct().getId(),
+                        item.getShade().getId(),
+                        user.getId()
+                    )
+                    .map(Review::getRating)
+                    .orElse(null);
+            }
+
+            DisplayRoutineItemDTO dto = new DisplayRoutineItemDTO(
+                item.getId(),
+                item.getProduct().getId(),
+                item.getProduct().getName(),
+                item.getProduct().getBrand().getName(),
+                item.getShade() != null ? item.getShade().getShadeName() : null,
+                item.getProduct().getCategory().getName(),
+                item.getShade() != null && item.getShade().getImageLink() != null
+                    ? item.getShade().getImageLink()
+                    : item.getProduct().getImageLink(),
+                item.getNotes(),
+                rating,
+                item.getStepOrder()
+            );
+
+            itemDTOs.add(dto);
+        }
+
+        return new DisplayRoutineDTO(
+            routine.getId(),
+            routine.getName(),
+            user.getUsername(),
+            routine.getUpdatedAt(),
+            routine.getOccasion() != null ? routine.getOccasion().name() : null,
+            routine.getNotes(),
+            itemDTOs
         );
     }
 }
