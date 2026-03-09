@@ -257,14 +257,79 @@ CREATE TYPE occasion_enum AS ENUM ('CASUAL', 'GLAM', 'EVENT', 'OTHER');
 
 CREATE TABLE routine (
     id BIGSERIAL PRIMARY KEY,
-    category_id BIGINT NOT NULL REFERENCES category(id) ON DELETE CASCADE,
-
+    account_id BIGINT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
+    category_id BIGINT NOT NULL REFERENCES category(id),
+    name TEXT,
     notes TEXT,
-
+    time_of_day time_of_day_enum NULL,   -- only used for Skincare
+    occasion occasion_enum NULL,         -- only used for Makeup
+    is_system BOOLEAN NOT NULL DEFAULT FALSE,     -- true if this is a default system routine, false if created by user
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    deleted_at TIMESTAMPTZ DEFAULT NULL
+    deleted_at TIMESTAMPTZ NULL
 );
+CREATE INDEX idx_routine_account ON routine (account_id);
+CREATE INDEX idx_routine_category ON routine (category_id);
+
+-- Trigger function to enforce name NULL for CASUAL/GLAM and not NULL for other occasions
+CREATE OR REPLACE FUNCTION routine_name_for_occasion_check()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.occasion IN ('CASUAL', 'GLAM') AND NEW.name IS NOT NULL THEN
+        RAISE EXCEPTION 'Routines with occasion % must have name IS NULL', NEW.occasion;
+    END IF;
+
+    IF NEW.occasion NOT IN ('CASUAL', 'GLAM') AND NEW.name IS NULL THEN
+        RAISE EXCEPTION 'Routines with occasion % must have a name', NEW.occasion;
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_routine_name_for_occasion
+BEFORE INSERT OR UPDATE ON routine
+FOR EACH ROW EXECUTE FUNCTION routine_name_for_occasion_check();
+
+-- Trigger function to enforce time_of_day only set for Skincare routines
+CREATE OR REPLACE FUNCTION routine_time_of_day_check()
+RETURNS TRIGGER AS $$
+DECLARE
+    skincare_category_id BIGINT;
+BEGIN
+    SELECT id INTO skincare_category_id FROM category WHERE name='Skincare';
+
+    IF NEW.time_of_day IS NOT NULL AND NEW.category_id <> skincare_category_id THEN
+        RAISE EXCEPTION 'time_of_day can only be set for Skincare routines';
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_routine_time_of_day
+BEFORE INSERT OR UPDATE ON routine
+FOR EACH ROW EXECUTE FUNCTION routine_time_of_day_check();
+
+-- Trigger function to enforce occasion only set for Makeup routines
+CREATE OR REPLACE FUNCTION routine_occasion_check()
+RETURNS TRIGGER AS $$
+DECLARE
+    makeup_category_id BIGINT;
+BEGIN
+    SELECT id INTO makeup_category_id FROM category WHERE name='Makeup';
+
+    IF NEW.occasion IS NOT NULL AND NEW.category_id <> makeup_category_id THEN
+        RAISE EXCEPTION 'occasion can only be set for Makeup routines';
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_routine_occasion
+BEFORE INSERT OR UPDATE ON routine
+FOR EACH ROW EXECUTE FUNCTION routine_occasion_check();
 
 -- Trigger function to enforce only base categories
 CREATE OR REPLACE FUNCTION check_base_category_for_routine()
@@ -283,6 +348,172 @@ CREATE TRIGGER routine_base_category_check
 BEFORE INSERT OR UPDATE ON routine
 FOR EACH ROW EXECUTE FUNCTION check_base_category_for_routine();
 
+-- Only one Haircare routine per account
+CREATE OR REPLACE FUNCTION unique_haircare_per_account()
+RETURNS TRIGGER AS $$
+DECLARE
+    count_routines INT;
+BEGIN
+    IF (NEW.category_id = (SELECT id FROM category WHERE name='Haircare')) THEN
+        SELECT COUNT(*) INTO count_routines
+        FROM routine
+        WHERE account_id = NEW.account_id
+          AND category_id = NEW.category_id
+          AND deleted_at IS NULL
+          AND id <> COALESCE(NEW.id, 0);
+
+        IF count_routines > 0 THEN
+            RAISE EXCEPTION 'Each account can have only one Haircare routine';
+        END IF;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_unique_haircare_per_account
+BEFORE INSERT OR UPDATE ON routine
+FOR EACH ROW EXECUTE FUNCTION unique_haircare_per_account();
+
+-- Only one Skincare AM routine per account
+CREATE OR REPLACE FUNCTION unique_skincare_am_per_account()
+RETURNS TRIGGER AS $$
+DECLARE
+    count_routines INT;
+    skincare_cat_id BIGINT;
+BEGIN
+    SELECT id INTO skincare_cat_id FROM category WHERE name='Skincare';
+    IF NEW.category_id = skincare_cat_id AND NEW.time_of_day = 'AM' THEN
+        SELECT COUNT(*) INTO count_routines
+        FROM routine
+        WHERE account_id = NEW.account_id
+          AND category_id = skincare_cat_id
+          AND time_of_day = 'AM'
+          AND deleted_at IS NULL
+          AND id <> COALESCE(NEW.id, 0);
+
+        IF count_routines > 0 THEN
+            RAISE EXCEPTION 'Each account can have only one Skincare AM routine';
+        END IF;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_unique_skincare_am_per_account
+BEFORE INSERT OR UPDATE ON routine
+FOR EACH ROW EXECUTE FUNCTION unique_skincare_am_per_account();
+
+-- Only one Skincare PM routine per account
+CREATE OR REPLACE FUNCTION unique_skincare_pm_per_account()
+RETURNS TRIGGER AS $$
+DECLARE
+    count_routines INT;
+    skincare_cat_id BIGINT;
+BEGIN
+    SELECT id INTO skincare_cat_id FROM category WHERE name='Skincare';
+    IF NEW.category_id = skincare_cat_id AND NEW.time_of_day = 'PM' THEN
+        SELECT COUNT(*) INTO count_routines
+        FROM routine
+        WHERE account_id = NEW.account_id
+          AND category_id = skincare_cat_id
+          AND time_of_day = 'PM'
+          AND deleted_at IS NULL
+          AND id <> COALESCE(NEW.id, 0);
+
+        IF count_routines > 0 THEN
+            RAISE EXCEPTION 'Each account can have only one Skincare PM routine';
+        END IF;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_unique_skincare_pm_per_account
+BEFORE INSERT OR UPDATE ON routine
+FOR EACH ROW EXECUTE FUNCTION unique_skincare_pm_per_account();
+
+-- Only one CASUAL Makeup routine per account, name must be NULL
+CREATE OR REPLACE FUNCTION unique_makeup_casual_per_account()
+RETURNS TRIGGER AS $$
+DECLARE
+    count_routines INT;
+    makeup_cat_id BIGINT;
+BEGIN
+    SELECT id INTO makeup_cat_id FROM category WHERE name='Makeup';
+    IF NEW.category_id = makeup_cat_id AND NEW.occasion = 'CASUAL' THEN
+        IF NEW.name IS NOT NULL THEN
+            RAISE EXCEPTION 'CASUAL Makeup routine cannot have a name';
+        END IF;
+
+        SELECT COUNT(*) INTO count_routines
+        FROM routine
+        WHERE account_id = NEW.account_id
+          AND category_id = makeup_cat_id
+          AND occasion = 'CASUAL'
+          AND deleted_at IS NULL
+          AND id <> COALESCE(NEW.id, 0);
+
+        IF count_routines > 0 THEN
+            RAISE EXCEPTION 'Each account can have only one CASUAL Makeup routine';
+        END IF;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_unique_makeup_casual_per_account
+BEFORE INSERT OR UPDATE ON routine
+FOR EACH ROW EXECUTE FUNCTION unique_makeup_casual_per_account();
+
+-- Only one GLAM Makeup routine per account, name must be NULL
+CREATE OR REPLACE FUNCTION unique_makeup_glam_per_account()
+RETURNS TRIGGER AS $$
+DECLARE
+    count_routines INT;
+    makeup_cat_id BIGINT;
+BEGIN
+    SELECT id INTO makeup_cat_id FROM category WHERE name='Makeup';
+    IF NEW.category_id = makeup_cat_id AND NEW.occasion = 'GLAM' THEN
+        IF NEW.name IS NOT NULL THEN
+            RAISE EXCEPTION 'GLAM Makeup routine cannot have a name';
+        END IF;
+
+        SELECT COUNT(*) INTO count_routines
+        FROM routine
+        WHERE account_id = NEW.account_id
+          AND category_id = makeup_cat_id
+          AND occasion = 'GLAM'
+          AND deleted_at IS NULL
+          AND id <> COALESCE(NEW.id, 0);
+
+        IF count_routines > 0 THEN
+            RAISE EXCEPTION 'Each account can have only one GLAM Makeup routine';
+        END IF;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_unique_makeup_glam_per_account
+BEFORE INSERT OR UPDATE ON routine
+FOR EACH ROW EXECUTE FUNCTION unique_makeup_glam_per_account();
+
+-- Prevent deletion of system routines
+CREATE OR REPLACE FUNCTION prevent_system_routine_deletion()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF OLD.is_system THEN
+        RAISE EXCEPTION 'Cannot delete a system routine';
+    END IF;
+    RETURN OLD;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_prevent_system_routine_deletion
+BEFORE DELETE ON routine
+FOR EACH ROW
+EXECUTE FUNCTION prevent_system_routine_deletion();
+
 CREATE TABLE routine_image (
     id BIGSERIAL PRIMARY KEY,
     routine_id BIGINT NOT NULL REFERENCES routine(id) ON DELETE CASCADE,
@@ -296,88 +527,21 @@ CREATE TABLE routine_image (
 );
 CREATE INDEX idx_routine_image_routine ON routine_image (routine_id);
 
-CREATE TABLE makeup_routine (
-    routine_id BIGINT PRIMARY KEY REFERENCES routine(id) ON DELETE CASCADE,
-    account_id BIGINT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
-    occasion occasion_enum NOT NULL,
-    name TEXT
-);
-CREATE INDEX idx_makeup_routine_account ON makeup_routine (account_id);
-
-CREATE TABLE makeup_routine_item (
+CREATE TABLE routine_item (
     id BIGSERIAL PRIMARY KEY,
-    routine_id BIGINT NOT NULL REFERENCES makeup_routine(routine_id) ON DELETE CASCADE,
+    routine_id BIGINT NOT NULL REFERENCES routine(id) ON DELETE CASCADE,
     product_id BIGINT NOT NULL REFERENCES product(id) ON DELETE CASCADE,
     shade_id BIGINT REFERENCES product_shade(id) ON DELETE SET NULL,
-
     step_order INT NOT NULL,
-    notes TEXT,
-
+    occurrence TEXT,    -- e.g., "AM", "PM" or custom notes
+    notes TEXT,         -- per-item notes
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     valid_from TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    valid_to TIMESTAMPTZ DEFAULT NULL,
-
-    UNIQUE (routine_id, step_order, valid_from)
+    valid_to TIMESTAMPTZ NULL
 );
-CREATE INDEX idx_makeup_routine_item_routine ON makeup_routine_item (routine_id);
-CREATE INDEX idx_makeup_routine_item_product ON makeup_routine_item (product_id);
-CREATE INDEX idx_makeup_routine_item_shade ON makeup_routine_item (shade_id);
-
-CREATE TABLE skincare_routine (
-    routine_id BIGINT PRIMARY KEY REFERENCES routine(id) ON DELETE CASCADE,
-    account_id BIGINT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
-
-    time_of_day time_of_day_enum NOT NULL,
-
-    UNIQUE (account_id, time_of_day)
-);
-CREATE INDEX idx_skincare_routine_account ON skincare_routine (account_id);
-
-CREATE TABLE skincare_routine_item (
-    id BIGSERIAL PRIMARY KEY,
-    routine_id BIGINT NOT NULL REFERENCES skincare_routine(routine_id) ON DELETE CASCADE,
-    product_id BIGINT NOT NULL REFERENCES product(id) ON DELETE CASCADE,
-    shade_id BIGINT REFERENCES product_shade(id) ON DELETE SET NULL,
-
-    step_order INT NOT NULL,
-    occurrence TEXT,
-    notes TEXT,
-
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    valid_from TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    valid_to TIMESTAMPTZ DEFAULT NULL,
-
-    UNIQUE (routine_id, step_order, valid_from)
-);
-CREATE INDEX idx_skincare_routine_item_routine ON skincare_routine_item (routine_id);
-CREATE INDEX idx_skincare_routine_item_product ON skincare_routine_item (product_id);
-CREATE INDEX idx_skincare_routine_item_shade ON skincare_routine_item (shade_id);
-
-CREATE TABLE haircare_routine (
-    routine_id BIGINT PRIMARY KEY REFERENCES routine(id) ON DELETE CASCADE,
-    account_id BIGINT UNIQUE NOT NULL REFERENCES account(id) ON DELETE CASCADE
-);
-CREATE INDEX idx_haircare_routine_account ON haircare_routine (account_id);
-
-CREATE TABLE haircare_routine_item (
-    id BIGSERIAL PRIMARY KEY,
-    routine_id BIGINT NOT NULL REFERENCES haircare_routine(routine_id) ON DELETE CASCADE,
-    product_id BIGINT NOT NULL REFERENCES product(id) ON DELETE CASCADE,
-    shade_id BIGINT REFERENCES product_shade(id) ON DELETE SET NULL,
-
-    step_order INT NOT NULL,
-    occurrence TEXT,
-    notes TEXT,
-
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    valid_from TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    valid_to TIMESTAMPTZ DEFAULT NULL,
-
-    UNIQUE (routine_id, step_order, valid_from)
-);
-CREATE INDEX idx_haircare_routine_item_routine ON haircare_routine_item (routine_id);
-CREATE INDEX idx_haircare_routine_item_product ON haircare_routine_item (product_id);
-CREATE INDEX idx_haircare_routine_item_shade ON haircare_routine_item (shade_id);
+CREATE INDEX idx_routine_item_routine ON routine_item (routine_id);
+CREATE INDEX idx_routine_item_product ON routine_item (product_id);
+CREATE INDEX idx_routine_item_shade ON routine_item (shade_id);
 
 --================================================================
 -- Product Page Content: Reviews, Q&A
@@ -847,23 +1011,11 @@ CREATE TABLE review_activity (
 );
 CREATE INDEX idx_review_activity_review ON review_activity (review_id);
 
-CREATE TABLE skincare_routine_item_activity (
+CREATE TABLE routine_item_activity (
     activity_id BIGINT PRIMARY KEY REFERENCES activity(id) ON DELETE CASCADE,
-    routine_item_id BIGINT NOT NULL REFERENCES skincare_routine_item(id) ON DELETE CASCADE
+    routine_item_id BIGINT NOT NULL REFERENCES routine_item(id) ON DELETE CASCADE
 );
-CREATE INDEX idx_skincare_routine_item_activity_routine_item ON skincare_routine_item_activity (routine_item_id);
-
-CREATE TABLE makeup_routine_item_activity (
-    activity_id BIGINT PRIMARY KEY REFERENCES activity(id) ON DELETE CASCADE,
-    routine_item_id BIGINT NOT NULL REFERENCES makeup_routine_item(id) ON DELETE CASCADE
-);
-CREATE INDEX idx_makeup_routine_item_activity_routine_item ON makeup_routine_item_activity (routine_item_id);
-
-CREATE TABLE haircare_routine_item_activity (
-    activity_id BIGINT PRIMARY KEY REFERENCES activity(id) ON DELETE CASCADE,
-    routine_item_id BIGINT NOT NULL REFERENCES haircare_routine_item(id) ON DELETE CASCADE
-);
-CREATE INDEX idx_haircare_routine_item_activity_routine_item ON haircare_routine_item_activity (routine_item_id);
+CREATE INDEX idx_routine_item_activity_routine_item ON routine_item_activity (routine_item_id);
 
 CREATE TABLE routine_image_activity (
     activity_id BIGINT PRIMARY KEY REFERENCES activity(id) ON DELETE CASCADE,
