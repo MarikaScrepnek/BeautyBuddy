@@ -38,3 +38,18 @@ export async function addProductToRoutine(routineId, productId, shadeName) {
     }
     return response.ok;
 }
+
+export async function updateRoutine(updatedData) {
+    const response = await fetch(`http://localhost:8080/api/routines/${updatedData.routineId}`, {
+        method: "PUT",
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedData),
+    });
+    if (!response.ok) {
+        throw new Error("Failed to update makeup routine");
+    }
+    return response.json();
+}
