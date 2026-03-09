@@ -1,11 +1,13 @@
 package com.beautybuddy.routine;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
 import com.beautybuddy.category.Category;
 import com.beautybuddy.category.CategoryRepository;
+import com.beautybuddy.common.DTOMapper;
 import com.beautybuddy.product.Product;
 import com.beautybuddy.product.ProductRepository;
 import com.beautybuddy.product.ProductShade;
@@ -14,63 +16,40 @@ import com.beautybuddy.routine.dto.AddToRoutineRequestDTO;
 import com.beautybuddy.routine.dto.CreateMakeupRoutineRequestDTO;
 import com.beautybuddy.routine.dto.DisplayRoutineDTO;
 import com.beautybuddy.routine.dto.DisplayRoutineItemDTO;
-import com.beautybuddy.routine.entity.MakeupRoutine;
-import com.beautybuddy.routine.entity.MakeupRoutineItem;
+import com.beautybuddy.routine.entity.OccasionEnum;
 import com.beautybuddy.routine.entity.Routine;
-import com.beautybuddy.routine.repo.MakeupRoutineRepository;
+import com.beautybuddy.routine.entity.RoutineItem;
 import com.beautybuddy.routine.repo.RoutineRepository;
 import com.beautybuddy.user.UserRepository;
 import com.beautybuddy.user.entity.User;
 import com.beautybuddy.review.ReviewRepository;
-import com.beautybuddy.review.entity.Review;
 
 @Service
 public class RoutineService {
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
     private final RoutineRepository routineRepository;
-    private final MakeupRoutineRepository makeupRoutineRepository;
-    private final ReviewRepository reviewRepository;
     private final ProductRepository productRepository;
     private final ProductShadeRepository productShadeRepository;
+    private final ReviewRepository reviewRepository;
 
-    public RoutineService(UserRepository userRepository, CategoryRepository categoryRepository, RoutineRepository routineRepository, MakeupRoutineRepository makeupRoutineRepository, ReviewRepository reviewRepository, ProductRepository productRepository, ProductShadeRepository productShadeRepository) {
+    public RoutineService(UserRepository userRepository, CategoryRepository categoryRepository, RoutineRepository routineRepository, ReviewRepository reviewRepository, ProductRepository productRepository, ProductShadeRepository productShadeRepository) {
         this.userRepository = userRepository;
         this.categoryRepository = categoryRepository;
         this.routineRepository = routineRepository;
-        this.makeupRoutineRepository = makeupRoutineRepository;
-        this.reviewRepository = reviewRepository;
         this.productRepository = productRepository;
         this.productShadeRepository = productShadeRepository;
+        this.reviewRepository = reviewRepository;
     }
 
     public List<DisplayRoutineDTO> getMakeupRoutines(String userEmail) {
         User user = userRepository.findByEmail(userEmail)
             .orElseThrow(() -> new RuntimeException("User not found"));
-        
-        List<MakeupRoutine> routines = makeupRoutineRepository.findByUser(user);
+
+        List<Routine> routines = routineRepository.findByUserIdAndCategoryName(user.getId(), "Makeup");
+
         return routines.stream()
-            .map(r -> new DisplayRoutineDTO(r.getRoutine().getId(), r.getName(), user.getUsername(), r.getRoutine().getUpdatedAt(), r.getOccasion().name(), r.getRoutine().getNotes(), r.getItems().stream()
-                .map(i -> new DisplayRoutineItemDTO(
-                    i.getId(),
-                    i.getProduct().getId(),
-                    i.getProduct().getName(),
-                    i.getProduct().getBrand().getName(),
-                    i.getShade().getShadeName(),
-                    i.getProduct().getCategory().getName(),
-                    i.getShade() != null && i.getShade().getImageLink() != null
-                        ? i.getShade().getImageLink()
-                        : i.getProduct().getImageLink(),
-                    i.getNotes(),
-                    reviewRepository.findByProduct_IdAndProductShade_IdAndUser_Id(
-                        i.getProduct().getId(),
-                        i.getShade().getId(),
-                        user.getId()
-                    ).map(Review::getRating).orElse(null),
-                    i.getStepOrder()
-                ))
-                .toList()
-            ))
+            .map(routine -> DTOMapper.toDisplayRoutineDTO(routine, reviewRepository))
             .toList();
     }
 
@@ -85,25 +64,19 @@ public class RoutineService {
             throw new RuntimeException("Cannot create routine for this occasion");
         }
         
-        Routine baseRoutine  = new Routine();
-        baseRoutine.setCategory(category);
-        baseRoutine.setNotes(request.notes());
-
-        MakeupRoutine routine = new MakeupRoutine();
-        routine.setRoutine(baseRoutine);
+        Routine routine  = new Routine();
         routine.setUser(user);
-        routine.setOccasion(request.occasion());
+        routine.setCategory(category);
         routine.setName(request.name());
+        routine.setNotes(request.notes());
+        routine.setOccasion(request.occasion());
 
-        routineRepository.save(baseRoutine);
-        makeupRoutineRepository.save(routine);
+        routineRepository.save(routine);
     }
 
     public void addProductToRoutine(String userEmail, Long routineId, AddToRoutineRequestDTO request) {
         User user = userRepository.findByEmail(userEmail)
             .orElseThrow(() -> new RuntimeException("User not found"));
-        Routine routine = routineRepository.findById(routineId)
-            .orElseThrow(() -> new RuntimeException("Routine not found"));
         Product product = productRepository.findById(request.productId())
             .orElseThrow(() -> new RuntimeException("Product not found"));
         ProductShade shade = null;
@@ -112,30 +85,66 @@ public class RoutineService {
                 .orElseThrow(() -> new RuntimeException("Shade not found"));
         }
 
-        if (routine.getCategory().getName().equals("Makeup")) {
-            MakeupRoutine makeupRoutine = makeupRoutineRepository.findByRoutineIdAndUserEmail(routineId, userEmail)
-                .orElseThrow(() -> new RuntimeException("Makeup routine not found"));
-            if (!makeupRoutine.getUser().getId().equals(user.getId())) {
-                throw new RuntimeException("Unauthorized");
+        Routine routine = routineRepository.findByIdAndUserEmail(routineId, userEmail)
+            .orElseThrow(() -> new RuntimeException("Routine not found"));
+        if (!routine.getUser().getId().equals(user.getId())) {
+            throw new RuntimeException("Unauthorized");
+        }
+
+        Integer stepOrder = routine.getItems().size() + 1;
+            
+        RoutineItem item = new RoutineItem();
+        item.setRoutine(routine);
+        item.setProduct(product);
+        item.setShade(shade);
+        item.setStepOrder(stepOrder);
+
+        routine.getItems().add(item);
+        routineRepository.save(routine);
+    }
+
+    public DisplayRoutineDTO updateRoutine(String userEmail, DisplayRoutineDTO request) {
+        User user = userRepository.findByEmail(userEmail)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+        Routine routine = routineRepository.findById(request.routineId())
+            .orElseThrow(() -> new RuntimeException("Routine not found"));
+        
+        if (!routine.getUser().getId().equals(user.getId())) {
+            throw new RuntimeException("Unauthorized");
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+        routine.getItems().forEach(item -> {
+            if (item.getValidTo() == null) {
+                item.setValidTo(now);
+            }
+        });
+
+        int stepOrder = 1;
+        for (DisplayRoutineItemDTO itemDTO : request.items()) {
+            Product product = productRepository.findById(itemDTO.productId())
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+            ProductShade shade = null;
+            if (itemDTO.productShadeName() != null) {
+                shade = productShadeRepository.findByProductAndShadeName(product, itemDTO.productShadeName())
+                    .orElseThrow(() -> new RuntimeException("Shade not found"));
             }
 
-            Integer stepOrder = makeupRoutine.getItems().size() + 1;
-             
-            MakeupRoutineItem item = new MakeupRoutineItem();
-            item.setMakeupRoutine(makeupRoutine);
-            item.setProduct(product);
-            item.setShade(shade);
-            item.setStepOrder(stepOrder);
+            RoutineItem newItem = new RoutineItem();
+            newItem.setRoutine(routine);
+            newItem.setProduct(product);
+            newItem.setShade(shade);
+            newItem.setNotes(itemDTO.productNotes());
+            newItem.setStepOrder(stepOrder++);
+            newItem.setValidFrom(now);
 
-            makeupRoutine.getItems().add(item);
-            makeupRoutineRepository.save(makeupRoutine);
-
-        } else if (routine.getCategory().getName().equals("Skincare")) {
-            throw new RuntimeException("Unsupported routine category");
-        } else if (routine.getCategory().getName().equals("Haircare")) {
-            throw new RuntimeException("Unsupported routine category");
-        } else {
-            throw new RuntimeException("Unknown routine category");
+            routine.getItems().add(newItem);
         }
+
+        routine.setNotes(request.notes());
+        routine.setUpdatedAt(now);
+        routineRepository.save(routine);
+        return DTOMapper.toDisplayRoutineDTO(routine, reviewRepository);
     }
+    
 }

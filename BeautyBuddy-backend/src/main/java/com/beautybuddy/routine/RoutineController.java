@@ -63,8 +63,13 @@ public class RoutineController {
     }
 
     @PutMapping("/{id}")
-    public String updateRoutine() {
-        return "This will update the routine with the given ID.";
+    public ResponseEntity<DisplayRoutineDTO> updateRoutine(Authentication authentication, @PathVariable Long id, @RequestBody DisplayRoutineDTO request) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(401).build();
+        }
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        DisplayRoutineDTO updatedRoutine = routineService.updateRoutine(userDetails.getEmail(), request);
+        return ResponseEntity.ok(updatedRoutine);
     }
 
     @DeleteMapping("/{id}")
