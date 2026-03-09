@@ -1,25 +1,63 @@
-import { useState, useEffect } from 'react';
-
-import { getMakeupRoutines } from '../../../api/routineApi';
+import { useEffect, useState } from 'react';
 
 import './MakeupRoutines.css';
 
 export default function MakeupRoutines( { userName, routine } ) {
-    const[editModalOpen, setEditModalOpen] = useState(false);
+    const[isEditingRoutine, setIsEditingRoutine] = useState(false);
+    const[editedRoutine, setEditedRoutine] = useState(routine);
+    
+    const[editNameModalOpen, setEditNameModalOpen] = useState(false);
+    const[editNotesModalOpen, setEditNotesModalOpen] = useState(false);
+
+    function handleNameChange(newName) {
+        setEditedRoutine(prev => ({ ...prev, name: newName }));
+    }
+
+    function handleNotesChange(newNotes) {
+        setEditedRoutine(prev => ({ ...prev, notes: newNotes }));
+    }
+
+    function handleReorderItems(newOrder) {
+        setEditedRoutine(prev => ({ ...prev, items: newOrder }));
+    }
+
+    function handleDeleteItem(itemId) {
+        setEditedRoutine(prev => ({
+            ...prev,
+            items: prev.items.filter(item => item.id !== itemId)
+        }));
+    }
+
+    async function handleSaveChanges() {
+        setIsEditingRoutine(false);
+    }
+
+    useEffect(() => {
+        setEditedRoutine(routine);
+    }, [routine]);
 
     return (
         <div className="routine-card">
             <div className="makeup-routine-header">
                 <div className="routine-name">
                     <p>{userName}'s</p>
-                    <h1>{routine.name || routine.occasion}</h1>
+                    <div className='routine-name-container' style={{ display: 'flex', alignItems: 'center' }}>
+                        <h1 style={{ flex: 1, textAlign: 'center' }}>
+                            {editedRoutine.name ? editedRoutine.name.toUpperCase() : editedRoutine.occasion}
+                        </h1>
+                        {(editedRoutine.occasion !== 'CASUAL' && editedRoutine.occasion !== 'GLAM') && isEditingRoutine ? (
+                            <button className="edit-name-button" onClick={() => setEditNameModalOpen(true)}>Edit Routine Name</button>
+                        ) : (
+                            <div style={{ width: '120px' }} />
+                        )}
+                    </div>
                     <p>Makeup Routine</p>
                 </div>
             </div>
 
             <div className="routine-meta">
                 <p>
-                    Updated {new Date(routine.updatedAt).toLocaleString('en-US', {
+                    Updated {new Date(editedRoutine.updatedAt).toLocaleString('en-US', {
                         month: 'long',
                         day: 'numeric',
                         year: 'numeric',
@@ -28,23 +66,39 @@ export default function MakeupRoutines( { userName, routine } ) {
                         hour12: true
                     })}
                 </p>
-                <button className="edit-button" onClick={() => setEditModalOpen(true)}>Edit Routine</button>
+                {isEditingRoutine ? (
+                    <button className="edit-button" onClick={handleSaveChanges}>Save Changes</button>
+                ) : (
+                    <button className="edit-button" onClick={() => setIsEditingRoutine(true)}>Edit Routine</button>
+                )}
             </div>
 
-            {routine.notes && (
+            {editedRoutine.notes ? (
                 <div className="routine-notes">
                     <h3>Notes:</h3>
-                    <p>{routine.notes}</p>
+                    <p>{editedRoutine.notes}</p>
+                    {isEditingRoutine && (
+                        <button className="edit-notes-button" onClick={() => setEditNotesModalOpen(true)}>Edit Notes</button>
+                    )}
                 </div>
+            ) : (
+                isEditingRoutine && (
+                    <button className="edit-notes-button" onClick={() => setEditNotesModalOpen(true)}>Add Notes</button>
+                )
             )}
 
             <ul className="routine-items-list">
-            {routine.items && routine.items.length > 0 ? (
-                routine.items
+            {editedRoutine.items && editedRoutine.items.length > 0 ? (
+                editedRoutine.items
                     .slice() // copy array to avoid mutating original
                     .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
                     .map(item => (
                     <li className="routine-item" key={item.id} onClick={() => window.open(`/${item.productId}`, '_blank')}>
+                        {isEditingRoutine && (
+                            <div className="delete-item-button" onClick={(e) => {e.stopPropagation(); handleDeleteItem(item.id);}}>
+                                <span>Delete</span>
+                            </div>
+                        )}
                         <img src={item.productImageUrl} alt={item.productName} className="routine-item-img" />
                         <div className="routine-item-info">
                             <p className="routine-item-name">{item.productName}</p>
@@ -53,14 +107,17 @@ export default function MakeupRoutines( { userName, routine } ) {
                                 <p>in {item.productShadeName}</p>
                             )}
                         </div>
+                        {isEditingRoutine && (
+                            <div className="reorder-item-button" onClick={(e) => {e.stopPropagation(); handleReorderItems(item.id);}}>
+                                <span>Reorder</span>
+                            </div>
+                        )}
                     </li>
                 ))
             ) : (
                 <p>No items in this routine.</p>
             )}
             </ul>
-
-            {/* {editModalOpen && <CreateRoutineModal onClose={() => setEditModalOpen(false)} />} */}
         </div>
     );
 }
