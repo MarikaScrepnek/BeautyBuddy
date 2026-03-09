@@ -5,6 +5,7 @@ import { updateRoutine } from '../../../api/routineApi';
 import './MakeupRoutines.css';
 
 export default function MakeupRoutines( { userName, routine } ) {
+    const [isEditingName, setIsEditingName] = useState(false);
     const[isEditingRoutine, setIsEditingRoutine] = useState(false);
     const[editedRoutine, setEditedRoutine] = useState(routine);
     
@@ -71,11 +72,41 @@ export default function MakeupRoutines( { userName, routine } ) {
                 <div className="routine-name">
                     <p>{userName}'s</p>
                     <div className='routine-name-container' style={{ display: 'flex', alignItems: 'center' }}>
-                        <h1 style={{ flex: 1, textAlign: 'center' }}>
-                            {editedRoutine.name ? editedRoutine.name.toUpperCase() : editedRoutine.occasion}
-                        </h1>
+                        <div style={{ flex: 1, textAlign: 'center' }}>
+                            {isEditingRoutine && (editedRoutine.occasion !== 'CASUAL' && editedRoutine.occasion !== 'GLAM') && isEditingName ? (
+                                <input
+                                    className="inline-edit-name-input"
+                                    type="text"
+                                    value={editedRoutine.name || ""}
+                                    autoFocus
+                                    style={{
+                                        fontSize: '2rem',
+                                        fontWeight: 'bold',
+                                        textAlign: 'center',
+                                        border: 'none',
+                                        background: 'transparent',
+                                        outline: 'none',
+                                        width: '100%',
+                                        textTransform: 'uppercase'
+                                    }}
+                                    onChange={e => handleNameChange(e.target.value)}
+                                    onBlur={() => {
+                                        setIsEditingName(false);
+                                    }}
+                                    onKeyDown={e => {
+                                        if (e.key === 'Enter') {
+                                            setIsEditingName(false);
+                                        }
+                                    }}
+                                />
+                            ) : (
+                                <h1 style={{ fontSize: '2rem', fontWeight: 'bold', textAlign: 'center', textTransform: 'uppercase' }}>
+                                    {editedRoutine.name || editedRoutine.occasion}
+                                </h1>
+                            )}
+                        </div>
                         {(editedRoutine.occasion !== 'CASUAL' && editedRoutine.occasion !== 'GLAM') && isEditingRoutine ? (
-                            <button className="edit-name-button" onClick={() => setEditNameModalOpen(true)}>Edit Routine Name</button>
+                            <button className="edit-name-button" onClick={() => setIsEditingName(true)}>Edit Routine Name</button>
                         ) : (
                             <div style={{ width: '120px' }} />
                         )}
