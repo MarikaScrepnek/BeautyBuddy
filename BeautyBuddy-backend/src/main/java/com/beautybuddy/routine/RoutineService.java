@@ -80,7 +80,7 @@ public class RoutineService {
         Product product = productRepository.findById(request.productId())
             .orElseThrow(() -> new RuntimeException("Product not found"));
         ProductShade shade = null;
-        if (request.shadeName() != null) {
+        if (request.shadeName() != null && !request.shadeName().isEmpty()) {
             shade = productShadeRepository.findByProductAndShadeName(product, request.shadeName())
                 .orElseThrow(() -> new RuntimeException("Shade not found"));
         }
