@@ -95,7 +95,10 @@ export default function MakeupRoutines( { userName, routine } ) {
                     })}
                 </p>
                 {isEditingRoutine ? (
-                    <button className="edit-button" onClick={handleSaveChanges}>Save Changes</button>
+                    <>
+                        <button className="edit-button" onClick={handleSaveChanges}>Save Changes</button>
+                        <button className="cancel-button" onClick={() => {setEditedRoutine(routine); setIsEditingRoutine(false);}}>Undo Changes</button>
+                    </>
                 ) : (
                     <button className="edit-button" onClick={() => setIsEditingRoutine(true)}>Edit Routine</button>
                 )}
@@ -155,6 +158,22 @@ export default function MakeupRoutines( { userName, routine } ) {
                                 <span>Reorder</span>
                             </div>
                         )}
+                            {item.notes ? (
+                                <>
+                                    <p className="item-notes">Notes: {item.notes}</p>
+                                    {isEditingRoutine && (
+                                        <button className="add-item-notes-button" onClick={(e) => {e.stopPropagation(); /* Open modal to edit notes for this item */}}>
+                                            Edit Notes
+                                        </button>
+                                    )}
+                                </>
+                            ) : (
+                                isEditingRoutine && (
+                                    <button className="add-item-notes-button" onClick={(e) => {e.stopPropagation(); /* Open modal to add notes for this item */}}>
+                                        Add Notes
+                                    </button>
+                                )
+                            )}
                     </li>
                 ))
             ) : (
