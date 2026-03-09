@@ -1,7 +1,5 @@
 package com.beautybuddy.routine.entity;
 
-import java.time.LocalDateTime;
-
 import com.beautybuddy.category.Category;
 import com.beautybuddy.common.entity.SoftDeletableEntity;
 
@@ -21,12 +19,6 @@ public class Routine extends SoftDeletableEntity {
     @Column(name = "notes", nullable = true)
     private String notes;
 
-    @Column(name = "valid_from", nullable = false)
-    private LocalDateTime validFrom = LocalDateTime.now();
-
-    @Column(name = "valid_to", nullable = true)
-    private LocalDateTime validTo;
-
     public Category getCategory() {
         return category;
     }
@@ -39,19 +31,5 @@ public class Routine extends SoftDeletableEntity {
     }
     public void setNotes(String notes) {
         this.notes = notes;
-    }
-
-    public LocalDateTime getValidFrom() {
-        return validFrom;
-    }
-    public void setValidFrom(LocalDateTime validFrom) {
-        this.validFrom = validFrom;
-    }
-
-    public LocalDateTime getValidTo() {
-        return validTo;
-    }
-    public void setValidTo(LocalDateTime validTo) {
-        this.validTo = validTo;
     }
 }

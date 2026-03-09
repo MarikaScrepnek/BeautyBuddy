@@ -263,10 +263,7 @@ CREATE TABLE routine (
 
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    deleted_at TIMESTAMPTZ DEFAULT NULL,
-
-    valid_from TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    valid_to TIMESTAMPTZ DEFAULT NULL
+    deleted_at TIMESTAMPTZ DEFAULT NULL
 );
 
 -- Trigger function to enforce only base categories
@@ -318,7 +315,9 @@ CREATE TABLE makeup_routine_item (
 
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     valid_from TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    valid_to TIMESTAMPTZ DEFAULT NULL
+    valid_to TIMESTAMPTZ DEFAULT NULL,
+
+    UNIQUE (routine_id, step_order, valid_from)
 );
 CREATE INDEX idx_makeup_routine_item_routine ON makeup_routine_item (routine_id);
 CREATE INDEX idx_makeup_routine_item_product ON makeup_routine_item (product_id);
@@ -346,7 +345,9 @@ CREATE TABLE skincare_routine_item (
 
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     valid_from TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    valid_to TIMESTAMPTZ DEFAULT NULL
+    valid_to TIMESTAMPTZ DEFAULT NULL,
+
+    UNIQUE (routine_id, step_order, valid_from)
 );
 CREATE INDEX idx_skincare_routine_item_routine ON skincare_routine_item (routine_id);
 CREATE INDEX idx_skincare_routine_item_product ON skincare_routine_item (product_id);
@@ -370,7 +371,9 @@ CREATE TABLE haircare_routine_item (
 
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     valid_from TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    valid_to TIMESTAMPTZ DEFAULT NULL
+    valid_to TIMESTAMPTZ DEFAULT NULL,
+
+    UNIQUE (routine_id, step_order, valid_from)
 );
 CREATE INDEX idx_haircare_routine_item_routine ON haircare_routine_item (routine_id);
 CREATE INDEX idx_haircare_routine_item_product ON haircare_routine_item (product_id);
