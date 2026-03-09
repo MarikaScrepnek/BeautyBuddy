@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 
+import { updateRoutine } from '../../../api/routineApi';
+
 import './MakeupRoutines.css';
 
 export default function MakeupRoutines( { userName, routine } ) {
@@ -24,15 +26,10 @@ export default function MakeupRoutines( { userName, routine } ) {
         setDragIndex(index);
     }
 
-    function handleDragOver(e) {
-        e.preventDefault(); // allows drop
-    }
-
     function handleDrop(dropIndex) {
         if (dragIndex === null || dragIndex === dropIndex) return;
 
-        const newItems = [...editedRoutine.items].sort((a,b) => (a.order ?? 0) - (b.order ?? 0));
-
+        const newItems = [...editedRoutine.items];
         const draggedItem = newItems.splice(dragIndex, 1)[0];
         newItems.splice(dropIndex, 0, draggedItem);
 
@@ -41,15 +38,13 @@ export default function MakeupRoutines( { userName, routine } ) {
             order: i
         }));
 
-        handleReorderItems(reordered);
-        setDragIndex(null);
-    }
-
-    function handleReorderItems(reorderedItems) {
         setEditedRoutine(prev => ({
             ...prev,
-            items: reorderedItems
+            items: reordered
         }));
+
+        setDragIndex(null);
+        setDragEnabled(false);
     }
 
     function handleDeleteItem(itemId) {
@@ -60,9 +55,9 @@ export default function MakeupRoutines( { userName, routine } ) {
     }
 
     async function handleSaveChanges() {
-        //api call to save changes
+        const updatedRoutine = await updateRoutine(editedRoutine);
+        setEditedRoutine(updatedRoutine);
         setIsEditingRoutine(false);
-        //reload routine data from backend to ensure we have the latest info (including updatedAt)
     }
 
     useEffect(() => {
@@ -122,17 +117,14 @@ export default function MakeupRoutines( { userName, routine } ) {
 
             <ul className="routine-items-list">
             {editedRoutine.items && editedRoutine.items.length > 0 ? (
-                editedRoutine.items
-                    .slice() // copy array to avoid mutating original
-                    .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
-                    .map(item => (
+                editedRoutine.items.map((item, index) => (
                     <li
                         className="routine-item"
                         key={item.id}
                         draggable={isEditingRoutine && dragEnabled}
-                        onDragStart={() => handleDragStart(item.order)}
-                        onDragOver={handleDragOver}
-                        onDrop={() => handleDrop(item.order)}
+                        onDragStart={() => handleDragStart(index)}
+                        onDragOver={(e) => e.preventDefault()}
+                        onDrop={() => handleDrop(index)}
                         onClick={() => {
                             if (!isEditingRoutine) {
                                 window.open(`/${item.productId}`, '_blank')
@@ -166,7 +158,7 @@ export default function MakeupRoutines( { userName, routine } ) {
                     </li>
                 ))
             ) : (
-                <p>No items in this routine.</p>
+                <p style={{justifyContent: "center"}}>No items have been added to this routine.</p>
             )}
             </ul>
         </div>
