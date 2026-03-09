@@ -139,7 +139,7 @@ export default function MakeupRoutines( { userName, routine } ) {
                                 <span>Delete</span>
                             </div>
                         )}
-                        <img src={item.productImageUrl} alt={item.productName} className="routine-item-img" />
+                        <img draggable="false" src={item.productImageUrl} alt={item.productName} className="routine-item-img" />
                         <div className="routine-item-info">
                             <p className="routine-item-name">{item.productName}</p>
                             <p>{item.productBrand}</p>
