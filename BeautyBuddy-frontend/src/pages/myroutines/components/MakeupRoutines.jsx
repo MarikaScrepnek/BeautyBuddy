@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { updateRoutine } from '../../../api/routineApi';
 
 import { GiTrashCan } from "react-icons/gi";
+import { IoReorderThreeOutline } from "react-icons/io5";
 
 import './MakeupRoutines.css';
 
@@ -189,7 +190,7 @@ export default function MakeupRoutines( { userName, routine } ) {
                                 onMouseLeave={() => setDragEnabled(false)}
                                 onClick={(e) => e.stopPropagation()}
                             >
-                                <span>Reorder</span>
+                                <IoReorderThreeOutline />
                             </div>
                         )}
                             {item.notes ? (
