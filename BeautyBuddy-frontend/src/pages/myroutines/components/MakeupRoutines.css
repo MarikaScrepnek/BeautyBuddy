@@ -142,7 +142,14 @@
 .delete-item-button {
     color: #e74c3c;
     cursor: pointer;
-    font-size: 16px;
+    padding: 4px 8px;
+    border-radius: 8px;
+    font-size: 25px;
     font-weight: 600;
+    margin-right: 10px;
     transition: background 0.2s, color 0.2s;
+}
+.delete-item-button:hover {
+    background: rgba(231, 76, 60, 0.1);
+    color: #c0392b;
 }
