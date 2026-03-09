@@ -9,6 +9,9 @@ export default function MakeupRoutines( { userName, routine } ) {
     const[editNameModalOpen, setEditNameModalOpen] = useState(false);
     const[editNotesModalOpen, setEditNotesModalOpen] = useState(false);
 
+    const[dragEnabled, setDragEnabled] = useState(false);
+    const[dragIndex, setDragIndex] = useState(null);
+
     function handleNameChange(newName) {
         setEditedRoutine(prev => ({ ...prev, name: newName }));
     }
@@ -17,8 +20,36 @@ export default function MakeupRoutines( { userName, routine } ) {
         setEditedRoutine(prev => ({ ...prev, notes: newNotes }));
     }
 
-    function handleReorderItems(newOrder) {
-        setEditedRoutine(prev => ({ ...prev, items: newOrder }));
+    function handleDragStart(index) {
+        setDragIndex(index);
+    }
+
+    function handleDragOver(e) {
+        e.preventDefault(); // allows drop
+    }
+
+    function handleDrop(dropIndex) {
+        if (dragIndex === null || dragIndex === dropIndex) return;
+
+        const newItems = [...editedRoutine.items].sort((a,b) => (a.order ?? 0) - (b.order ?? 0));
+
+        const draggedItem = newItems.splice(dragIndex, 1)[0];
+        newItems.splice(dropIndex, 0, draggedItem);
+
+        const reordered = newItems.map((item, i) => ({
+            ...item,
+            order: i
+        }));
+
+        handleReorderItems(reordered);
+        setDragIndex(null);
+    }
+
+    function handleReorderItems(reorderedItems) {
+        setEditedRoutine(prev => ({
+            ...prev,
+            items: reorderedItems
+        }));
     }
 
     function handleDeleteItem(itemId) {
@@ -29,7 +60,9 @@ export default function MakeupRoutines( { userName, routine } ) {
     }
 
     async function handleSaveChanges() {
+        //api call to save changes
         setIsEditingRoutine(false);
+        //reload routine data from backend to ensure we have the latest info (including updatedAt)
     }
 
     useEffect(() => {
@@ -93,7 +126,19 @@ export default function MakeupRoutines( { userName, routine } ) {
                     .slice() // copy array to avoid mutating original
                     .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
                     .map(item => (
-                    <li className="routine-item" key={item.id} onClick={() => window.open(`/${item.productId}`, '_blank')}>
+                    <li
+                        className="routine-item"
+                        key={item.id}
+                        draggable={isEditingRoutine && dragEnabled}
+                        onDragStart={() => handleDragStart(item.order)}
+                        onDragOver={handleDragOver}
+                        onDrop={() => handleDrop(item.order)}
+                        onClick={() => {
+                            if (!isEditingRoutine) {
+                                window.open(`/${item.productId}`, '_blank')
+                            }
+                        }}
+                    >
                         {isEditingRoutine && (
                             <div className="delete-item-button" onClick={(e) => {e.stopPropagation(); handleDeleteItem(item.id);}}>
                                 <span>Delete</span>
@@ -108,7 +153,13 @@ export default function MakeupRoutines( { userName, routine } ) {
                             )}
                         </div>
                         {isEditingRoutine && (
-                            <div className="reorder-item-button" onClick={(e) => {e.stopPropagation(); handleReorderItems(item.id);}}>
+                            <div
+                                className="reorder-item-button"
+                                onMouseDown={() => setDragEnabled(true)}
+                                onMouseUp={() => setDragEnabled(false)}
+                                onMouseLeave={() => setDragEnabled(false)}
+                                onClick={(e) => e.stopPropagation()}
+                            >
                                 <span>Reorder</span>
                             </div>
                         )}
