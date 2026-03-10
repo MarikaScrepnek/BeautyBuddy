@@ -86,6 +86,12 @@ export default function Wishlist({isLoggedIn}) {
         {!isLoggedIn ? (
             <p>Please log in to see your wishlist.</p>
         ) : (
+            <>
+            {wishlist.length === 0 && !wishlistLoading && (
+                <div style={{ display: "flex", justifyContent: "center", alignItems: "center"}}>
+                    <p style={{ fontStyle: "italic", color: "#888" }}>Your wishlist is empty.</p>
+                </div>
+            )}
             <div
                 className="wishlist-container"
                 ref={wishlistContainerRef}
@@ -137,7 +143,9 @@ export default function Wishlist({isLoggedIn}) {
                 </div>
             ))}
             </div>
-        )}
+            </>
+        )
+        }
         </>
     );
 }
