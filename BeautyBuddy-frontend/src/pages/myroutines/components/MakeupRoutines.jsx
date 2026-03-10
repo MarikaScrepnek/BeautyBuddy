@@ -124,8 +124,9 @@ export default function MakeupRoutines( { userName, routine } ) {
                                         border: 'none',
                                         background: 'transparent',
                                         outline: 'none'
+
                                     }}>
-                                        {editedRoutine.name || editedRoutine.occasion}
+                                        {editedRoutine.name || (routine.occasion.charAt(0).toUpperCase() + routine.occasion.slice(1).toLowerCase())}
                                     </h1>
                                     <button className="edit-name-button" onClick={() => setIsEditingName(true)}>
                                         <CiEdit />
@@ -141,7 +142,7 @@ export default function MakeupRoutines( { userName, routine } ) {
                                         background: 'transparent',
                                         outline: 'none'
                                     }}>
-                                        {editedRoutine.name || editedRoutine.occasion}
+                                        {editedRoutine.name || (routine.occasion.charAt(0).toUpperCase() + routine.occasion.slice(1).toLowerCase())}
                                     </h1>
                                 }
                             </>
