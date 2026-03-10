@@ -163,10 +163,11 @@ export default function MakeupRoutines( { userName, routine } ) {
                     })}
                 </p>
                 {isEditingRoutine ? (
-                    <>
-                        <button className="edit-button" onClick={handleSaveChanges}>Save Changes</button>
-                        <button className="cancel-button" onClick={() => {setEditedRoutine(routine); setIsEditingRoutine(false);}}>Undo Changes</button>
-                    </>
+                    <div style={{display: "flex"}}>
+                        <div style={{width:"120px"}}></div>
+                        <button className="edit-button" style={{ margin: '0 auto', marginTop: '8px' }} onClick={handleSaveChanges}>Save Changes</button>
+                        <button className="cancel-button" style={{width:"120px", marginTop: '18px'}} onClick={() => {setEditedRoutine(routine); setIsEditingRoutine(false);}}>Undo Changes</button>
+                    </div>
                 ) : (
                     <button className="edit-button" onClick={() => setIsEditingRoutine(true)}>Edit Routine</button>
                 )}
