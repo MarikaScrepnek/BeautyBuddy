@@ -60,7 +60,7 @@ export default function MakeupRoutines( { userName, routine } ) {
     }
 
     async function handleSaveChanges() {
-        if (!editedRoutine.name || editedRoutine.name.trim() === "") {
+        if ((editedRoutine.occasion !== 'CASUAL' && editedRoutine.occasion !== 'GLAM') && (!editedRoutine.name || editedRoutine.name.trim() === "")) {
             alert("Routine name cannot be empty.");
             return;
         }
