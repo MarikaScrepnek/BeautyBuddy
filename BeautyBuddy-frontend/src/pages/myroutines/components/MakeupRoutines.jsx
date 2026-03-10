@@ -4,16 +4,17 @@ import { updateRoutine } from '../../../api/routineApi';
 
 import { GiTrashCan } from "react-icons/gi";
 import { IoReorderThreeOutline } from "react-icons/io5";
+import { CiEdit } from "react-icons/ci";
 
 import './MakeupRoutines.css';
 
 export default function MakeupRoutines( { userName, routine } ) {
-    const [isEditingName, setIsEditingName] = useState(false);
     const[isEditingRoutine, setIsEditingRoutine] = useState(false);
     const[editedRoutine, setEditedRoutine] = useState(routine);
-    
-    const[editNameModalOpen, setEditNameModalOpen] = useState(false);
-    const[editNotesModalOpen, setEditNotesModalOpen] = useState(false);
+
+    const[isEditingName, setIsEditingName] = useState(false);
+
+    const[isEditingNotes, setIsEditingNotes] = useState(false);
 
     const[dragEnabled, setDragEnabled] = useState(false);
     const[dragIndex, setDragIndex] = useState(null);
@@ -59,6 +60,14 @@ export default function MakeupRoutines( { userName, routine } ) {
     }
 
     async function handleSaveChanges() {
+        if (!editedRoutine.name || editedRoutine.name.trim() === "") {
+            alert("Routine name cannot be empty.");
+            return;
+        }
+        if (editedRoutine === routine) {
+            setIsEditingRoutine(false);
+            return;
+        }
         const updatedRoutine = await updateRoutine(editedRoutine);
         setEditedRoutine(updatedRoutine);
         setIsEditingRoutine(false);
@@ -75,8 +84,7 @@ export default function MakeupRoutines( { userName, routine } ) {
                 <div className="routine-name">
                     <p>{userName}'s</p>
                     <div className='routine-name-container' style={{ display: 'flex', alignItems: 'center' }}>
-                        <div style={{ flex: 1, textAlign: 'center' }}>
-                            {isEditingRoutine && (editedRoutine.occasion !== 'CASUAL' && editedRoutine.occasion !== 'GLAM') && isEditingName ? (
+                        {isEditingRoutine && (editedRoutine.occasion !== 'CASUAL' && editedRoutine.occasion !== 'GLAM') && isEditingName ? (
                                 <input
                                     className="inline-edit-name-input"
                                     type="text"
@@ -85,12 +93,13 @@ export default function MakeupRoutines( { userName, routine } ) {
                                     style={{
                                         fontSize: '2rem',
                                         fontWeight: 'bold',
+                                        color: '#6c63ff',
                                         textAlign: 'center',
                                         border: 'none',
                                         background: 'transparent',
                                         outline: 'none',
-                                        width: '100%',
-                                        textTransform: 'uppercase'
+                                        minWidth: '120px',
+                                        maxWidth: '300px'
                                     }}
                                     onChange={e => handleNameChange(e.target.value)}
                                     onBlur={() => {
@@ -102,16 +111,27 @@ export default function MakeupRoutines( { userName, routine } ) {
                                         }
                                     }}
                                 />
-                            ) : (
-                                <h1 style={{ fontSize: '2rem', fontWeight: 'bold', textAlign: 'center'}}>
+                        ) : (
+                            <>
+                                <h1 style={{
+                                    fontSize: '2rem',
+                                    fontWeight: 'bold',
+                                    color: '#6c63ff',
+                                    textAlign: 'center',
+                                    border: 'none',
+                                    background: 'transparent',
+                                    outline: 'none',
+                                    minWidth: '120px',
+                                    maxWidth: '300px'
+                                }}>
                                     {editedRoutine.name || editedRoutine.occasion}
                                 </h1>
-                            )}
-                        </div>
-                        {(editedRoutine.occasion !== 'CASUAL' && editedRoutine.occasion !== 'GLAM') && isEditingRoutine ? (
-                            <button className="edit-name-button" onClick={() => setIsEditingName(true)}>Edit Routine Name</button>
-                        ) : (
-                            <div style={{ width: '120px' }} />
+                                {(editedRoutine.occasion !== 'CASUAL' && editedRoutine.occasion !== 'GLAM') && isEditingRoutine && (
+                                    <button className="edit-name-button" onClick={() => setIsEditingName(true)}>
+                                        <CiEdit />
+                                    </button>
+                                )}
+                            </>
                         )}
                     </div>
                     <p>Makeup Routine</p>
@@ -144,12 +164,12 @@ export default function MakeupRoutines( { userName, routine } ) {
                     <h3>Notes:</h3>
                     <p>{editedRoutine.notes}</p>
                     {isEditingRoutine && (
-                        <button className="edit-notes-button" onClick={() => setEditNotesModalOpen(true)}>Edit Notes</button>
+                        <button className="edit-notes-button">Edit Notes</button>
                     )}
                 </div>
             ) : (
                 isEditingRoutine && (
-                    <button className="edit-notes-button" onClick={() => setEditNotesModalOpen(true)}>Add Notes</button>
+                    <button className="edit-notes-button">Add Notes</button>
                 )
             )}
 

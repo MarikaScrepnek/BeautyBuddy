@@ -43,6 +43,26 @@
     letter-spacing: 1px;
 }
 
+.routine-name-container {
+    display: flex;
+    flex-direction: row;
+    gap: 12px;
+    align-items: center;
+    justify-content: center;
+}
+
+.edit-name-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 20px;
+    margin-top: 8px;
+    transition: color 0.2s;
+}
+.edit-name-button:hover {
+    color: #6c63ff;
+}
+
 .routine-meta {
     display: flex;
     flex-direction: column;
