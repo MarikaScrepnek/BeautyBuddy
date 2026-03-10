@@ -174,7 +174,7 @@ export default function MakeupRoutines( { userName, routine } ) {
             </div>
 
             {editedRoutine.notes && !isEditingRoutine ? (
-                <div className="routine-notes">
+                <div style={{marginTop: '20px'}} className="routine-notes">
                     <h3>Notes:</h3>
                     <p>{editedRoutine.notes}</p>
                 </div>
