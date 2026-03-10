@@ -157,14 +157,15 @@
 .reorder-item-button {
     color: #6c63ff;
     cursor: pointer;
-    padding: 4px 4px;
-    border-radius: 4px;
     font-size: 25px;
     font-weight: 600;
-    margin-right: 10px;
     transition: background 0.2s, color 0.2s;
-    margin-right: 0;
     margin-left: auto;
+
+    padding-right: 5px;
+    padding-left: 5px;
+    padding-top: 6px;
+    border-radius: 8px;
 }
 .reorder-item-button:hover {
     background: rgba(108, 99, 255, 0.1);
