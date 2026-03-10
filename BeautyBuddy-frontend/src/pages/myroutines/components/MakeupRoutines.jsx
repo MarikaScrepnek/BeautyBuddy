@@ -173,17 +173,29 @@ export default function MakeupRoutines( { userName, routine } ) {
                 )}
             </div>
 
-            {editedRoutine.notes ? (
+            {editedRoutine.notes && !isEditingRoutine ? (
                 <div className="routine-notes">
                     <h3>Notes:</h3>
                     <p>{editedRoutine.notes}</p>
-                    {isEditingRoutine && (
-                        <button className="edit-notes-button">Edit Notes</button>
-                    )}
                 </div>
             ) : (
                 isEditingRoutine && (
-                    <button className="edit-notes-button">Add Notes</button>
+                    <div style={{ marginTop: '35px' }}>
+                        <textarea
+                            value={editedRoutine.notes || ''}
+                            onChange={e => handleNotesChange(e.target.value)}
+                            style={{
+                                width: '400px',
+                                minHeight: '80px',
+                                fontSize: '16px',
+                                padding: '8px',
+                                borderRadius: '8px',
+                                border: '1px solid #ccc',
+                                resize: 'none',
+                            }}
+                            placeholder="Add routine notes..."
+                        />
+                    </div>
                 )
             )}
 
