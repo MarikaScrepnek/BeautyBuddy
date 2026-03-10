@@ -85,35 +85,12 @@ export default function MakeupRoutines( { userName, routine } ) {
                     <p>{userName}'s</p>
                     <div className='routine-name-container' style={{ display: 'flex', alignItems: 'center' }}>
                         {isEditingRoutine && (editedRoutine.occasion !== 'CASUAL' && editedRoutine.occasion !== 'GLAM') && isEditingName ? (
-                                <input
-                                    className="inline-edit-name-input"
-                                    type="text"
-                                    value={editedRoutine.name || ""}
-                                    autoFocus
-                                    style={{
-                                        fontSize: '2rem',
-                                        fontWeight: 'bold',
-                                        color: '#6c63ff',
-                                        textAlign: 'center',
-                                        border: 'none',
-                                        background: 'transparent',
-                                        outline: 'none',
-                                        minWidth: '120px',
-                                        maxWidth: '300px'
-                                    }}
-                                    onChange={e => handleNameChange(e.target.value)}
-                                    onBlur={() => {
-                                        setIsEditingName(false);
-                                    }}
-                                    onKeyDown={e => {
-                                        if (e.key === 'Enter') {
-                                            setIsEditingName(false);
-                                        }
-                                    }}
-                                />
-                        ) : (
-                            <>
-                                <h1 style={{
+                            <input
+                                className="inline-edit-name-input"
+                                type="text"
+                                value={editedRoutine.name || ""}
+                                autoFocus
+                                style={{
                                     fontSize: '2rem',
                                     fontWeight: 'bold',
                                     color: '#6c63ff',
@@ -123,14 +100,50 @@ export default function MakeupRoutines( { userName, routine } ) {
                                     outline: 'none',
                                     minWidth: '120px',
                                     maxWidth: '300px'
-                                }}>
-                                    {editedRoutine.name || editedRoutine.occasion}
-                                </h1>
-                                {(editedRoutine.occasion !== 'CASUAL' && editedRoutine.occasion !== 'GLAM') && isEditingRoutine && (
+                                }}
+                                onChange={e => handleNameChange(e.target.value)}
+                                onBlur={() => {
+                                    setIsEditingName(false);
+                                }}
+                                onKeyDown={e => {
+                                    if (e.key === 'Enter') {
+                                        setIsEditingName(false);
+                                    }
+                                }}
+                            />
+                        ) : (
+                            <>
+                                {(editedRoutine.occasion !== 'CASUAL' && editedRoutine.occasion !== 'GLAM') && isEditingRoutine ? (
+                                    <>
+                                    <div style={{width:"8px"}}></div>
+                                    <h1 style={{
+                                        fontSize: '2rem',
+                                        fontWeight: 'bold',
+                                        color: '#6c63ff',
+                                        textAlign: 'center',
+                                        border: 'none',
+                                        background: 'transparent',
+                                        outline: 'none'
+                                    }}>
+                                        {editedRoutine.name || editedRoutine.occasion}
+                                    </h1>
                                     <button className="edit-name-button" onClick={() => setIsEditingName(true)}>
                                         <CiEdit />
                                     </button>
-                                )}
+                                    </>
+                                ) : 
+                                    <h1 style={{
+                                        fontSize: '2rem',
+                                        fontWeight: 'bold',
+                                        color: '#6c63ff',
+                                        textAlign: 'center',
+                                        border: 'none',
+                                        background: 'transparent',
+                                        outline: 'none'
+                                    }}>
+                                        {editedRoutine.name || editedRoutine.occasion}
+                                    </h1>
+                                }
                             </>
                         )}
                     </div>
