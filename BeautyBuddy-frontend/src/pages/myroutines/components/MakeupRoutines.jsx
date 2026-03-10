@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { updateRoutine } from '../../../api/routineApi';
 
@@ -156,9 +156,9 @@ export default function MakeupRoutines( { userName, routine } ) {
             <ul className="routine-items-list">
             {editedRoutine.items && editedRoutine.items.length > 0 ? (
                 editedRoutine.items.map((item, index) => (
+                    <React.Fragment key={item.id}>
                     <li
                         className="routine-item"
-                        key={item.id}
                         draggable={isEditingRoutine && dragEnabled}
                         onDragStart={() => handleDragStart(index)}
                         onDragOver={(e) => e.preventDefault()}
@@ -193,23 +193,27 @@ export default function MakeupRoutines( { userName, routine } ) {
                                 <IoReorderThreeOutline />
                             </div>
                         )}
-                            {item.notes ? (
-                                <>
-                                    <p className="item-notes">Notes: {item.notes}</p>
-                                    {isEditingRoutine && (
-                                        <button className="add-item-notes-button" onClick={(e) => {e.stopPropagation(); /* Open modal to edit notes for this item */}}>
-                                            Edit Notes
-                                        </button>
-                                    )}
-                                </>
-                            ) : (
-                                isEditingRoutine && (
-                                    <button className="add-item-notes-button" onClick={(e) => {e.stopPropagation(); /* Open modal to add notes for this item */}}>
-                                        Add Notes
-                                    </button>
-                                )
-                            )}
                     </li>
+                    <div>
+                        {item.notes ? (
+                            <>
+                                <p className="item-notes">Notes: {item.notes}</p>
+                                {isEditingRoutine && (
+                                    <button className="add-item-notes-button" onClick={(e) => {e.stopPropagation(); /* Open modal to edit notes for this item */}}>
+                                        Edit Notes
+                                    </button>
+                                )}
+                            </>
+                        ) : (
+                            isEditingRoutine && (
+                                <button className="add-item-notes-button" onClick={(e) => {e.stopPropagation(); /* Open modal to add notes for this item */}}>
+                                    + Add Notes
+                                </button>
+                            )
+                        )}
+                    </div>
+                    </React.Fragment>
+                    
                 ))
             ) : (
                 <div style={{ display: "flex", justifyContent: "center", alignItems: "center"}}>
