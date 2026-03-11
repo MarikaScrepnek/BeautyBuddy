@@ -9,8 +9,8 @@ import java.util.Set;
 import com.beautybuddy.common.entity.UpdatableEntity;
 import com.beautybuddy.brand.Brand;
 import com.beautybuddy.category.Category;
-import com.beautybuddy.ingredient.MayContainIngredient;
-import com.beautybuddy.ingredient.ProductIngredient;
+import com.beautybuddy.ingredient.entity.MayContainIngredient;
+import com.beautybuddy.ingredient.entity.ProductIngredient;
 
 @Entity
 @Table(

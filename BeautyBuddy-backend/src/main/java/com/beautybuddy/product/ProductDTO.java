@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.beautybuddy.brand.BrandDTO;
 import com.beautybuddy.category.CategoryDTO;
-import com.beautybuddy.ingredient.IngredientDTO;
+import com.beautybuddy.ingredient.dto.IngredientDTO;
 
 public record ProductDTO (
     Long id,

@@ -1,5 +1,7 @@
-package com.beautybuddy.ingredient;
+package com.beautybuddy.ingredient.repo;
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.beautybuddy.ingredient.entity.Ingredient;
 
 import java.util.Optional;
 

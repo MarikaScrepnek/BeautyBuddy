@@ -1,6 +1,8 @@
 package com.beautybuddy.ingredient;
 
 import com.beautybuddy.common.DTOMapper;
+import com.beautybuddy.ingredient.dto.IngredientDTO;
+import com.beautybuddy.ingredient.repo.IngredientRepository;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;

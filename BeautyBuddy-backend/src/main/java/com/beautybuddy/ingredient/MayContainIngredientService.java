@@ -3,6 +3,10 @@ package com.beautybuddy.ingredient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.beautybuddy.ingredient.entity.Ingredient;
+import com.beautybuddy.ingredient.entity.MayContainIngredient;
+import com.beautybuddy.ingredient.repo.IngredientRepository;
+import com.beautybuddy.ingredient.repo.MayContainIngredientRepository;
 import com.beautybuddy.product.Product;
 import com.beautybuddy.product.ProductRepository;
 

@@ -1,4 +1,4 @@
-package com.beautybuddy.ingredient;
+package com.beautybuddy.ingredient.entity;
 
 import com.beautybuddy.common.entity.UpdatableEntity;
 

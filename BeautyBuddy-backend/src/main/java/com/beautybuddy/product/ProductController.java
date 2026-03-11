@@ -3,8 +3,8 @@ package com.beautybuddy.product;
 import java.util.List;
 
 import com.beautybuddy.common.DTOMapper;
-import com.beautybuddy.ingredient.MayContainIngredientDTO;
-import com.beautybuddy.ingredient.ProductIngredientDTO;
+import com.beautybuddy.ingredient.dto.MayContainIngredientDTO;
+import com.beautybuddy.ingredient.dto.ProductIngredientDTO;
 import com.beautybuddy.report.ReportService;
 import com.beautybuddy.report.ReportRequestDTO;
 import com.beautybuddy.security.CustomUserDetails;
