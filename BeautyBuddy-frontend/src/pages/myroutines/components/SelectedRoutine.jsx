@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { use, useEffect, useState } from 'react';
 
 import { updateRoutine } from '../../../api/routineApi';
 
@@ -14,10 +14,32 @@ export default function MakeupRoutines( { userName, routine, routineType } ) {
 
     const[isEditingName, setIsEditingName] = useState(false);
 
-    const[editingItemNotes, setEditingItemNotes] = useState({});
-
     const[dragEnabled, setDragEnabled] = useState(false);
     const[dragIndex, setDragIndex] = useState(null);
+
+    function getRoutineHeader() {
+        if (routineType === "Makeup") {
+            const occ = editedRoutine.occasion?.toLowerCase();
+            if (occ === "glam" || occ === "casual") {
+                return occ.charAt(0).toUpperCase() + occ.slice(1);
+            } else if (occ === "event" || occ === "other") {
+                return editedRoutine.name || "Routine";
+            } else {
+                return editedRoutine.name || "Routine";
+            }
+        } else if (routineType === "Skincare") {
+            if (editedRoutine.timeOfDay?.toLowerCase() === "am") {
+                return "AM";
+            } else if (editedRoutine.timeOfDay?.toLowerCase() === "pm") {
+                return "PM";
+            } else {
+                return "Skincare";
+            }
+        } else if (routineType === "Haircare") {
+            return "Haircare";
+        }
+        return editedRoutine.name || "Routine";
+    }
 
     function handleNameChange(newName) {
         setEditedRoutine(prev => ({ ...prev, name: newName }));
@@ -67,9 +89,11 @@ export default function MakeupRoutines( { userName, routine, routineType } ) {
     }
 
     async function handleSaveChanges() {
-        if ((editedRoutine.occasion !== 'CASUAL' && editedRoutine.occasion !== 'GLAM') && (!editedRoutine.name || editedRoutine.name.trim() === "")) {
-            alert("Routine name cannot be empty.");
-            return;
+        if (routineType === "Makeup") {
+            if ((editedRoutine.occasion !== 'Casual' && editedRoutine.occasion !== 'Glam') && (!editedRoutine.name || editedRoutine.name.trim() === "")) {
+                alert("Routine name cannot be empty.");
+                return;
+            }
         }
         if (editedRoutine === routine) {
             setIsEditingRoutine(false);
@@ -91,7 +115,7 @@ export default function MakeupRoutines( { userName, routine, routineType } ) {
                 <div className="routine-name">
                     <p>{userName}'s</p>
                     <div className='routine-name-container' style={{ display: 'flex', alignItems: 'center' }}>
-                        {isEditingRoutine && (editedRoutine.occasion !== 'CASUAL' && editedRoutine.occasion !== 'GLAM') && isEditingName ? (
+                        {isEditingRoutine && routineType === "Makeup" && isEditingName ? (
                             <input
                                 className="inline-edit-name-input"
                                 type="text"
@@ -120,38 +144,22 @@ export default function MakeupRoutines( { userName, routine, routineType } ) {
                             />
                         ) : (
                             <>
-                                {(editedRoutine.occasion !== 'CASUAL' && editedRoutine.occasion !== 'GLAM') && isEditingRoutine ? (
-                                    <>
-                                    <div style={{width:"8px"}}></div>
-                                    <h1 style={{
-                                        fontSize: '2rem',
-                                        fontWeight: 'bold',
-                                        color: '#6c63ff',
-                                        textAlign: 'center',
-                                        border: 'none',
-                                        background: 'transparent',
-                                        outline: 'none'
-
-                                    }}>
-                                        {editedRoutine.name || (routine.occasion.charAt(0).toUpperCase() + routine.occasion.slice(1).toLowerCase())}
-                                    </h1>
+                                <h1 style={{
+                                    fontSize: '2rem',
+                                    fontWeight: 'bold',
+                                    color: '#6c63ff',
+                                    textAlign: 'center',
+                                    border: 'none',
+                                    background: 'transparent',
+                                    outline: 'none'
+                                }}>
+                                    {getRoutineHeader()}
+                                </h1>
+                                {isEditingRoutine && routineType === "Makeup" && (editedRoutine.occasion?.toLowerCase() === "event" || editedRoutine.occasion?.toLowerCase() === "other") && (
                                     <button className="edit-name-button" onClick={() => setIsEditingName(true)}>
                                         <CiEdit />
                                     </button>
-                                    </>
-                                ) : 
-                                    <h1 style={{
-                                        fontSize: '2rem',
-                                        fontWeight: 'bold',
-                                        color: '#6c63ff',
-                                        textAlign: 'center',
-                                        border: 'none',
-                                        background: 'transparent',
-                                        outline: 'none'
-                                    }}>
-                                        {editedRoutine.name || (routine.occasion.charAt(0).toUpperCase() + routine.occasion.slice(1).toLowerCase())}
-                                    </h1>
-                                }
+                                )}
                             </>
                         )}
                     </div>
