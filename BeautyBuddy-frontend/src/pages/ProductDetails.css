@@ -28,7 +28,11 @@
     font-weight: 700;
     margin: 0.2rem 0;
     color: #222;
-    cursor: default
+    cursor: default;
+    text-align: center;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
 }
 
 .product-brand {

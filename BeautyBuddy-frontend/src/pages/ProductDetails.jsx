@@ -1,6 +1,7 @@
-import { useParams } from "react-router-dom";
+import { NavLink, useParams } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { FaSearch } from 'react-icons/fa';
+import { IoIosArrowRoundBack } from "react-icons/io";
 
 import AuthModal from "../components/AuthModal";
 import { addToWishlist, removeFromWishlist, getWishlist } from "../api/wishlistApi";
@@ -506,8 +507,14 @@ export default function ProductDetails() {
         <div className="product-card">
             {/* Header: Name + Brand + Category */}
             <div className="product-header">
-                <h1 className="product-name">{data.name}</h1>
+                <div style={{display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%"}}>
+                    <NavLink style={{ fontSize: "2rem", color: "inherit", marginRight: "auto" }} to={`/products`}>
+                        <IoIosArrowRoundBack />
+                    </NavLink>
+                    <h1 className="product-name">{data.name}</h1>
+                </div>
                 <p className="product-brand">by {data.brand.name}</p>
+                <div style={{width: "32px"}}></div>
             </div>
 
             {/* Main section: Image on left, Price + Rating on right */}
