@@ -38,13 +38,23 @@ public class RoutineController {
     }
 
     @GetMapping("/skincare")
-    public String getSkincareRoutines() {
-        return "This will return the user's skincare routines.";
+    public ResponseEntity<List<DisplayRoutineDTO>> getSkincareRoutines(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(401).build();
+        }
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        List<DisplayRoutineDTO> routines = routineService.getSkincareRoutines(userDetails.getEmail());
+        return ResponseEntity.ok(routines);
     }
 
     @GetMapping("/haircare")
-    public String getHaircareRoutines() {
-        return "This will return the user's haircare routines.";
+    public ResponseEntity<DisplayRoutineDTO> getHaircareRoutines(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(401).build();
+        }
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        DisplayRoutineDTO routine = routineService.getHaircareRoutine(userDetails.getEmail());
+        return ResponseEntity.ok(routine);
     }
 
     @GetMapping("/search")

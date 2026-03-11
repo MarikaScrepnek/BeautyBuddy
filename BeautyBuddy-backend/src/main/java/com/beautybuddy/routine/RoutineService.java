@@ -53,6 +53,30 @@ public class RoutineService {
             .toList();
     }
 
+    public List<DisplayRoutineDTO> getSkincareRoutines(String userEmail) {
+        User user = userRepository.findByEmail(userEmail)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+
+        List<Routine> routines = routineRepository.findByUserIdAndCategoryName(user.getId(), "Skincare");
+
+        return routines.stream()
+            .map(routine -> DTOMapper.toDisplayRoutineDTO(routine, reviewRepository))
+            .toList();
+    }
+
+    public DisplayRoutineDTO getHaircareRoutine(String userEmail) {
+        User user = userRepository.findByEmail(userEmail)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+
+        List<Routine> routines = routineRepository.findByUserIdAndCategoryName(user.getId(), "Haircare");
+
+        if (routines.isEmpty()) {
+            throw new RuntimeException("No haircare routine found");
+        }
+
+        return DTOMapper.toDisplayRoutineDTO(routines.get(0), reviewRepository);
+    }
+
     public void createMakeupRoutine(String userEmail, CreateMakeupRoutineRequestDTO request) {
         Category category = categoryRepository.findByName("Makeup")
             .orElseThrow(() -> new RuntimeException("Category not found"));
