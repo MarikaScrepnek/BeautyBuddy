@@ -14,7 +14,7 @@ export default function MakeupRoutines( { userName, routine } ) {
 
     const[isEditingName, setIsEditingName] = useState(false);
 
-    const[isEditingNotes, setIsEditingNotes] = useState(false);
+    const[editingItemNotes, setEditingItemNotes] = useState({});
 
     const[dragEnabled, setDragEnabled] = useState(false);
     const[dragIndex, setDragIndex] = useState(null);
@@ -25,6 +25,13 @@ export default function MakeupRoutines( { userName, routine } ) {
 
     function handleNotesChange(newNotes) {
         setEditedRoutine(prev => ({ ...prev, notes: newNotes }));
+    }
+
+    function handleItemNotesChange(itemId, newNotes) {
+        setEditedRoutine(prev => ({
+            ...prev,
+            items: prev.items.map(item => item.id === itemId ? { ...item, productNotes: newNotes } : item)
+        }));
     }
 
     function handleDragStart(index) {
@@ -192,7 +199,7 @@ export default function MakeupRoutines( { userName, routine } ) {
                                 padding: '8px',
                                 borderRadius: '8px',
                                 border: '1px solid #ccc',
-                                resize: 'none',
+                                resize: 'none'
                             }}
                             placeholder="Add routine notes..."
                         />
@@ -241,22 +248,27 @@ export default function MakeupRoutines( { userName, routine } ) {
                             </div>
                         )}
                     </li>
+                    {(item.productNotes && !isEditingRoutine) && (
+                        <div style={{ border: '1px solid #ccc', borderRadius: '8px', padding: '10px' }}>
+                            <p>Product Notes: {item.productNotes}</p>
+                        </div>
+                    )}
                     <div>
-                        {item.notes ? (
-                            <>
-                                <p className="item-notes">Notes: {item.notes}</p>
-                                {isEditingRoutine && (
-                                    <button className="add-item-notes-button" onClick={(e) => {e.stopPropagation(); /* Open modal to edit notes for this item */}}>
-                                        Edit Notes
-                                    </button>
-                                )}
-                            </>
-                        ) : (
-                            isEditingRoutine && (
-                                <button className="add-item-notes-button" onClick={(e) => {e.stopPropagation(); /* Open modal to add notes for this item */}}>
-                                    + Add Notes
-                                </button>
-                            )
+                        {isEditingRoutine && (
+                            <textarea
+                                value={editedRoutine.items[index]?.productNotes || ''}
+                                onChange={e => handleItemNotesChange(item.id, e.target.value)}
+                                style={{
+                                    width: '608px',
+                                    minHeight: '40px',
+                                    fontSize: '16px',
+                                    padding: '8px',
+                                    borderRadius: '8px',
+                                    border: '1px solid #ccc',
+                                    resize: 'none'
+                                }}
+                                placeholder="Add product notes..."
+                            />
                         )}
                     </div>
                     </React.Fragment>
