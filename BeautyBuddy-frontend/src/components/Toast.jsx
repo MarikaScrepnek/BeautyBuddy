@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import "./Toast.css";
 
-export default function Toast({ message, type = "info", duration = 2500, onClose }) {
+export default function Toast({ message, type = "info", duration = 800, onClose }) {
   const [closing, setClosing] = useState(false);
 
   useEffect(() => {
