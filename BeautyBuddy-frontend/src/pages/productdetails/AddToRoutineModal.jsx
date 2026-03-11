@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
 
-import { getMakeupRoutines, addProductToRoutine } from "../../api/routineApi";
+import { getMakeupRoutines, getSkincareRoutines, getHaircareRoutine, addProductToRoutine } from "../../api/routineApi";
 
 import Toast from "../../components/Toast";
 
 export default function AddToRoutineModal({ baseCategory, productName, productId, shadeName, onClose }) {
     const [makeupRoutines, setMakeupRoutines] = useState([]);
     const [skincareRoutines, setSkincareRoutines] = useState([]);
-    const [haircareRoutines, setHaircareRoutines] = useState([]);
+    const [haircareRoutine, setHaircareRoutine] = useState([]);
 
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState("");
@@ -39,7 +39,7 @@ export default function AddToRoutineModal({ baseCategory, productName, productId
             .catch(error => {
                 console.error("Error fetching makeup routines:", error);
             });
-        /* getSkincareRoutines()
+        getSkincareRoutines()
             .then(data => {
                 setSkincareRoutines(data);
                 console.log("Fetched skincare routines:", data);
@@ -47,14 +47,14 @@ export default function AddToRoutineModal({ baseCategory, productName, productId
             .catch(error => {
                 console.error("Error fetching skincare routines:", error);
             });
-        getHaircareRoutines()
+        getHaircareRoutine()
             .then(data => {
-                setHaircareRoutines(data);
-                console.log("Fetched haircare routines:", data);
+                setHaircareRoutine(data);
+                console.log("Fetched haircare routine:", data);
             })
             .catch(error => {
-                console.error("Error fetching haircare routines:", error);
-            }); */
+                console.error("Error fetching haircare routine:", error);
+            });
     }, []);
 
     useEffect(() => {
@@ -77,17 +77,45 @@ export default function AddToRoutineModal({ baseCategory, productName, productId
                 </button>
                 <h2>Add</h2>
                 <h2>{productName}</h2>
-                <h2>to a Routine</h2>
-                {makeupRoutines.map(routine => (
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }} key={routine.routineId} className="routine-option">
-                        <p>{routine.name || (routine.occasion.charAt(0).toUpperCase() + routine.occasion.slice(1).toLowerCase())}</p>
+                <h2>to a {baseCategory} Routine</h2>
+                {baseCategory === "Makeup" && (
+                    <>
+                    {makeupRoutines.map(routine => (
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }} key={routine.routineId} className="routine-option">
+                            <p>{routine.name || (routine.occasion.charAt(0).toUpperCase() + routine.occasion.slice(1).toLowerCase())}</p>
+                            <button className="add-button"
+                            onClick={() => handleAddToRoutine(routine.routineId, productId, shadeName)}
+                            >
+                                +
+                            </button>
+                        </div>
+                    ))}
+                    </>
+                )}
+                {baseCategory === "Skincare" && (
+                    <>
+                    {skincareRoutines.map(routine => (
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }} key={routine.routineId} className="routine-option">
+                            <p>{routine.name || routine.timeOfDay}</p>
+                            <button className="add-button"
+                            onClick={() => handleAddToRoutine(routine.routineId, productId, shadeName)}
+                            >
+                                +
+                            </button>
+                        </div>
+                    ))}
+                    </>
+                )}
+                {baseCategory === "Haircare" && haircareRoutine.routineId && (
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }} key={haircareRoutine.routineId} className="routine-option">
+                        <p>{haircareRoutine.name || "Haircare Routine"}</p>
                         <button className="add-button"
-                         onClick={() => handleAddToRoutine(routine.routineId, productId, shadeName)}
+                        onClick={() => handleAddToRoutine(haircareRoutine.routineId, productId, shadeName)}
                         >
                             +
                         </button>
                     </div>
-                ))}
+                )}
             </div>
             <Toast
                 message={showToast ? toastMessage : ""}
