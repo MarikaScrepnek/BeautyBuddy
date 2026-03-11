@@ -1,4 +1,4 @@
-import React, { use, useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import { updateRoutine } from '../../../api/routineApi';
 
@@ -9,6 +9,8 @@ import { CiEdit } from "react-icons/ci";
 import './SelectedRoutine.css';
 
 export default function MakeupRoutines( { userName, routine, routineType } ) {
+    const notesRef = useRef(null);
+
     const[isEditingRoutine, setIsEditingRoutine] = useState(false);
     const[editedRoutine, setEditedRoutine] = useState(routine);
 
@@ -16,6 +18,11 @@ export default function MakeupRoutines( { userName, routine, routineType } ) {
 
     const[dragEnabled, setDragEnabled] = useState(false);
     const[dragIndex, setDragIndex] = useState(null);
+
+    function autoResizeTextarea(e) {
+        e.target.style.height = "auto";
+        e.target.style.height = e.target.scrollHeight + "px";
+    }
 
     function getRoutineHeader() {
         if (routineType === "Makeup") {
@@ -90,7 +97,7 @@ export default function MakeupRoutines( { userName, routine, routineType } ) {
 
     async function handleSaveChanges() {
         if (routineType === "Makeup") {
-            if ((editedRoutine.occasion !== 'Casual' && editedRoutine.occasion !== 'Glam') && (!editedRoutine.name || editedRoutine.name.trim() === "")) {
+            if ((editedRoutine.occasion !== 'CASUAL' && editedRoutine.occasion !== 'GLAM') && (!editedRoutine.name || editedRoutine.name.trim() === "")) {
                 alert("Routine name cannot be empty.");
                 return;
             }
@@ -108,6 +115,13 @@ export default function MakeupRoutines( { userName, routine, routineType } ) {
         setEditedRoutine(routine);
         setIsEditingRoutine(false);
     }, [routine]);
+
+    useEffect(() => {
+        if (notesRef.current) {
+            notesRef.current.style.height = "auto";
+            notesRef.current.style.height = notesRef.current.scrollHeight + "px";
+        }
+    }, [isEditingRoutine, editedRoutine.notes]);
 
     return (
         <div className="routine-card">
@@ -181,7 +195,7 @@ export default function MakeupRoutines( { userName, routine, routineType } ) {
                 {isEditingRoutine ? (
                     <div style={{display: "flex"}}>
                         <div style={{width:"120px"}}></div>
-                        <button className="edit-button" style={{ margin: '0 auto', marginTop: '8px' }} onClick={handleSaveChanges}>Save Changes</button>
+                        <button className="edit-button" onClick={handleSaveChanges}>Save Changes</button>
                         <button className="cancel-button" style={{width:"120px", marginTop: '18px'}} onClick={() => {setEditedRoutine(routine); setIsEditingRoutine(false);}}>Undo Changes</button>
                     </div>
                 ) : (
@@ -190,26 +204,19 @@ export default function MakeupRoutines( { userName, routine, routineType } ) {
             </div>
 
             {editedRoutine.notes && !isEditingRoutine ? (
-                <div style={{marginTop: '20px'}} className="routine-notes">
-                    <h3>Notes:</h3>
+                <div className="routine-notes">
                     <p>{editedRoutine.notes}</p>
                 </div>
             ) : (
                 isEditingRoutine && (
-                    <div style={{ marginTop: '35px' }}>
+                    <div className="routine-notes">
                         <textarea
+                            ref={notesRef}
+                            className='routine-notes-input'
                             value={editedRoutine.notes || ''}
-                            onChange={e => handleNotesChange(e.target.value)}
-                            style={{
-                                width: '400px',
-                                minHeight: '80px',
-                                fontSize: '16px',
-                                padding: '8px',
-                                borderRadius: '8px',
-                                border: '1px solid #ccc',
-                                resize: 'none'
-                            }}
+                            onChange={e => {handleNotesChange(e.target.value); autoResizeTextarea(e);}}
                             placeholder="Add routine notes..."
+                            onInput={autoResizeTextarea}
                         />
                     </div>
                 )
@@ -237,48 +244,48 @@ export default function MakeupRoutines( { userName, routine, routineType } ) {
                             </div>
                         )}
                         <img draggable="false" src={item.productImageUrl} alt={item.productName} className="routine-item-img" />
-                        <div className="routine-item-info">
-                            <p className="routine-item-name">{item.productName}</p>
-                            <p>{item.productBrand}</p>
-                            {item.productShadeName && (
-                                <p>in {item.productShadeName}</p>
-                            )}
-                        </div>
-                        {isEditingRoutine && (
-                            <div
-                                className="reorder-item-button"
-                                onMouseDown={() => setDragEnabled(true)}
-                                onMouseUp={() => setDragEnabled(false)}
-                                onMouseLeave={() => setDragEnabled(false)}
-                                onClick={(e) => e.stopPropagation()}
-                            >
-                                <IoReorderThreeOutline />
+                        <div className="routine-item-main">
+                            <div className='routine-item-info-row'>
+                                <div className="routine-item-info">
+                                    <p className="routine-item-name">{item.productName}</p>
+                                    <div className='routine-item-meta'>
+                                        <span>{item.productBrand}</span>
+                                        {item.productShadeName && (
+                                            <span>• {item.productShadeName}</span>
+                                        )}
+                                    </div>
+                                </div>
+                                {isEditingRoutine && (
+                                    <div
+                                        className="reorder-item-button"
+                                        onMouseDown={() => setDragEnabled(true)}
+                                        onMouseUp={() => setDragEnabled(false)}
+                                        onMouseLeave={() => setDragEnabled(false)}
+                                        onClick={(e) => e.stopPropagation()}
+                                    >
+                                        <IoReorderThreeOutline />
+                                    </div>
+                                )}
                             </div>
-                        )}
-                    </li>
-                    {(item.productNotes && !isEditingRoutine) && (
-                        <div style={{ border: '1px solid #ccc', borderRadius: '8px', padding: '10px' }}>
-                            <p>Product Notes: {item.productNotes}</p>
+                                    {isEditingRoutine ? (
+                                        <div className="routine-item-notes">
+                                            <textarea
+                                                value={editedRoutine.items[index]?.productNotes || ''}
+                                                onChange={e => handleItemNotesChange(item.id, e.target.value)}
+                                                className="routine-item-notes-input"
+                                                placeholder="Add product notes..."
+                                                onClick={(e) => e.stopPropagation()}
+                                            />
+                                        </div>
+                                    ) : (
+                                        (item.productNotes && (
+                                            <div className="routine-item-notes">
+                                                <p>{item.productNotes}</p>
+                                            </div>
+                                        ))
+                                    )}
                         </div>
-                    )}
-                    <div>
-                        {isEditingRoutine && (
-                            <textarea
-                                value={editedRoutine.items[index]?.productNotes || ''}
-                                onChange={e => handleItemNotesChange(item.id, e.target.value)}
-                                style={{
-                                    width: '608px',
-                                    minHeight: '40px',
-                                    fontSize: '16px',
-                                    padding: '8px',
-                                    borderRadius: '8px',
-                                    border: '1px solid #ccc',
-                                    resize: 'none'
-                                }}
-                                placeholder="Add product notes..."
-                            />
-                        )}
-                    </div>
+                    </li>
                     </React.Fragment>
                     
                 ))

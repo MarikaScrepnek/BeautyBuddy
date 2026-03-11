@@ -105,23 +105,6 @@
     text-decoration: underline;
 }
 
-.routine-notes {
-    margin-top: 5px;
-    font-size: 18px;
-    color: #555;
-    text-align: center;
-    background: #f7f7fa;
-    border-radius: 8px;
-    padding: 16px 32px;
-    box-shadow: 0 2px 8px rgba(108, 99, 255, 0.05);
-    font-size: 16px;
-    color: #555;
-    text-align: center;
-    background: #f7f7fa;
-    border-radius: 4px;
-    padding: 10px 20px;
-}
-
 .routine-items-list {
     width: 100%;
     max-width: 700px;
@@ -147,6 +130,19 @@
     cursor: pointer;
 }
 
+.routine-item-info-row{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+}
+
+.routine-item-main {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+}
+
 .routine-item-img {
     width: 60px;
     height: 60px;
@@ -167,6 +163,86 @@
     font-weight: 700;
     color: #6c63ff;
     margin-bottom: 2px;
+}
+
+.routine-item-meta {
+    font-size: 14px;
+    color: #777;
+    display: flex;
+    gap: 6px;
+}
+
+.routine-notes {
+    width: 100%;
+    max-width: 500px;
+    margin: 10px auto 0 auto;
+
+    font-size: 16px;
+    color: #555;
+    text-align: center;
+
+    background: #f7f7fa;
+    border-radius: 6px;
+    padding: 14px 20px;
+    box-sizing: border-box;
+    word-break: break-word;
+}
+
+.routine-notes p {
+    margin: 0;
+    line-height: 1.4;
+}
+
+.routine-notes-input {
+    width: 100%;
+    font-size: 16px;
+    color: #555;
+    background: transparent;
+    padding-bottom: 0;
+    margin-bottom: 0;
+
+    border: none;
+    resize: none;
+    outline: none;
+
+    font-family: inherit;
+
+    text-align: center;   
+    overflow: hidden;    
+    margin: 0;
+    line-height: 1.4;
+}
+
+.routine-item-notes {
+    font-size: 14px;
+    color: #555;
+    background: #f6f6ff;
+    padding: 8px 10px;
+    border-radius: 6px;
+    word-break: break-word;
+}
+
+.routine-item-notes p {
+    margin: 0;
+    line-height: 1.4;
+}
+
+.routine-item-notes-input {
+    width: 100%;
+    font-size: 14px;
+    color: #555;
+    background: transparent;
+
+    border: none;
+    resize: none;
+    outline: none;
+    padding: 0;
+    margin: 0;
+
+    font-family: inherit;
+}
+.routine-item-notes-input:focus {
+    outline: none;
 }
 
 .delete-item-button {
