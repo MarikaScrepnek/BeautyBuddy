@@ -8,6 +8,7 @@ public record DisplayRoutineDTO(
     String name, //can be null
     String author,
     LocalDateTime updatedAt,
+    String timeOfDay, //can be null
     String occasion, //can be null
     String notes,
     List<DisplayRoutineItemDTO> items

@@ -141,6 +141,7 @@ public class DTOMapper {
             routine.getName(),
             user.getUsername(),
             routine.getUpdatedAt(),
+            routine.getTimeOfDay() != null ? routine.getTimeOfDay().name() : null,
             routine.getOccasion() != null ? routine.getOccasion().name() : null,
             routine.getNotes(),
             itemDTOs
