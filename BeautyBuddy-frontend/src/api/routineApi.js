@@ -9,6 +9,28 @@ export async function getMakeupRoutines() {
     return await response.json();
 }
 
+export async function getSkincareRoutines() {
+    const response = await fetch(`http://localhost:8080/api/routines/skincare`, {
+        method: "GET",
+        credentials: "include",
+    });
+    if (!response.ok) {
+        throw new Error("Failed to fetch skincare routines");
+    }
+    return await response.json();
+}
+
+export async function getHaircareRoutine() {
+    const response = await fetch(`http://localhost:8080/api/routines/haircare`, {
+        method: "GET",
+        credentials: "include",
+    });
+    if (!response.ok) {
+        throw new Error("Failed to fetch haircare routine");
+    }
+    return await response.json();
+}
+
 export async function createMakeupRoutine(occasion, name, notes) {
     const response = await fetch(`http://localhost:8080/api/routines/makeup`, {
         method: "POST",
