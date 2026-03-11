@@ -11,3 +11,19 @@
   border-radius: 16px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.05);
 }
+
+.create-button {
+  background-color: #ff61e5;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 5px 15px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  max-width: 300px;
+}
+
+.create-button:hover {
+  background-color: #ff3eb8;
+}
