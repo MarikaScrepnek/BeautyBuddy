@@ -48,6 +48,15 @@ public class RoutineService {
 
         List<Routine> routines = routineRepository.findByUserIdAndCategoryName(user.getId(), "Makeup");
 
+        List<String> occasionOrder = List.of("CASUAL", "GLAM", "EVENT", "OTHER");
+        routines.sort((a, b) -> {
+            String occA = a.getOccasion() != null ? a.getOccasion().name() : "OTHER";
+            String occB = b.getOccasion() != null ? b.getOccasion().name() : "OTHER";
+            int idxA = occasionOrder.indexOf(occA);
+            int idxB = occasionOrder.indexOf(occB);
+            return Integer.compare(idxA == -1 ? occasionOrder.size() : idxA, idxB == -1 ? occasionOrder.size() : idxB);
+        });
+
         return routines.stream()
             .map(routine -> DTOMapper.toDisplayRoutineDTO(routine, reviewRepository))
             .toList();
@@ -58,6 +67,14 @@ public class RoutineService {
             .orElseThrow(() -> new RuntimeException("User not found"));
 
         List<Routine> routines = routineRepository.findByUserIdAndCategoryName(user.getId(), "Skincare");
+
+        routines.sort((a, b) -> {
+            String timeA = a.getTimeOfDay() != null ? a.getTimeOfDay().name() : "PM";
+            String timeB = b.getTimeOfDay() != null ? b.getTimeOfDay().name() : "PM";
+            int idxA = "AM".equals(timeA) ? 0 : 1;
+            int idxB = "AM".equals(timeB) ? 0 : 1;
+            return Integer.compare(idxA, idxB);
+        });
 
         return routines.stream()
             .map(routine -> DTOMapper.toDisplayRoutineDTO(routine, reviewRepository))
