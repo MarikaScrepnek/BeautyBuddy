@@ -8,6 +8,7 @@ import Tooltip from "../../../components/common/Tooltip";
 import Searchbar from "../../../components/common/Searchbar";
 
 import "./Wishlist.css";
+import ReviewStars from "../../../components/common/ReviewStars";
 
 export default function Wishlist({isLoggedIn}) {
     const [showToast, setShowToast] = useState(false);
@@ -104,14 +105,16 @@ export default function Wishlist({isLoggedIn}) {
                         <h2 style={{fontSize: "1.25rem", textAlign: "center", justifyContent: "center"}}>
                             {item.productName}
                         </h2>
-                        <p style={{textAlign: "center"}}>
-                            {item.brandName}
-                        </p>
-                        {item.shadeName && (
+                        <div style={{display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center", gap: "4px"}}>
                             <p style={{textAlign: "center"}}>
-                                in {item.shadeName}
+                                {item.brandName} 
                             </p>
-                        )}
+                            {item.shadeName && (
+                                <p style={{textAlign: "center"}}>
+                                    • {item.shadeName}
+                                </p>
+                            )}
+                        </div>
                     </div>
 
                     <img src={item.imageLink} alt="Product" style={{"height": "250px"}} />
@@ -119,8 +122,12 @@ export default function Wishlist({isLoggedIn}) {
                     <div className="wishlist-item-footer">
 
                         <div className="wishlist-item-meta">
-                            <span>Rating: {item.rating}</span>
-                            <span>Price: ${item.price}</span>
+                            <span style={{marginBottom: "6px"}}>${item.price}</span>
+                            {item.rating ? (
+                                <ReviewStars productId={item.productId} shadeName={item.shadeName} rating={item.rating} disabled={true} />
+                            ) : (
+                                <p style={{fontStyle: "italic", color: "#888"}}>No ratings yet</p>
+                            )}
                         </div>
 
                         <Tooltip message="Remove from wishlist" position="top">
