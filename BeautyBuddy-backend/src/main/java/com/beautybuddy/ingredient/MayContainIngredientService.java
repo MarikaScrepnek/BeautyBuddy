@@ -62,7 +62,7 @@ public class MayContainIngredientService {
             // Clean up ingredient string
             raw = raw.replaceAll("\\([^)]*\\)", ""); // remove parentheses
             raw = raw.replace("/", ",");             // replace slashes
-            String[] ingredients = raw.split(",");
+            String[] ingredients = raw.split(", ");
 
             Set<Long> addedCanonicals = new HashSet<>();
 
