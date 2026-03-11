@@ -8,7 +8,7 @@ import Routines from './components/Routines';
 import "./MyRoutines.css";
 import Searchbar from '../../components/common/Searchbar';
 import SelectedRoutine from './components/SelectedRoutine';
-import { getMakeupRoutines } from '../../api/routineApi';
+import { getHaircareRoutine, getMakeupRoutines, getSkincareRoutines } from '../../api/routineApi';
 
 import CreateRoutineModal from './components/CreateRoutineModal';
 
@@ -20,7 +20,10 @@ export default function MyRoutines() {
   // sidebar state
   const [selected, setSelected] = useState("Wishlist");
   const [selectedRoutine, setSelectedRoutine] = useState(null);
+
   const [makeupRoutines, setMakeupRoutines] = useState([]);
+  const [skincareRoutines, setSkincareRoutines] = useState([]);
+  const [haircareRoutine, setHaircareRoutine] = useState([]);
 
   const[createModalOpen, setCreateModalOpen] = useState(false);
 
@@ -40,6 +43,20 @@ export default function MyRoutines() {
         setMakeupRoutines(data);
       })
       .catch((err) => console.error("Error fetching makeup routines:", err));
+
+      getSkincareRoutines()
+      .then((data) => {
+        console.log("Skincare routines:", data);
+        setSkincareRoutines(data);
+      })
+      .catch((err) => console.error("Error fetching skincare routines:", err));
+
+      getHaircareRoutine()
+      .then((data) => {
+        console.log("Haircare routine:", data);
+        setHaircareRoutine(data);
+      })
+      .catch((err) => console.error("Error fetching haircare routine:", err));
   }, []);
 
   return (
@@ -88,18 +105,25 @@ export default function MyRoutines() {
             <button className="create-button" onClick={() => setCreateModalOpen(true)} style={{margin: "1rem", width: "calc(100% - 2rem)"}}>
                 + New Routine
             </button>
-            <li
-              onClick={() => setSelected("Skincare")}
-              style={{
-                padding: "1rem",
-                cursor: "pointer",
-                background: selected === "Skincare" ? "#e0e0e0" : "transparent",
-                fontWeight: selected === "Skincare" ? "bold" : "normal",
-                borderLeft: selected === "Skincare" ? "4px solid #6c63ff" : "4px solid transparent"
-              }}
-            >
+            <li style={{padding: "1rem", fontWeight: "bold", fontSize: "1.1rem", color: "#6c63ff", background: "transparent"}}>
               Skincare
             </li>
+            {skincareRoutines.map((routine) => (
+              <li
+                key={routine.routineId}
+                onClick={() => { setSelected(routine.routineId); setSelectedRoutine(routine); }}
+                style={{
+                  padding: "0.5rem 1.5rem",
+                  cursor: "pointer",
+                  color: "#333",
+                  textDecoration: "underline",
+                  background: selected === routine.routineId ? "#e0e0e0" : "transparent",
+                  borderLeft: selected === routine.routineId ? "4px solid #6c63ff" : "4px solid transparent"
+                }}
+              >
+                {routine.timeOfDay}
+              </li>
+            ))}
             <li
               onClick={() => setSelected("Haircare")}
               style={{
@@ -117,24 +141,16 @@ export default function MyRoutines() {
       
       <main style={{ flex: 1, padding: "0 2rem" }}>
 
-        {selected === "Haircare" && 
-        <div>
-          Haircare routine content goes here.
-        </div>
+        {selected === "Wishlist" && 
+        <Wishlist isLoggedIn={isLoggedIn} />
         }
 
         {makeupRoutines.some(r => r.routineId === selected) && selectedRoutine &&
           <SelectedRoutine userName={username} routine={selectedRoutine} routineType="Makeup" />
         }
 
-        {selected === "Skincare" && 
-        <div>
-          Skincare routine content goes here.
-        </div>
-        }
-
-        {selected === "Wishlist" && 
-        <Wishlist isLoggedIn={isLoggedIn} />
+        {skincareRoutines.some(r => r.routineId === selected) && selectedRoutine &&
+          <SelectedRoutine userName={username} routine={selectedRoutine} routineType="Skincare" />
         }
 
       </main>
