@@ -6,6 +6,8 @@ import { GiTrashCan } from "react-icons/gi";
 import { IoReorderThreeOutline } from "react-icons/io5";
 import { CiEdit } from "react-icons/ci";
 
+import ReviewStars from '../../../components/common/ReviewStars';
+
 import './SelectedRoutine.css';
 
 export default function MakeupRoutines( { userName, routine, routineType } ) {
@@ -265,6 +267,21 @@ export default function MakeupRoutines( { userName, routine, routineType } ) {
                                         {item.productShadeName && (
                                             <span>• {item.productShadeName}</span>
                                         )}
+                                        <span>• </span>
+                                        <ReviewStars
+                                            productId={item.productId}
+                                            shadeName={item.productShadeName}
+                                            rating={item.rating}
+                                            reviewId={item.reviewId ? item.reviewId : null}
+                                            onReviewSubmitted={(newRating) => {
+                                                setEditedRoutine(prev => ({
+                                                    ...prev,
+                                                    items: prev.items.map(it =>
+                                                        it.id === item.id ? { ...it, rating: newRating } : it
+                                                    )
+                                                }));
+                                            }}
+                                        />
                                     </div>
                                 </div>
                                 {isEditingRoutine && (
