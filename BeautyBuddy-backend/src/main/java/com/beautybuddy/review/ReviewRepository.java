@@ -18,7 +18,9 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
         Pageable pageable
     );
 
-    Optional<Review> findByProduct_IdAndProductShade_IdAndUser_Id(Long productId, Long shadeId, Long userId);
+    Optional<Review> findByProduct_IdAndProductShade_IdAndUser_IdAndDeletedAtIsNull(Long productId, Long shadeId, Long userId);
+
+    Optional<Review> findByProduct_IdAndUser_IdAndDeletedAtIsNull(Long productId, Long userId);
 
     @Query("""
         SELECT AVG(r.rating)

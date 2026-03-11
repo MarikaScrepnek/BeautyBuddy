@@ -112,9 +112,18 @@ public class DTOMapper {
             BigDecimal rating = null;
             if (item.getShade() != null) {
                 rating = reviewRepository
-                    .findByProduct_IdAndProductShade_IdAndUser_Id(
+                    .findByProduct_IdAndProductShade_IdAndUser_IdAndDeletedAtIsNull(
                         item.getProduct().getId(),
                         item.getShade().getId(),
+                        user.getId()
+                    )
+                    .map(Review::getRating)
+                    .orElse(null);
+            }
+            if (item.getShade() == null) {
+                rating = reviewRepository
+                    .findByProduct_IdAndUser_IdAndDeletedAtIsNull(
+                        item.getProduct().getId(),
                         user.getId()
                     )
                     .map(Review::getRating)
