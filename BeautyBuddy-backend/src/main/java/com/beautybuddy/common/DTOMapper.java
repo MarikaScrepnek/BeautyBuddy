@@ -142,6 +142,20 @@ public class DTOMapper {
                     : item.getProduct().getImageLink(),
                 item.getNotes(),
                 rating,
+                item.getShade() != null
+                    ? reviewRepository.findByProduct_IdAndProductShade_IdAndUser_IdAndDeletedAtIsNull(
+                        item.getProduct().getId(),
+                        item.getShade().getId(),
+                        user.getId()
+                    )
+                    .map(Review::getId)
+                    .orElse(null)
+                    : reviewRepository.findByProduct_IdAndUser_IdAndDeletedAtIsNull(
+                        item.getProduct().getId(),
+                        user.getId()
+                    )
+                    .map(Review::getId)
+                    .orElse(null),
                 item.getStepOrder()
             );
 

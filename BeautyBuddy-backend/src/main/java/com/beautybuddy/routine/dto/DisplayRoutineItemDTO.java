@@ -12,6 +12,7 @@ public record DisplayRoutineItemDTO(
     String productImageUrl,
     String productNotes, //can be null
     BigDecimal rating, //can be null
+    Long reviewId, //can be null
     //add occurence
     Integer order
 ) {}
