@@ -631,7 +631,7 @@ export default function ProductDetails() {
 
                         <div className="action-icon" onClick={handleAddToRoutine}>
                             <span className="icon">+</span>
-                            <span className="tooltip">Add to Makeup Routine</span>
+                            <span className="tooltip">Add to {data.category.baseCategoryName} Routine</span>
                         </div>
                     </div>
 
