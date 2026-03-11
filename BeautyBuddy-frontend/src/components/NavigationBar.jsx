@@ -3,8 +3,6 @@ import { FaSearch } from "react-icons/fa";
 import { NavLink } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
-import userSettingsIcon from '../assets/images/user-settings-icon.png';
-
 import './NavigationBar.css';
 
 import AuthModal from './AuthModal';
@@ -103,12 +101,6 @@ export default function NavigationBar({ searchQuery, setSearchQuery }) {
               >
                 Logout
               </button>
-
-              <img
-                className="user-settings-icon"
-                src={userSettingsIcon}
-                alt="User settings"
-              /> 
             </div>
           ) : (
             <button
