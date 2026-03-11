@@ -246,7 +246,7 @@ export default function MakeupRoutines( { userName, routine, routineType } ) {
                         onDrop={() => handleDrop(index)}
                         onClick={() => {
                             if (!isEditingRoutine) {
-                                window.open(`/${item.productId}`, '_blank')
+                                window.open(`/products/${item.productId}`, '_blank')
                             }
                         }}
                     >

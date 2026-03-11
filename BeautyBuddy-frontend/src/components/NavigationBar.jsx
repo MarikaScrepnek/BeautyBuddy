@@ -20,7 +20,7 @@ export default function NavigationBar({ searchQuery, setSearchQuery }) {
     const value = e.target.value;
     setSearchQuery(value);
 
-    if (location.pathname === "/") {
+    if (location.pathname === "/products") {
       navigate(`/?q=${encodeURIComponent(value)}`, { replace: true });
     }
   }
@@ -60,10 +60,10 @@ export default function NavigationBar({ searchQuery, setSearchQuery }) {
           <h1 className='logo' onClick={() => navigate('/')}>BeautyBuddy</h1>
 
           <nav className='nav-bar-links'>
-            <NavLink to="/" className={({ isActive }) => isActive ? 'active-link' : undefined}>Home</NavLink>
-            <NavLink to="/my-routines" className={({ isActive }) => isActive ? 'active-link' : undefined}>My Routines</NavLink>
+            <NavLink to="/products" className={({ isActive }) => isActive ? 'active-link' : undefined}>Products</NavLink>
             <NavLink to="/discussions" className={({ isActive }) => isActive ? 'active-link' : undefined}>Discussions</NavLink>
-            <NavLink to="/feed" className={({ isActive }) => isActive ? 'active-link' : undefined}>Feed</NavLink>
+            <NavLink to="/my-routines" className={({ isActive }) => isActive ? 'active-link' : undefined}>Routines</NavLink>
+            <NavLink to="/my-feed" className={({ isActive }) => isActive ? 'active-link' : undefined}>Feed</NavLink>
           </nav>
 
           <div className="search-container">

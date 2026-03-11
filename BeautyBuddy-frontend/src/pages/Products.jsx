@@ -2,7 +2,7 @@ import ProductList from '../components/ProductList';
 import { useSearchParams } from 'react-router-dom';
 import { useState } from 'react';
 
-import './Home.css';
+import './Products.css';
 
 import RequestModal from '../components/RequestModal';
 

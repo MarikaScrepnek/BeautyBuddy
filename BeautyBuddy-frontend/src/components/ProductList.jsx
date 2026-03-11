@@ -75,7 +75,7 @@ export default function ProductList({ searchQuery, onLoadingChange }) {
   return (
     <div className="product-grid">
       {products.map(p => (
-        <div className="product-card-home" key={p.id} onClick={() => navigate(`/${p.id}`)}>
+        <div className="product-card-home" key={p.id} onClick={() => navigate(`/products/${p.id}`)}>
           {p.image_link && (
             <img src={p.image_link} alt={p.name} className="product-image-home" />
           )}
