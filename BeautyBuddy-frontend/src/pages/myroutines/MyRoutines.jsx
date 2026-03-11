@@ -124,7 +124,7 @@ export default function MyRoutines() {
         }
 
         {makeupRoutines.some(r => r.routineId === selected) && selectedRoutine &&
-          <MakeupRoutines userName={username} routine={selectedRoutine} />
+          <MakeupRoutines userName={username} routine={selectedRoutine} routineType="Makeup" />
         }
 
         {selected === "Skincare" && 

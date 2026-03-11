@@ -8,7 +8,7 @@ import { CiEdit } from "react-icons/ci";
 
 import './MakeupRoutines.css';
 
-export default function MakeupRoutines( { userName, routine } ) {
+export default function MakeupRoutines( { userName, routine, routineType } ) {
     const[isEditingRoutine, setIsEditingRoutine] = useState(false);
     const[editedRoutine, setEditedRoutine] = useState(routine);
 
@@ -155,7 +155,7 @@ export default function MakeupRoutines( { userName, routine } ) {
                             </>
                         )}
                     </div>
-                    <p>Makeup Routine</p>
+                    <p>{routineType} Routine</p>
                 </div>
             </div>
 
