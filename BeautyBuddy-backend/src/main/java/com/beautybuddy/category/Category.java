@@ -24,5 +24,13 @@ public class Category extends UpdatableEntity {
 
     public Category getParentCategory() { return parentCategory; }
     public void setParentCategory(Category parentCategory) { this.parentCategory = parentCategory; }
+
+    public Category getBaseCategory() {
+        if (parentCategory == null) {
+            return this;
+        } else {
+            return parentCategory.getBaseCategory();
+        }
+    }
 }
 

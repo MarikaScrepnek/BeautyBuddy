@@ -35,7 +35,10 @@ public class DTOMapper {
     }
 
     public static CategoryDTO toCategoryDTO(Category category) {
-        return new CategoryDTO(category.getId(), category.getName());
+        if (category == null) {
+            return null;
+        }
+        return new CategoryDTO(category.getId(), category.getName(), category.getBaseCategory().getName());
     }
 
     public static IngredientDTO toIngredientDTO(Ingredient ingredient) {
