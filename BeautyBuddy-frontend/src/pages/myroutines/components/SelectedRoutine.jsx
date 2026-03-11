@@ -163,7 +163,7 @@ export default function MakeupRoutines( { userName, routine, routineType } ) {
                             </>
                         )}
                     </div>
-                    <p>{routineType} Routine</p>
+                    <p>{routineType === "Haircare" ? "" : routineType} Routine</p>
                 </div>
             </div>
 
