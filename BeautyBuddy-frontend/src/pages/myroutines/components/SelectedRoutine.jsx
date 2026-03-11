@@ -49,14 +49,26 @@ export default function MakeupRoutines( { userName, routine, routineType } ) {
     }
 
     function handleNameChange(newName) {
+        if (newName.length > 128) {
+            alert("Routine name cannot exceed 128 characters.");
+            return;
+        }
         setEditedRoutine(prev => ({ ...prev, name: newName }));
     }
 
     function handleNotesChange(newNotes) {
+        if (newNotes.length > 400) {
+            alert("Routine notes cannot exceed 400 characters.");
+            return;
+        }
         setEditedRoutine(prev => ({ ...prev, notes: newNotes }));
     }
 
     function handleItemNotesChange(itemId, newNotes) {
+        if (newNotes.length > 126) {
+            alert("Product notes cannot exceed 126 characters.");
+            return;
+        }
         setEditedRoutine(prev => ({
             ...prev,
             items: prev.items.map(item => item.id === itemId ? { ...item, productNotes: newNotes } : item)

@@ -171,6 +171,10 @@ public class RoutineService {
                     .orElseThrow(() -> new RuntimeException("Shade not found"));
             }
 
+            if (itemDTO.productNotes() != null && itemDTO.productNotes().length() > 126) {
+                throw new RuntimeException("Product notes cannot exceed 126 characters");
+            }
+
             RoutineItem newItem = new RoutineItem();
             newItem.setRoutine(routine);
             newItem.setProduct(product);
@@ -182,7 +186,14 @@ public class RoutineService {
             routine.getItems().add(newItem);
         }
 
+        if (request.name() != null && request.name().length() > 128) {
+            throw new RuntimeException("Routine name cannot exceed 128 characters");
+        }
         routine.setName(request.name());
+
+        if (request.notes() != null && request.notes().length() > 400) {
+            throw new RuntimeException("Routine notes cannot exceed 400 characters");
+        }
         routine.setNotes(request.notes());
         routine.setUpdatedAt(now);
         routineRepository.save(routine);

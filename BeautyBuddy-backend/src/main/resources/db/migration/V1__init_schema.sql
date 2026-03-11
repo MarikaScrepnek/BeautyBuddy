@@ -266,7 +266,9 @@ CREATE TABLE routine (
     is_system BOOLEAN NOT NULL DEFAULT FALSE,     -- true if this is a default system routine, false if created by user
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    deleted_at TIMESTAMPTZ NULL
+    deleted_at TIMESTAMPTZ NULL,
+
+    CHECK (name IS NULL OR length(trim(name)) <= 128)
 );
 CREATE INDEX idx_routine_account ON routine (account_id);
 CREATE INDEX idx_routine_category ON routine (category_id);
@@ -537,7 +539,9 @@ CREATE TABLE routine_item (
     notes TEXT,         -- per-item notes
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     valid_from TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    valid_to TIMESTAMPTZ NULL
+    valid_to TIMESTAMPTZ NULL,
+
+    CHECK (notes IS NULL OR length(trim(notes)) <= 126)
 );
 CREATE INDEX idx_routine_item_routine ON routine_item (routine_id);
 CREATE INDEX idx_routine_item_product ON routine_item (product_id);
