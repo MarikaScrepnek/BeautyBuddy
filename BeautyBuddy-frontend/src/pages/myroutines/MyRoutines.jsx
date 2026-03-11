@@ -71,6 +71,7 @@ export default function MyRoutines() {
       <aside className='routines-sidebar' style={{ width: "200px", background: "#f7f7f7", padding: "1rem 0", borderRight: "1px solid #eee" }}>
         <h2 style={{textAlign: "center"}}>All Lists</h2>
         <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+
             <li
               onClick={() => { setSelected("Wishlist"); setSelectedRoutine(null); }}
               style={{
@@ -83,6 +84,7 @@ export default function MyRoutines() {
             >
               Wishlist
             </li>
+
             <li style={{padding: "1rem", fontWeight: "bold", fontSize: "1.1rem", color: "#6c63ff", background: "transparent"}}>
               Makeup
             </li>
@@ -105,6 +107,7 @@ export default function MyRoutines() {
             <button className="create-button" onClick={() => setCreateModalOpen(true)} style={{margin: "1rem", width: "calc(100% - 2rem)"}}>
                 + New Routine
             </button>
+
             <li style={{padding: "1rem", fontWeight: "bold", fontSize: "1.1rem", color: "#6c63ff", background: "transparent"}}>
               Skincare
             </li>
@@ -124,18 +127,23 @@ export default function MyRoutines() {
                 {routine.timeOfDay}
               </li>
             ))}
-            <li
-              onClick={() => setSelected("Haircare")}
-              style={{
-                padding: "1rem",
-                cursor: "pointer",
-                background: selected === "Haircare" ? "#e0e0e0" : "transparent",
-                fontWeight: selected === "Haircare" ? "bold" : "normal",
-                borderLeft: selected === "Haircare" ? "4px solid #6c63ff" : "4px solid transparent"
-              }}
-            >
+
+            <li style={{padding: "1rem", fontWeight: "bold", fontSize: "1.1rem", color: "#6c63ff", background: "transparent"}}>
               Haircare
             </li>
+              <li
+                onClick={() => { setSelected(haircareRoutine.routineId); setSelectedRoutine(haircareRoutine); }}
+                style={{
+                  padding: "0.5rem 1.5rem",
+                  cursor: "pointer",
+                  color: "#333",
+                  textDecoration: "underline",
+                  background: selected === haircareRoutine.routineId ? "#e0e0e0" : "transparent",
+                  borderLeft: selected === haircareRoutine.routineId ? "4px solid #6c63ff" : "4px solid transparent"
+                }}
+              >
+                Haircare Routine
+              </li>
         </ul>
       </aside>
       
@@ -151,6 +159,10 @@ export default function MyRoutines() {
 
         {skincareRoutines.some(r => r.routineId === selected) && selectedRoutine &&
           <SelectedRoutine userName={username} routine={selectedRoutine} routineType="Skincare" />
+        }
+
+        {haircareRoutine.routineId === selected && selectedRoutine &&
+          <SelectedRoutine userName={username} routine={selectedRoutine} routineType="Haircare" />
         }
 
       </main>
