@@ -78,7 +78,6 @@ export default function MyRoutines() {
                 padding: "1rem",
                 cursor: "pointer",
                 background: selected === "Wishlist" ? "#e0e0e0" : "transparent",
-                fontWeight: selected === "Wishlist" ? "bold" : "normal",
                 borderLeft: selected === "Wishlist" ? "4px solid #6c63ff" : "4px solid transparent"
               }}
             >
