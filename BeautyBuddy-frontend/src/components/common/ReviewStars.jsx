@@ -71,8 +71,8 @@ export default function ReviewStars({
           onMouseEnter={(e) => !disabled && setHover(getStarValueFromEvent(e, i))}
           onMouseLeave={() => !disabled && setHover(null)}
           onClick={(e) => {
+            e.stopPropagation();
             if (!disabled) {
-              e.stopPropagation();
               setIsSubmitting(true);
               handleSubmitReview(getStarValueFromEvent(e, i));
               setIsSubmitting(false);
