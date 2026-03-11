@@ -68,6 +68,11 @@
     transition: all 0.3s ease;
 }
 
+.not-logged-in-links {
+    color: #777;
+    cursor: not-allowed;
+}
+
 .search-container {
     position: relative;
     display: flex;

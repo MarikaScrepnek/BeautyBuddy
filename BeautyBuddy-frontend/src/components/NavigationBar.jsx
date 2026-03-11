@@ -7,6 +7,7 @@ import './NavigationBar.css';
 
 import AuthModal from './AuthModal';
 import { getCurrentUser, logoutUser } from '../api/authApi';
+import Tooltip from './common/Tooltip';
 
 export default function NavigationBar({ searchQuery, setSearchQuery }) {
   const navigate = useNavigate();
@@ -62,8 +63,21 @@ export default function NavigationBar({ searchQuery, setSearchQuery }) {
           <nav className='nav-bar-links'>
             <NavLink to="/products" className={({ isActive }) => isActive ? 'active-link' : undefined}>Products</NavLink>
             <NavLink to="/discussions" className={({ isActive }) => isActive ? 'active-link' : undefined}>Discussions</NavLink>
-            <NavLink to="/my-routines" className={({ isActive }) => isActive ? 'active-link' : undefined}>Routines</NavLink>
-            <NavLink to="/my-feed" className={({ isActive }) => isActive ? 'active-link' : undefined}>Feed</NavLink>
+            {!isLoggedIn ? (
+              <>
+                <Tooltip message="Please log in to view your routines." position="bottom">
+                  <p className="not-logged-in-links">Routines</p>
+                </Tooltip>
+                <Tooltip message={"Please log in to view your feed"} position="bottom">
+                  <p className="not-logged-in-links">Feed</p>
+                </Tooltip>
+              </>
+            ) : (
+              <>
+              <NavLink to="/my-routines" className={({ isActive }) => isActive ? 'active-link' : undefined}>Routines</NavLink>
+              <NavLink to="/my-feed" className={({ isActive }) => isActive ? 'active-link' : undefined}>Feed</NavLink>
+              </>
+            )}
           </nav>
 
           <div className="search-container">
