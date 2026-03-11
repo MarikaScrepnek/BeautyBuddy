@@ -1,0 +1,198 @@
+.modal-header {
+    width: 100%;
+    padding: 18px 0 10px 0;
+    background: linear-gradient(90deg, #f8f8ff 60%, #e0d7ff 100%);
+    border-radius: 16px 16px 0 0;
+    text-align: center;
+    margin-bottom: 18px;
+    box-shadow: 0 2px 8px rgba(108,99,255,0.07);
+}
+.modal-header h2 {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #6c63ff;
+    margin: 0;
+    letter-spacing: 1px;
+}
+.modal-header h3 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #333;
+    margin: 8px 0 0 0;
+}
+.modal-header h4 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #888;
+    margin: 8px 0 0 0;
+}
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-card {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(108,99,255,0.15);
+    padding: 32px 24px 24px 24px;
+    min-width: 340px;
+    max-width: 95vw;
+    width: 400px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    animation: modalFadeIn 0.3s;
+}
+
+@keyframes modalFadeIn {
+    from { opacity: 0; transform: translateY(40px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.close-button {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: none;
+    border: none;
+    font-size: 2rem;
+    color: #888;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+.close-button:hover {
+    color: #e74c3c;
+}
+
+.modal-card h2 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #6c63ff;
+    margin: 8px 0;
+    text-align: center;
+}
+.modal-footer {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0;
+}
+
+.routine-option {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f7f7fa;
+    border-radius: 8px;
+    padding: 10px 18px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 8px rgba(108,99,255,0.07);
+    transition: box-shadow 0.2s;
+    width: 100%;
+}
+.routine-option:hover {
+    box-shadow: 0 4px 16px rgba(108,99,255,0.13);
+}
+.routine-option p {
+    margin: 0;
+    font-size: 1rem;
+    color: #333;
+    font-weight: 500;
+}
+
+.add-button {
+    background-color: #6c63ff;
+    color: #fff;
+    border: none;
+    padding: 6px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1.2rem;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(108,99,255,0.08);
+    transition: background 0.2s, color 0.2s;
+}
+.add-button:hover {
+    background: #4b47c3;
+}
+
+.other-routines-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    margin-top: 18px;
+    margin-bottom: 8px;
+}
+.dropdown-button {
+    background-color: #f0f0f0;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #6c63ff;
+    transition: background 0.2s, color 0.2s;
+}
+.dropdown-button:hover {
+    background: #e0e0ff;
+    color: #4b47c3;
+}
+
+.other-routines-list {
+    width: 100%;
+    margin-top: 8px;
+    padding: 8px 0;
+}
+.other-routines-list h1 {
+    font-size: 1rem;
+    color: #888;
+    margin: 16px 0 8px 0;
+    font-weight: 600;
+}
+.add-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.routine-option {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.routine-option p {
+    margin: 0;
+    font-size: 16px;
+    color: #333;
+}
+
+.other-routines-header {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}
+
+.dropdown-button {
+    background-color: #f0f0f0;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+}

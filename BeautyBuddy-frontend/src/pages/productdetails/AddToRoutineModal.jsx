@@ -4,6 +4,8 @@ import { getMakeupRoutines, getSkincareRoutines, getHaircareRoutine, addProductT
 
 import Toast from "../../components/Toast";
 
+import "./AddToRoutineModal.css";
+
 export default function AddToRoutineModal({ baseCategory, productName, productId, shadeName, onClose }) {
     const [makeupRoutines, setMakeupRoutines] = useState([]);
     const [skincareRoutines, setSkincareRoutines] = useState([]);
@@ -12,6 +14,8 @@ export default function AddToRoutineModal({ baseCategory, productName, productId
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState("");
     const [toastType, setToastType] = useState("info");
+
+    const[isOtherRoutinesOpen, setIsOtherRoutinesOpen] = useState(false);
 
     async function handleAddToRoutine(routineId, productId, shadeName) {
         addProductToRoutine(routineId, productId, shadeName)
@@ -75,9 +79,11 @@ export default function AddToRoutineModal({ baseCategory, productName, productId
                 <button className="close-button" onClick={onClose}>
                     &times;
                 </button>
-                <h2>Add</h2>
-                <h2>{productName}</h2>
-                <h2>to a {baseCategory} Routine</h2>
+                <div className="modal-header">
+                    <h2>Add</h2>
+                    <h3>{productName}</h3>
+                    <h4>to a {baseCategory} Routine</h4>
+                </div>
                 {baseCategory === "Makeup" && (
                     <>
                     {makeupRoutines.map(routine => (
@@ -95,7 +101,7 @@ export default function AddToRoutineModal({ baseCategory, productName, productId
                 {baseCategory === "Skincare" && (
                     <>
                     {skincareRoutines.map(routine => (
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }} key={routine.routineId} className="routine-option">
+                        <div key={routine.routineId} className="routine-option">
                             <p>{routine.name || routine.timeOfDay}</p>
                             <button className="add-button"
                             onClick={() => handleAddToRoutine(routine.routineId, productId, shadeName)}
@@ -107,7 +113,7 @@ export default function AddToRoutineModal({ baseCategory, productName, productId
                     </>
                 )}
                 {baseCategory === "Haircare" && haircareRoutine.routineId && (
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }} key={haircareRoutine.routineId} className="routine-option">
+                    <div key={haircareRoutine.routineId} className="routine-option">
                         <p>{haircareRoutine.name || "Haircare Routine"}</p>
                         <button className="add-button"
                         onClick={() => handleAddToRoutine(haircareRoutine.routineId, productId, shadeName)}
@@ -116,6 +122,64 @@ export default function AddToRoutineModal({ baseCategory, productName, productId
                         </button>
                     </div>
                 )}
+                <div className="other-routines-header">
+                    <h1 className="modal-footer">Other Routines</h1>
+                    <button
+                        className="dropdown-button"
+                        onClick={() => setIsOtherRoutinesOpen(!isOtherRoutinesOpen)}
+                    >
+                        {isOtherRoutinesOpen ? "▲" : "▼"}
+                    </button>
+                </div>
+
+                {isOtherRoutinesOpen && (
+                    <div className="other-routines-list">
+                        {baseCategory !== "Makeup" && (
+                        <>
+                            <h1 style={{ margin: "20px 0 10px 0" }}>Makeup Routines</h1>
+                            {makeupRoutines.map(routine => (
+                                <div key={routine.routineId} className="routine-option">
+                                    <p>{routine.name || (routine.occasion.charAt(0).toUpperCase() + routine.occasion.slice(1).toLowerCase())}</p>
+                                    <button className="add-button"
+                                    onClick={() => handleAddToRoutine(routine.routineId, productId, shadeName)}
+                                    >
+                                        +
+                                    </button>
+                                </div>
+                            ))}
+                        </>
+                        )}
+                        {baseCategory !== "Skincare" && (
+                        <>
+                            <h1 style={{ margin: "20px 0 10px 0" }}>Skincare Routines</h1>
+                            {skincareRoutines.map(routine => (
+                                <div key={routine.routineId} className="routine-option">
+                                    <p>{routine.name || routine.timeOfDay}</p>
+                                    <button className="add-button"
+                                    onClick={() => handleAddToRoutine(routine.routineId, productId, shadeName)}
+                                    >
+                                        +
+                                    </button>
+                                </div>
+                            ))}
+                        </>
+                        )}
+                        {baseCategory !== "Haircare" && haircareRoutine.routineId && (
+                            <>
+                            <h1 style={{ margin: "20px 0 10px 0" }}>Haircare Routine</h1>
+                            <div key={haircareRoutine.routineId} className="routine-option">
+                                <p>{haircareRoutine.name || "Haircare Routine"}</p>
+                                <button className="add-button"
+                                onClick={() => handleAddToRoutine(haircareRoutine.routineId, productId, shadeName)}
+                                >
+                                    +
+                                </button>
+                            </div>
+                        </>
+                        )}
+                    </div>
+                )}
+                
             </div>
             <Toast
                 message={showToast ? toastMessage : ""}
