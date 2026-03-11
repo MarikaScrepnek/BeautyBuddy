@@ -7,7 +7,7 @@ import Routines from './components/Routines';
 
 import "./MyRoutines.css";
 import Searchbar from '../../components/common/Searchbar';
-import MakeupRoutines from './components/MakeupRoutines';
+import SelectedRoutine from './components/SelectedRoutine';
 import { getMakeupRoutines } from '../../api/routineApi';
 
 import CreateRoutineModal from './components/CreateRoutineModal';
@@ -124,7 +124,7 @@ export default function MyRoutines() {
         }
 
         {makeupRoutines.some(r => r.routineId === selected) && selectedRoutine &&
-          <MakeupRoutines userName={username} routine={selectedRoutine} routineType="Makeup" />
+          <SelectedRoutine userName={username} routine={selectedRoutine} routineType="Makeup" />
         }
 
         {selected === "Skincare" && 

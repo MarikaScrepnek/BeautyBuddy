@@ -6,7 +6,7 @@ import { GiTrashCan } from "react-icons/gi";
 import { IoReorderThreeOutline } from "react-icons/io5";
 import { CiEdit } from "react-icons/ci";
 
-import './MakeupRoutines.css';
+import './SelectedRoutine.css';
 
 export default function MakeupRoutines( { userName, routine, routineType } ) {
     const[isEditingRoutine, setIsEditingRoutine] = useState(false);
