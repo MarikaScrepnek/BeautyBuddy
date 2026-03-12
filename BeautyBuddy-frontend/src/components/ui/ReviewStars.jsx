@@ -34,7 +34,7 @@ export default function ReviewStars({
   async function handleSubmitReview(ratingValue) {
     let result;
     if (reviewId === null) {
-      result = await submitReview(productId, shadeName, ratingValue, "", "", [])
+      result = await submitReview(productId, shadeName, ratingValue, null, null, [])
         .then((res) => {
           setToastMsg("Review submitted successfully!");
           return res;
