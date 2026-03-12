@@ -511,7 +511,7 @@ export default function ProductDetails() {
                     <NavLink style={{ fontSize: "2rem", color: "inherit", marginRight: "auto" }} to={`/products`}>
                         <IoIosArrowRoundBack />
                     </NavLink>
-                    <h1 className="product-name">{data.name}</h1>
+                    <h1 style={{ maxWidth: "600px", wordBreak: "break-word",  }} className="product-name">{data.name}</h1>
                 </div>
                 <p className="product-brand">by {data.brand.name}</p>
                 <div style={{width: "32px"}}></div>

@@ -43,5 +43,6 @@ export default function Routines({isLoggedIn}) {
 
             {showCreateModal && <CreateRoutineModal onClose={() => setShowCreateModal(false)} />}
         </div>
+
     );
 }

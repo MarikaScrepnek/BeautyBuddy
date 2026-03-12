@@ -60,6 +60,15 @@ export default function MyRoutines() {
   }, []);
 
   return (
+    <>
+    {!isLoggedIn ? (
+
+      <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '80vh'}}>
+          <h1 style={{fontSize: '2rem', color: '#555'}}>Login to view your routines...</h1>
+      </div>
+            
+    ) : (
+
   <div className='routines-page-container'>
 
     {isLoggedIn && (
@@ -170,5 +179,7 @@ export default function MyRoutines() {
     {createModalOpen && <CreateRoutineModal onClose={() => setCreateModalOpen(false)} />}
 
   </div>
+  )}
+  </>
   );
 }
