@@ -5,9 +5,9 @@ import { useEffect, useState } from 'react';
 
 import './NavigationBar.css';
 
-import AuthModal from './AuthModal';
-import { getCurrentUser, logoutUser } from '../api/authApi';
-import Tooltip from './common/Tooltip';
+import { getCurrentUser, logoutUser } from '../features/auth/api/authApi';
+import AuthModal from '../features/auth/modals/AuthModal';
+import Tooltip from './ui/Tooltip';
 
 export default function NavigationBar({ searchQuery, setSearchQuery }) {
   const navigate = useNavigate();
