@@ -39,6 +39,7 @@ export default function UserDropdown({ user, onSignOut }) {
 
       <div className={`user-dropdown-menu ${isOpen ? "show" : ""}`}>
         <a href="/profile" className="dropdown-item">Profile</a>
+        <a href="/friends" className="dropdown-item">Friends</a>
         <a href="/settings" className="dropdown-item">Settings</a>
         <button onClick={onSignOut} className="dropdown-item">Sign Out</button>
       </div>
