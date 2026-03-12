@@ -1,0 +1,100 @@
+/* Container relative for dropdown positioning */
+.user-dropdown-container {
+  position: relative;
+  display: inline-block;
+}
+
+/* Button with avatar + name + arrow */
+.user-dropdown-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px; /* pill shape */
+  background-color: #fff;
+  border: 1px solid #ddd;
+  cursor: pointer;
+  transition: background-color 0.2s, box-shadow 0.2s;
+}
+
+.user-dropdown-button:hover {
+  background-color: #f9f9f9;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.user-name {
+  font-weight: 500;
+  color: #111;
+}
+
+/* Chevron rotation */
+.user-chevron {
+  transition: transform 0.2s ease;
+}
+
+.user-chevron.open {
+  transform: rotate(180deg);
+}
+
+/* Dropdown menu */
+.user-dropdown-menu {
+  position: absolute;
+  right: 0;
+  margin-top: 0.5rem;
+  width: 180px;
+  background-color: #fff;
+  border-radius: 0.375rem;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+  overflow: hidden;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+  z-index: 50;
+}
+
+.user-dropdown-menu.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* Dropdown items */
+.dropdown-item {
+  display: block;
+  padding: 0.5rem 1rem;
+  text-align: left;
+  background-color: transparent;
+  border: none;
+  width: 100%;
+  cursor: pointer;
+  transition: background-color 0.15s;
+  font-size: 0.95rem;
+}
+
+.dropdown-item:hover {
+  background-color: #f3f4f6;
+}
+
+/* Fallback avatar */
+.user-avatar-fallback {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: #6b7280; /* gray-500, can change per user if you want */
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  object-fit: cover;
+}

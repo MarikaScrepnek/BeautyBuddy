@@ -8,6 +8,7 @@ import './NavigationBar.css';
 import { getCurrentUser, logoutUser } from '../features/auth/api/authApi';
 import AuthModal from '../features/auth/modals/AuthModal';
 import Tooltip from './ui/Tooltip';
+import UserDropdown from './UserDropdown';
 
 export default function NavigationBar({ searchQuery, setSearchQuery }) {
   const navigate = useNavigate();
@@ -102,9 +103,9 @@ export default function NavigationBar({ searchQuery, setSearchQuery }) {
 
           {isLoggedIn ? (
             <div className="user-section">
-              <button
-                className="logout-button"
-                onClick={() => {
+              <UserDropdown
+                user={{ name: "Marika", avatar: null }}
+                onSignOut={() => {
                   logoutUser()
                     .then(() => {
                       setIsLoggedIn(false);
@@ -112,9 +113,7 @@ export default function NavigationBar({ searchQuery, setSearchQuery }) {
                     })
                     .catch((error) => console.error("Logout failed:", error));
                 }}
-              >
-                Logout
-              </button>
+              />
             </div>
           ) : (
             <button
@@ -124,21 +123,6 @@ export default function NavigationBar({ searchQuery, setSearchQuery }) {
               Login / Create Account
             </button>
           )}
-
-          {showAuth && (
-            <AuthModal
-             onClose={() => setShowAuth(false)}
-             onLoginSuccess={async () => {
-              try {
-                await getCurrentUser();
-                setIsLoggedIn(true);
-              } catch {
-                setIsLoggedIn(false);
-              }
-              setShowAuth(false);
-             }}
-            />
-          )}
           
         </div>
       </header>
@@ -146,6 +130,21 @@ export default function NavigationBar({ searchQuery, setSearchQuery }) {
       <main className='page-container'>
         <Outlet />
       </main>
+
+      {showAuth && (
+        <AuthModal
+          onClose={() => setShowAuth(false)}
+          onLoginSuccess={async () => {
+          try {
+            await getCurrentUser();
+            setIsLoggedIn(true);
+          } catch {
+            setIsLoggedIn(false);
+          }
+          setShowAuth(false);
+          }}
+        />
+      )}
 
     </div>
   );
