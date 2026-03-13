@@ -3,8 +3,12 @@ import { getExchangeRate } from "../api/productApi";
 import { useNavigate } from "react-router-dom";
 
 import './ProductList.css';
+import ReviewStars from "../../../components/ui/ReviewStars";
 
 export default function ProductList({ searchQuery, onLoadingChange }) {
+
+  const [setSelectedItemRoutine] = useState(null);
+  const [setSelectedItemWishlist] = useState(null);
 
   // --- All hooks at the top ---
   const [products, setProducts] = useState([]);
@@ -85,14 +89,37 @@ export default function ProductList({ searchQuery, onLoadingChange }) {
               <p className="shade-count">
                 {p.shades?.length > 1 ? `${p.shades.length} shades` : "\u00A0"}
               </p>
-              <p>Rating: {p.rating ? `${p.rating}/5` : "N/A"}</p>
+              <ReviewStars rating={p.rating} disabled={true} />
               <p className="product-card-price">
                 Price: {p.price ? `≈ ${priceMap[p.id]}` : "N/A"}
               </p>
+              <div className="wishlist-actions">
+              
+              <div className="action-icon" onClick={() => setSelectedItemRoutine(p)}>
+                  <span style={{ color: "#1a8ec4" }} className="icon">+</span>
+                  <span className="tooltip">Add to routine</span>
+              </div>
+
+              <div
+                  className="action-icon" onClick={() => setSelectedItemWishlist(p)}
+              >
+                  <span className="icon">♥</span>
+                  <span className="tooltip">Add to wishlist</span>
+              </div>
+
+          </div>
             </div>
           </div>
         </div>
       ))}
+      {setSelectedItemRoutine && (
+        <AddToRoutineModal
+          productId={setSelectedItemRoutine.id}
+          productName={setSelectedItemRoutine.name}
+          baseCategory={setSelectedItemRoutine.category}
+          onClose={() => setSelectedItemRoutine(null)}
+        />
+      )}
     </div>
   );
 }
