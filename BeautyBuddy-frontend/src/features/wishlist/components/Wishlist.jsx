@@ -2,9 +2,9 @@ import { useEffect, useRef } from "react";
 import { useState } from "react";
 
 import { getWishlist, removeFromWishlist, searchWishlist } from "../api/wishlistApi";
+import AddToRoutineModal from "../../routines/modals/AddToRoutineModal";
 
 import Toast from "../../../components/ui/Toast";
-import Tooltip from "../../../components/ui/Tooltip";
 import Searchbar from "../../../components/ui/Searchbar";
 
 import "./Wishlist.css";
@@ -17,6 +17,8 @@ export default function Wishlist({isLoggedIn}) {
     const [wishlist, setWishlist] = useState([]);
     const [wishlistLoading, setWishlistLoading] = useState(false);
     const [wishlistError, setWishlistError] = useState("");
+
+    const [selectedItem, setSelectedItem] = useState(null);
 
     async function loadWishlist() {
     setWishlistLoading(true);
@@ -111,7 +113,7 @@ export default function Wishlist({isLoggedIn}) {
 
                         <div className="wishlist-actions">
 
-                            <div className="action-icon" onClick={() => handleAddToRoutine(item)}>
+                            <div className="action-icon" onClick={() => setSelectedItem(item)}>
                                 <span style={{ color: "#1a8ec4" }} className="icon">+</span>
                                 <span className="tooltip">Add to routine</span>
                             </div>
@@ -140,6 +142,15 @@ export default function Wishlist({isLoggedIn}) {
                     
                 </div>
             ))}
+            {selectedItem && (
+                <AddToRoutineModal
+                    productId={selectedItem.productId}
+                    shadeName={selectedItem.shadeName}
+                    productName={selectedItem.productName}
+                    baseCategory={selectedItem.baseCategoryName}
+                    onClose={() => setSelectedItem(null)}
+                />
+            )}
             </div>
             </>
         )
