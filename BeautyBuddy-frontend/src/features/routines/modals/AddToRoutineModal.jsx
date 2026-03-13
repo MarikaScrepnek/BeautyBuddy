@@ -17,6 +17,12 @@ export default function AddToRoutineModal({ baseCategory, productName, productId
 
     const[isOtherRoutinesOpen, setIsOtherRoutinesOpen] = useState(false);
 
+    // Helper to check if product is in routine
+    function isProductInRoutine(routine) {
+        if (!routine.items) return false;
+        return routine.items.some(p => p.productId === productId);
+    }
+
     async function handleAddToRoutine(routineId, productId, shadeName) {
         addProductToRoutine(routineId, productId, shadeName)
             .then(() => {
@@ -88,7 +94,7 @@ export default function AddToRoutineModal({ baseCategory, productName, productId
                     <>
                     {makeupRoutines.map(routine => (
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }} key={routine.routineId} className="routine-option">
-                            <p>{routine.name || (routine.occasion.charAt(0).toUpperCase() + routine.occasion.slice(1).toLowerCase())}</p>
+                            <p>{routine.name || (routine.occasion.charAt(0).toUpperCase() + routine.occasion.slice(1).toLowerCase())} {isProductInRoutine(routine) && <span style={{color:'grey',fontSize:'14px', textDecoration:'italic'}}>(Already in this routine)</span>}</p>
                             <button className="add-button"
                             onClick={() => handleAddToRoutine(routine.routineId, productId, shadeName)}
                             >
@@ -102,7 +108,7 @@ export default function AddToRoutineModal({ baseCategory, productName, productId
                     <>
                     {skincareRoutines.map(routine => (
                         <div key={routine.routineId} className="routine-option">
-                            <p>{routine.name || routine.timeOfDay}</p>
+                            <p>{routine.name || routine.timeOfDay} {isProductInRoutine(routine) && <span style={{color:'grey',fontSize:'14px', textDecoration:'italic'}}>(Already in this routine)</span>}</p>
                             <button className="add-button"
                             onClick={() => handleAddToRoutine(routine.routineId, productId, shadeName)}
                             >
@@ -114,7 +120,7 @@ export default function AddToRoutineModal({ baseCategory, productName, productId
                 )}
                 {baseCategory === "Haircare" && haircareRoutine.routineId && (
                     <div key={haircareRoutine.routineId} className="routine-option">
-                        <p>{haircareRoutine.name || "Haircare Routine"}</p>
+                        <p>{haircareRoutine.name || "Haircare Routine"} {isProductInRoutine(haircareRoutine) && <span style={{color:'grey',fontSize:'14px', textDecoration:'italic'}}>(Already in this routine)</span>}</p>
                         <button className="add-button"
                         onClick={() => handleAddToRoutine(haircareRoutine.routineId, productId, shadeName)}
                         >
@@ -139,7 +145,7 @@ export default function AddToRoutineModal({ baseCategory, productName, productId
                             <h1 style={{ margin: "20px 0 10px 0" }}>Makeup Routines</h1>
                             {makeupRoutines.map(routine => (
                                 <div key={routine.routineId} className="routine-option">
-                                    <p>{routine.name || (routine.occasion.charAt(0).toUpperCase() + routine.occasion.slice(1).toLowerCase())}</p>
+                                    <p>{routine.name || (routine.occasion.charAt(0).toUpperCase() + routine.occasion.slice(1).toLowerCase())} {isProductInRoutine(routine) && <span style={{color:'grey',fontSize:'14px', textDecoration:'italic'}}>(Already in this routine)</span>}</p>
                                     <button className="add-button"
                                     onClick={() => handleAddToRoutine(routine.routineId, productId, shadeName)}
                                     >
@@ -154,7 +160,7 @@ export default function AddToRoutineModal({ baseCategory, productName, productId
                             <h1 style={{ margin: "20px 0 10px 0" }}>Skincare Routines</h1>
                             {skincareRoutines.map(routine => (
                                 <div key={routine.routineId} className="routine-option">
-                                    <p>{routine.name || routine.timeOfDay}</p>
+                                    <p>{routine.name || routine.timeOfDay} {isProductInRoutine(routine) && <span style={{color:'grey',fontSize:'14px', textDecoration:'italic'}}>(Already in this routine)</span>}</p>
                                     <button className="add-button"
                                     onClick={() => handleAddToRoutine(routine.routineId, productId, shadeName)}
                                     >
@@ -168,7 +174,7 @@ export default function AddToRoutineModal({ baseCategory, productName, productId
                             <>
                             <h1 style={{ margin: "20px 0 10px 0" }}>Haircare Routine</h1>
                             <div key={haircareRoutine.routineId} className="routine-option">
-                                <p>{haircareRoutine.name || "Haircare Routine"}</p>
+                                <p>{haircareRoutine.name || "Haircare Routine"} {isProductInRoutine(haircareRoutine) && <span style={{color:'grey',fontSize:'14px', textDecoration:'italic'}}>(Already in this routine)</span>}</p>
                                 <button className="add-button"
                                 onClick={() => handleAddToRoutine(haircareRoutine.routineId, productId, shadeName)}
                                 >
