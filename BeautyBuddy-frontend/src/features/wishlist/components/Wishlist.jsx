@@ -109,9 +109,15 @@ export default function Wishlist({isLoggedIn}) {
                             )}
                         </div>
 
-                        <Tooltip message="Remove from wishlist" position="top">
-                            <button
-                                className="remove-button"
+                        <div className="wishlist-actions">
+
+                            <div className="action-icon" onClick={() => handleAddToRoutine(item)}>
+                                <span style={{ color: "#1a8ec4" }} className="icon">+</span>
+                                <span className="tooltip">Add to routine</span>
+                            </div>
+
+                            <div
+                                className="action-icon"
                                 onClick={() => {
                                     removeFromWishlist(item.productId, item.shadeName).then(() => {
                                         setWishlist(prev =>
@@ -124,9 +130,11 @@ export default function Wishlist({isLoggedIn}) {
                                     });
                                 }}
                             >
-                                -
-                            </button>
-                        </Tooltip>
+                                <span style={{ color: "#ff4d4f" }} className="icon">−</span>
+                                <span className="tooltip">Remove from wishlist</span>
+                            </div>
+
+                        </div>
 
                     </div>
                     
