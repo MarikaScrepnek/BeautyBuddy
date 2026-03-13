@@ -18,8 +18,6 @@ export default function Wishlist({isLoggedIn}) {
     const [wishlistLoading, setWishlistLoading] = useState(false);
     const [wishlistError, setWishlistError] = useState("");
 
-    const wishlistContainerRef = useRef(null);
-
     async function loadWishlist() {
     setWishlistLoading(true);
     setWishlistError("");
@@ -51,24 +49,6 @@ export default function Wishlist({isLoggedIn}) {
         loadWishlist();
     }, []);
 
-    useEffect(() => {
-        const container = wishlistContainerRef.current;
-        if (!container) return;
-        const handleWheel = (e) => {
-            if (e.deltaY !== 0) {
-                e.preventDefault();
-                container.scrollBy({
-                    left: e.deltaY * 3, // adjust multiplier for sensitivity
-                    behavior: 'smooth'
-                });
-            }
-        };
-        container.addEventListener('wheel', handleWheel, { passive: false });
-        return () => {
-            container.removeEventListener('wheel', handleWheel);
-        };
-    }, []);
-
     return (
         <>
         {showToast && 
@@ -95,14 +75,13 @@ export default function Wishlist({isLoggedIn}) {
             )}
             <div
                 className="wishlist-container"
-                ref={wishlistContainerRef}
                 style={{scrollBehavior: 'smooth'}}
             >
                 {wishlist.map((item) => (
                     <div className="wishlist-item-card" key={item.id}>
 
                     <div className="wishlist-item-header">
-                        <h2 style={{fontSize: "1.25rem", textAlign: "center", justifyContent: "center"}}>
+                        <h2 style={{ fontSize: "1.25rem", textAlign: "center" }}>
                             {item.productName}
                         </h2>
                         <div style={{display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center", gap: "4px"}}>
@@ -117,7 +96,7 @@ export default function Wishlist({isLoggedIn}) {
                         </div>
                     </div>
 
-                    <img src={item.imageLink} alt="Product" style={{"height": "250px"}} />
+                    <img src={item.imageLink} alt="Product" style={{height: "250px"}} />
 
                     <div className="wishlist-item-footer">
 
@@ -135,9 +114,13 @@ export default function Wishlist({isLoggedIn}) {
                                 className="remove-button"
                                 onClick={() => {
                                     removeFromWishlist(item.productId, item.shadeName).then(() => {
-                                        loadWishlist();
-                                        setShowToast(true);
-                                        setTimeout(() => setShowToast(false), toastTime);
+                                        setWishlist(prev =>
+                                            prev.filter(
+                                                w =>
+                                                    !(w.productId === item.productId &&
+                                                    w.shadeName === item.shadeName)
+                                            )
+                                        );
                                     });
                                 }}
                             >
