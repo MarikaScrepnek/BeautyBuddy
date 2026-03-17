@@ -568,7 +568,8 @@ export default function ProductDetails() {
                             <p className="rating-empty">Be the first to review!</p>
                         )}
                     </div>
-
+                    
+                    {data.shades?.length > 0 && (
                     <div className="shade-selector">
                         <p htmlFor={`shade-${data.id}`}>Shade:</p>
                         <div
@@ -623,6 +624,7 @@ export default function ProductDetails() {
                                 : "No ratings for this shade yet"}
                         </p>
                     </div>
+                    )}
 
                     <p className="price">
                         <span>Price: ≈</span> {formattedPrice ? `≈ ${formattedPrice}` : (data.price ? `$${data.price}` : "N/A")}
