@@ -111,6 +111,12 @@
   margin-left: 10px;
 }
 
+.shade-count {
+  font-size: 0.77rem;
+  color: #000000;
+  margin-top: 5px;
+}
+
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
