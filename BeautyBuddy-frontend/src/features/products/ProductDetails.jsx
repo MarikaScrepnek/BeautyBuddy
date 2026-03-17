@@ -2,6 +2,7 @@ import { NavLink, useParams } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { FaSearch } from 'react-icons/fa';
 import { IoIosArrowRoundBack } from "react-icons/io";
+import { MdOutlinePlaylistAdd } from "react-icons/md";
 
 import { addToWishlist, removeFromWishlist, getWishlist } from "../wishlist/api/wishlistApi";
 import AuthModal from "../auth/modals/AuthModal";
@@ -25,6 +26,7 @@ import Toast from "../../components/ui/Toast";
 import { deleteReview, getReviews, submitReview, editReview } from "../reviews/api/reviewApi";
 import { reportProduct } from "./api/productApi";
 import { getQuestionsForProduct, submitQuestion } from "../questions/api/qaApi";
+import { addToBreakoutList } from "../breakout/api/breakoutListApi";
 
 export default function ProductDetails() {
 
@@ -318,6 +320,19 @@ export default function ProductDetails() {
             return;
         }
         setAddToRoutineOpen(true);
+    };
+
+    const handleAddToBreakoutList = async (id) => {
+        if (!isLoggedIn) {
+            setShowLoginModal(true);
+            return;
+        }
+        try {
+            await addToBreakoutList("product", id);
+            showToast("Added to breakout list", "success");
+        } catch (error) {
+            showToast("Failed to add to breakout list", "error");
+        }
     };
 
     const handleAskQuestion = async () => {
@@ -642,6 +657,12 @@ export default function ProductDetails() {
                             <span className="icon">+</span>
                             <span className="tooltip">Add to {data.category.baseCategoryName} Routine</span>
                         </div>
+
+                        <div className="action-icon" onClick={() => handleAddToBreakoutList(data.id)}>
+                            <MdOutlinePlaylistAdd />
+                            <span className="tooltip">Add to Breakout List</span>
+                        </div>
+
                     </div>
 
                     <p
