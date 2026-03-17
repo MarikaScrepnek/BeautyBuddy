@@ -1032,3 +1032,30 @@ CREATE TABLE wishlist_item_activity (
     wishlist_item_id BIGINT NOT NULL REFERENCES wishlist_item(id) ON DELETE CASCADE
 );
 CREATE INDEX idx_wishlist_item_activity_wishlist_item ON wishlist_item_activity (wishlist_item_id);
+
+-- ===========================================================================
+-- Breakout List
+-- ===========================================================================
+
+CREATE TABLE breakout_list (
+    account_id BIGINT PRIMARY KEY NOT NULL REFERENCES account(id) ON DELETE CASCADE,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE breakout_list_ingredient (
+    id BIGSERIAL PRIMARY KEY,
+    breakout_list_id BIGINT NOT NULL REFERENCES breakout_list(id) ON DELETE CASCADE,
+    ingredient_id BIGINT NOT NULL REFERENCES ingredient(id) ON DELETE CASCADE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX idx_breakout_list_ingredient_breakout_list ON breakout_list_ingredient (breakout_list_id);
+CREATE INDEX idx_breakout_list_ingredient_ingredient ON breakout_list_ingredient (ingredient_id);
+
+CREATE TABLE breakout_list_product (
+    id BIGSERIAL PRIMARY KEY,
+    breakout_list_id BIGINT NOT NULL REFERENCES breakout_list(id) ON DELETE CASCADE,
+    product_id BIGINT NOT NULL REFERENCES product(id) ON DELETE CASCADE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX idx_breakout_list_product_breakout_list ON breakout_list_product (breakout_list_id);
+CREATE INDEX idx_breakout_list_product_product ON breakout_list_product (product_id);
