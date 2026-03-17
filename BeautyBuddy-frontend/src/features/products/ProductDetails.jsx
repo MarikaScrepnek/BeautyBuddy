@@ -507,11 +507,11 @@ export default function ProductDetails() {
         <div className="product-card">
             {/* Header: Name + Brand + Category */}
             <div className="product-header">
-                <div style={{display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%"}}>
-                    <NavLink style={{ fontSize: "2rem", color: "inherit", marginRight: "auto" }} to={`/products`}>
+                <div style={{ position: "relative", width: "100%" }}>
+                    <NavLink style={{ position: "absolute", left: 0, fontSize: "2rem", color: "inherit" }} to={`/products`}>
                         <IoIosArrowRoundBack />
                     </NavLink>
-                    <h1 style={{ maxWidth: "600px", wordBreak: "break-word",  }} className="product-name">{data.name}</h1>
+                    <h1 className="product-name">{data.name}</h1>
                 </div>
                 <p className="product-brand">by {data.brand.name}</p>
                 <div style={{width: "32px"}}></div>
