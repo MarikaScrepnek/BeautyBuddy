@@ -9,7 +9,7 @@ import SelectedRoutine from './components/SelectedRoutine';
 import { getHaircareRoutine, getMakeupRoutines, getSkincareRoutines } from './api/routineApi';
 
 import CreateRoutineModal from './modals/CreateRoutineModal';
-import BreakoutList from '../breakout/components/breakoutList';
+import BreakoutList from '../breakout/components/BreakoutList';
 
 export default function MyRoutines() {
   // log in
