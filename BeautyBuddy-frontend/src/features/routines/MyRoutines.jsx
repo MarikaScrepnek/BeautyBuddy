@@ -3,14 +3,13 @@ import { useState, useEffect } from 'react';
 import { getCurrentUser } from '../auth/api/authApi';
 
 import Wishlist from '../wishlist/components/Wishlist';
-import Routines from './components/Routines';
 
 import "./MyRoutines.css";
-import Searchbar from '../../components/ui/Searchbar';
 import SelectedRoutine from './components/SelectedRoutine';
 import { getHaircareRoutine, getMakeupRoutines, getSkincareRoutines } from './api/routineApi';
 
 import CreateRoutineModal from './modals/CreateRoutineModal';
+import BreakoutList from '../breakout/components/breakoutList';
 
 export default function MyRoutines() {
   // log in
@@ -93,8 +92,20 @@ export default function MyRoutines() {
               Wishlist
             </li>
 
+            <li
+              onClick={() => { setSelected("Breakout List"); setSelectedRoutine(null); }}
+              style={{
+                padding: "1rem",
+                cursor: "pointer",
+                background: selected === "Breakout List" ? "#e0e0e0" : "transparent",
+                borderLeft: selected === "Breakout List" ? "4px solid #6c63ff" : "4px solid transparent"
+              }}
+            >
+              Breakout List
+            </li>
+
             <li style={{padding: "1rem", fontWeight: "bold", fontSize: "1.1rem", color: "#6c63ff", background: "transparent"}}>
-              Makeup
+              Makeup Routines
             </li>
             {makeupRoutines.map((routine) => (
               <li
@@ -117,7 +128,7 @@ export default function MyRoutines() {
             </button>
 
             <li style={{padding: "1rem", fontWeight: "bold", fontSize: "1.1rem", color: "#6c63ff", background: "transparent"}}>
-              Skincare
+              Skincare Routines
             </li>
             {skincareRoutines.map((routine) => (
               <li
@@ -137,7 +148,7 @@ export default function MyRoutines() {
             ))}
 
             <li style={{padding: "1rem", fontWeight: "bold", fontSize: "1.1rem", color: "#6c63ff", background: "transparent"}}>
-              Haircare
+              Haircare Routine
             </li>
               <li
                 onClick={() => { setSelected(haircareRoutine.routineId); setSelectedRoutine(haircareRoutine); }}
@@ -159,6 +170,10 @@ export default function MyRoutines() {
 
         {selected === "Wishlist" && 
         <Wishlist isLoggedIn={isLoggedIn} />
+        }
+
+        {selected === "Breakout List" &&
+        <BreakoutList />
         }
 
         {makeupRoutines.some(r => r.routineId === selected) && selectedRoutine &&
