@@ -10,6 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.MapsId;
 import jakarta.persistence.CascadeType;
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -20,7 +21,10 @@ import java.util.Set;
 @Entity
 public class Wishlist extends ForeignKeyIdEntity {
     @Id
+    private Long id;
+
     @OneToOne
+    @MapsId
     @JoinColumn(name = "account_id", nullable = false)
     private User user;
 
