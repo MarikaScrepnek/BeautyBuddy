@@ -19,10 +19,9 @@ function App() {
           <Route path="/" element={<Navigate to="/products" />} />
           <Route path="/products" element={<Products />} />
           <Route path="/discussions" element={<Discussions />} />
-          <Route path="/my-routines" element={<MyRoutines />} />
+          <Route path="/profile" element={<MyRoutines />} />
           <Route path="/my-feed" element={<Feed />} />
           <Route path='/products/:productId' element={<ProductDetails />} />
-          <Route path="/profile" element={<div>Profile Page (to be implemented)</div>} />
           <Route path="/friends" element={<div>Friends Page (to be implemented)</div>} />
           <Route path="/settings" element={<div>Settings Page (to be implemented)</div>} />
         </Route>
