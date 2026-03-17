@@ -1044,18 +1044,22 @@ CREATE TABLE breakout_list (
 
 CREATE TABLE breakout_list_ingredient (
     id BIGSERIAL PRIMARY KEY,
-    breakout_list_id BIGINT NOT NULL REFERENCES breakout_list(id) ON DELETE CASCADE,
+    breakout_list_id BIGINT NOT NULL REFERENCES breakout_list(account_id) ON DELETE CASCADE,
     ingredient_id BIGINT NOT NULL REFERENCES ingredient(id) ON DELETE CASCADE,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+
+    UNIQUE (breakout_list_id, ingredient_id)
 );
 CREATE INDEX idx_breakout_list_ingredient_breakout_list ON breakout_list_ingredient (breakout_list_id);
 CREATE INDEX idx_breakout_list_ingredient_ingredient ON breakout_list_ingredient (ingredient_id);
 
 CREATE TABLE breakout_list_product (
     id BIGSERIAL PRIMARY KEY,
-    breakout_list_id BIGINT NOT NULL REFERENCES breakout_list(id) ON DELETE CASCADE,
+    breakout_list_id BIGINT NOT NULL REFERENCES breakout_list(account_id) ON DELETE CASCADE,
     product_id BIGINT NOT NULL REFERENCES product(id) ON DELETE CASCADE,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+
+    UNIQUE (breakout_list_id, product_id)
 );
 CREATE INDEX idx_breakout_list_product_breakout_list ON breakout_list_product (breakout_list_id);
 CREATE INDEX idx_breakout_list_product_product ON breakout_list_product (product_id);
