@@ -2,6 +2,8 @@ package com.beautybuddy.user;
 
 import com.beautybuddy.user.entity.User;
 import com.beautybuddy.wishlist.entity.Wishlist;
+import com.beautybuddy.breakout.entity.BreakoutList;
+import com.beautybuddy.breakout.repo.BreakoutListRepository;
 import com.beautybuddy.category.Category;
 import com.beautybuddy.category.CategoryRepository;
 import com.beautybuddy.routine.RoutineService;
@@ -21,13 +23,14 @@ public class AuthService {
 
     private final CategoryRepository categoryRepository;
     private final RoutineRepository routineRepository;
+    private final BreakoutListRepository breakoutListRepo;
 
-
-    public AuthService(UserRepository userRepo, PasswordEncoder encoder, RoutineService routineService, CategoryRepository categoryRepository, RoutineRepository routineRepository) {
+    public AuthService(UserRepository userRepo, PasswordEncoder encoder, RoutineService routineService, CategoryRepository categoryRepository, RoutineRepository routineRepository, BreakoutListRepository breakoutListRepo) {
         this.userRepo = userRepo;
         this.encoder = encoder;
         this.categoryRepository = categoryRepository;
         this.routineRepository = routineRepository;
+        this.breakoutListRepo = breakoutListRepo;
     }
 
     public void register(String username, String email, String rawPassword) {
@@ -93,6 +96,14 @@ public class AuthService {
         haircareRoutine.setNotes("My go-to haircare routine for healthy hair.");
         haircareRoutine.setIsSystem(true);
         routineRepository.save(haircareRoutine);
+
+        BreakoutList breakoutList = new BreakoutList();
+        breakoutList.setUser(user);
+        breakoutList.setUpdatedAt(LocalDateTime.now());
+        user.setBreakoutList(breakoutList);
+
+        userRepo.save(user);
+        breakoutListRepo.save(breakoutList);
     }
 
     public boolean login(String email, String rawPassword) {
