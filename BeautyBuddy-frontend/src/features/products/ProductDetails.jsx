@@ -513,7 +513,7 @@ export default function ProductDetails() {
                     </NavLink>
                     <h1 className="product-name">{data.name}</h1>
                 </div>
-                <p className="product-brand">by {data.brand.name}</p>
+                <p className="product-brand">{data.brand.name}</p>
                 <div style={{width: "32px"}}></div>
             </div>
 

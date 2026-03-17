@@ -84,7 +84,8 @@ export default function ProductList({ searchQuery, onLoadingChange }) {
             <img src={p.image_link} alt={p.name} className="product-image-home" />
           )}
           <div className="product-card-content">
-            <h3 className="product-card-title">{p.name} by {p.brand?.name}</h3>
+            <h3 className="product-card-title">{p.name}</h3>
+            <p>{p.brand?.name}</p>
             <div className="product-card-bottom">
               <p className="shade-count">
                 {p.shades?.length > 1 ? `${p.shades.length} shades` : "\u00A0"}
