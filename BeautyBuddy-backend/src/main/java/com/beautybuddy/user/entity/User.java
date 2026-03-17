@@ -1,5 +1,6 @@
 package com.beautybuddy.user.entity;
 
+import com.beautybuddy.breakout.entity.BreakoutList;
 import com.beautybuddy.common.entity.SoftDeletableEntity;
 import com.beautybuddy.wishlist.entity.Wishlist;
 
@@ -44,6 +45,9 @@ public class User extends SoftDeletableEntity{
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Wishlist wishlist;
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private BreakoutList breakoutList;
+
     public String getUsername() { return username; }
     public void setUsername(String username) { this.username = username; }
 
@@ -73,4 +77,7 @@ public class User extends SoftDeletableEntity{
 
     public Wishlist getWishlist() { return wishlist; }
     public void setWishlist(Wishlist wishlist) { this.wishlist = wishlist; }
+
+    public BreakoutList getBreakoutList() { return breakoutList; }
+    public void setBreakoutList(BreakoutList breakoutList) { this.breakoutList = breakoutList; }
 }
