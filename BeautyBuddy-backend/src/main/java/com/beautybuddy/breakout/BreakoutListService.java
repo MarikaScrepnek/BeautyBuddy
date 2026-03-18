@@ -1,14 +1,18 @@
 package com.beautybuddy.breakout;
 
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Service;
 
 import com.beautybuddy.breakout.dto.AddToBreakoutListDTO;
+import com.beautybuddy.breakout.dto.DisplayBreakoutListProductDTO;
 import com.beautybuddy.breakout.entity.BreakoutList;
 import com.beautybuddy.breakout.entity.BreakoutListIngredient;
 import com.beautybuddy.breakout.entity.BreakoutListProduct;
 import com.beautybuddy.breakout.repo.BreakoutListIngredientRepository;
 import com.beautybuddy.breakout.repo.BreakoutListProductRepository;
-import com.beautybuddy.breakout.repo.BreakoutListRepository;
+import com.beautybuddy.common.DTOMapper;
 import com.beautybuddy.ingredient.entity.Ingredient;
 import com.beautybuddy.ingredient.repo.IngredientRepository;
 import com.beautybuddy.product.Product;
@@ -22,15 +26,13 @@ public class BreakoutListService {
     private final ProductRepository productRepository;
     private final IngredientRepository ingredientRepository;
 
-    private final BreakoutListRepository breakoutListRepository;
     private final BreakoutListProductRepository breakoutListProductRepository;
     private final BreakoutListIngredientRepository breakoutListIngredientRepository;
 
-    public BreakoutListService(UserRepository userRepository, ProductRepository productRepository, IngredientRepository ingredientRepository, BreakoutListRepository breakoutListRepository, BreakoutListProductRepository breakoutListProductRepository, BreakoutListIngredientRepository breakoutListIngredientRepository) {
+    public BreakoutListService(UserRepository userRepository, ProductRepository productRepository, IngredientRepository ingredientRepository, BreakoutListProductRepository breakoutListProductRepository, BreakoutListIngredientRepository breakoutListIngredientRepository) {
         this.userRepository = userRepository;
         this.productRepository = productRepository;
         this.ingredientRepository = ingredientRepository;
-        this.breakoutListRepository = breakoutListRepository;
         this.breakoutListProductRepository = breakoutListProductRepository;
         this.breakoutListIngredientRepository = breakoutListIngredientRepository;
     }
@@ -58,6 +60,36 @@ public class BreakoutListService {
             breakoutListIngredient.setIngredient(ingredient);
 
             breakoutListIngredientRepository.save(breakoutListIngredient);
+        }
+        else {
+            throw new RuntimeException("Either productId or ingredientId must be provided");
+        }
+    }
+
+    public Set<DisplayBreakoutListProductDTO> getBreakoutListProducts (String userEmail) {
+        User user = userRepository.findByEmail(userEmail)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+        
+        BreakoutList breakoutList = user.getBreakoutList();
+        Set<DisplayBreakoutListProductDTO> products = breakoutList.getProducts().stream()
+            .map(DTOMapper::toDisplayBreakoutListProductDTO)
+            .collect(Collectors.toSet());
+        return products;
+    }
+
+    public void removeFromBreakoutList(String userEmail, AddToBreakoutListDTO removeFromBreakoutListDTO) {
+        User user = userRepository.findByEmail(userEmail)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+        
+        if (removeFromBreakoutListDTO.productId() != null) {
+            BreakoutListProduct breakoutListProduct = breakoutListProductRepository.findByBreakoutListIdAndProductId(user.getBreakoutList().getId(), removeFromBreakoutListDTO.productId())
+                .orElseThrow(() -> new RuntimeException("Product not found in breakout list"));
+            breakoutListProductRepository.delete(breakoutListProduct);
+        }
+        else if (removeFromBreakoutListDTO.ingredientId() != null) {
+            BreakoutListIngredient breakoutListIngredient = breakoutListIngredientRepository.findByBreakoutListIdAndIngredientId(user.getBreakoutList().getId(), removeFromBreakoutListDTO.ingredientId())
+                .orElseThrow(() -> new RuntimeException("Ingredient not found in breakout list"));
+            breakoutListIngredientRepository.delete(breakoutListIngredient);
         }
         else {
             throw new RuntimeException("Either productId or ingredientId must be provided");

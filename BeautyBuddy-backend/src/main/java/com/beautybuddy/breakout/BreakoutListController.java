@@ -1,5 +1,8 @@
 package com.beautybuddy.breakout;
 
+import java.util.Set;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.beautybuddy.breakout.dto.AddToBreakoutListDTO;
+import com.beautybuddy.breakout.dto.DisplayBreakoutListProductDTO;
 import com.beautybuddy.security.CustomUserDetails;
 
 @RestController
@@ -30,10 +34,21 @@ public class BreakoutListController {
     }
 
     @GetMapping
-    public void getBreakoutList() {
+    public ResponseEntity<Set<DisplayBreakoutListProductDTO>> getBreakoutList(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new RuntimeException("User must be authenticated to view breakout list");
+        }
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        Set<DisplayBreakoutListProductDTO> breakoutList = breakoutListService.getBreakoutListProducts(userDetails.getEmail());
+        return ResponseEntity.ok(breakoutList);
     }
 
     @DeleteMapping("/remove")
-    public void removeFromBreakoutList() {
+    public void removeFromBreakoutList(@RequestBody AddToBreakoutListDTO removeFromBreakoutListDTO, Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new RuntimeException("User must be authenticated to remove from breakout list");
+        }
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        breakoutListService.removeFromBreakoutList(userDetails.getEmail(), removeFromBreakoutListDTO);
     }
 }
