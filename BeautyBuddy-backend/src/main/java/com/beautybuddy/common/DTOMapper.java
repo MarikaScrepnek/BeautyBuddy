@@ -2,6 +2,8 @@ package com.beautybuddy.common;
 
 import com.beautybuddy.brand.Brand;
 import com.beautybuddy.brand.BrandDTO;
+import com.beautybuddy.breakout.dto.DisplayBreakoutListProductDTO;
+import com.beautybuddy.breakout.entity.BreakoutListProduct;
 import com.beautybuddy.category.Category;
 import com.beautybuddy.category.CategoryDTO;
 import com.beautybuddy.ingredient.dto.IngredientDTO;
@@ -171,6 +173,20 @@ public class DTOMapper {
             routine.getOccasion() != null ? routine.getOccasion().name() : null,
             routine.getNotes(),
             itemDTOs
+        );
+    }
+
+    public static DisplayBreakoutListProductDTO toDisplayBreakoutListProductDTO(BreakoutListProduct blp) {
+        return new DisplayBreakoutListProductDTO(
+            blp.getId(),
+            blp.getProduct().getId(),
+            blp.getProduct().getName(),
+            blp.getProduct().getBrand().getName(),
+            blp.getProduct().getImageLink(),
+            blp.getProduct().getProductIngredients().stream()
+                .sorted(Comparator.comparingInt(ProductIngredient::getPosition))
+                .map(pi -> toIngredientDTO(pi.getIngredient()))
+                .toList()
         );
     }
 }
