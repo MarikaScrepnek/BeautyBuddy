@@ -4,11 +4,13 @@ import "./BreakoutList.css";
 
 import { useEffect, useState } from "react";
 import React from "react";
+import Tooltip from "../../../components/ui/Tooltip";
 
 export default function BreakoutList() {
     const [ingredientsSelected, setIngredientsSelected] = useState(true);
     const [productsSelected, setProductsSelected] = useState(false);
     const [breakoutListProducts, setBreakoutListProducts] = useState([]);
+    const [addIngredientModalOpen, setAddIngredientModalOpen] = useState(false);
 
     useEffect(() => {
         getBreakoutListProducts()
@@ -51,7 +53,14 @@ export default function BreakoutList() {
         <div className="card-body">
 
             {ingredientsSelected && (
+                <>
                 <p>Ingredients will be displayed here in the future.</p>
+                <Tooltip message="Add Ingredient">
+                    <button className="add-ingredient" onClick={() => setAddIngredientModalOpen(true)}>
+                        +
+                    </button>
+                </Tooltip>
+                </>
             )}
 
             {productsSelected && (
@@ -94,6 +103,9 @@ export default function BreakoutList() {
                 </ul>
             )}
         </div>
+        {addIngredientModalOpen && (
+            <AddIngredientModal></AddIngredientModal>
+        )}
     </div> 
     );
 }
