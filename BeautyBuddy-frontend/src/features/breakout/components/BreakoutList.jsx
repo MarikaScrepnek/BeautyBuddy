@@ -5,6 +5,7 @@ import "./BreakoutList.css";
 import { useEffect, useState } from "react";
 import React from "react";
 import Tooltip from "../../../components/ui/Tooltip";
+import AddIngredientModal from "../modals/AddIngredientModal";
 
 export default function BreakoutList() {
     const [ingredientsSelected, setIngredientsSelected] = useState(true);
@@ -104,7 +105,7 @@ export default function BreakoutList() {
             )}
         </div>
         {addIngredientModalOpen && (
-            <AddIngredientModal></AddIngredientModal>
+            <AddIngredientModal onClose={() => setAddIngredientModalOpen(false)} />
         )}
     </div> 
     );
