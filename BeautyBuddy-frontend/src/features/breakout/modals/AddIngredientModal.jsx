@@ -1,4 +1,17 @@
+import { useEffect } from "react";
+import getIngredients from "../api/ingredientApi";
+
 export default function AddIngredientModal({ onClose }) {
+
+    useEffect(() => {
+        getIngredients()
+            .then(data => {
+                console.log("Ingredients:", data);
+            })
+            .catch(error => {
+                console.error("Error fetching ingredients:", error);
+            });
+    }, []);
 
     return (
         <div className="modal-overlay">
