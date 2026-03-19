@@ -4,11 +4,11 @@ import com.beautybuddy.common.DTOMapper;
 import com.beautybuddy.ingredient.dto.IngredientDTO;
 import com.beautybuddy.ingredient.repo.IngredientRepository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/ingredients")
@@ -26,10 +26,9 @@ public class IngredientController {
     }
 
     @GetMapping
-    public List<IngredientDTO> getAllIngredients() {
-        return ingredientRepository.findAll().stream()
-                .map(DTOMapper::toIngredientDTO)
-                .toList();
+    public Page<IngredientDTO> getAllIngredients(Pageable pageable) {
+        return ingredientRepository.findAll(pageable)
+            .map(DTOMapper::toIngredientDTO);
     }
 
     // this should be changed before release as its not the most secure way to do this
