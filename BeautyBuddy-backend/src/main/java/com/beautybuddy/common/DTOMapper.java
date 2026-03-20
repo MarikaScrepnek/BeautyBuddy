@@ -44,7 +44,7 @@ public class DTOMapper {
     }
 
     public static IngredientDTO toIngredientDTO(Ingredient ingredient) {
-        return new IngredientDTO(ingredient.getName());
+        return new IngredientDTO(ingredient.getId(), ingredient.getName());
     }
 
     public static ProductIngredientDTO toProductIngredientDTO(ProductIngredient pi) {
