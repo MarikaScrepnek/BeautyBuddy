@@ -24,7 +24,15 @@ export async function addToBreakoutList(type, id) {
 }
 
 export async function getBreakoutListProducts() {
-    const response = await fetch(`http://localhost:8080/api/breakout-list`, {
+    const response = await fetch(`http://localhost:8080/api/breakout-list/products`, {
+        method: "GET",
+        credentials: "include"
+    });
+    return response.json();
+}
+
+export async function getBreakoutListIngredients() {
+    const response = await fetch(`http://localhost:8080/api/breakout-list/ingredients`, {
         method: "GET",
         credentials: "include"
     });

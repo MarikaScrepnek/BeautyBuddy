@@ -1,4 +1,4 @@
-import { getBreakoutListProducts, removeFromBreakoutList } from "../api/breakoutListApi";
+import { getBreakoutListIngredients, getBreakoutListProducts, removeFromBreakoutList } from "../api/breakoutListApi";
 import { GiTrashCan } from "react-icons/gi";
 import "./BreakoutList.css";
 
@@ -11,6 +11,7 @@ export default function BreakoutList() {
     const [ingredientsSelected, setIngredientsSelected] = useState(true);
     const [productsSelected, setProductsSelected] = useState(false);
     const [breakoutListProducts, setBreakoutListProducts] = useState([]);
+    const [breakoutListIngredients, setBreakoutListIngredients] = useState([]);
     const [addIngredientModalOpen, setAddIngredientModalOpen] = useState(false);
 
     useEffect(() => {
@@ -21,6 +22,13 @@ export default function BreakoutList() {
             })
             .catch(error => {
                 console.error("Error fetching breakout list:", error);
+            });
+        getBreakoutListIngredients()
+            .then(data => {
+                setBreakoutListIngredients(data);
+            })
+            .catch(error => {
+                console.error("Error fetching breakout list ingredients:", error);
             });
     }, []);
 
@@ -55,7 +63,21 @@ export default function BreakoutList() {
 
             {ingredientsSelected && (
                 <>
-                <p>Ingredients will be displayed here in the future.</p>
+                {breakoutListIngredients.length === 0 ? (
+                    <p>Your breakout list is empty. Click the + button to add ingredients.</p>
+                ) : (
+                    <ul>
+                        {breakoutListIngredients.map((ingredient) => (
+                            <div 
+                            className="ingredient-card"
+                            style={{width: "450px"}}
+                            key={ingredient.id}
+                            >
+                                <span>{ingredient.name}</span>
+                            </div>
+                        ))}
+                    </ul>
+                )}
                 <Tooltip message="Add Ingredient">
                     <button className="add-ingredient" onClick={() => setAddIngredientModalOpen(true)}>
                         +
