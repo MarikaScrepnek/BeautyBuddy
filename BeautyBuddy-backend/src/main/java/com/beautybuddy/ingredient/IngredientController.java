@@ -27,7 +27,7 @@ public class IngredientController {
 
     @GetMapping
     public Page<IngredientDTO> getAllIngredients(Pageable pageable) {
-        return ingredientRepository.findAll(pageable)
+        return ingredientRepository.findByCanonicalIdNull(pageable)
             .map(DTOMapper::toIngredientDTO);
     }
 
