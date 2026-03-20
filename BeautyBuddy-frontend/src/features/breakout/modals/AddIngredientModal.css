@@ -1,0 +1,33 @@
+.ingredient-card {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    margin-top: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    list-style-type: none;
+}
+.ingredient-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+.ingredient-card p {
+    flex: 1;
+    font-size: 16px;
+    color: #333;
+    margin: 0;
+}
+.ingredient-card button {
+    background-color: #60bfeb;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s ease;
+}
