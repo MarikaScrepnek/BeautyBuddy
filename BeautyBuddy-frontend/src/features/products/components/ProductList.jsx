@@ -5,6 +5,8 @@ import { useNavigate } from "react-router-dom";
 import './ProductList.css';
 import ReviewStars from "../../../components/ui/ReviewStars";
 
+import { MdOutlinePlaylistAdd } from "react-icons/md";
+
 export default function ProductList({ searchQuery, onLoadingChange }) {
 
   const [setSelectedItemRoutine] = useState(null);
@@ -96,19 +98,24 @@ export default function ProductList({ searchQuery, onLoadingChange }) {
               </p>
               <div className="wishlist-actions">
               
-              <div className="action-icon" onClick={() => setSelectedItemRoutine(p)}>
-                  <span style={{ color: "#1a8ec4" }} className="icon">+</span>
-                  <span className="tooltip">Add to routine</span>
-              </div>
+                <div className="action-icon" onClick={() => setSelectedItemRoutine(p)}>
+                    <span style={{ color: "#1a8ec4" }} className="icon">+</span>
+                    <span className="tooltip">Add to routine</span>
+                </div>
 
-              <div
-                  className="action-icon" onClick={() => setSelectedItemWishlist(p)}
-              >
-                  <span className="icon">♥</span>
-                  <span className="tooltip">Add to wishlist</span>
-              </div>
+                <div
+                    className="action-icon" onClick={() => setSelectedItemWishlist(p)}
+                >
+                    <span className="icon">♥</span>
+                    <span className="tooltip">Add to wishlist</span>
+                </div>
 
-          </div>
+                <div className="action-icon">
+                    <MdOutlinePlaylistAdd />
+                    <span className="tooltip">Add to breakout list</span>
+                </div>
+
+            </div>
             </div>
           </div>
         </div>
