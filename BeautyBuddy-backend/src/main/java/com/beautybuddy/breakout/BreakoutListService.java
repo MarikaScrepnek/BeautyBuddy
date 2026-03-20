@@ -13,6 +13,7 @@ import com.beautybuddy.breakout.entity.BreakoutListProduct;
 import com.beautybuddy.breakout.repo.BreakoutListIngredientRepository;
 import com.beautybuddy.breakout.repo.BreakoutListProductRepository;
 import com.beautybuddy.common.DTOMapper;
+import com.beautybuddy.ingredient.dto.IngredientDTO;
 import com.beautybuddy.ingredient.entity.Ingredient;
 import com.beautybuddy.ingredient.repo.IngredientRepository;
 import com.beautybuddy.product.Product;
@@ -75,6 +76,18 @@ public class BreakoutListService {
             .map(DTOMapper::toDisplayBreakoutListProductDTO)
             .collect(Collectors.toSet());
         return products;
+    }
+
+    public Set<IngredientDTO> getBreakoutListIngredients(String userEmail) {
+        User user = userRepository.findByEmail(userEmail)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+        
+        BreakoutList breakoutList = user.getBreakoutList();
+        Set<IngredientDTO> ingredients = breakoutList.getIngredients().stream()
+            .map(BreakoutListIngredient::getIngredient)
+            .map(DTOMapper::toIngredientDTO)
+            .collect(Collectors.toSet());
+        return ingredients;
     }
 
     public void removeFromBreakoutList(String userEmail, AddToBreakoutListDTO removeFromBreakoutListDTO) {

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.beautybuddy.breakout.dto.AddToBreakoutListDTO;
 import com.beautybuddy.breakout.dto.DisplayBreakoutListProductDTO;
+import com.beautybuddy.ingredient.dto.IngredientDTO;
 import com.beautybuddy.security.CustomUserDetails;
 
 @RestController
@@ -33,14 +34,24 @@ public class BreakoutListController {
         breakoutListService.addToBreakoutList(userDetails.getEmail(), addToBreakoutListDTO);
     }
 
-    @GetMapping
-    public ResponseEntity<Set<DisplayBreakoutListProductDTO>> getBreakoutList(Authentication authentication) {
+    @GetMapping("/products")
+    public ResponseEntity<Set<DisplayBreakoutListProductDTO>> getBreakoutListProducts(Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
             throw new RuntimeException("User must be authenticated to view breakout list");
         }
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         Set<DisplayBreakoutListProductDTO> breakoutList = breakoutListService.getBreakoutListProducts(userDetails.getEmail());
         return ResponseEntity.ok(breakoutList);
+    }
+
+    @GetMapping("/ingredients")
+    public ResponseEntity<Set<IngredientDTO>> getBreakoutListIngredients(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new RuntimeException("User must be authenticated to view breakout list");
+        }
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        Set<IngredientDTO> breakoutListIngredients = breakoutListService.getBreakoutListIngredients(userDetails.getEmail());
+        return ResponseEntity.ok(breakoutListIngredients);
     }
 
     @DeleteMapping("/remove")
