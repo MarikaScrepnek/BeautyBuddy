@@ -17,23 +17,16 @@ export default function UserDropdown({ user, onSignOut }) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Grab first letter if avatar is missing
-  const avatarContent = user.avatar ? (
-    <img src={user.avatar} alt="avatar" className="user-avatar" />
-  ) : (
-    <div className="user-avatar-fallback">
-      {user.name.charAt(0).toUpperCase()}
-    </div>
-  );
-
   return (
     <div className="user-dropdown-container" ref={dropdownRef}>
       <button
         className="user-dropdown-button"
         onClick={() => setIsOpen(!isOpen)}
       >
-        {avatarContent}
-        <span className="user-name">{user.name}</span>
+        <div className="user-avatar-fallback">
+          {user.username.charAt(0).toUpperCase()}
+        </div>
+        <span className="user-name">{user.username}</span>
         <FaChevronDown className={`user-chevron ${isOpen ? "open" : ""}`} />
       </button>
 

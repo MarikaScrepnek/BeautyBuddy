@@ -18,6 +18,8 @@ export default function NavigationBar({ searchQuery, setSearchQuery }) {
 
   const[isLoggedIn, setIsLoggedIn] = useState(false);
 
+  const [currentUser, setCurrentUser] = useState(null);
+
   const handleChange = (e) => {
     const value = e.target.value;
     setSearchQuery(value);
@@ -40,7 +42,10 @@ export default function NavigationBar({ searchQuery, setSearchQuery }) {
   
   useEffect(() => {
     getCurrentUser()
-      .then(() => setIsLoggedIn(true))
+      .then((user) => {
+        setCurrentUser(user);
+        setIsLoggedIn(true);
+      })
       .catch(() => setIsLoggedIn(false));
     const handleAuthLogin = () => {
       getCurrentUser()
@@ -104,7 +109,7 @@ export default function NavigationBar({ searchQuery, setSearchQuery }) {
           {isLoggedIn ? (
             <div className="user-section">
               <UserDropdown
-                user={{ name: "Marika", avatar: null }}
+                user={currentUser}
                 onSignOut={() => {
                   logoutUser()
                     .then(() => {
