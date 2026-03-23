@@ -60,7 +60,8 @@ export default function ProductDetails() {
     const [quickRating, setQuickRating] = useState(0);
     const [quickHoverRating, setQuickHoverRating] = useState(null);
     const [isSubmittingQuickRating, setIsSubmittingQuickRating] = useState(false);
-    const [searchQuery, setSearchQuery] = useState("");
+    const [searchInput, setSearchInput] = useState("");
+    const [searchQuery, setSearchQuery] = useState(""); // committed search term
     const [searchResults, setSearchResults] = useState({ reviews: [], questions: [] });
     const [exchangeRate, setExchangeRate] = useState(1);
     const [formattedPrice, setFormattedPrice] = useState("");
@@ -457,6 +458,10 @@ export default function ProductDetails() {
         setIsSubmittingQuickRating(false);
     };
 
+    const triggerSearch = () => {
+        setSearchQuery(searchInput.trim());
+    };
+
     useEffect(() => {
         if (!searchQuery) {
             setSearchResults({ reviews: [], questions: [] });
@@ -734,45 +739,24 @@ export default function ProductDetails() {
                     type="text"
                     className="reviews-search-bar"
                     placeholder="Enter terms here..."
-                    value = {searchQuery}
-                    onChange={e => setSearchQuery(e.target.value)}
+                    value={searchInput}
+                    onChange={e => setSearchInput(e.target.value)}
+                    onKeyDown={e => {
+                        if (e.key === "Enter") {
+                            triggerSearch();
+                        }
+                    }}
                 />
     
                 <button
                     type="button"
                     className="reviews-search-button"
                     aria-label="Search"
+                    onClick={triggerSearch}
                 >
                     <FaSearch />
                 </button>
             </div>
-
-            {searchQuery && (
-                <div className="search-results">
-                    {searchResults.questions.map(q => (
-                    <QuestionCard key={q.id} question={q} searchTerm={searchQuery} /* other props */ />
-                    ))}
-                    {searchResults.reviews.map(review => (
-                    <ReviewCard
-                        key={review.reviewId || review.id}
-                        review={review}
-                        reviewId={review.reviewId || review.id}
-                        reviewerName={review.reviewerName}
-                        reviewTitle={review.reviewTitle}
-                        reviewText={review.reviewText}
-                        reviewDate={review.createdAt}
-                        avatar={review.reviewerProfilePicture}
-                        upvoteCount={review.upvoteCount}
-                        isUpvoted={review.hasUpvoted}
-                        searchTerm={searchQuery}
-                        // ...other props as needed
-                    />
-                    ))}
-                    {searchResults.reviews.length === 0 && searchResults.questions.length === 0 && (
-                    <div>No results found.</div>
-                    )}
-                </div>
-            )}
 
             <hr className="section-divider" />  
 
@@ -789,6 +773,21 @@ export default function ProductDetails() {
                 </h2>
                     {questionsOpen && (
                         <div className="questions-content">
+                            {(() => {
+                                const displayedQuestions = searchQuery ? searchResults.questions : questions;
+                                if (!displayedQuestions || displayedQuestions.length === 0) {
+                                    return (
+                                        <div className="questions-empty-state">
+                                            <p>
+                                                {searchQuery
+                                                    ? "No questions match your search."
+                                                    : "No questions have been asked about this product yet."}
+                                            </p>
+                                        </div>
+                                    );
+                                }
+                                return null;
+                            })()}
                             <AskQuestionModal
                                 isOpen={askOpen}
                                 onClose={() => setAskOpen(false)}
@@ -810,29 +809,30 @@ export default function ProductDetails() {
                                 > Ask a question about this product
                             </button>
 
+                            {(() => {
+                                const displayedQuestions = searchQuery ? searchResults.questions : questions;
+                                if (!displayedQuestions || displayedQuestions.length === 0) {
+                                    return null;
+                                }
+                                return (
+                                    <div>
+                                        {displayedQuestions.map(q => (
+                                            <QuestionCard
+                                                key={q.id}
+                                                question={q}
+                                                onRefresh={() => loadQuestions(questionsPage)}
+                                                currentUserName={currentUser?.username}
+                                                isLoggedIn={isLoggedIn}
+                                                onRequireLogin={() => setShowLoginModal(true)}
+                                                onToast={showToast}
+                                                searchTerm={searchQuery}
+                                            />
+                                        ))}
+                                    </div>
+                                );
+                            })()}
 
-                            {questions.length === 0 ? (
-                                <div className="questions-empty-state">
-                                    <p>
-                                        No questions have been asked about this product yet.
-                                    </p>
-                                </div>
-                            ) : (
-                                <div>
-                                    {questions.map(q => (
-                                        <QuestionCard
-                                            key={q.id}
-                                            question={q}
-                                            onRefresh={() => loadQuestions(questionsPage)}
-                                            currentUserName={currentUser?.username}
-                                            isLoggedIn={isLoggedIn}
-                                            onRequireLogin={() => setShowLoginModal(true)}
-                                            onToast={showToast}
-                                        />
-                                    ))}
-                                </div>
-                            )}
-                            {questionsTotalPages > 1 && (
+                            {!searchQuery && questionsTotalPages > 1 && (
                                 <div className="questions-pagination">
                                     <button
                                         type="button"
@@ -958,12 +958,40 @@ export default function ProductDetails() {
                             onClick={() => handleWriteReview()}
                             > Write a review for this product
                         </button>
-                        <ReviewList
-                            productId={productId}
-                            refreshKey={reviewRefreshKey}
-                            onEditReview={handleEditReview}
-                            onRequireLogin={() => setShowLoginModal(true)}
-                        />
+                        {searchQuery ? (
+                            <>
+                                {searchResults.reviews.length === 0 ? (
+                                    <div className="reviews-empty-state">
+                                        <p>No reviews match your search.</p>
+                                    </div>
+                                ) : (
+                                    <div className="search-results-reviews">
+                                        {searchResults.reviews.map(review => (
+                                            <ReviewCard
+                                                key={review.reviewId || review.id}
+                                                review={review}
+                                                reviewId={review.reviewId || review.id}
+                                                reviewerName={review.reviewerName}
+                                                reviewTitle={review.reviewTitle}
+                                                reviewText={review.reviewText}
+                                                reviewDate={review.createdAt}
+                                                avatar={review.reviewerProfilePicture}
+                                                upvoteCount={review.upvoteCount}
+                                                isUpvoted={review.hasUpvoted}
+                                                searchTerm={searchQuery}
+                                            />
+                                        ))}
+                                    </div>
+                                )}
+                            </>
+                        ) : (
+                            <ReviewList
+                                productId={productId}
+                                refreshKey={reviewRefreshKey}
+                                onEditReview={handleEditReview}
+                                onRequireLogin={() => setShowLoginModal(true)}
+                            />
+                        )}
                     </div>
                 )}
             </section>
