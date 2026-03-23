@@ -8,8 +8,8 @@ import ReviewStars from "../../../components/ui/ReviewStars";
 import { PiWarningCircleFill } from "react-icons/pi";
 export default function ProductList({ searchQuery, onLoadingChange }) {
 
-  const [setSelectedItemRoutine] = useState(null);
-  const [setSelectedItemWishlist] = useState(null);
+  const [selectedItemRoutine, setSelectedItemRoutine] = useState(null);
+  const [selectedItemWishlist, setSelectedItemWishlist] = useState(null);
 
   // --- All hooks at the top ---
   const [products, setProducts] = useState([]);
@@ -96,36 +96,54 @@ export default function ProductList({ searchQuery, onLoadingChange }) {
               </p>
             </div>
             <div className="product-card-bottom">
-              <ReviewStars rating={p.rating} disabled={true} />
+                <div onClick={(e) => e.stopPropagation()}>
+                  <ReviewStars rating={p.rating} />
+                </div>
               <div className="wishlist-actions">
               
-                <div className="action-icon" onClick={() => setSelectedItemRoutine(p)}>
+                  <div
+                    className="action-icon"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedItemRoutine(p);
+                    }}
+                  >
                     <span style={{ color: "#1a8ec4" }} className="icon">+</span>
                     <span className="tooltip">Add to routine</span>
                 </div>
 
-                <div
-                    className="action-icon" onClick={() => setSelectedItemWishlist(p)}
-                >
+                  <div
+                    className="action-icon"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedItemWishlist(p);
+                    }}
+                  >
                     <span className="icon">♥</span>
                     <span className="tooltip">Add to wishlist</span>
                 </div>
 
-                <div className="action-icon">
+                  <div
+                    className="action-icon"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      // breakout list action handler can be added here
+                    }}
+                  >
                     <span className="icon">!</span>
                     <span className="tooltip">Add to breakout list</span>
                 </div>
 
-            </div>
+              </div>
             </div>
           </div>
         </div>
       ))}
-      {setSelectedItemRoutine && (
+      {selectedItemRoutine && (
         <AddToRoutineModal
-          productId={setSelectedItemRoutine.id}
-          productName={setSelectedItemRoutine.name}
-          baseCategory={setSelectedItemRoutine.category}
+          productId={selectedItemRoutine.id}
+          productName={selectedItemRoutine.name}
+          baseCategory={selectedItemRoutine.category}
           onClose={() => setSelectedItemRoutine(null)}
         />
       )}
