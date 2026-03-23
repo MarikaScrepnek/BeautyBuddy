@@ -760,7 +760,6 @@ export default function ProductDetails() {
 
             <hr className="section-divider" />  
 
-            {/* Reviews / Questions */}
             <section className="questions-section">
                 <h2 className="questions-dropdown-header">
                     Q&A{" "}
@@ -771,6 +770,26 @@ export default function ProductDetails() {
                         {questionsOpen ? "▲" : "▼"}
                     </span>
                 </h2>
+                <AskQuestionModal
+                    isOpen={askOpen}
+                    onClose={() => setAskOpen(false)}
+                    onSubmit={async (payload) => {
+                        const success = await submitQuestion(productId, payload.body);
+                        if (success) {
+                            showToast("Question submitted!", "success");
+                            await loadQuestions(0);
+                            setAskOpen(false);
+                        } else {
+                            showToast("Failed to submit question.", "error");
+                        }
+                    }}
+                    productName={data?.name}
+                />
+                <button
+                    className="ask-question-button"
+                    onClick={() => handleAskQuestion()}
+                    > Ask a question about this product
+                </button>
                     {questionsOpen && (
                         <div className="questions-content">
                             {(() => {
@@ -788,26 +807,6 @@ export default function ProductDetails() {
                                 }
                                 return null;
                             })()}
-                            <AskQuestionModal
-                                isOpen={askOpen}
-                                onClose={() => setAskOpen(false)}
-                                onSubmit={async (payload) => {
-                                    const success = await submitQuestion(productId, payload.body);
-                                    if (success) {
-                                        showToast("Question submitted!", "success");
-                                        await loadQuestions(0);
-                                        setAskOpen(false);
-                                    } else {
-                                        showToast("Failed to submit question.", "error");
-                                    }
-                                }}
-                                productName={data?.name}
-                            />
-                            <button
-                                className="ask-question-button"
-                                onClick={() => handleAskQuestion()}
-                                > Ask a question about this product
-                            </button>
 
                             {(() => {
                                 const displayedQuestions = searchQuery ? searchResults.questions : questions;
