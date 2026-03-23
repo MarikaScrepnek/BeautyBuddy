@@ -2,8 +2,7 @@ import { NavLink, useParams } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { FaSearch } from 'react-icons/fa';
 import { IoIosArrowRoundBack } from "react-icons/io";
-import { MdOutlinePlaylistAdd } from "react-icons/md";
-
+import { IoIosWarning } from "react-icons/io";
 import { addToWishlist, removeFromWishlist, getWishlist } from "../wishlist/api/wishlistApi";
 import AuthModal from "../auth/modals/AuthModal";
 
@@ -664,7 +663,7 @@ export default function ProductDetails() {
                         </div>
 
                         <div className="action-icon" onClick={() => handleAddToBreakoutList(data.id)}>
-                            <MdOutlinePlaylistAdd />
+                            <span className="icon">!</span>
                             <span className="tooltip">Add to Breakout List</span>
                         </div>
 

@@ -5,8 +5,7 @@ import { useNavigate } from "react-router-dom";
 import './ProductList.css';
 import ReviewStars from "../../../components/ui/ReviewStars";
 
-import { MdOutlinePlaylistAdd } from "react-icons/md";
-
+import { PiWarningCircleFill } from "react-icons/pi";
 export default function ProductList({ searchQuery, onLoadingChange }) {
 
   const [setSelectedItemRoutine] = useState(null);
@@ -111,7 +110,7 @@ export default function ProductList({ searchQuery, onLoadingChange }) {
                 </div>
 
                 <div className="action-icon">
-                    <MdOutlinePlaylistAdd />
+                    <span className="icon">!</span>
                     <span className="tooltip">Add to breakout list</span>
                 </div>
 
