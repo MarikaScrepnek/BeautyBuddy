@@ -6,7 +6,9 @@ import Tooltip from "../../../components/ui/Tooltip";
 import Searchbar from "../../../components/ui/Searchbar";
 import { addToBreakoutList } from "../api/breakoutListApi";
 
-export default function AddIngredientModal({ onClose }) {
+import NewIngredientModal from "./NewIngredientModal";
+
+export default function AddIngredientModal({ onClose, setNewIngredientModalOpen }) {
     const [ingredients, setIngredients] = useState([]);
 
     const[searchQuery, setSearchQuery] = useState("");
@@ -68,7 +70,7 @@ export default function AddIngredientModal({ onClose }) {
                     onSearch={query => setSearchQuery(query)} 
                 />
 
-                {ingredients.length > 0 && (
+                {ingredients.length > 0 ? (
                     <ul>
                         {ingredients.map(ingredient => (
                             <div className="ingredient-card" key={ingredient.id}>
@@ -79,6 +81,13 @@ export default function AddIngredientModal({ onClose }) {
                             </div>
                         ))}
                     </ul>
+                ) : (
+                    <>
+                    <p>No ingredients found.</p>
+                    <Tooltip message="Add new ingredient">
+                        <button onClick={() => {setNewIngredientModalOpen(true); onClose()}}>+</button>
+                    </Tooltip>
+                    </>
                 )}
             </div>
         </div>

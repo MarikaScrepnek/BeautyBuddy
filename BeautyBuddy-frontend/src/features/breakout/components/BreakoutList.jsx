@@ -7,12 +7,15 @@ import React from "react";
 import Tooltip from "../../../components/ui/Tooltip";
 import AddIngredientModal from "../modals/AddIngredientModal";
 
+import NewIngredientModal from "../modals/NewIngredientModal";
+
 export default function BreakoutList() {
     const [ingredientsSelected, setIngredientsSelected] = useState(true);
     const [productsSelected, setProductsSelected] = useState(false);
     const [breakoutListProducts, setBreakoutListProducts] = useState([]);
     const [breakoutListIngredients, setBreakoutListIngredients] = useState([]);
     const [addIngredientModalOpen, setAddIngredientModalOpen] = useState(false);
+    const [newIngredientModalOpen, setNewIngredientModalOpen] = useState(false);
 
     useEffect(() => {
         getBreakoutListProducts()
@@ -78,7 +81,7 @@ export default function BreakoutList() {
                         ))}
                     </ul>
                 )}
-                <Tooltip message="Add Ingredient">
+                <Tooltip message="Request new ingredient">
                     <button className="add-ingredient" onClick={() => setAddIngredientModalOpen(true)}>
                         +
                     </button>
@@ -127,7 +130,10 @@ export default function BreakoutList() {
             )}
         </div>
         {addIngredientModalOpen && (
-            <AddIngredientModal onClose={() => setAddIngredientModalOpen(false)} />
+            <AddIngredientModal onClose={() => setAddIngredientModalOpen(false)} setNewIngredientModalOpen={setNewIngredientModalOpen} />
+        )}
+        {newIngredientModalOpen && (
+            <NewIngredientModal onClose={() => setNewIngredientModalOpen(false)} />
         )}
     </div> 
     );
