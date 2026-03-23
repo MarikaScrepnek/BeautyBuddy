@@ -84,17 +84,19 @@ export default function ProductList({ searchQuery, onLoadingChange }) {
           {p.image_link && (
             <img src={p.image_link} alt={p.name} className="product-image-home" />
           )}
+          <p className="shade-count">
+            {p.shades.length > 1 ? `${p.shades.length} shades` : "\u00A0"}
+          </p>
           <div className="product-card-content">
-            <h3 className="product-card-title">{p.name}</h3>
-            <p>{p.brand?.name}</p>
-            <div className="product-card-bottom">
-              <p className="shade-count">
-                {p.shades?.length > 1 ? `${p.shades.length} shades` : "\u00A0"}
-              </p>
-              <ReviewStars rating={p.rating} disabled={true} />
+              <div className="product-card-header">
+              <h3 className="product-card-title">{p.name}</h3>
+              <p>{p.brand?.name}</p>
               <p className="product-card-price">
-                Price: {p.price ? `≈ ${priceMap[p.id]}` : "N/A"}
+                {p.price ? `≈ ${priceMap[p.id]}` : "Price: N/A"}
               </p>
+            </div>
+            <div className="product-card-bottom">
+              <ReviewStars rating={p.rating} disabled={true} />
               <div className="wishlist-actions">
               
                 <div className="action-icon" onClick={() => setSelectedItemRoutine(p)}>

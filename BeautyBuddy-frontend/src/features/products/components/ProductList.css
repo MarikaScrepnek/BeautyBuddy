@@ -39,11 +39,16 @@
     flex-shrink: 0;
   }
 
+  .product-card-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+
   .product-card-bottom {
     position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 15px;
+    bottom: 0px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -115,7 +120,9 @@
   font-size: 0.77rem;
   color: #000000;
   margin-top: 5px;
-}
+  position: absolute;
+  top: 212px;
+  }
 
 @keyframes spin {
   to { transform: rotate(360deg); }
