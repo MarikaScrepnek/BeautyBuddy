@@ -5,11 +5,28 @@ import { useNavigate } from "react-router-dom";
 import './ProductList.css';
 import ReviewStars from "../../../components/ui/ReviewStars";
 import AddToRoutineModal from "../../routines/modals/AddToRoutineModal";
+import { addToWishlist } from "../../wishlist/api/wishlistApi";
+import Toast from "../../../components/ui/Toast";
 
 export default function ProductList({ searchQuery, onLoadingChange }) {
 
   const [selectedItemRoutine, setSelectedItemRoutine] = useState(null);
   const [selectedItemWishlist, setSelectedItemWishlist] = useState(null);
+
+  const[showToast, setShowToast] = useState(false);
+  const[toastMessage, setToastMessage] = useState("");
+
+  async function handleAddToWishlist(productId) {
+    addToWishlist(productId)
+      .then(() => {;
+        setToastMessage("Product added to wishlist!");
+        setShowToast(true);
+      })
+      .catch((error) => {
+        setToastMessage("Error adding product to wishlist");
+        setShowToast(true);
+      });
+  }
 
   // --- All hooks at the top ---
   const [products, setProducts] = useState([]);
@@ -117,6 +134,7 @@ export default function ProductList({ searchQuery, onLoadingChange }) {
                     onClick={(e) => {
                       e.stopPropagation();
                       setSelectedItemWishlist(p);
+                      handleAddToWishlist(p.id);
                     }}
                   >
                     <span className="icon">♥</span>
@@ -146,6 +164,9 @@ export default function ProductList({ searchQuery, onLoadingChange }) {
           baseCategoryName={selectedItemRoutine.category.baseCategoryName}
           onClose={() => setSelectedItemRoutine(null)}
         />
+      )}
+      {showToast && (
+        <Toast message={toastMessage} />
       )}
     </div>
   );
