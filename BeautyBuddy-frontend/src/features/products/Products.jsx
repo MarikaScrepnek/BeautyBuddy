@@ -6,7 +6,7 @@ import './Products.css';
 
 import RequestModal from './modals/RequestModal';
 
-export default function Home() {
+export default function Products() {
   const [params] = useSearchParams();
   const searchQuery = params.get("q") || "";
 
