@@ -6,7 +6,7 @@ import Toast from "../../../components/ui/Toast";
 
 import "./AddToRoutineModal.css";
 
-export default function AddToRoutineModal({ baseCategory, productName, productId, shadeName, onClose }) {
+export default function AddToRoutineModal({ baseCategoryName, productName, productId, shadeName = null, onClose }) {
     const [makeupRoutines, setMakeupRoutines] = useState([]);
     const [skincareRoutines, setSkincareRoutines] = useState([]);
     const [haircareRoutine, setHaircareRoutine] = useState([]);
@@ -88,9 +88,9 @@ export default function AddToRoutineModal({ baseCategory, productName, productId
                 <div className="modal-header">
                     <h2>Add</h2>
                     <h3>{productName}</h3>
-                    <h4>to a {baseCategory} Routine</h4>
+                    <h4>to a {baseCategoryName} Routine</h4>
                 </div>
-                {baseCategory === "Makeup" && (
+                {baseCategoryName === "Makeup" && (
                     <>
                     {makeupRoutines.map(routine => (
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }} key={routine.routineId} className="routine-option">
@@ -104,7 +104,7 @@ export default function AddToRoutineModal({ baseCategory, productName, productId
                     ))}
                     </>
                 )}
-                {baseCategory === "Skincare" && (
+                {baseCategoryName === "Skincare" && (
                     <>
                     {skincareRoutines.map(routine => (
                         <div key={routine.routineId} className="routine-option">
@@ -118,7 +118,7 @@ export default function AddToRoutineModal({ baseCategory, productName, productId
                     ))}
                     </>
                 )}
-                {baseCategory === "Haircare" && haircareRoutine.routineId && (
+                {baseCategoryName === "Haircare" && haircareRoutine.routineId && (
                     <div key={haircareRoutine.routineId} className="routine-option">
                         <p>{haircareRoutine.name || "Haircare Routine"} {isProductInRoutine(haircareRoutine) && <span style={{color:'grey',fontSize:'14px', textDecoration:'italic'}}>(Already in this routine)</span>}</p>
                         <button className="add-button"
@@ -140,7 +140,7 @@ export default function AddToRoutineModal({ baseCategory, productName, productId
 
                 {isOtherRoutinesOpen && (
                     <div className="other-routines-list">
-                        {baseCategory !== "Makeup" && (
+                        {baseCategoryName !== "Makeup" && (
                         <>
                             <h1 style={{ margin: "20px 0 10px 0" }}>Makeup Routines</h1>
                             {makeupRoutines.map(routine => (
@@ -155,7 +155,7 @@ export default function AddToRoutineModal({ baseCategory, productName, productId
                             ))}
                         </>
                         )}
-                        {baseCategory !== "Skincare" && (
+                        {baseCategoryName !== "Skincare" && (
                         <>
                             <h1 style={{ margin: "20px 0 10px 0" }}>Skincare Routines</h1>
                             {skincareRoutines.map(routine => (
@@ -170,7 +170,7 @@ export default function AddToRoutineModal({ baseCategory, productName, productId
                             ))}
                         </>
                         )}
-                        {baseCategory !== "Haircare" && haircareRoutine.routineId && (
+                        {baseCategoryName !== "Haircare" && haircareRoutine.routineId && (
                             <>
                             <h1 style={{ margin: "20px 0 10px 0" }}>Haircare Routine</h1>
                             <div key={haircareRoutine.routineId} className="routine-option">

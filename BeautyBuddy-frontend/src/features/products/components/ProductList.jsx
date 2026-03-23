@@ -4,8 +4,8 @@ import { useNavigate } from "react-router-dom";
 
 import './ProductList.css';
 import ReviewStars from "../../../components/ui/ReviewStars";
+import AddToRoutineModal from "../../routines/modals/AddToRoutineModal";
 
-import { PiWarningCircleFill } from "react-icons/pi";
 export default function ProductList({ searchQuery, onLoadingChange }) {
 
   const [selectedItemRoutine, setSelectedItemRoutine] = useState(null);
@@ -143,7 +143,7 @@ export default function ProductList({ searchQuery, onLoadingChange }) {
         <AddToRoutineModal
           productId={selectedItemRoutine.id}
           productName={selectedItemRoutine.name}
-          baseCategory={selectedItemRoutine.category}
+          baseCategoryName={selectedItemRoutine.category.baseCategoryName}
           onClose={() => setSelectedItemRoutine(null)}
         />
       )}
