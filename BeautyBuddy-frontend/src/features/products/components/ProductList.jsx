@@ -7,6 +7,7 @@ import ReviewStars from "../../../components/ui/ReviewStars";
 import AddToRoutineModal from "../../routines/modals/AddToRoutineModal";
 import { addToWishlist } from "../../wishlist/api/wishlistApi";
 import Toast from "../../../components/ui/Toast";
+import { addToBreakoutList } from "../../breakout/api/breakoutListApi";
 
 export default function ProductList({ searchQuery, onLoadingChange }) {
 
@@ -24,6 +25,18 @@ export default function ProductList({ searchQuery, onLoadingChange }) {
       })
       .catch((error) => {
         setToastMessage("Error adding product to wishlist");
+        setShowToast(true);
+      });
+  }
+
+  async function handleAddToBreakoutList(productId) {
+    addToBreakoutList("product", productId)
+      .then(() => {
+        setToastMessage("Product added to breakout list!");
+        setShowToast(true);
+      })
+      .catch((error) => {
+        setToastMessage("Error adding product to breakout list");
         setShowToast(true);
       });
   }
@@ -145,7 +158,7 @@ export default function ProductList({ searchQuery, onLoadingChange }) {
                     className="action-icon"
                     onClick={(e) => {
                       e.stopPropagation();
-                      // breakout list action handler can be added here
+                      handleAddToBreakoutList(p.id);
                     }}
                   >
                     <span className="icon">!</span>
