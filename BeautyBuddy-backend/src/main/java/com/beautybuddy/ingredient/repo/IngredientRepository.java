@@ -10,4 +10,6 @@ import java.util.Optional;
 public interface IngredientRepository extends JpaRepository<Ingredient, Long> {
     Optional<Ingredient> findByName(String name);
     Page<Ingredient> findByCanonicalIdNull(Pageable pageable);
+    Page<Ingredient> findByCanonicalIdNullAndNameContaining(Pageable pageable, String name);
+    Page<Ingredient> findByCanonicalIdNotNullAndNameContaining(Pageable pageable, String name);
 }

@@ -9,6 +9,8 @@ import { addToBreakoutList } from "../api/breakoutListApi";
 export default function AddIngredientModal({ onClose }) {
     const [ingredients, setIngredients] = useState([]);
 
+    const[searchQuery, setSearchQuery] = useState("");
+
     async function handleAddIngredient(ingredientId) {
         addToBreakoutList("ingredient", ingredientId)
             .then(success => {
@@ -23,6 +25,26 @@ export default function AddIngredientModal({ onClose }) {
                 alert("An error occurred. Please try again.");
             });
     }
+
+    useEffect(() => {
+        if (searchQuery.trim() === "") {
+            getIngredients(0, 8)
+                .then(data => {
+                    setIngredients(data.content);
+                })
+                .catch(error => {
+                    console.error("Error fetching ingredients:", error);
+                });
+        } else {
+            getIngredients(0, 8, searchQuery)
+                .then(data => {
+                    setIngredients(data.content);
+                })
+                .catch(error => {
+                    console.error("Error fetching ingredients:", error);
+                });
+        }
+    }, [searchQuery]);
 
     useEffect(() => {
         getIngredients(0, 8)
@@ -41,7 +63,10 @@ export default function AddIngredientModal({ onClose }) {
 
                 <h2>Add Ingredient to Breakout List</h2>
 
-                <Searchbar placeholder="Search ingredients..." onSearch={query => console.log("Search for:", query)} />
+                <Searchbar 
+                    placeholder="Search ingredients..." 
+                    onSearch={query => setSearchQuery(query)} 
+                />
 
                 {ingredients.length > 0 && (
                     <ul>
