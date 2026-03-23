@@ -27,6 +27,10 @@
   font-weight: bold;
   transition: color 0.2s;
 }
+.plus-sign:hover {
+  color: rgb(231, 155, 219);
+  cursor: pointer;
+}
 
 .create-discussion-action-icon:hover {
   transform: scale(1.1);

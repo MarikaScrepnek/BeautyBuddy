@@ -8,6 +8,7 @@ import AuthModal from "../auth/modals/AuthModal";
 import { FaSearch } from "react-icons/fa";
 
 import "./Discussions.css";
+import Tooltip from "../../components/ui/Tooltip";
 
 export default function Discussions() {
   const [discussions, setDiscussions] = useState([]);
@@ -75,16 +76,15 @@ export default function Discussions() {
     <div>
       <div className="discussions-header-container">
         <div className="discussions-button-row">
-          <div className="create-discussion-action-icon" onClick={() => {
-            if (!isLoggedIn) {
-              setShowLoginModal(true);
-              return;
-            }
-            setShowModal(true);
-          }}>
-            <span className="plus-sign">+</span>
-            <span className="tooltip">Create Discussion</span>
-          </div>
+            <Tooltip message="Create a Discussion" position="left">
+            <button onClick={() => {
+              if (!isLoggedIn) {
+                setShowLoginModal(true);
+                return;
+              }
+              setShowModal(true);
+            }} className="plus-sign">+</button>
+            </Tooltip>
         </div>
         <div className="discussions-search-center">
           <div className="discussions-search-container">
