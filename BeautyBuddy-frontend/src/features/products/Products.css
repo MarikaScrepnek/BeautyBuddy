@@ -25,3 +25,39 @@
 .request-product-button:active {
     scale: 0.98;
 }
+
+.search-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    margin-top: 20px;
+    width: 100%;
+}
+
+.search-bar {
+    padding: 3px 12px;
+    width: 100%;
+    font-size: 1rem;
+    border: 1px solid #333131;
+    border-radius: 4px;
+}
+
+.search-bar:focus {
+  outline: none;
+  border-color: rgb(231, 155, 219);
+}
+
+.search-button {
+  position: absolute;
+  right: 6px;
+  top: 6px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #777;
+  font-size: 0.9rem;
+}
+
+.search-button:hover {
+  color: #333;
+}

@@ -1,5 +1,4 @@
-import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
-import { FaSearch } from "react-icons/fa";
+import { Outlet, useNavigate } from 'react-router-dom';
 import { NavLink } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
@@ -10,9 +9,8 @@ import AuthModal from '../features/auth/modals/AuthModal';
 import Tooltip from './ui/Tooltip';
 import UserDropdown from './UserDropdown';
 
-export default function NavigationBar({ searchQuery, setSearchQuery }) {
+export default function NavigationBar() {
   const navigate = useNavigate();
-  const location = useLocation();
 
   const [showAuth, setShowAuth] = useState(false);
 
@@ -20,26 +18,6 @@ export default function NavigationBar({ searchQuery, setSearchQuery }) {
 
   const [currentUser, setCurrentUser] = useState(null);
 
-  const handleChange = (e) => {
-    const value = e.target.value;
-    setSearchQuery(value);
-
-    if (location.pathname === "/products") {
-      navigate(`/?q=${encodeURIComponent(value)}`, { replace: true });
-    }
-  }
-
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter") {
-      navigate(`/?q=${encodeURIComponent(searchQuery)}`);
-    }
-  };
-
-  const handleSearch = () => {
-    navigate(`/?q=${encodeURIComponent(searchQuery)}`);
-  };
-
-  
   useEffect(() => {
     getCurrentUser()
       .then((user) => {
@@ -85,26 +63,6 @@ export default function NavigationBar({ searchQuery, setSearchQuery }) {
               </>
             )}
           </nav>
-
-          <div className="search-container">
-            <input
-              type="text"
-              className="search-bar"
-              placeholder="Search products..."
-              value={searchQuery}
-              onChange={handleChange}
-              onKeyDown={handleKeyDown}
-            />
-
-            <button
-              type="button"
-              className="search-button"
-              onClick={handleSearch}
-              aria-label="Search"
-            >
-              <FaSearch />
-            </button>
-          </div>
 
           {isLoggedIn ? (
             <div className="user-section">
