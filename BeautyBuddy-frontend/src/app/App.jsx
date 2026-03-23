@@ -22,7 +22,6 @@ function App() {
           <Route path="/profile" element={<MyRoutines />} />
           <Route path="/my-feed" element={<Feed />} />
           <Route path='/products/:productId' element={<ProductDetails />} />
-          <Route path="/friends" element={<div>Friends Page (to be implemented)</div>} />
           <Route path="/settings" element={<div>Settings Page (to be implemented)</div>} />
         </Route>
       </Routes>
