@@ -64,6 +64,19 @@ export default function ProductList({ searchQuery, onLoadingChange }) {
     return routineItems.includes(productId);
   }
 
+  function handleRoutineChange(action, productId) {
+    setRoutineItems(prev => {
+      if (action === "added") {
+        if (prev.includes(productId)) return prev;
+        return [...prev, productId];
+      }
+      if (action === "removed") {
+        return prev.filter(id => id !== productId);
+      }
+      return prev;
+    });
+  }
+
   async function handleToggleWishlist(productId) {
     if (isInWishlist(productId)) {
       removeFromWishlist(productId)
@@ -284,6 +297,7 @@ export default function ProductList({ searchQuery, onLoadingChange }) {
           productId={selectedItemRoutine.id}
           productName={selectedItemRoutine.name}
           baseCategoryName={selectedItemRoutine.category.baseCategoryName}
+          onRoutineChange={handleRoutineChange}
           onClose={() => setSelectedItemRoutine(null)}
         />
       )}

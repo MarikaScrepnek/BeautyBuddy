@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 
-import { getMakeupRoutines, getSkincareRoutines, getHaircareRoutine, addProductToRoutine } from "../api/routineApi";
+import { getMakeupRoutines, getSkincareRoutines, getHaircareRoutine, addProductToRoutine, deleteRoutineItem } from "../api/routineApi";
 
 import Toast from "../../../components/ui/Toast";
 
 import "./AddToRoutineModal.css";
+import Tooltip from "../../../components/ui/Tooltip";
 
-export default function AddToRoutineModal({ baseCategoryName, productName, productId, shadeName = null, onClose }) {
+export default function AddToRoutineModal({ baseCategoryName, productName, productId, shadeName = null, onClose, onRoutineChange }) {
     const [makeupRoutines, setMakeupRoutines] = useState([]);
     const [skincareRoutines, setSkincareRoutines] = useState([]);
     const [haircareRoutine, setHaircareRoutine] = useState([]);
@@ -17,27 +18,87 @@ export default function AddToRoutineModal({ baseCategoryName, productName, produ
 
     const[isOtherRoutinesOpen, setIsOtherRoutinesOpen] = useState(false);
 
-    // Helper to check if product is in routine
     function isProductInRoutine(routine) {
         if (!routine.items) return false;
         return routine.items.some(p => p.productId === productId);
     }
 
     async function handleAddToRoutine(routineId, productId, shadeName) {
-        addProductToRoutine(routineId, productId, shadeName)
-            .then(() => {
-                console.log("Product added to routine successfully");
-                setToastMessage("Product added to routine!");
-                setToastType("success");
-                setShowToast(true);
-                setTimeout(onClose, 1000);
-            })
-            .catch((error) => {
-                console.error("Error adding product to routine:", error);
-                setToastMessage("Error adding product to routine");
-                setToastType("error");
-                setShowToast(true);
-            });
+        try {
+            await addProductToRoutine(routineId, productId, shadeName);
+            setToastMessage("Product added to routine!");
+            setToastType("success");
+            setShowToast(true);
+
+            // Optimistically update local routines
+            setMakeupRoutines(prev =>
+                prev.map(r =>
+                    r.routineId === routineId
+                        ? { ...r, items: [...(r.items || []), { productId }] }
+                        : r
+                )
+            );
+            setSkincareRoutines(prev =>
+                prev.map(r =>
+                    r.routineId === routineId
+                        ? { ...r, items: [...(r.items || []), { productId }] }
+                        : r
+                )
+            );
+            setHaircareRoutine(prev =>
+                prev && prev.routineId === routineId
+                    ? { ...prev, items: [...(prev.items || []), { productId }] }
+                    : prev
+            );
+
+            if (onRoutineChange) {
+                onRoutineChange("added", productId);
+            }
+        } catch (error) {
+            console.error("Error adding product to routine:", error);
+            setToastMessage("Error adding product to routine");
+            setToastType("error");
+            setShowToast(true);
+        }
+    }
+
+    async function removeFromRoutine(routineId, productId) {
+        try {
+            await deleteRoutineItem(routineId, productId);
+            setToastMessage("Product removed from routine!");
+            setToastType("success");
+            setShowToast(true);
+
+            // Optimistically update local routines
+            setMakeupRoutines(prev =>
+                prev.map(r =>
+                    r.routineId === routineId
+                        ? { ...r, items: (r.items || []).filter(item => item.productId !== productId) }
+                        : r
+                )
+            );
+            setSkincareRoutines(prev =>
+                prev.map(r =>
+                    r.routineId === routineId
+                        ? { ...r, items: (r.items || []).filter(item => item.productId !== productId) }
+                        : r
+                )
+            );
+            setHaircareRoutine(prev =>
+                prev && prev.routineId === routineId
+                    ? { ...prev, items: (prev.items || []).filter(item => item.productId !== productId) }
+                    : prev
+            );
+
+            if (onRoutineChange) {
+                onRoutineChange("removed", productId);
+            }
+        } catch (error) {
+            console.error("Error removing product from routine:", error);
+            setToastMessage("Error removing product from routine");
+            setToastType("error");
+            setShowToast(true);
+        }
     }
 
     useEffect(() => {
@@ -94,12 +155,30 @@ export default function AddToRoutineModal({ baseCategoryName, productName, produ
                     <>
                     {makeupRoutines.map(routine => (
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }} key={routine.routineId} className="routine-option">
-                            <p>{routine.name || (routine.occasion.charAt(0).toUpperCase() + routine.occasion.slice(1).toLowerCase())} {isProductInRoutine(routine) && <span style={{color:'grey',fontSize:'14px', textDecoration:'italic'}}>(Already in this routine)</span>}</p>
-                            <button className="add-button"
-                            onClick={() => handleAddToRoutine(routine.routineId, productId, shadeName)}
-                            >
-                                +
-                            </button>
+                            <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '8px' }}>
+                                <p>{routine.name || (routine.occasion.charAt(0).toUpperCase() + routine.occasion.slice(1).toLowerCase())}</p>
+                                {isProductInRoutine(routine) && (
+                                    <span style={{color:'grey',fontSize:'14px', fontStyle:'italic'}}>(Already in this routine)</span>
+                                )}
+                            </div>
+                                <div className="button-group">
+                                {isProductInRoutine(routine) && (
+                                    <Tooltip message="Remove from routine">
+                                        <button className="add-button"
+                                        onClick={() => removeFromRoutine(routine.routineId, productId)}
+                                        >
+                                            -
+                                        </button>
+                                    </Tooltip>
+                                )}
+                                <Tooltip message="Add to routine">
+                                <button className="add-button"
+                                onClick={() => handleAddToRoutine(routine.routineId, productId, shadeName)}
+                                >
+                                    +
+                                </button>
+                                </Tooltip>
+                            </div>
                         </div>
                     ))}
                     </>
@@ -108,24 +187,60 @@ export default function AddToRoutineModal({ baseCategoryName, productName, produ
                     <>
                     {skincareRoutines.map(routine => (
                         <div key={routine.routineId} className="routine-option">
-                            <p>{routine.name || routine.timeOfDay} {isProductInRoutine(routine) && <span style={{color:'grey',fontSize:'14px', textDecoration:'italic'}}>(Already in this routine)</span>}</p>
+                            <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '8px' }}>
+                            <p>{routine.name || routine.timeOfDay}</p>
+                            {isProductInRoutine(routine) && (
+                                <span style={{color:'grey',fontSize:'14px', fontStyle:'italic'}}>(Already in this routine)</span>
+                            )}
+                            </div>
+                            <div className="button-group">
+                            {isProductInRoutine(routine) && (
+                                <Tooltip message="Remove from routine">
+                                    <button className="add-button"
+                                    onClick={() => removeFromRoutine(routine.routineId, productId)}
+                                    >
+                                        -
+                                    </button>
+                                </Tooltip>
+                            )}
+                            <Tooltip message="Add to routine">
                             <button className="add-button"
                             onClick={() => handleAddToRoutine(routine.routineId, productId, shadeName)}
                             >
                                 +
                             </button>
+                            </Tooltip>
+                        </div>
                         </div>
                     ))}
                     </>
                 )}
                 {baseCategoryName === "Haircare" && haircareRoutine.routineId && (
                     <div key={haircareRoutine.routineId} className="routine-option">
-                        <p>{haircareRoutine.name || "Haircare Routine"} {isProductInRoutine(haircareRoutine) && <span style={{color:'grey',fontSize:'14px', textDecoration:'italic'}}>(Already in this routine)</span>}</p>
+                        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '8px' }}>
+                        <p>{haircareRoutine.name || "Haircare Routine"}</p>
+                        {isProductInRoutine(haircareRoutine) && (
+                            <span style={{color:'grey',fontSize:'14px', fontStyle:'italic'}}>(Already in this routine)</span>
+                        )}
+                        </div>
+                        <div className="button-group">
+                        {isProductInRoutine(haircareRoutine) && (
+                            <Tooltip message="Remove from routine">
+                                <button className="add-button"
+                                onClick={() => removeFromRoutine(haircareRoutine.routineId, productId)}
+                                >
+                                    -
+                                </button>
+                            </Tooltip>
+                        )}
+                        <Tooltip message="Add to routine">
                         <button className="add-button"
                         onClick={() => handleAddToRoutine(haircareRoutine.routineId, productId, shadeName)}
                         >
                             +
                         </button>
+                        </Tooltip>
+                    </div>
                     </div>
                 )}
                 <div className="other-routines-header">
@@ -145,12 +260,30 @@ export default function AddToRoutineModal({ baseCategoryName, productName, produ
                             <h1 style={{ margin: "20px 0 10px 0" }}>Makeup Routines</h1>
                             {makeupRoutines.map(routine => (
                                 <div key={routine.routineId} className="routine-option">
-                                    <p>{routine.name || (routine.occasion.charAt(0).toUpperCase() + routine.occasion.slice(1).toLowerCase())} {isProductInRoutine(routine) && <span style={{color:'grey',fontSize:'14px', textDecoration:'italic'}}>(Already in this routine)</span>}</p>
+                                    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '8px' }}>
+                                    <p>{routine.name || (routine.occasion.charAt(0).toUpperCase() + routine.occasion.slice(1).toLowerCase())}</p>
+                                    {isProductInRoutine(routine) && (
+                                        <span style={{color:'grey',fontSize:'14px', fontStyle:'italic'}}>(Already in this routine)</span>
+                                    )}
+                                    </div>
+                                    <div className="button-group">
+                                        {isProductInRoutine(routine) && (
+                                            <Tooltip message="Remove from routine">
+                                                <button className="add-button"
+                                                onClick={() => removeFromRoutine(routine.routineId, productId)}
+                                                >
+                                                    -
+                                                </button>
+                                            </Tooltip>
+                                        )}
+                                    <Tooltip message="Add to routine">
                                     <button className="add-button"
                                     onClick={() => handleAddToRoutine(routine.routineId, productId, shadeName)}
                                     >
                                         +
                                     </button>
+                                    </Tooltip>
+                                </div>
                                 </div>
                             ))}
                         </>
@@ -160,12 +293,30 @@ export default function AddToRoutineModal({ baseCategoryName, productName, produ
                             <h1 style={{ margin: "20px 0 10px 0" }}>Skincare Routines</h1>
                             {skincareRoutines.map(routine => (
                                 <div key={routine.routineId} className="routine-option">
-                                    <p>{routine.name || routine.timeOfDay} {isProductInRoutine(routine) && <span style={{color:'grey',fontSize:'14px', textDecoration:'italic'}}>(Already in this routine)</span>}</p>
+                                    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '8px' }}>
+                                    <p>{routine.name || routine.timeOfDay}</p>
+                                    {isProductInRoutine(routine) && (
+                                        <span style={{color:'grey',fontSize:'14px', fontStyle:'italic'}}>(Already in this routine)</span>
+                                    )}
+                                    </div>
+                                    <div className="button-group">
+                                    {isProductInRoutine(routine) && (
+                                        <Tooltip message="Remove from routine">
+                                            <button className="add-button"
+                                            onClick={() => removeFromRoutine(routine.routineId, productId)}
+                                            >
+                                                -
+                                            </button>
+                                        </Tooltip>
+                                    )}
+                                    <Tooltip message="Add to routine">
                                     <button className="add-button"
                                     onClick={() => handleAddToRoutine(routine.routineId, productId, shadeName)}
                                     >
                                         +
                                     </button>
+                                    </Tooltip>
+                                </div>
                                 </div>
                             ))}
                         </>
@@ -174,12 +325,30 @@ export default function AddToRoutineModal({ baseCategoryName, productName, produ
                             <>
                             <h1 style={{ margin: "20px 0 10px 0" }}>Haircare Routine</h1>
                             <div key={haircareRoutine.routineId} className="routine-option">
-                                <p>{haircareRoutine.name || "Haircare Routine"} {isProductInRoutine(haircareRoutine) && <span style={{color:'grey',fontSize:'14px', textDecoration:'italic'}}>(Already in this routine)</span>}</p>
+                            <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '8px' }}>
+                                <p>{haircareRoutine.name || "Haircare Routine"}</p>
+                                {isProductInRoutine(haircareRoutine) && (
+                                    <span style={{color:'grey',fontSize:'14px', fontStyle:'italic'}}>(Already in this routine)</span>
+                                )}
+                            </div>
+                                <div className="button-group">
+                                {isProductInRoutine(haircareRoutine) && (
+                                    <Tooltip message="Remove from routine">
+                                        <button className="add-button"
+                                        onClick={() => removeFromRoutine(haircareRoutine.routineId, productId)}
+                                        >
+                                            -
+                                        </button>
+                                    </Tooltip>
+                                )}
+                                <Tooltip message="Add to routine">
                                 <button className="add-button"
                                 onClick={() => handleAddToRoutine(haircareRoutine.routineId, productId, shadeName)}
                                 >
                                     +
                                 </button>
+                                </Tooltip>
+                            </div>
                             </div>
                         </>
                         )}
