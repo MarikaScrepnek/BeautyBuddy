@@ -12,12 +12,20 @@ import { addToBreakoutList } from "../../breakout/api/breakoutListApi";
 export default function ProductList({ searchQuery, onLoadingChange }) {
 
   const [selectedItemRoutine, setSelectedItemRoutine] = useState(null);
-  const [selectedItemWishlist, setSelectedItemWishlist] = useState(null);
 
   const[showToast, setShowToast] = useState(false);
   const[toastMessage, setToastMessage] = useState("");
 
-  async function handleAddToWishlist(productId) {
+  async function isInWishlist(productId) {
+  }
+
+  async function isInBreakoutList(productId) {
+  }
+
+  async function isInRoutine(productId) {
+  }
+
+  async function handleToggleWishlist(productId) {
     addToWishlist(productId)
       .then(() => {;
         setToastMessage("Product added to wishlist!");
@@ -29,7 +37,7 @@ export default function ProductList({ searchQuery, onLoadingChange }) {
       });
   }
 
-  async function handleAddToBreakoutList(productId) {
+  async function handleToggleBreakoutList(productId) {
     addToBreakoutList("product", productId)
       .then(() => {
         setToastMessage("Product added to breakout list!");
@@ -114,21 +122,21 @@ export default function ProductList({ searchQuery, onLoadingChange }) {
           {p.image_link && (
             <img src={p.image_link} alt={p.name} className="product-image-home" />
           )}
-          <p className="shade-count">
-            {p.shades.length > 1 ? `${p.shades.length} shades` : "\u00A0"}
-          </p>
           <div className="product-card-content">
               <div className="product-card-header">
               <h3 className="product-card-title">{p.name}</h3>
               <p>{p.brand?.name}</p>
-              <p className="product-card-price">
-                {p.price ? `≈ ${priceMap[p.id]}` : "Price: N/A"}
+              <p className="shade-count">
+                {p.shades.length > 1 ? `${p.shades.length} shades` : "\u00A0"}
               </p>
             </div>
             <div className="product-card-bottom">
-                <div onClick={(e) => e.stopPropagation()}>
-                  <ReviewStars rating={p.rating} />
-                </div>
+              <p className="product-card-price">
+                {p.price ? `≈ ${priceMap[p.id]}` : "Price: N/A"}
+              </p>
+              <div onClick={(e) => e.stopPropagation()}>
+                <ReviewStars rating={p.rating} />
+              </div>
               <div className="wishlist-actions">
               
                   <div
@@ -146,8 +154,7 @@ export default function ProductList({ searchQuery, onLoadingChange }) {
                     className="action-icon"
                     onClick={(e) => {
                       e.stopPropagation();
-                      setSelectedItemWishlist(p);
-                      handleAddToWishlist(p.id);
+                      handleToggleWishlist(p.id);
                     }}
                   >
                     <span className="icon">♥</span>
@@ -158,7 +165,7 @@ export default function ProductList({ searchQuery, onLoadingChange }) {
                     className="action-icon"
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleAddToBreakoutList(p.id);
+                      handleToggleBreakoutList(p.id);
                     }}
                   >
                     <span className="icon">!</span>
