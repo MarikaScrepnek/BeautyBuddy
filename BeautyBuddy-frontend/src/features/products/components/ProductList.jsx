@@ -5,27 +5,79 @@ import { useNavigate } from "react-router-dom";
 import './ProductList.css';
 import ReviewStars from "../../../components/ui/ReviewStars";
 import AddToRoutineModal from "../../routines/modals/AddToRoutineModal";
-import { addToWishlist } from "../../wishlist/api/wishlistApi";
+import { addToWishlist, getWishlist, removeFromWishlist } from "../../wishlist/api/wishlistApi";
 import Toast from "../../../components/ui/Toast";
-import { addToBreakoutList } from "../../breakout/api/breakoutListApi";
+import { addToBreakoutList, getBreakoutListProducts, removeFromBreakoutList } from "../../breakout/api/breakoutListApi";
+import { getAllRoutineItems } from "../../routines/api/routineApi";
 
 export default function ProductList({ searchQuery, onLoadingChange }) {
 
   const [selectedItemRoutine, setSelectedItemRoutine] = useState(null);
+  const [wishlistItems, setWishlistItems] = useState([]);
+  const [breakoutListItems, setBreakoutListItems] = useState([]);
+  const [routineItems, setRoutineItems] = useState([]);
 
   const[showToast, setShowToast] = useState(false);
   const[toastMessage, setToastMessage] = useState("");
 
-  async function isInWishlist(productId) {
+  async function fetchWishlistItems() {
+    getWishlist()
+      .then((data) => {
+        const productIds = data.map(item => item.productId);
+        setWishlistItems(productIds);
+      })
+      .catch((error) => {
+        console.error("Error fetching wishlist items:", error);
+      });
   }
 
-  async function isInBreakoutList(productId) {
+  async function fetchBreakoutListItems() {
+    getBreakoutListProducts()
+      .then((data) => {
+        const productIds = data.map(item => item.productId);
+        setBreakoutListItems(productIds);
+      })
+      .catch((error) => {
+        console.error("Error fetching breakout list items:", error);
+      });
   }
 
-  async function isInRoutine(productId) {
+  async function fetchRoutineItems() {
+    getAllRoutineItems()
+      .then((data) => {
+        setRoutineItems(data);
+      })
+      .catch((error) => {
+        console.error("Error fetching routine items:", error);
+      }); 
+  }
+
+  function isInWishlist(productId) {
+    return wishlistItems.includes(productId);
+  }
+
+  function isInBreakoutList(productId) {
+    return breakoutListItems.includes(productId);
+  }
+
+  function isInRoutine(productId) {
+    return routineItems.includes(productId);
   }
 
   async function handleToggleWishlist(productId) {
+    if (isInWishlist(productId)) {
+      removeFromWishlist(productId)
+        .then(() => {
+          setToastMessage("Product removed from wishlist!");
+          setShowToast(true);
+        })
+        .catch((error) => {
+          setToastMessage("Error removing product from wishlist");
+          setShowToast(true);
+        });
+      wishlistItems.splice(wishlistItems.indexOf(productId), 1);
+    }
+    else {
     addToWishlist(productId)
       .then(() => {;
         setToastMessage("Product added to wishlist!");
@@ -35,18 +87,35 @@ export default function ProductList({ searchQuery, onLoadingChange }) {
         setToastMessage("Error adding product to wishlist");
         setShowToast(true);
       });
+    wishlistItems.push(productId);
+    }
   }
 
   async function handleToggleBreakoutList(productId) {
-    addToBreakoutList("product", productId)
-      .then(() => {
-        setToastMessage("Product added to breakout list!");
-        setShowToast(true);
-      })
-      .catch((error) => {
-        setToastMessage("Error adding product to breakout list");
-        setShowToast(true);
-      });
+    if (isInBreakoutList(productId)) {
+      removeFromBreakoutList(productId)
+        .then(() => {
+          setToastMessage("Product removed from breakout list!");
+          setShowToast(true);
+        })
+        .catch((error) => {
+          setToastMessage("Error removing product from breakout list");
+          setShowToast(true);
+        });
+      breakoutListItems.splice(breakoutListItems.indexOf(productId), 1);
+    }
+    else {
+      addToBreakoutList("product", productId)
+        .then(() => {
+          setToastMessage("Product added to breakout list!");
+          setShowToast(true);
+        })
+        .catch((error) => {
+          setToastMessage("Error adding product to breakout list");
+          setShowToast(true);
+        });
+      breakoutListItems.push(productId);
+    }
   }
 
   // --- All hooks at the top ---
@@ -111,6 +180,12 @@ export default function ProductList({ searchQuery, onLoadingChange }) {
     setPriceMap(newPriceMap);
   }, [products, exchangeRate, userLocale, userCurrency]);
 
+  useEffect(() => {
+    fetchWishlistItems();
+    fetchBreakoutListItems();
+    fetchRoutineItems();
+  }, []);
+
   if (loading) {
     return <div className="loading">Loading products...</div>;
   }
@@ -138,6 +213,26 @@ export default function ProductList({ searchQuery, onLoadingChange }) {
                 <ReviewStars rating={p.rating} />
               </div>
               <div className="wishlist-actions">
+
+                <div
+                    className="action-icon"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleToggleWishlist(p.id);
+                    }}
+                  >
+                    {isInWishlist(p.id) ? (
+                      <>
+                      <span style={{ color: "rgb(231, 155, 219)" }} className="icon">♥</span>
+                      <span className="tooltip">Remove from wishlist</span>
+                      </>
+                    ) : (
+                      <>
+                      <span className="icon">♥</span>
+                      <span className="tooltip">Add to wishlist</span>
+                      </>
+                    )}
+                </div>
               
                   <div
                     className="action-icon"
@@ -146,19 +241,17 @@ export default function ProductList({ searchQuery, onLoadingChange }) {
                       setSelectedItemRoutine(p);
                     }}
                   >
-                    <span style={{ color: "#1a8ec4" }} className="icon">+</span>
-                    <span className="tooltip">Add to routine</span>
-                </div>
-
-                  <div
-                    className="action-icon"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleToggleWishlist(p.id);
-                    }}
-                  >
-                    <span className="icon">♥</span>
-                    <span className="tooltip">Add to wishlist</span>
+                    {isInRoutine(p.id) ? (
+                      <>
+                      <span style={{ color: "#1a8ec4" }} className="icon">+</span>
+                      <span className="tooltip">Add to another routine</span>
+                      </>
+                    ) : (
+                      <>
+                      <span className="icon">+</span>
+                      <span className="tooltip">Add to routine</span>
+                      </>
+                    )}
                 </div>
 
                   <div
@@ -168,8 +261,17 @@ export default function ProductList({ searchQuery, onLoadingChange }) {
                       handleToggleBreakoutList(p.id);
                     }}
                   >
-                    <span className="icon">!</span>
-                    <span className="tooltip">Add to breakout list</span>
+                    {isInBreakoutList(p.id) ? (
+                      <>
+                      <span style={{ color: "red" , fontSize: "0.95em"}} className="icon">!</span>
+                      <span className="tooltip">Remove from breakout list</span>
+                      </>
+                    ) : (
+                      <>
+                      <span style={{ fontSize: "0.95em"}} className="icon">!</span>
+                      <span className="tooltip">Add to breakout list</span>
+                      </>
+                    )}
                 </div>
 
               </div>
