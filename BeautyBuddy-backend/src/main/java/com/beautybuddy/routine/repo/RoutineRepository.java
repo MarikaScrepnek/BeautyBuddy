@@ -10,4 +10,5 @@ import com.beautybuddy.routine.entity.Routine;
 public interface RoutineRepository extends JpaRepository<Routine, Long> {
     List<Routine> findByUserIdAndCategoryName(Long userId, String categoryName);
     Optional<Routine> findByIdAndUserEmail(Long id, String userEmail);
+    List<Routine> findByUserId(Long userId);
 }

@@ -199,5 +199,17 @@ public class RoutineService {
         routineRepository.save(routine);
         return DTOMapper.toDisplayRoutineDTO(routine, reviewRepository);
     }
+
+    public List<Long> getAllRoutineItems(String userEmail) {
+        User user = userRepository.findByEmail(userEmail)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+
+        List<Routine> routines = routineRepository.findByUserId(user.getId());
+
+        return routines.stream()
+            .flatMap(routine -> routine.getItems().stream())
+            .map(item -> item.getProduct().getId())
+            .toList();
+    }
     
 }

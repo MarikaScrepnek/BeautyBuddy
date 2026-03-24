@@ -106,4 +106,14 @@ public class RoutineController {
     public String removeProductFromRoutine() {
         return "This will remove a product from the routine with the given ID.";
     }
+
+    @GetMapping("/items")
+    public ResponseEntity<List<Long>> getAllRoutineItems(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(401).build();
+        }
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        List<Long> items = routineService.getAllRoutineItems(userDetails.getEmail());
+        return ResponseEntity.ok(items);
+    }
 }

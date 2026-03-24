@@ -75,3 +75,14 @@ export async function updateRoutine(updatedData) {
     }
     return response.json();
 }
+
+export async function getAllRoutineItems() {
+    const response = await fetch(`http://localhost:8080/api/routines/items`, {
+        method: "GET",
+        credentials: "include",
+    });
+    if (!response.ok) {
+        throw new Error("Failed to fetch routine items");
+    }
+    return await response.json();
+}
