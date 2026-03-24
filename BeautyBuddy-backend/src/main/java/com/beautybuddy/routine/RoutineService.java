@@ -208,8 +208,29 @@ public class RoutineService {
 
         return routines.stream()
             .flatMap(routine -> routine.getItems().stream())
+            .filter(item -> item.getValidTo() == null)
             .map(item -> item.getProduct().getId())
             .toList();
+    }
+
+    public void removeProductFromRoutine(String userEmail, Long routineId, Long productId) {
+        User user = userRepository.findByEmail(userEmail)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Routine routine = routineRepository.findByIdAndUserEmail(routineId, userEmail)
+            .orElseThrow(() -> new RuntimeException("Routine not found"));
+
+        if (!routine.getUser().getId().equals(user.getId())) {
+            throw new RuntimeException("Unauthorized");
+        }
+
+        RoutineItem itemToRemove = routine.getItems().stream()
+            .filter(item -> item.getProduct().getId().equals(productId) && item.getValidTo() == null)
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException("Product not found in routine"));
+
+        itemToRemove.setValidTo(LocalDateTime.now());
+        routineRepository.save(routine);
     }
     
 }

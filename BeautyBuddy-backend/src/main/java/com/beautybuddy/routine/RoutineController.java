@@ -102,9 +102,14 @@ public class RoutineController {
         return "This will update a product in the routine with the given ID.";
     }
 
-    @DeleteMapping("/{id}/remove-product")
-    public String removeProductFromRoutine() {
-        return "This will remove a product from the routine with the given ID.";
+    @DeleteMapping("/{routineId}/{productId}")
+    public ResponseEntity<Void> removeProductFromRoutine(Authentication authentication, @PathVariable Long routineId, @PathVariable Long productId) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(401).build();
+        }
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        routineService.removeProductFromRoutine(userDetails.getEmail(), routineId, productId);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/items")
