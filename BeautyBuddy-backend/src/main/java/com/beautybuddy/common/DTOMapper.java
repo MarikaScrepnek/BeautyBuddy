@@ -138,6 +138,10 @@ public class DTOMapper {
                 item.getProduct().getName(),
                 item.getProduct().getBrand().getName(),
                 item.getShade() != null ? item.getShade().getShadeName() : null,
+                item.getProduct().getProductShades().stream()
+                    .sorted(Comparator.comparing(ProductShade::getShadeNumber))
+                    .map(DTOMapper::toProductShadeDTO)
+                    .toList(),
                 item.getProduct().getCategory().getName(),
                 item.getShade() != null && item.getShade().getImageLink() != null
                     ? item.getShade().getImageLink()
