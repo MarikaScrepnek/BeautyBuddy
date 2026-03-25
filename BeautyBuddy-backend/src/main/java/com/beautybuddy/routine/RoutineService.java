@@ -125,6 +125,10 @@ public class RoutineService {
             shade = productShadeRepository.findByProductAndShadeName(product, request.shadeName())
                 .orElseThrow(() -> new RuntimeException("Shade not found"));
         }
+        if (!product.getProductShades().isEmpty() && shade == null) {
+            shade = productShadeRepository.findByProductAndShadeNumber(product, 1)
+                .orElseThrow(() -> new RuntimeException("Default shade not found"));
+        }
 
         Routine routine = routineRepository.findByIdAndUserEmail(routineId, userEmail)
             .orElseThrow(() -> new RuntimeException("Routine not found"));
@@ -213,7 +217,7 @@ public class RoutineService {
             .toList();
     }
 
-    public void removeProductFromRoutine(String userEmail, Long routineId, Long productId) {
+    public void removeProductFromRoutine(String userEmail, Long routineId, Long productId, String shadeName) {
         User user = userRepository.findByEmail(userEmail)
             .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -225,7 +229,7 @@ public class RoutineService {
         }
 
         RoutineItem itemToRemove = routine.getItems().stream()
-            .filter(item -> item.getProduct().getId().equals(productId) && item.getValidTo() == null)
+            .filter(item -> item.getProduct().getId().equals(productId) && item.getValidTo() == null && (shadeName == null || (item.getShade() != null && shadeName.equals(item.getShade().getShadeName()))))
             .findFirst()
             .orElseThrow(() -> new RuntimeException("Product not found in routine"));
 

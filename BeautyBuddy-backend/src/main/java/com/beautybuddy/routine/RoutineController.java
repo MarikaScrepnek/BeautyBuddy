@@ -103,12 +103,12 @@ public class RoutineController {
     }
 
     @DeleteMapping("/{routineId}/{productId}")
-    public ResponseEntity<Void> removeProductFromRoutine(Authentication authentication, @PathVariable Long routineId, @PathVariable Long productId) {
+    public ResponseEntity<Void> removeProductFromRoutine(Authentication authentication, @PathVariable Long routineId, @PathVariable Long productId, @RequestBody(required = false) String shadeName) {
         if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.status(401).build();
         }
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        routineService.removeProductFromRoutine(userDetails.getEmail(), routineId, productId);
+        routineService.removeProductFromRoutine(userDetails.getEmail(), routineId, productId, shadeName);
         return ResponseEntity.ok().build();
     }
 
