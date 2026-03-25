@@ -77,6 +77,17 @@ export default function MakeupRoutines( { userName, routine, routineType } ) {
         }));
     }
 
+    function handleItemShadeChange(itemId, newShadeName) {
+        setEditedRoutine(prev => ({
+            ...prev,
+            items: prev.items.map(item =>
+                item.id === itemId
+                    ? { ...item, productShadeName: newShadeName }
+                    : item
+            )
+        }));
+    }
+
     function handleDragStart(index) {
         setDragIndex(index);
     }
@@ -264,8 +275,34 @@ export default function MakeupRoutines( { userName, routine, routineType } ) {
                                     <p className="routine-item-name">{item.productName}</p>
                                     <div className='routine-item-meta'>
                                         <span>{item.productBrand}</span>
-                                        {item.productShadeName && (
-                                            <span>• {item.productShadeName}</span>
+                                        {isEditingRoutine && item.allShades && item.allShades.length > 0 ? (
+                                            <>
+                                                <span>• </span>
+                                                <select
+                                                    className="routine-item-shade-select"
+                                                    value={item.productShadeName || ""}
+                                                    onChange={(e) => {
+                                                        e.stopPropagation();
+                                                        const rawValue = e.target.value;
+                                                        handleItemShadeChange(item.id, rawValue || null);
+                                                    }}
+                                                    onClick={(e) => e.stopPropagation()}
+                                                >
+                                                    {item.allShades.map((shade) => {
+                                                        const shadeName = typeof shade === "string" ? shade : shade.shadeName;
+                                                        if (!shadeName) return null;
+                                                        return (
+                                                            <option key={shadeName} value={shadeName}>
+                                                                {shadeName}
+                                                            </option>
+                                                        );
+                                                    })}
+                                                </select>
+                                            </>
+                                        ) : (
+                                            item.productShadeName && (
+                                                <span>• {item.productShadeName}</span>
+                                            )
                                         )}
                                         <span>• </span>
                                         <ReviewStars
