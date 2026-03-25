@@ -24,11 +24,20 @@ export default function NavigationBar() {
         setCurrentUser(user);
         setIsLoggedIn(true);
       })
-      .catch(() => setIsLoggedIn(false));
+      .catch(() => {
+        setCurrentUser(null);
+        setIsLoggedIn(false);
+      });
     const handleAuthLogin = () => {
       getCurrentUser()
-        .then(() => setIsLoggedIn(true))
-        .catch(() => setIsLoggedIn(false));
+        .then((user) => {
+          setCurrentUser(user);
+          setIsLoggedIn(true);
+        })
+        .catch(() => {
+          setCurrentUser(null);
+          setIsLoggedIn(false);
+        });
     };
 
     window.addEventListener("auth:login", handleAuthLogin);
@@ -64,13 +73,14 @@ export default function NavigationBar() {
             )}
           </nav>
 
-          {isLoggedIn ? (
+          {isLoggedIn && currentUser?.username ? (
             <div className="user-section">
               <UserDropdown
                 user={currentUser}
                 onSignOut={() => {
                   logoutUser()
                     .then(() => {
+                      setCurrentUser(null);
                       setIsLoggedIn(false);
                       navigate("/");
                     })
@@ -99,9 +109,11 @@ export default function NavigationBar() {
           onClose={() => setShowAuth(false)}
           onLoginSuccess={async () => {
           try {
-            await getCurrentUser();
+            const user = await getCurrentUser();
+            setCurrentUser(user);
             setIsLoggedIn(true);
           } catch {
+            setCurrentUser(null);
             setIsLoggedIn(false);
           }
           setShowAuth(false);

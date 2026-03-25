@@ -7,6 +7,8 @@ export default function UserDropdown({ user, onSignOut }) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
 
+  const username = user?.username ?? "";
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -24,9 +26,9 @@ export default function UserDropdown({ user, onSignOut }) {
         onClick={() => setIsOpen(!isOpen)}
       >
         <div className="user-avatar-fallback">
-          {user.username.charAt(0).toUpperCase()}
+          {username.charAt(0).toUpperCase()}
         </div>
-        <span className="user-name">{user.username}</span>
+        <span className="user-name">{username}</span>
         <FaChevronDown className={`user-chevron ${isOpen ? "open" : ""}`} />
       </button>
 
