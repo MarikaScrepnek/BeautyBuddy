@@ -43,6 +43,10 @@ public class WishlistService {
             shade = shadeRepository.findByProductAndShadeName(product, request.shadeName())
                 .orElseThrow(() -> new RuntimeException("Shade not found"));
         }
+        if (!product.getProductShades().isEmpty() && shade == null) {
+            shade = shadeRepository.findByProductAndShadeNumber(product, 1)
+                .orElseThrow(() -> new RuntimeException("Default shade not found"));
+        }
 
         Wishlist wishlist = user.getWishlist();
 
