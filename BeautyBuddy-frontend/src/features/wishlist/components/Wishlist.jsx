@@ -11,7 +11,7 @@ import Searchbar from "../../../components/ui/Searchbar";
 import "./Wishlist.css";
 import ReviewStars from "../../../components/ui/ReviewStars";
 import Tooltip from "../../../components/ui/Tooltip";
-import SortFilterModal from "./SortFilterPopup";
+import SortFilterModal from "../../../components/SortFilterPopup";
 
 export default function Wishlist({isLoggedIn}) {
     const [showToast, setShowToast] = useState(false);
