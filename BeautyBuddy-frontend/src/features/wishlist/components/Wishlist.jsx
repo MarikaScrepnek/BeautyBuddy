@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { useState } from "react";
 
 import { getWishlist, removeFromWishlist, searchWishlist } from "../api/wishlistApi";
+import { FaSort, FaFilter } from "react-icons/fa";
 import AddToRoutineModal from "../../routines/modals/AddToRoutineModal";
 
 import Toast from "../../../components/ui/Toast";
@@ -9,6 +10,8 @@ import Searchbar from "../../../components/ui/Searchbar";
 
 import "./Wishlist.css";
 import ReviewStars from "../../../components/ui/ReviewStars";
+import Tooltip from "../../../components/ui/Tooltip";
+import SortFilterModal from "./SortFilterPopup";
 
 export default function Wishlist({isLoggedIn}) {
     const [showToast, setShowToast] = useState(false);
@@ -19,6 +22,12 @@ export default function Wishlist({isLoggedIn}) {
     const [wishlistError, setWishlistError] = useState("");
 
     const [selectedItem, setSelectedItem] = useState(null);
+
+    const[sortOptionsOpen, setSortOptionsOpen] = useState(false);
+    const sortOptionsRef = useRef(null);
+
+    const[filterOptionsOpen, setFilterOptionsOpen] = useState(false);
+    const filterOptionsRef = useRef(null);
 
     async function loadWishlist() {
     setWishlistLoading(true);
@@ -47,6 +56,14 @@ export default function Wishlist({isLoggedIn}) {
         }
     }
 
+    async function handleSort() {
+        setSortOptionsOpen(!sortOptionsOpen);
+    }
+
+    async function handleFilter() {
+        setFilterOptionsOpen(!filterOptionsOpen);
+    }
+
     useEffect(() => {
         loadWishlist();
     }, []);
@@ -60,9 +77,39 @@ export default function Wishlist({isLoggedIn}) {
         <div className="wishlist-header">
             <h1>Wishlist♥</h1>
             {isLoggedIn && (
+                <>
+                <div className="wishlist-header-actions">
+                    <div className="sort-filter-wrapper" ref={sortOptionsRef}>
+                        <Tooltip message="Sort" position="top">
+                            <button style={{ fontSize: "18px" }} className="sort-button" onClick={handleSort}>
+                                <FaSort />
+                            </button>
+                        </Tooltip>
+                        <SortFilterModal
+                            isOpen={sortOptionsOpen}
+                            onClose={() => setSortOptionsOpen(false)}
+                            type="sort"
+                        />
+                    </div>
+
+                    <div className="sort-filter-wrapper" ref={filterOptionsRef}>
+                        <Tooltip message="Filter" position="top">
+                            <button className="filter-button" onClick={handleFilter}>
+                                <FaFilter />
+                            </button>
+                        </Tooltip>
+                        <SortFilterModal
+                            isOpen={filterOptionsOpen}
+                            onClose={() => setFilterOptionsOpen(false)}
+                            type="filter"
+                        />
+                    </div>
+                </div>
+
                 <span className="wishlist-search">
                     <Searchbar placeholder="Search wishlist..." onSearch={handleSearch} />
                 </span>
+                </>
             )}
         </div>
 

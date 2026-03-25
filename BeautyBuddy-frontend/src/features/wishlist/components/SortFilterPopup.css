@@ -1,0 +1,50 @@
+.sort-filter-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.sort-filter-popup {
+    position: absolute;
+    top: 120%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: 6px;
+    background: #333;
+    color: #ffffff;
+    border-radius: 6px;
+    padding: 8px 0;
+    min-width: 190px;
+    z-index: 20;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.sort-filter-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.sort-filter-item {
+    margin: 0;
+    color: #ffffff;
+}
+
+.sort-filter-button {
+    width: 100%;
+    border: none;
+    background: transparent;
+    color: #ffffff;
+    text-align: left;
+    padding: 6px 12px;
+    font-size: 0.95rem;
+    cursor: pointer;
+}
+
+.sort-filter-button:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.wishlist-header-actions {
+    display: flex;
+    gap: 8px;
+}
