@@ -997,7 +997,7 @@ export default function ProductDetails() {
         </div>
         {addToRoutineOpen && (
             <AddToRoutineModal
-                baseCategory={data.category.baseCategoryName}
+                baseCategoryName={data.category.baseCategoryName}
                 productName={data.name}
                 productId={data.id}
                 shadeName={selectedShade?.shadeName ?? ""}
