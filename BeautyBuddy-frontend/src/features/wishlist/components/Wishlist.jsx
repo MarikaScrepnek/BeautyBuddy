@@ -91,9 +91,12 @@ export default function Wishlist({isLoggedIn}) {
                                 {item.brandName} 
                             </p>
                             {item.shadeName && (
+                                <>
+                                <p style={{textAlign: "center"}}>•</p>
                                 <p style={{textAlign: "center"}}>
-                                    • {item.shadeName}
+                                    {item.shadeName}
                                 </p>
+                                </>
                             )}
                         </div>
                     </div>
