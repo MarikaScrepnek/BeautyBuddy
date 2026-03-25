@@ -20,7 +20,7 @@ export default function AddToRoutineModal({ baseCategoryName, productName, produ
 
     function isProductInRoutine(routine) {
         if (!routine.items) return false;
-        return routine.items.some(p => p.productId === productId);
+        return routine.items.some(p => p.productId === productId && (!shadeName || p.shadeName === shadeName));
     }
 
     async function handleAddToRoutine(routineId, productId, shadeName) {
@@ -34,20 +34,20 @@ export default function AddToRoutineModal({ baseCategoryName, productName, produ
             setMakeupRoutines(prev =>
                 prev.map(r =>
                     r.routineId === routineId
-                        ? { ...r, items: [...(r.items || []), { productId }] }
+                        ? { ...r, items: [...(r.items || []), { productId, shadeName }] }
                         : r
                 )
             );
             setSkincareRoutines(prev =>
                 prev.map(r =>
                     r.routineId === routineId
-                        ? { ...r, items: [...(r.items || []), { productId }] }
+                        ? { ...r, items: [...(r.items || []), { productId, shadeName }] }
                         : r
                 )
             );
             setHaircareRoutine(prev =>
                 prev && prev.routineId === routineId
-                    ? { ...prev, items: [...(prev.items || []), { productId }] }
+                    ? { ...prev, items: [...(prev.items || []), { productId, shadeName }] }
                     : prev
             );
 
@@ -62,9 +62,9 @@ export default function AddToRoutineModal({ baseCategoryName, productName, produ
         }
     }
 
-    async function removeFromRoutine(routineId, productId) {
+    async function removeFromRoutine(routineId, productId, shadeName) {
         try {
-            await deleteRoutineItem(routineId, productId);
+            await deleteRoutineItem(routineId, productId, shadeName);
             setToastMessage("Product removed from routine!");
             setToastType("success");
             setShowToast(true);
@@ -73,20 +73,20 @@ export default function AddToRoutineModal({ baseCategoryName, productName, produ
             setMakeupRoutines(prev =>
                 prev.map(r =>
                     r.routineId === routineId
-                        ? { ...r, items: (r.items || []).filter(item => item.productId !== productId) }
+                        ? { ...r, items: (r.items || []).filter(item => !(item.productId === productId && (!shadeName || item.shadeName === shadeName))) }
                         : r
                 )
             );
             setSkincareRoutines(prev =>
                 prev.map(r =>
                     r.routineId === routineId
-                        ? { ...r, items: (r.items || []).filter(item => item.productId !== productId) }
+                        ? { ...r, items: (r.items || []).filter(item => !(item.productId === productId && (!shadeName || item.shadeName === shadeName))) }
                         : r
                 )
             );
             setHaircareRoutine(prev =>
                 prev && prev.routineId === routineId
-                    ? { ...prev, items: (prev.items || []).filter(item => item.productId !== productId) }
+                    ? { ...prev, items: (prev.items || []).filter(item => !(item.productId === productId && (!shadeName || item.shadeName === shadeName))) }
                     : prev
             );
 
@@ -165,7 +165,7 @@ export default function AddToRoutineModal({ baseCategoryName, productName, produ
                                 {isProductInRoutine(routine) && (
                                     <Tooltip message="Remove from routine">
                                         <button className="add-button"
-                                        onClick={() => removeFromRoutine(routine.routineId, productId)}
+                                        onClick={() => removeFromRoutine(routine.routineId, productId, shadeName)}
                                         >
                                             -
                                         </button>
@@ -197,7 +197,7 @@ export default function AddToRoutineModal({ baseCategoryName, productName, produ
                             {isProductInRoutine(routine) && (
                                 <Tooltip message="Remove from routine">
                                     <button className="add-button"
-                                    onClick={() => removeFromRoutine(routine.routineId, productId)}
+                                    onClick={() => removeFromRoutine(routine.routineId, productId, shadeName)}
                                     >
                                         -
                                     </button>
@@ -227,7 +227,7 @@ export default function AddToRoutineModal({ baseCategoryName, productName, produ
                         {isProductInRoutine(haircareRoutine) && (
                             <Tooltip message="Remove from routine">
                                 <button className="add-button"
-                                onClick={() => removeFromRoutine(haircareRoutine.routineId, productId)}
+                                onClick={() => removeFromRoutine(haircareRoutine.routineId, productId, shadeName)}
                                 >
                                     -
                                 </button>
@@ -270,7 +270,7 @@ export default function AddToRoutineModal({ baseCategoryName, productName, produ
                                         {isProductInRoutine(routine) && (
                                             <Tooltip message="Remove from routine">
                                                 <button className="add-button"
-                                                onClick={() => removeFromRoutine(routine.routineId, productId)}
+                                                onClick={() => removeFromRoutine(routine.routineId, productId, shadeName)}
                                                 >
                                                     -
                                                 </button>
@@ -303,7 +303,7 @@ export default function AddToRoutineModal({ baseCategoryName, productName, produ
                                     {isProductInRoutine(routine) && (
                                         <Tooltip message="Remove from routine">
                                             <button className="add-button"
-                                            onClick={() => removeFromRoutine(routine.routineId, productId)}
+                                            onClick={() => removeFromRoutine(routine.routineId, productId, shadeName)}
                                             >
                                                 -
                                             </button>
@@ -335,7 +335,7 @@ export default function AddToRoutineModal({ baseCategoryName, productName, produ
                                 {isProductInRoutine(haircareRoutine) && (
                                     <Tooltip message="Remove from routine">
                                         <button className="add-button"
-                                        onClick={() => removeFromRoutine(haircareRoutine.routineId, productId)}
+                                        onClick={() => removeFromRoutine(haircareRoutine.routineId, productId, shadeName)}
                                         >
                                             -
                                         </button>

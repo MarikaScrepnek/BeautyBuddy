@@ -87,10 +87,14 @@ export async function getAllRoutineItems() {
     return await response.json();
 }
 
-export async function deleteRoutineItem(routineId,itemId) {
+export async function deleteRoutineItem(routineId,itemId, shadeName) {
     const response = await fetch(`http://localhost:8080/api/routines/${routineId}/${itemId}`, {
         method: "DELETE",
         credentials: "include",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ shadeName }),
     });
     if (!response.ok) {
         throw new Error("Failed to delete routine item");
