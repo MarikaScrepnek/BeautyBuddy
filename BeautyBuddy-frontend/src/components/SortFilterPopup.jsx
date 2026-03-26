@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 
 import "./SortFilterPopup.css";
 
-export default function SortFilterPopup({ isOpen, onClose, type, page, onSelect }) {
+export default function SortFilterPopup({ isOpen, onClose, type, page, onSelect, selectedOption }) {
     const [options, setOptions] = useState([]);
     const popupRef = useRef(null);
 
@@ -50,8 +50,8 @@ export default function SortFilterPopup({ isOpen, onClose, type, page, onSelect 
                     <li key={option} className="sort-filter-item">
                         <button
                             type="button"
-                            className="sort-filter-button"
-                            style={{color:"white"}}
+                            className={`sort-filter-button${selectedOption === option ? " selected" : ""}`}
+                            style={{ color: "white" }}
                             onClick={() => {
                                 onSelect?.(type, option);
                                 onClose?.();

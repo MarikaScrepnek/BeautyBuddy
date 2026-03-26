@@ -44,6 +44,11 @@
     background: rgba(255, 255, 255, 0.1);
 }
 
+.sort-filter-button.selected {
+    background: rgba(255, 255, 255, 0.15);
+    font-weight: 600;
+}
+
 .wishlist-header-actions {
     display: flex;
     gap: 8px;

@@ -107,21 +107,42 @@ export default function Wishlist({isLoggedIn}) {
         }
     }
 
+    function mapSortKeyToOption(key) {
+        switch (key) {
+            case "added_desc":
+                return "Date Added: Newest First";
+            case "added_asc":
+                return "Date Added: Oldest First";
+            case "price_asc":
+                return "Price: Low to High";
+            case "price_desc":
+                return "Price: High to Low";
+            case "rating_desc":
+                return "Rating: High to Low";
+            case "rating_asc":
+                return "Rating: Low to High";
+            default:
+                return null;
+        }
+    }
+
     async function handleSort(option) {
         setSortOptionsOpen(!sortOptionsOpen);
         if (!option) return;
 
         const sortKey = mapSortOptionToKey(option);
-        setCurrentSort(sortKey);
-        await fetchWishlistWithParams({ sortKey });
+        const nextSortKey = sortKey === currentSort ? null : sortKey;
+        setCurrentSort(nextSortKey);
+        await fetchWishlistWithParams({ sortKey: nextSortKey });
     }
 
     async function handleFilter(option) {
         setFilterOptionsOpen(!filterOptionsOpen);
         if (!option) return;
 
-        setCurrentFilter(option);
-        await fetchWishlistWithParams({ filterOption: option });
+        const nextFilter = option === currentFilter ? null : option;
+        setCurrentFilter(nextFilter);
+        await fetchWishlistWithParams({ filterOption: nextFilter });
     }
 
     useEffect(() => {
@@ -151,6 +172,7 @@ export default function Wishlist({isLoggedIn}) {
                             type="sort"
                             page ="wishlist"
                             onSelect={handleSelect}
+                            selectedOption={mapSortKeyToOption(currentSort)}
                         />
                     </div>
 
@@ -166,6 +188,7 @@ export default function Wishlist({isLoggedIn}) {
                             type="filter"
                             page ="wishlist"
                             onSelect={handleSelect}
+                            selectedOption={currentFilter}
                         />
                     </div>
                 </div>
