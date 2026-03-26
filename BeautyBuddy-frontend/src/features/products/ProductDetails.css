@@ -600,3 +600,23 @@
   border-top: 1px solid #f0cef0;
   opacity: 0.3;
 }
+
+.sort-filter-wrapper {
+    position: relative;
+    display: inline-flex;
+    gap: 10px;
+}
+.sort-filter-wrapper button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    color: #333;
+    transition: all 0.3s ease;
+}
+.sort-filter-wrapper button:hover {
+    transform: translateY(-2px);    
+}
+.sort-filter-wrapper button:active {
+    transform: translateY(0);
+}

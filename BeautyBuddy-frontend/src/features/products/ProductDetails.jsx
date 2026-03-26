@@ -26,6 +26,10 @@ import { deleteReview, getReviews, submitReview, editReview } from "../reviews/a
 import { reportProduct } from "./api/productApi";
 import { getQuestionsForProduct, submitQuestion } from "../questions/api/qaApi";
 import { addToBreakoutList } from "../breakout/api/breakoutListApi";
+import Tooltip from "../../components/ui/Tooltip";
+
+import { FaFilter, FaSort } from "react-icons/fa";
+import SortFilterModal from "../../components/SortFilterPopup";
 
 export default function ProductDetails() {
 
@@ -66,6 +70,12 @@ export default function ProductDetails() {
     const [formattedPrice, setFormattedPrice] = useState("");
 
     const[addToRoutineOpen, setAddToRoutineOpen] = useState(false);
+    const [filterOptionsOpen, setFilterOptionsOpen] = useState(false);
+    const filterOptionsRef = useRef(null);
+    const [currentFilter, setCurrentFilter] = useState(null);
+    const [sortOptionsOpen, setSortOptionsOpen] = useState(false);
+    const sortOptionsRef = useRef(null);
+    const [currentSort, setCurrentSort] = useState(null);
 
     // --- Currency localization logic below all hooks ---
     const localeCurrencyMap = {
@@ -490,6 +500,12 @@ export default function ProductDetails() {
             regex.test(part) ? <span key={i} style={{ background: "yellow" }}>{part}</span> : part
         );
     }
+
+    async function handleSelect(type, option) {
+    }
+
+    async function handleSort(option) {
+    }
             
 
   if (loading) return <p className="loading">Loading product details...</p>;
@@ -731,13 +747,50 @@ export default function ProductDetails() {
 
             <hr className="section-divider" />
 
-            <h2 className="reviews-and-questions-header">Search Questions and Reviews</h2>
+            <div style={{display: "flex", gap: "10px", justifyContent: "center"}}>
+
+                <h2 className="reviews-and-questions-header">Questions and Reviews</h2>
+
+                <div className="sort-filter-wrapper" ref={filterOptionsRef}>
+                    <div className="sort-filter-wrapper" ref={sortOptionsRef}>
+                        <Tooltip message="Sort" position="top">
+                            <button style={{ fontSize: "18px" }} className="sort-button" onClick={() => handleSort(null)}>
+                                <FaSort />
+                            </button>
+                        </Tooltip>
+                        <SortFilterModal
+                            isOpen={sortOptionsOpen}
+                            onClose={() => setSortOptionsOpen(false)}
+                            type="sort"
+                            page ="wishlist"
+                            onSelect={handleSelect}
+                            selectedOption={currentSort}
+                        />
+                    </div>
+
+                    <Tooltip message="Filter" position="top">
+                        <button style={{ fontSize: "12px" }} className="filter-button" onClick={() => handleSort(null)}>
+                            <FaFilter />
+                        </button>
+                    </Tooltip>
+                    <SortFilterModal
+                        isOpen={filterOptionsOpen}
+                        onClose={() => setFilterOptionsOpen(false)}
+                        type="sort"
+                        page ="wishlist"
+                        onSelect={handleSelect}
+                        selectedOption={currentFilter}
+                    />
+                </div>
+                
+
+            </div>
 
             <div className="reviews-search-container">
                 <input
                     type="text"
                     className="reviews-search-bar"
-                    placeholder="Enter terms here..."
+                    placeholder="Search questions and reviews..."
                     value={searchInput}
                     onChange={e => setSearchInput(e.target.value)}
                     onKeyDown={e => {
