@@ -63,4 +63,14 @@ public class WishlistController {
         List<WishlistItemDTO> searchResults = wishlistService.searchWishlistItems(userDetails.getEmail(), query);
         return ResponseEntity.ok(searchResults);
     }
+
+    @GetMapping("/sort")
+    public ResponseEntity<List<WishlistItemDTO>> sortWishlist(@RequestParam String type, Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(401).build();
+        }
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        List<WishlistItemDTO> sortedItems = wishlistService.sortWishlist(userDetails.getEmail(), type);
+        return ResponseEntity.ok(sortedItems);
+    }
 }

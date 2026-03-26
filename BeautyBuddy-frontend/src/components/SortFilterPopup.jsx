@@ -2,12 +2,12 @@ import React, { useEffect, useRef, useState } from "react";
 
 import "./SortFilterPopup.css";
 
-export default function SortFilterPopup({ isOpen, onClose, type }) {
+export default function SortFilterPopup({ isOpen, onClose, type, page, onSelect }) {
     const [options, setOptions] = useState([]);
     const popupRef = useRef(null);
 
     useEffect(() => {
-        if (type === "sort") {
+        if (type === "sort" && page === "wishlist") {
             setOptions([
                 "Date Added: Newest First",
                 "Date Added: Oldest First",
@@ -16,7 +16,7 @@ export default function SortFilterPopup({ isOpen, onClose, type }) {
                 "Rating: High to Low",
                 "Rating: Low to High"
             ]);
-        } else if (type === "filter") {
+        } else if (type === "filter" && page === "wishlist") {
             setOptions([
                 "Skincare",
                 "Makeup",
@@ -28,7 +28,7 @@ export default function SortFilterPopup({ isOpen, onClose, type }) {
         } else {
             setOptions([]);
         }
-    }, [type]);
+    }, [type, page]);
 
     useEffect(() => {
         if (!isOpen) return;
@@ -56,6 +56,7 @@ export default function SortFilterPopup({ isOpen, onClose, type }) {
                             className="sort-filter-button"
                             style={{color:"white"}}
                             onClick={() => {
+                                onSelect?.(type, option);
                                 onClose?.();
                             }}
                         >

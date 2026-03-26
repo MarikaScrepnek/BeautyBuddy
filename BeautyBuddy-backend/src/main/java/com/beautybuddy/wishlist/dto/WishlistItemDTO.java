@@ -1,6 +1,7 @@
 package com.beautybuddy.wishlist.dto;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 public record WishlistItemDTO (
     Long id,
@@ -11,5 +12,6 @@ public record WishlistItemDTO (
     String shadeName,
     String imageLink,
     BigDecimal price,
-    BigDecimal rating
+    BigDecimal rating,
+    LocalDateTime dateAdded
 ) {}

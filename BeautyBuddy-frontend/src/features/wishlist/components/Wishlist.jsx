@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useState } from "react";
 
-import { getWishlist, removeFromWishlist, searchWishlist } from "../api/wishlistApi";
+import { getWishlist, removeFromWishlist, searchWishlist, sortWishlist } from "../api/wishlistApi";
 import { FaSort, FaFilter } from "react-icons/fa";
 import AddToRoutineModal from "../../routines/modals/AddToRoutineModal";
 
@@ -56,12 +56,47 @@ export default function Wishlist({isLoggedIn}) {
         }
     }
 
-    async function handleSort() {
-        setSortOptionsOpen(!sortOptionsOpen);
+    function handleSelect(type, option) {
+        if (type === "sort") {
+            handleSort(option);
+        } else if (type === "filter") {
+            handleFilter(option);
+        }
     }
 
-    async function handleFilter() {
+    async function handleSort(option) {
+        setSortOptionsOpen(!sortOptionsOpen);
+        if (option != null) {
+            if (option === "Date Added: Newest First") {
+                sortWishlist("added_desc").then(sorted => setWishlist(sorted));
+            }
+            else if (option === "Date Added: Oldest First") {
+                sortWishlist("added_asc").then(sorted => setWishlist(sorted));
+            }
+            else if (option === "Price: Low to High") {
+                sortWishlist("price_asc").then(sorted => setWishlist(sorted));
+            }
+            else if (option === "Price: High to Low") {
+                sortWishlist("price_desc").then(sorted => setWishlist(sorted));
+            }
+            else if (option === "Rating: High to Low") {
+                sortWishlist("rating_desc").then(sorted => setWishlist(sorted));
+            }
+            else if (option === "Rating: Low to High") {
+                sortWishlist("rating_asc").then(sorted => setWishlist(sorted));
+            }
+        }
+        return;
+    }
+
+    async function handleFilter(option) {
         setFilterOptionsOpen(!filterOptionsOpen);
+        if (option != null) {
+            // Implement filtering logic here based on the selected option
+            // For example, you could filter the wishlist array in state
+            // and then call setWishlist with the filtered array
+        }
+        return;
     }
 
     useEffect(() => {
@@ -81,7 +116,7 @@ export default function Wishlist({isLoggedIn}) {
                 <div className="wishlist-header-actions">
                     <div className="sort-filter-wrapper" ref={sortOptionsRef}>
                         <Tooltip message="Sort" position="top">
-                            <button style={{ fontSize: "18px" }} className="sort-button" onClick={handleSort}>
+                            <button style={{ fontSize: "18px" }} className="sort-button" onClick={() => handleSort(null)}>
                                 <FaSort />
                             </button>
                         </Tooltip>
@@ -89,12 +124,14 @@ export default function Wishlist({isLoggedIn}) {
                             isOpen={sortOptionsOpen}
                             onClose={() => setSortOptionsOpen(false)}
                             type="sort"
+                            page ="wishlist"
+                            onSelect={handleSelect}
                         />
                     </div>
 
                     <div className="sort-filter-wrapper" ref={filterOptionsRef}>
                         <Tooltip message="Filter" position="top">
-                            <button className="filter-button" onClick={handleFilter}>
+                            <button className="filter-button" onClick={() => handleFilter(null)}>
                                 <FaFilter />
                             </button>
                         </Tooltip>
@@ -102,6 +139,8 @@ export default function Wishlist({isLoggedIn}) {
                             isOpen={filterOptionsOpen}
                             onClose={() => setFilterOptionsOpen(false)}
                             type="filter"
+                            page ="wishlist"
+                            onSelect={handleSelect}
                         />
                     </div>
                 </div>

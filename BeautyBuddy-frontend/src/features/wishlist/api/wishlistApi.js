@@ -43,3 +43,14 @@ export async function searchWishlist(query) {
     }
     return res.json();
 }
+
+export async function sortWishlist(type) {
+    const res = await fetch(`http://localhost:8080/api/wishlist/sort?type=${encodeURIComponent(type)}`, {
+        method: "GET",
+        credentials: "include",
+    });
+    if (!res.ok) {
+        throw new Error("Failed to sort wishlist");
+    }
+    return res.json();
+}

@@ -11,8 +11,11 @@ import com.beautybuddy.wishlist.dto.WishlistItemDTO;
 import com.beautybuddy.wishlist.entity.Wishlist;
 import com.beautybuddy.wishlist.entity.WishlistItem;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -79,7 +82,8 @@ public class WishlistService {
                 shadeName,
                 imageLink,
                 product.getPrice(),
-                product.getRating()
+                product.getRating(),
+                item.getCreatedAt()
             ));
         }
 
@@ -111,7 +115,8 @@ public class WishlistService {
                     shadeName,
                     imageLink,
                     product.getPrice(),
-                    product.getRating()
+                    product.getRating(),
+                    item.getCreatedAt()
                 ));
             }
         }
@@ -139,5 +144,58 @@ public class WishlistService {
         } else {
             throw new RuntimeException("Wishlist item not found");
         }
+    }
+
+    public List<WishlistItemDTO> sortWishlist (String email, String type) {
+        List<WishlistItem> items = wishlistItemRepository.findByWishlist_User_Email(email);
+        List<WishlistItemDTO> result = new ArrayList<>();
+
+        for (WishlistItem item : items) {
+            Product product = item.getProduct();
+            ProductShade shade = item.getShade();
+            String shadeName = shade != null ? shade.getShadeName() : null;
+            String imageLink = shade != null && shade.getImageLink() != null
+                ? shade.getImageLink()
+                : product.getImageLink();
+
+            result.add(new WishlistItemDTO(
+                item.getId(),
+                product.getId(),
+                product.getName(),
+                product.getCategory().getBaseCategory().getName(),
+                product.getBrand().getName(),
+                shadeName,
+                imageLink,
+                product.getPrice(),
+                product.getRating(),
+                item.getCreatedAt()
+            ));
+        }
+
+        if (type.equals("price_asc")) {
+            result.sort((a, b) -> a.price().compareTo(b.price()));
+        } else if (type.equals("price_desc")) {
+            result.sort((a, b) -> b.price().compareTo(a.price()));
+        } else if (type.equals("rating_desc")) {
+            result.sort(
+                Comparator.comparing(
+                    WishlistItemDTO::rating,
+                    Comparator.nullsFirst(BigDecimal::compareTo)
+                ).reversed()
+            );
+        } else if (type.equals("rating_asc")) {
+            result.sort(
+                Comparator.comparing(
+                    WishlistItemDTO::rating,
+                    Comparator.nullsLast(BigDecimal::compareTo)
+                )
+            );
+        } else if (type.equals("added_asc")) {
+            result.sort((a, b) -> a.dateAdded().compareTo(b.dateAdded()));
+        } else if (type.equals("added_desc")) {
+            result.sort((a, b) -> b.dateAdded().compareTo(a.dateAdded()));
+        }
+
+        return result;
     }
 }
