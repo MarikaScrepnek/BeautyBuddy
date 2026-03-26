@@ -12,6 +12,7 @@ import "./Wishlist.css";
 import ReviewStars from "../../../components/ui/ReviewStars";
 import Tooltip from "../../../components/ui/Tooltip";
 import SortFilterModal from "../../../components/SortFilterPopup";
+import { useNavigate } from "react-router-dom";
 
 export default function Wishlist({isLoggedIn}) {
     const [showToast, setShowToast] = useState(false);
@@ -32,6 +33,8 @@ export default function Wishlist({isLoggedIn}) {
 
     const [filterOptionsOpen, setFilterOptionsOpen] = useState(false);
     const filterOptionsRef = useRef(null);
+
+    const navigate = useNavigate();
 
     function getFilterParams(filterOption) {
         let category = null;
@@ -214,7 +217,7 @@ export default function Wishlist({isLoggedIn}) {
                 style={{scrollBehavior: 'smooth'}}
             >
                 {wishlist.map((item) => (
-                    <div className="wishlist-item-card" key={item.id}>
+                    <div className="wishlist-item-card" key={item.id} style={{ cursor: "pointer" }} onClick={() => navigate(`/products/${item.productId}`)}>
 
                     <div className="wishlist-item-header">
                         <h2 style={{ fontSize: "1.25rem", textAlign: "center" }}>
@@ -250,14 +253,21 @@ export default function Wishlist({isLoggedIn}) {
 
                         <div className="wishlist-actions">
 
-                            <div className="action-icon" onClick={() => setSelectedItem(item)}>
+                            <div
+                                className="action-icon"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setSelectedItem(item);
+                                }}
+                            >
                                 <span style={{ color: "#1a8ec4" }} className="icon">+</span>
                                 <span className="tooltip">Add to routine</span>
                             </div>
 
                             <div
                                 className="action-icon"
-                                onClick={() => {
+                                onClick={(e) => {
+                                    e.stopPropagation();
                                     removeFromWishlist(item.productId, item.shadeName).then(() => {
                                         setWishlist(prev =>
                                             prev.filter(
