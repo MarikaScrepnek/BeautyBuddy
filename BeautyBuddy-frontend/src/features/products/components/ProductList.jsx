@@ -151,6 +151,21 @@ export default function ProductList({ searchQuery, onLoadingChange }) {
   const [exchangeRate, setExchangeRate] = useState(1);
   const [priceMap, setPriceMap] = useState({});
 
+  async function handleInlineReviewSubmitted(productId) {
+    try {
+      const res = await fetch(`http://localhost:8080/api/products/${productId}`);
+      if (!res.ok) return;
+      const updated = await res.json();
+      setProducts(prev =>
+        prev.map(p =>
+          p.id === productId ? { ...p, rating: updated.rating } : p
+        )
+      );
+    } catch (err) {
+      console.error("Failed to refresh product rating", err);
+    }
+  }
+
   useEffect(() => {
     const query = searchQuery || "";
     setLoading(true);
@@ -223,7 +238,12 @@ export default function ProductList({ searchQuery, onLoadingChange }) {
                 {p.price ? `≈ ${priceMap[p.id]}` : "Price: N/A"}
               </p>
               <div onClick={(e) => e.stopPropagation()}>
-                <ReviewStars rating={p.rating} />
+                <ReviewStars
+                  rating={p.rating}
+                  productId={p.id}
+                  shadeName={p.shadeName}
+                  onReviewSubmitted={() => handleInlineReviewSubmitted(p.id)}
+                />
               </div>
               <div className="wishlist-actions">
 
