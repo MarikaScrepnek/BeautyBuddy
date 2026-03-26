@@ -58,6 +58,10 @@ public class ReviewService {
             shade = productShadeRepository.findByProductAndShadeName(product, review.shadeName())
                 .orElseThrow(() -> new RuntimeException("Shade not found"));
         }
+        if (product.getProductShades() != null && shade == null) {
+            shade = productShadeRepository.findByProductAndShadeNumber(product, 1)
+                .orElseThrow(() -> new RuntimeException("Default shade not found"));
+        }
         BigDecimal rating = review.rating();
         String reviewTitle = review.title();
         String reviewText = review.text();
