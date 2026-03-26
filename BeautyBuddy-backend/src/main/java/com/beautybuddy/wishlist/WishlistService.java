@@ -90,6 +90,82 @@ public class WishlistService {
         return result;
     }
 
+    public List<WishlistItemDTO> getWishlist(
+        String username,
+        String sort,          // e.g. "price_asc", "rating_desc", "added_desc"
+        String query,         // optional search
+        String category,      // optional category filter
+        String priceRange     // optional price range filter
+) {
+    List<WishlistItemDTO> items = getWishlistItems(username);
+
+    // 1) filtering
+    List<WishlistItemDTO> filtered = new ArrayList<>();
+    for (WishlistItemDTO dto : items) {
+        if (query != null && !query.isBlank()) {
+            String q = query.toLowerCase();
+            boolean matches =
+                    dto.productName().toLowerCase().contains(q) ||
+                    dto.brandName().toLowerCase().contains(q) ||
+                    (dto.shadeName() != null && dto.shadeName().toLowerCase().contains(q));
+            if (!matches) continue;
+        }
+
+        if (category != null && !category.isBlank()) {
+            if (!dto.baseCategoryName().equalsIgnoreCase(category)) continue;
+        }
+
+        if (priceRange != null) {
+            BigDecimal price = dto.price();
+            switch (priceRange) {
+                case "below_20":
+                    if (price.compareTo(new BigDecimal("20")) >= 0) continue;
+                    break;
+                case "20_50":
+                    if (price.compareTo(new BigDecimal("20")) < 0 ||
+                        price.compareTo(new BigDecimal("50")) > 0) continue;
+                    break;
+                case "above_50":
+                    if (price.compareTo(new BigDecimal("50")) <= 0) continue;
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        filtered.add(dto);
+    }
+
+    // 2) sorting
+    if (sort != null) {
+        switch (sort) {
+            case "price_asc" -> filtered.sort((a, b) -> a.price().compareTo(b.price()));
+            case "price_desc" -> filtered.sort((a, b) -> b.price().compareTo(a.price()));
+            case "rating_desc" -> filtered.sort((a, b) -> {
+                BigDecimal ra = a.rating();
+                BigDecimal rb = b.rating();
+                if (ra == null && rb == null) return 0;
+                if (ra == null) return 1;
+                if (rb == null) return -1;
+                return rb.compareTo(ra);
+            });
+            case "rating_asc" -> filtered.sort((a, b) -> {
+                BigDecimal ra = a.rating();
+                BigDecimal rb = b.rating();
+                if (ra == null && rb == null) return 0;
+                if (ra == null) return 1;
+                if (rb == null) return -1;
+                return ra.compareTo(rb);
+            });
+            case "added_asc" -> filtered.sort((a, b) -> a.dateAdded().compareTo(b.dateAdded()));
+            case "added_desc" -> filtered.sort((a, b) -> b.dateAdded().compareTo(a.dateAdded()));
+            default -> { }
+        }
+    }
+
+    return filtered;
+    }
+
     public List<WishlistItemDTO> searchWishlistItems(String username, String query) {
         List<WishlistItem> items = wishlistItemRepository.findByWishlist_User_Email(username);
         List<WishlistItemDTO> result = new ArrayList<>();

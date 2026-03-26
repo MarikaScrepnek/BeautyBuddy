@@ -45,12 +45,21 @@ public class WishlistController {
     }
 
     @GetMapping
-    public ResponseEntity<List<WishlistItemDTO>> getWishlist(Authentication authentication) {
+    public ResponseEntity<List<WishlistItemDTO>> getWishlist(
+            @RequestParam(required = false) String sort,
+            @RequestParam(required = false) String query,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String priceRange,
+            Authentication authentication) {
+
         if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.status(401).build();
         }
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        List<WishlistItemDTO> wishlistItems = wishlistService.getWishlistItems(userDetails.getEmail());
+
+        List<WishlistItemDTO> wishlistItems =
+                wishlistService.getWishlist(userDetails.getEmail(), sort, query, category, priceRange);
+
         return ResponseEntity.ok(wishlistItems);
     }
 

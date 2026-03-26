@@ -22,35 +22,22 @@ export async function removeFromWishlist(productId, shadeName) {
     return res.ok;
 }
 
-export async function getWishlist() {
-    const res = await fetch("http://localhost:8080/api/wishlist", {
-        method: "GET",
-        credentials: "include",
-    });
-    if (!res.ok) {
-        throw new Error("Failed to fetch wishlist");
-    }
-    return res.json();
-}
+export async function getWishlist({ sort, category, priceRange, query } = {}) {
+  const params = new URLSearchParams();
+  if (sort) params.set("sort", sort);
+  if (category) params.set("category", category);
+  if (priceRange) params.set("priceRange", priceRange);
+  if (query) params.set("query", query);
 
-export async function searchWishlist(query) {
-    const res = await fetch(`http://localhost:8080/api/wishlist/search?query=${encodeURIComponent(query)}`, {
-        method: "GET",
-        credentials: "include",
-    });
-    if (!res.ok) {
-        throw new Error("Failed to search wishlist");
-    }
-    return res.json();
-}
+  const qs = params.toString();
+  const url = qs
+    ? `http://localhost:8080/api/wishlist?${qs}`
+    : "http://localhost:8080/api/wishlist";
 
-export async function sortWishlist(type) {
-    const res = await fetch(`http://localhost:8080/api/wishlist/sort?type=${encodeURIComponent(type)}`, {
-        method: "GET",
-        credentials: "include",
-    });
-    if (!res.ok) {
-        throw new Error("Failed to sort wishlist");
-    }
-    return res.json();
+  const res = await fetch(url, {
+    method: "GET",
+    credentials: "include",
+  });
+  if (!res.ok) throw new Error("Failed to fetch wishlist");
+  return res.json();
 }

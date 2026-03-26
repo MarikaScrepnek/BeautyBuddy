@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useState } from "react";
 
-import { getWishlist, removeFromWishlist, searchWishlist, sortWishlist } from "../api/wishlistApi";
+import { getWishlist, removeFromWishlist } from "../api/wishlistApi";
 import { FaSort, FaFilter } from "react-icons/fa";
 import AddToRoutineModal from "../../routines/modals/AddToRoutineModal";
 
@@ -18,42 +18,66 @@ export default function Wishlist({isLoggedIn}) {
     const toastTime = 1000;
 
     const [wishlist, setWishlist] = useState([]);
+    const [currentSort, setCurrentSort] = useState(null);      // backend sort key, e.g. "price_asc"
+    const [currentFilter, setCurrentFilter] = useState(null);  // popup label, e.g. "Skincare" or "Below $20"
+    const [currentQuery, setCurrentQuery] = useState("");
+
     const [wishlistLoading, setWishlistLoading] = useState(false);
     const [wishlistError, setWishlistError] = useState("");
 
     const [selectedItem, setSelectedItem] = useState(null);
 
-    const[sortOptionsOpen, setSortOptionsOpen] = useState(false);
+    const [sortOptionsOpen, setSortOptionsOpen] = useState(false);
     const sortOptionsRef = useRef(null);
 
-    const[filterOptionsOpen, setFilterOptionsOpen] = useState(false);
+    const [filterOptionsOpen, setFilterOptionsOpen] = useState(false);
     const filterOptionsRef = useRef(null);
 
-    async function loadWishlist() {
-    setWishlistLoading(true);
-    setWishlistError("");
-    try {
-        const items = await getWishlist();
-        setWishlist(items);
-    } catch (err) {
-        setWishlistError("Failed to load wishlist.");
-        setWishlist([]);
-    } finally {
-        setWishlistLoading(false);
+    function getFilterParams(filterOption) {
+        let category = null;
+        let priceRange = null;
+
+        switch (filterOption) {
+            case "Skincare":
+            case "Makeup":
+            case "Haircare":
+                category = filterOption;
+                break;
+        }
+
+        return { category, priceRange };
     }
-    };
+
+    async function fetchWishlistWithParams({ sortKey = currentSort, filterOption = currentFilter, query = currentQuery } = {}) {
+        setWishlistLoading(true);
+        setWishlistError("");
+        try {
+            const { category, priceRange } = getFilterParams(filterOption);
+            const items = await getWishlist({
+                sort: sortKey,
+                category,
+                priceRange,
+                query,
+            });
+            setWishlist(items);
+        } catch (err) {
+            setWishlistError("Failed to load wishlist.");
+            setWishlist([]);
+        } finally {
+            setWishlistLoading(false);
+        }
+    }
+
+    async function loadWishlist() {
+        setCurrentSort(null);
+        setCurrentFilter(null);
+        setCurrentQuery("");
+        await fetchWishlistWithParams({ sortKey: null, filterOption: null, query: "" });
+    }
 
     async function handleSearch(query) {
-        if (query.trim() === "") {
-            loadWishlist();
-        } else {
-            try {
-                const results = await searchWishlist(query);    
-                setWishlist(results);
-            } catch (err) {
-                setWishlistError("Search failed.");
-            }
-        }
+        setCurrentQuery(query);
+        await fetchWishlistWithParams({ query });
     }
 
     function handleSelect(type, option) {
@@ -64,39 +88,40 @@ export default function Wishlist({isLoggedIn}) {
         }
     }
 
+    function mapSortOptionToKey(option) {
+        switch (option) {
+            case "Date Added: Newest First":
+                return "added_desc";
+            case "Date Added: Oldest First":
+                return "added_asc";
+            case "Price: Low to High":
+                return "price_asc";
+            case "Price: High to Low":
+                return "price_desc";
+            case "Rating: High to Low":
+                return "rating_desc";
+            case "Rating: Low to High":
+                return "rating_asc";
+            default:
+                return null;
+        }
+    }
+
     async function handleSort(option) {
         setSortOptionsOpen(!sortOptionsOpen);
-        if (option != null) {
-            if (option === "Date Added: Newest First") {
-                sortWishlist("added_desc").then(sorted => setWishlist(sorted));
-            }
-            else if (option === "Date Added: Oldest First") {
-                sortWishlist("added_asc").then(sorted => setWishlist(sorted));
-            }
-            else if (option === "Price: Low to High") {
-                sortWishlist("price_asc").then(sorted => setWishlist(sorted));
-            }
-            else if (option === "Price: High to Low") {
-                sortWishlist("price_desc").then(sorted => setWishlist(sorted));
-            }
-            else if (option === "Rating: High to Low") {
-                sortWishlist("rating_desc").then(sorted => setWishlist(sorted));
-            }
-            else if (option === "Rating: Low to High") {
-                sortWishlist("rating_asc").then(sorted => setWishlist(sorted));
-            }
-        }
-        return;
+        if (!option) return;
+
+        const sortKey = mapSortOptionToKey(option);
+        setCurrentSort(sortKey);
+        await fetchWishlistWithParams({ sortKey });
     }
 
     async function handleFilter(option) {
         setFilterOptionsOpen(!filterOptionsOpen);
-        if (option != null) {
-            // Implement filtering logic here based on the selected option
-            // For example, you could filter the wishlist array in state
-            // and then call setWishlist with the filtered array
-        }
-        return;
+        if (!option) return;
+
+        setCurrentFilter(option);
+        await fetchWishlistWithParams({ filterOption: option });
     }
 
     useEffect(() => {

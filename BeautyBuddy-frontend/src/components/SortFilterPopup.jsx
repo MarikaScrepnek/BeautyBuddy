@@ -20,10 +20,7 @@ export default function SortFilterPopup({ isOpen, onClose, type, page, onSelect 
             setOptions([
                 "Skincare",
                 "Makeup",
-                "Haircare",
-                "Below $20",
-                "$20 - $50",
-                "Above $50"
+                "Haircare"
             ]);
         } else {
             setOptions([]);
