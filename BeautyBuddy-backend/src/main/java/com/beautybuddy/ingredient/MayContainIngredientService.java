@@ -7,8 +7,8 @@ import com.beautybuddy.ingredient.entity.Ingredient;
 import com.beautybuddy.ingredient.entity.MayContainIngredient;
 import com.beautybuddy.ingredient.repo.IngredientRepository;
 import com.beautybuddy.ingredient.repo.MayContainIngredientRepository;
-import com.beautybuddy.product.Product;
-import com.beautybuddy.product.ProductRepository;
+import com.beautybuddy.product.entity.Product;
+import com.beautybuddy.product.repo.ProductRepository;
 
 import java.util.Locale;
 

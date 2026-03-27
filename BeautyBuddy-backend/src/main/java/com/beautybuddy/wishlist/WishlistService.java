@@ -1,9 +1,9 @@
 package com.beautybuddy.wishlist;
 
-import com.beautybuddy.product.Product;
-import com.beautybuddy.product.ProductRepository;
-import com.beautybuddy.product.ProductShade;
-import com.beautybuddy.product.ProductShadeRepository;
+import com.beautybuddy.product.entity.Product;
+import com.beautybuddy.product.entity.ProductShade;
+import com.beautybuddy.product.repo.ProductRepository;
+import com.beautybuddy.product.repo.ProductShadeRepository;
 import com.beautybuddy.user.UserRepository;
 import com.beautybuddy.user.entity.User;
 import com.beautybuddy.wishlist.dto.AddToWishlistRequestDTO;

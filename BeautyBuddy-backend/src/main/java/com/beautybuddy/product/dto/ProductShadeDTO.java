@@ -1,4 +1,4 @@
-package com.beautybuddy.product;
+package com.beautybuddy.product.dto;
 
 public record ProductShadeDTO (
     String shadeName,

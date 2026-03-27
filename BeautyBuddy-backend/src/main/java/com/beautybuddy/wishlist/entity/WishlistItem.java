@@ -1,8 +1,8 @@
 package com.beautybuddy.wishlist.entity;
 
 import com.beautybuddy.common.entity.BaseEntity;
-import com.beautybuddy.product.Product;
-import com.beautybuddy.product.ProductShade;
+import com.beautybuddy.product.entity.Product;
+import com.beautybuddy.product.entity.ProductShade;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;

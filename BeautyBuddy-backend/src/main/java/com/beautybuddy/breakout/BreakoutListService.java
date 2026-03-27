@@ -16,8 +16,8 @@ import com.beautybuddy.common.DTOMapper;
 import com.beautybuddy.ingredient.dto.IngredientDTO;
 import com.beautybuddy.ingredient.entity.Ingredient;
 import com.beautybuddy.ingredient.repo.IngredientRepository;
-import com.beautybuddy.product.Product;
-import com.beautybuddy.product.ProductRepository;
+import com.beautybuddy.product.entity.Product;
+import com.beautybuddy.product.repo.ProductRepository;
 import com.beautybuddy.user.UserRepository;
 import com.beautybuddy.user.entity.User;
 

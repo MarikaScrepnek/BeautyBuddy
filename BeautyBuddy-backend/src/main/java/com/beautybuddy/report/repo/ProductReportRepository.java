@@ -4,7 +4,7 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.beautybuddy.product.Product;
+import com.beautybuddy.product.entity.Product;
 import com.beautybuddy.report.entity.ProductReport;
 import com.beautybuddy.user.entity.User;
 

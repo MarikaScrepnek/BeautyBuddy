@@ -1,4 +1,4 @@
-package com.beautybuddy.product;
+package com.beautybuddy.product.dto;
 
 import java.math.BigDecimal;
 import java.util.List;

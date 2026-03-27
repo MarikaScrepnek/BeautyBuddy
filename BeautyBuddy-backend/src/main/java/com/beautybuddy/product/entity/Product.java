@@ -1,4 +1,4 @@
-package com.beautybuddy.product;
+package com.beautybuddy.product.entity;
 
 import jakarta.persistence.*;
 

@@ -1,7 +1,9 @@
 package com.beautybuddy.review;
 
-import com.beautybuddy.product.ProductRepository;
-import com.beautybuddy.product.ProductShadeRepository;
+import com.beautybuddy.product.entity.Product;
+import com.beautybuddy.product.entity.ProductShade;
+import com.beautybuddy.product.repo.ProductRepository;
+import com.beautybuddy.product.repo.ProductShadeRepository;
 import com.beautybuddy.report.repo.ReviewReportRepository;
 import com.beautybuddy.review.dto.DisplayReviewDTO;
 import com.beautybuddy.review.dto.SubmitReviewDTO;
@@ -14,9 +16,6 @@ import com.beautybuddy.review.dto.EditReviewDTO;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.beautybuddy.product.Product;
-import com.beautybuddy.product.ProductShade;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

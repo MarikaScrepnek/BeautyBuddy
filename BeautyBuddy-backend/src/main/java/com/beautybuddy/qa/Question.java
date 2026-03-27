@@ -1,7 +1,7 @@
 package com.beautybuddy.qa;
 
 import com.beautybuddy.common.entity.UserWrittenEntity;
-import com.beautybuddy.product.Product;
+import com.beautybuddy.product.entity.Product;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

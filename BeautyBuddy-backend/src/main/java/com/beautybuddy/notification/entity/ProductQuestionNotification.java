@@ -1,7 +1,7 @@
 package com.beautybuddy.notification.entity;
 
 import com.beautybuddy.notification.BaseNotificationType;
-import com.beautybuddy.product.Product;
+import com.beautybuddy.product.entity.Product;
 import com.beautybuddy.qa.Question;
 
 import jakarta.persistence.Entity;

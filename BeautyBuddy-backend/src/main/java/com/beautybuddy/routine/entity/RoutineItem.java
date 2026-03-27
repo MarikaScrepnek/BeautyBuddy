@@ -1,7 +1,7 @@
 package com.beautybuddy.routine.entity;
 
-import com.beautybuddy.product.Product;
-import com.beautybuddy.product.ProductShade;
+import com.beautybuddy.product.entity.Product;
+import com.beautybuddy.product.entity.ProductShade;
 
 import java.time.LocalDateTime;
 

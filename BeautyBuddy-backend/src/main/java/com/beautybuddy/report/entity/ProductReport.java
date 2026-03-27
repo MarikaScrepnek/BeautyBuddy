@@ -1,7 +1,7 @@
 package com.beautybuddy.report.entity;
 
+import com.beautybuddy.product.entity.Product;
 import com.beautybuddy.report.BaseReport;
-import com.beautybuddy.product.Product;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;

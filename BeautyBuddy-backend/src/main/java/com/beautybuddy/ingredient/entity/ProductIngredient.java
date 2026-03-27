@@ -1,7 +1,7 @@
 package com.beautybuddy.ingredient.entity;
 
-import com.beautybuddy.product.Product;
 import com.beautybuddy.common.entity.BaseEntity;
+import com.beautybuddy.product.entity.Product;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

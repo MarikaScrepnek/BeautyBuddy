@@ -3,7 +3,7 @@ package com.beautybuddy.routine.dto;
 import java.math.BigDecimal;
 import java.util.List;
 
-import com.beautybuddy.product.ProductShadeDTO;
+import com.beautybuddy.product.dto.ProductShadeDTO;
 
 public record DisplayRoutineItemDTO(
     Long id,
