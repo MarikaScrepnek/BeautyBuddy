@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 
 import "./SortFilterPopup.css";
 
-export default function SortFilterPopup({ isOpen, onClose, type, page, onSelect, selectedOption }) {
+export default function SortFilterPopup({ isOpen, onClose, type, page, onSelect, selectedOption, shades=null }) {
     const [options, setOptions] = useState([]);
     const popupRef = useRef(null);
 
@@ -22,6 +22,17 @@ export default function SortFilterPopup({ isOpen, onClose, type, page, onSelect,
                 "Makeup",
                 "Haircare"
             ]);
+            
+        } else if (type === "sort" && page === "productDetails") {
+            setOptions([
+                "Most Helpful",
+                "Newest",
+                "Oldest",
+                "Highest Rating",
+                "Lowest Rating"
+            ]);
+        } else if (type === "filter" && page === "productDetails") {
+            setOptions(shades?.map(s => s.shadeName) || []);
         } else {
             setOptions([]);
         }

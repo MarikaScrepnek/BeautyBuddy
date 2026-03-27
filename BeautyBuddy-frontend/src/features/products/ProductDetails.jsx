@@ -501,10 +501,26 @@ export default function ProductDetails() {
         );
     }
 
-    async function handleSelect(type, option) {
+    async function handleSort(option) {
+        setSortOptionsOpen(prev => !prev);
+        if (!option) return;
+
+        setCurrentSort(option);
     }
 
-    async function handleSort(option) {
+    async function handleFilter(option) {
+        setFilterOptionsOpen(prev => !prev);
+        if (!option) return;
+
+        setCurrentFilter(option);
+    }
+
+    function handleSelect(type, option) {
+        if (type === "sort") {
+            handleSort(option);
+        } else if (type === "filter") {
+            handleFilter(option);
+        }
     }
             
 
@@ -751,7 +767,7 @@ export default function ProductDetails() {
 
                 <h2 className="reviews-and-questions-header">Questions and Reviews</h2>
 
-                <div className="sort-filter-wrapper" ref={filterOptionsRef}>
+                <div style={{display: "flex", gap: "10px"}}>
                     <div className="sort-filter-wrapper" ref={sortOptionsRef}>
                         <Tooltip message="Sort" position="top">
                             <button style={{ fontSize: "18px" }} className="sort-button" onClick={() => handleSort(null)}>
@@ -762,25 +778,30 @@ export default function ProductDetails() {
                             isOpen={sortOptionsOpen}
                             onClose={() => setSortOptionsOpen(false)}
                             type="sort"
-                            page ="wishlist"
+                            page ="productDetails"
                             onSelect={handleSelect}
                             selectedOption={currentSort}
                         />
                     </div>
 
-                    <Tooltip message="Filter" position="top">
-                        <button style={{ fontSize: "12px" }} className="filter-button" onClick={() => handleSort(null)}>
-                            <FaFilter />
-                        </button>
-                    </Tooltip>
-                    <SortFilterModal
-                        isOpen={filterOptionsOpen}
-                        onClose={() => setFilterOptionsOpen(false)}
-                        type="sort"
-                        page ="wishlist"
-                        onSelect={handleSelect}
-                        selectedOption={currentFilter}
-                    />
+                    {data.shades?.length > 0 && (
+                        <div className="sort-filter-wrapper" ref={filterOptionsRef}>
+                        <Tooltip message="Filter" position="top">
+                            <button style={{ fontSize: "12px" }} className="filter-button" onClick={() => handleFilter(null)}>
+                                <FaFilter />
+                            </button>
+                        </Tooltip>
+                        <SortFilterModal
+                            isOpen={filterOptionsOpen}
+                            onClose={() => setFilterOptionsOpen(false)}
+                            type="filter"
+                            page ="productDetails"
+                            onSelect={handleSelect}
+                            selectedOption={currentFilter}
+                            shades={data.shades}
+                        />
+                        </div>
+                    )}
                 </div>
                 
 
@@ -1057,6 +1078,7 @@ export default function ProductDetails() {
                 onClose={() => setAddToRoutineOpen(false)}
             />
         )}
+
     </div>
   );
 }
