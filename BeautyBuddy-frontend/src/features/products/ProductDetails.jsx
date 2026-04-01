@@ -1050,6 +1050,8 @@ export default function ProductDetails() {
                                                 avatar={review.reviewerProfilePicture}
                                                 upvoteCount={review.upvoteCount}
                                                 isUpvoted={review.hasUpvoted}
+                                                isLoggedIn={isLoggedIn}
+                                                onRequireLogin={() => setShowLoginModal(true)}
                                                 searchTerm={searchQuery}
                                             />
                                         ))}

@@ -283,6 +283,8 @@ export default function ReviewList({ productId, refreshKey, onEditReview, onRequ
 						isPending={isPending}
 						isUpvoted={isUpvoted}
 						upvoteCount={upvoteCount}
+						isLoggedIn={Boolean(currentUser)}
+						onRequireLogin={onRequireLogin}
 						onEdit={
 							typeof onEditReview === "function"
 								? onEditReview

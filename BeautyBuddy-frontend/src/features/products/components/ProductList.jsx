@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { getExchangeRate } from "../api/productApi";
 import { useNavigate } from "react-router-dom";
+import AuthModal from "../../auth/modals/AuthModal";
+import { getCurrentUser } from "../../auth/api/authApi";
 
 import './ProductList.css';
 import ReviewStars from "../../../components/ui/ReviewStars";
@@ -16,6 +18,8 @@ export default function ProductList({ searchQuery, onLoadingChange }) {
   const [wishlistItems, setWishlistItems] = useState([]);
   const [breakoutListItems, setBreakoutListItems] = useState([]);
   const [routineItems, setRoutineItems] = useState([]);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   const[showToast, setShowToast] = useState(false);
   const[toastMessage, setToastMessage] = useState("");
@@ -63,6 +67,30 @@ export default function ProductList({ searchQuery, onLoadingChange }) {
   function isInRoutine(productId) {
     return routineItems.includes(productId);
   }
+
+  useEffect(() => {
+    getCurrentUser()
+      .then(() => setIsLoggedIn(true))
+      .catch(() => setIsLoggedIn(false));
+
+    const handleAuthLogin = () => {
+      setIsLoggedIn(true);
+    };
+
+    const handleAuthLogout = () => {
+      setIsLoggedIn(false);
+      setWishlistItems([]);
+      setBreakoutListItems([]);
+      setRoutineItems([]);
+    };
+
+    window.addEventListener("auth:login", handleAuthLogin);
+    window.addEventListener("auth:logout", handleAuthLogout);
+    return () => {
+      window.removeEventListener("auth:login", handleAuthLogin);
+      window.removeEventListener("auth:logout", handleAuthLogout);
+    };
+  }, []);
 
   function handleRoutineChange(action, productId) {
     setRoutineItems(prev => {
@@ -209,10 +237,17 @@ export default function ProductList({ searchQuery, onLoadingChange }) {
   }, [products, exchangeRate, userLocale, userCurrency]);
 
   useEffect(() => {
+    if (!isLoggedIn) {
+      setWishlistItems([]);
+      setBreakoutListItems([]);
+      setRoutineItems([]);
+      return;
+    }
+
     fetchWishlistItems();
     fetchBreakoutListItems();
     fetchRoutineItems();
-  }, []);
+  }, [isLoggedIn]);
 
   if (loading) {
     return <div className="loading">Loading products...</div>;
@@ -220,6 +255,15 @@ export default function ProductList({ searchQuery, onLoadingChange }) {
 
   return (
     <div className="product-grid">
+      {showLoginModal && (
+        <AuthModal
+          onClose={() => setShowLoginModal(false)}
+          onLoginSuccess={() => {
+            setIsLoggedIn(true);
+            setShowLoginModal(false);
+          }}
+        />
+      )}
       {products.map(p => (
         <div className="product-card-home" key={p.id} onClick={() => navigate(`/products/${p.id}`)}>
           {p.image_link && (
@@ -242,7 +286,10 @@ export default function ProductList({ searchQuery, onLoadingChange }) {
                   rating={p.rating}
                   productId={p.id}
                   shadeName={p.shadeName}
+                  locked={!isLoggedIn}
+                  onRequireLogin={() => setShowLoginModal(true)}
                   onReviewSubmitted={() => handleInlineReviewSubmitted(p.id)}
+                  
                 />
               </div>
               <div className="wishlist-actions">
@@ -251,6 +298,10 @@ export default function ProductList({ searchQuery, onLoadingChange }) {
                     className="action-icon"
                     onClick={(e) => {
                       e.stopPropagation();
+                      if (!isLoggedIn) {
+                        setShowLoginModal(true);
+                        return;
+                      }
                       handleToggleWishlist(p.id);
                     }}
                   >
@@ -271,6 +322,10 @@ export default function ProductList({ searchQuery, onLoadingChange }) {
                     className="action-icon"
                     onClick={(e) => {
                       e.stopPropagation();
+                      if (!isLoggedIn) {
+                        setShowLoginModal(true);
+                        return;
+                      }
                       setSelectedItemRoutine(p);
                     }}
                   >
@@ -291,6 +346,10 @@ export default function ProductList({ searchQuery, onLoadingChange }) {
                     className="action-icon"
                     onClick={(e) => {
                       e.stopPropagation();
+                      if (!isLoggedIn) {
+                        setShowLoginModal(true);
+                        return;
+                      }
                       handleToggleBreakoutList(p.id);
                     }}
                   >

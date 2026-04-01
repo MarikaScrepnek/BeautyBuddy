@@ -9,6 +9,8 @@ export default function ReviewStars({
   rating = 0,
   reviewId = null,
   disabled = false,
+  locked = false,
+  onRequireLogin,
   tooltipText = "Submit a rating",
   ariaLabel = "Rate this product",
   onReviewSubmitted,
@@ -71,11 +73,16 @@ export default function ReviewStars({
             type="button"
             className="rating-star-btn"
             aria-label={`Rate ${i} star${i > 1 ? "s" : ""}`}
-            style={{ cursor: disabled ? "default" : "pointer" }}
             onMouseMove={(e) => !disabled && setHover(getStarValueFromEvent(e, i))}
             onMouseEnter={(e) => !disabled && setHover(getStarValueFromEvent(e, i))}
             onMouseLeave={() => !disabled && setHover(null)}
             onClick={(e) => {
+              if (locked) {
+                e.stopPropagation();
+                onRequireLogin?.();
+                return;
+              }
+
               if (!disabled) {
                 e.stopPropagation();
                 setIsSubmitting(true);
@@ -83,7 +90,7 @@ export default function ReviewStars({
                 setIsSubmitting(false);
               }
             }}
-            disabled={disabled || isSubmitting}
+            disabled={isSubmitting}
           >
             <span className="rating-star" style={{ "--fill": ratingFill(i) }}>
               <svg viewBox="0 0 24 24" aria-hidden="true">

@@ -64,6 +64,8 @@ export default function ReviewCard({
   onDelete,
   onUpvote,
   onReport,
+  isLoggedIn = true,
+  onRequireLogin,
   searchTerm,
 }) {
   return (
@@ -120,7 +122,13 @@ export default function ReviewCard({
               <button
                 type="button"
                 className="review-action-btn"
-                onClick={() => onUpvote?.(review)}
+                onClick={() => {
+                  if (!isLoggedIn) {
+                    onRequireLogin?.();
+                    return;
+                  }
+                  onUpvote?.(review);
+                }}
                 disabled={isPending}
               >
                 {isUpvoted ? "Undo" : "Helpful"}
@@ -132,7 +140,13 @@ export default function ReviewCard({
             <button
               type="button"
               className="review-action-btn review-action-muted"
-              onClick={() => onReport?.(review)}
+              onClick={() => {
+                if (!isLoggedIn) {
+                  onRequireLogin?.();
+                  return;
+                }
+                onReport?.(review);
+              }}
               disabled={isPending}
             >
               Report
