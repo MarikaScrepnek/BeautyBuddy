@@ -61,6 +61,26 @@ export default function ReviewStars({
     }
   }
 
+  async function handleStarClick(e, index) {
+    if (locked) {
+      e.stopPropagation();
+      onRequireLogin?.();
+      return;
+    }
+
+    if (disabled || isSubmitting) {
+      return;
+    }
+
+    e.stopPropagation();
+    setIsSubmitting(true);
+    try {
+      await handleSubmitReview(getStarValueFromEvent(e, index));
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
   return (
     <>
       {toastMsg && (
@@ -76,20 +96,7 @@ export default function ReviewStars({
             onMouseMove={(e) => !disabled && setHover(getStarValueFromEvent(e, i))}
             onMouseEnter={(e) => !disabled && setHover(getStarValueFromEvent(e, i))}
             onMouseLeave={() => !disabled && setHover(null)}
-            onClick={(e) => {
-              if (locked) {
-                e.stopPropagation();
-                onRequireLogin?.();
-                return;
-              }
-
-              if (!disabled) {
-                e.stopPropagation();
-                setIsSubmitting(true);
-                handleSubmitReview(getStarValueFromEvent(e, i));
-                setIsSubmitting(false);
-              }
-            }}
+            onClick={(e) => handleStarClick(e, i)}
             disabled={isSubmitting}
           >
             <span className="rating-star" style={{ "--fill": ratingFill(i) }}>
