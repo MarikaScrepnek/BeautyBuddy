@@ -57,7 +57,7 @@ public class ReviewService {
             shade = productShadeRepository.findByProductAndShadeName(product, review.shadeName())
                 .orElseThrow(() -> new RuntimeException("Shade not found"));
         }
-        if (product.getProductShades() != null && shade == null) {
+        if (!product.getProductShades().isEmpty() && shade == null) {
             shade = productShadeRepository.findByProductAndShadeNumber(product, 1)
                 .orElseThrow(() -> new RuntimeException("Default shade not found"));
         }
