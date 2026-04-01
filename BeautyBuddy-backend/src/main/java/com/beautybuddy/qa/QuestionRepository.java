@@ -7,7 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface QuestionRepository extends JpaRepository<Question, Long> {
-	Page<Question> findByProduct_IdAndDeletedAtIsNullAndApprovedTrueOrderByCreatedAtDesc(Long productId, Pageable pageable);
+	Page<Question> findByProduct_IdAndDeletedAtIsNullAndApprovedTrue(Long productId, Pageable pageable);
 
 	@Query("""
 			SELECT DISTINCT q FROM Question q
@@ -19,7 +19,6 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
 				LOWER(q.text) LIKE LOWER(CONCAT('%', :query, '%')) OR
 				LOWER(a.text) LIKE LOWER(CONCAT('%', :query, '%'))
 			  )
-			ORDER BY q.createdAt DESC
 	""")
 	Page<Question> searchQuestionsByProductAndQuery(@Param("productId") Long productId, @Param("query") String query, Pageable pageable);
 }

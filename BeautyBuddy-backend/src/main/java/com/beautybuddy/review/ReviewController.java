@@ -105,6 +105,8 @@ public class ReviewController {
         @PathVariable Long productId,
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") int size,
+        @RequestParam(required = false) String sort,
+        @RequestParam(required = false) String filter,
         Authentication authentication
     ) {
         String email = null;
@@ -112,7 +114,7 @@ public class ReviewController {
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
             email = userDetails.getEmail();
         }
-        Page<DisplayReviewDTO> reviews = reviewService.getReviewsForProduct(productId, page, size, email);
+        Page<DisplayReviewDTO> reviews = reviewService.getReviewsForProduct(productId, page, size, sort, filter, email);
         return ResponseEntity.ok(reviews);
     }
 
@@ -122,6 +124,8 @@ public class ReviewController {
         @RequestParam String query,
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") int size,
+        @RequestParam(required = false) String sort,
+        @RequestParam(required = false) String filter,
         Authentication authentication
     ) {
         String email = null;
@@ -129,7 +133,7 @@ public class ReviewController {
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
             email = userDetails.getEmail();
         }
-        Page<DisplayReviewDTO> reviews = reviewService.searchReviewsForProduct(productId, query, page, size, email);
+        Page<DisplayReviewDTO> reviews = reviewService.searchReviewsForProduct(productId, query, page, size, sort, filter, email);
         return ResponseEntity.ok(reviews);
     }
 

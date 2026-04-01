@@ -160,6 +160,7 @@ public class QAController {
         @PathVariable Long productId,
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") int size,
+        @RequestParam(required = false) String sort,
         Authentication authentication
     ) {
         String email = null;
@@ -167,7 +168,7 @@ public class QAController {
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
             email = userDetails.getEmail();
         }
-        return ResponseEntity.ok(qaService.getQuestionsAndAnswersForProduct(productId, page, size, email));
+        return ResponseEntity.ok(qaService.getQuestionsAndAnswersForProduct(productId, page, size, sort, email));
     }
 
     @GetMapping("/questions/{productId}/search")
@@ -176,6 +177,7 @@ public class QAController {
         @RequestParam String query,
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") int size,
+        @RequestParam(required = false) String sort,
         Authentication authentication
     ) {
         String email = null;
@@ -183,6 +185,6 @@ public class QAController {
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
             email = userDetails.getEmail();
         }
-        return ResponseEntity.ok(qaService.searchQuestionsAndAnswersForProduct(productId, query, page, size, email));
+        return ResponseEntity.ok(qaService.searchQuestionsAndAnswersForProduct(productId, query, page, size, sort, email));
     }
 }

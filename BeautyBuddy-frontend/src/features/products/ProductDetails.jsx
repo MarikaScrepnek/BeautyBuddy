@@ -77,6 +77,40 @@ export default function ProductDetails() {
     const sortOptionsRef = useRef(null);
     const [currentSort, setCurrentSort] = useState(null);
 
+    const mapSortToReviewKey = (option) => {
+        switch (option) {
+            case "Most Helpful":
+                return "helpful_desc";
+            case "Oldest":
+                return "created_asc";
+            case "Highest Rating":
+                return "rating_desc";
+            case "Lowest Rating":
+                return "rating_asc";
+            case "Newest":
+            default:
+                return "created_desc";
+        }
+    };
+
+    const mapSortToQuestionKey = (option) => {
+        switch (option) {
+            case "Most Helpful":
+                return "helpful_desc";
+            case "Oldest":
+                return "created_asc";
+            case "Newest":
+            case "Highest Rating":
+            case "Lowest Rating":
+            default:
+                return "created_desc";
+        }
+    };
+
+    const reviewSortKey = mapSortToReviewKey(currentSort);
+    const questionSortKey = mapSortToQuestionKey(currentSort);
+    const reviewShadeFilter = data?.shades?.length ? currentFilter : null;
+
     // --- Currency localization logic below all hooks ---
     const localeCurrencyMap = {
         "en-US": "USD",
@@ -201,7 +235,10 @@ export default function ProductDetails() {
             return;
         }
         try {
-            const response = await getReviews(productId, 0, 200);
+            const response = await getReviews(productId, 0, 200, {
+                sort: reviewSortKey,
+                filter: reviewShadeFilter
+            });
             setAllReviews(normalizeReviews(response));
         } catch {
             setAllReviews([]);
@@ -210,7 +247,9 @@ export default function ProductDetails() {
 
     const loadQuestions = async (page = 0) => {
         try {
-            const response = await getQuestionsForProduct(productId, page, 10);
+            const response = await getQuestionsForProduct(productId, page, 10, {
+                sort: questionSortKey
+            });
             setQuestions(response?.content ?? []);
             setQuestionsPage(response?.number ?? page);
             setQuestionsTotalPages(response?.totalPages ?? 0);
@@ -223,11 +262,17 @@ export default function ProductDetails() {
 
     useEffect(() => {
         loadQuestions(0);
-    }, [productId]);
+    }, [productId, currentSort]);
 
     useEffect(() => {
         loadAllReviews();
-    }, [productId, reviewRefreshKey]);
+    }, [productId, reviewRefreshKey, currentSort, currentFilter, data?.shades?.length]);
+
+    useEffect(() => {
+        if (!data?.shades?.length && currentFilter) {
+            setCurrentFilter(null);
+        }
+    }, [data?.shades?.length, currentFilter]);
 
     useEffect(() => {
         if (!currentUser?.username) {
@@ -479,8 +524,13 @@ export default function ProductDetails() {
         async function performSearch() {
             try {
                 const [reviewsResult, questionsResult] = await Promise.all([
-                    searchReviews(productId, searchQuery, 0, 5),
-                    searchQuestions(productId, searchQuery, 0, 5)
+                    searchReviews(productId, searchQuery, 0, 5, {
+                        sort: reviewSortKey,
+                        filter: reviewShadeFilter
+                    }),
+                    searchQuestions(productId, searchQuery, 0, 5, {
+                        sort: questionSortKey
+                    })
                 ]);
                 setSearchResults({
                     reviews: reviewsResult.content || [],
@@ -491,7 +541,7 @@ export default function ProductDetails() {
             }
         }
         performSearch();
-    }, [searchQuery, productId]);
+    }, [searchQuery, productId, currentSort, currentFilter, data?.shades?.length]);
 
     function highlightText(text, term) {
         if (!term) return text;
@@ -1064,6 +1114,8 @@ export default function ProductDetails() {
                                 refreshKey={reviewRefreshKey}
                                 onEditReview={handleEditReview}
                                 onRequireLogin={() => setShowLoginModal(true)}
+                                sortKey={reviewSortKey}
+                                shadeFilter={reviewShadeFilter}
                             />
                         )}
                     </div>

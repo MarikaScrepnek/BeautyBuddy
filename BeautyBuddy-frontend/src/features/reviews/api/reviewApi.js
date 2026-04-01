@@ -48,8 +48,15 @@ export async function getAverageRating(productId) {
     return response.json();
 }
 
-export async function getReviews(productId, page = 0, size = 10) {
-    const response = await fetch(`http://localhost:8080/api/reviews/${productId}?page=${page}&size=${size}`, {
+export async function getReviews(productId, page = 0, size = 10, options = {}) {
+    const params = new URLSearchParams({
+        page: String(page),
+        size: String(size)
+    });
+    if (options.sort) params.set("sort", options.sort);
+    if (options.filter) params.set("filter", options.filter);
+
+    const response = await fetch(`http://localhost:8080/api/reviews/${productId}?${params.toString()}`, {
         credentials: 'include'
     });
     return response.json();
@@ -83,8 +90,16 @@ export async function reportReview(reviewId, reason) {
     return response.ok;
 }
 
-export async function searchReviews(productId, query, page = 0, size = 10) {
-    const response = await fetch(`http://localhost:8080/api/reviews/${productId}/search?query=${encodeURIComponent(query)}&page=${page}&size=${size}`, {
+export async function searchReviews(productId, query, page = 0, size = 10, options = {}) {
+    const params = new URLSearchParams({
+        query,
+        page: String(page),
+        size: String(size)
+    });
+    if (options.sort) params.set("sort", options.sort);
+    if (options.filter) params.set("filter", options.filter);
+
+    const response = await fetch(`http://localhost:8080/api/reviews/${productId}/search?${params.toString()}`, {
         credentials: 'include'
     });
     return response.json();

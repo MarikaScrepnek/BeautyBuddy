@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 @Service
 public class QAService {
@@ -142,14 +143,27 @@ public class QAService {
     }
 
     @Transactional(readOnly = true)
-    public Page<DisplayQuestionWithAnswersDTO> getQuestionsAndAnswersForProduct(Long productId, int page, int size, String userEmail) {
+    private PageRequest buildQuestionPageRequest(int page, int size, String sortKey) {
+        String effectiveSortKey = sortKey == null ? "created_desc" : sortKey;
+        Sort sort = switch (effectiveSortKey) {
+            case "helpful_desc" -> Sort.by(Sort.Direction.DESC, "upvoteCount");
+            case "created_asc" -> Sort.by(Sort.Direction.ASC, "createdAt");
+            case "created_desc" -> Sort.by(Sort.Direction.DESC, "createdAt");
+            default -> Sort.by(Sort.Direction.DESC, "createdAt");
+        };
+        return PageRequest.of(page, size, sort);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<DisplayQuestionWithAnswersDTO> getQuestionsAndAnswersForProduct(Long productId, int page, int size, String sortKey, String userEmail) {
         final User currentUser = userEmail != null
             ? userRepository.findByEmail(userEmail).orElse(null)
             : null;
+        PageRequest pageRequest = buildQuestionPageRequest(page, size, sortKey);
         Page<Question> questions = questionRepository
-            .findByProduct_IdAndDeletedAtIsNullAndApprovedTrueOrderByCreatedAtDesc(
+            .findByProduct_IdAndDeletedAtIsNullAndApprovedTrue(
                 productId,
-                PageRequest.of(page, size)
+                pageRequest
             );
 
         Set<Long> reportedQuestionIds = currentUser == null
@@ -200,15 +214,16 @@ public class QAService {
         return new PageImpl<>(mapped, questions.getPageable(), mapped.size());
     }
 
-    public Page<DisplayQuestionWithAnswersDTO> searchQuestionsAndAnswersForProduct(Long productId, String query, int page, int size, String userEmail) {
+    public Page<DisplayQuestionWithAnswersDTO> searchQuestionsAndAnswersForProduct(Long productId, String query, int page, int size, String sortKey, String userEmail) {
         final User currentUser = userEmail != null
             ? userRepository.findByEmail(userEmail).orElse(null)
             : null;
+        PageRequest pageRequest = buildQuestionPageRequest(page, size, sortKey);
         Page<Question> questions = questionRepository
             .searchQuestionsByProductAndQuery(
                 productId,
                 query,
-                PageRequest.of(page, size)
+                pageRequest
             );
 
         Set<Long> reportedQuestionIds = currentUser == null

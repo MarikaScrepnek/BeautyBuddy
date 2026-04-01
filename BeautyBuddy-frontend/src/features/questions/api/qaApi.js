@@ -1,5 +1,11 @@
-export async function getQuestionsForProduct(productId, page = 0, size = 10) {
-    const res = await fetch(`http://localhost:8080/api/questions/${productId}?page=${page}&size=${size}`, {
+export async function getQuestionsForProduct(productId, page = 0, size = 10, options = {}) {
+    const params = new URLSearchParams({
+        page: String(page),
+        size: String(size)
+    });
+    if (options.sort) params.set("sort", options.sort);
+
+    const res = await fetch(`http://localhost:8080/api/questions/${productId}?${params.toString()}`, {
         credentials: 'include'
     });
     return res.json();
@@ -125,8 +131,15 @@ export async function reportAnswer(answerId, reason) {
     return res.ok;
 }
 
-export async function searchQuestions(productId, query, page = 0, size = 10) {
-    const response = await fetch(`http://localhost:8080/api/questions/${productId}/search?query=${encodeURIComponent(query)}&page=${page}&size=${size}`, {
+export async function searchQuestions(productId, query, page = 0, size = 10, options = {}) {
+    const params = new URLSearchParams({
+        query,
+        page: String(page),
+        size: String(size)
+    });
+    if (options.sort) params.set("sort", options.sort);
+
+    const response = await fetch(`http://localhost:8080/api/questions/${productId}/search?${params.toString()}`, {
         credentials: 'include'
     });
     return response.json();

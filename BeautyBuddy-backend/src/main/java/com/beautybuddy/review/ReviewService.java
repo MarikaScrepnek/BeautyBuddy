@@ -24,6 +24,7 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -146,15 +147,37 @@ public class ReviewService {
         return averageRating != null ? averageRating : BigDecimal.ZERO;
     }
 
-    public Page<DisplayReviewDTO> getReviewsForProduct(Long productId, int page, int size, String userEmail) {
+    private PageRequest buildReviewPageRequest(int page, int size, String sortKey) {
+        String effectiveSortKey = sortKey == null ? "created_desc" : sortKey;
+        Sort sort = switch (effectiveSortKey) {
+            case "helpful_desc" -> Sort.by(Sort.Direction.DESC, "upvoteCount");
+            case "created_asc" -> Sort.by(Sort.Direction.ASC, "createdAt");
+            case "rating_desc" -> Sort.by(Sort.Direction.DESC, "rating");
+            case "rating_asc" -> Sort.by(Sort.Direction.ASC, "rating");
+            case "created_desc" -> Sort.by(Sort.Direction.DESC, "createdAt");
+            default -> Sort.by(Sort.Direction.DESC, "createdAt");
+        };
+        return PageRequest.of(page, size, sort);
+    }
+
+    public Page<DisplayReviewDTO> getReviewsForProduct(Long productId, int page, int size, String sortKey, String shadeFilter, String userEmail) {
         final User currentUser = userEmail != null
             ? userRepository.findByEmail(userEmail).orElse(null)
             : null;
-        Page<Review> reviewPage =
-            reviewRepository.findByProduct_IdAndDeletedAtIsNullAndApprovedTrueOrderByCreatedAtDesc(
+        PageRequest pageRequest = buildReviewPageRequest(page, size, sortKey);
+        Page<Review> reviewPage;
+        if (shadeFilter != null && !shadeFilter.isBlank()) {
+            reviewPage = reviewRepository.findByProduct_IdAndProductShade_ShadeNameIgnoreCaseAndDeletedAtIsNullAndApprovedTrue(
                 productId,
-                PageRequest.of(page, size)
+                shadeFilter,
+                pageRequest
             );
+        } else {
+            reviewPage = reviewRepository.findByProduct_IdAndDeletedAtIsNullAndApprovedTrue(
+                productId,
+                pageRequest
+            );
+        }
 
         Set<Long> reportedReviewIds = currentUser == null
             ? Set.of()
@@ -200,15 +223,26 @@ public class ReviewService {
         });
     }
 
-    public Page<DisplayReviewDTO> searchReviewsForProduct(Long productId, String query, int page, int size, String userEmail) {
+    public Page<DisplayReviewDTO> searchReviewsForProduct(Long productId, String query, int page, int size, String sortKey, String shadeFilter, String userEmail) {
         final User currentUser = userEmail != null
             ? userRepository.findByEmail(userEmail).orElse(null)
             : null;
-        Page<Review> reviewPage = reviewRepository.searchByProductAndText(
-            productId,
-            query,
-            PageRequest.of(page, size)
-        );
+        PageRequest pageRequest = buildReviewPageRequest(page, size, sortKey);
+        Page<Review> reviewPage;
+        if (shadeFilter != null && !shadeFilter.isBlank()) {
+            reviewPage = reviewRepository.searchByProductAndShadeAndText(
+                productId,
+                shadeFilter,
+                query,
+                pageRequest
+            );
+        } else {
+            reviewPage = reviewRepository.searchByProductAndText(
+                productId,
+                query,
+                pageRequest
+            );
+        }
 
         Set<Long> reportedReviewIds = currentUser == null
             ? Set.of()

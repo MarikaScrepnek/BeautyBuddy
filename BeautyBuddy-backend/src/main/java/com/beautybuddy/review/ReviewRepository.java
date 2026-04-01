@@ -13,10 +13,16 @@ import java.math.BigDecimal;
 
 public interface ReviewRepository extends JpaRepository<Review, Long> {
 
-    Page<Review> findByProduct_IdAndDeletedAtIsNullAndApprovedTrueOrderByCreatedAtDesc(
+  Page<Review> findByProduct_IdAndDeletedAtIsNullAndApprovedTrue(
         Long productId,
         Pageable pageable
     );
+
+  Page<Review> findByProduct_IdAndProductShade_ShadeNameIgnoreCaseAndDeletedAtIsNullAndApprovedTrue(
+    Long productId,
+    String shadeName,
+    Pageable pageable
+  );
 
     Optional<Review> findByProduct_IdAndProductShade_IdAndUser_IdAndDeletedAtIsNull(Long productId, Long shadeId, Long userId);
 
@@ -40,10 +46,28 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
                 LOWER(r.title) LIKE LOWER(CONCAT('%', :query, '%')) OR
                 LOWER(r.text) LIKE LOWER(CONCAT('%', :query, '%'))
               )
-            ORDER BY r.createdAt DESC
     """)
     Page<Review> searchByProductAndText(
         @Param("productId") Long productId,
+        @Param("query") String query,
+        Pageable pageable
+    );
+
+    @Query("""
+            SELECT r FROM Review r
+            WHERE r.product.id = :productId
+              AND r.deletedAt IS NULL
+              AND r.approved = true
+              AND r.productShade IS NOT NULL
+              AND LOWER(r.productShade.shadeName) = LOWER(:shadeName)
+              AND (
+                LOWER(r.title) LIKE LOWER(CONCAT('%', :query, '%')) OR
+                LOWER(r.text) LIKE LOWER(CONCAT('%', :query, '%'))
+              )
+    """)
+    Page<Review> searchByProductAndShadeAndText(
+        @Param("productId") Long productId,
+        @Param("shadeName") String shadeName,
         @Param("query") String query,
         Pageable pageable
     );

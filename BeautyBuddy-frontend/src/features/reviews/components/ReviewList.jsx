@@ -30,7 +30,7 @@ const formatDate = (value) => {
 
 const getReviewId = (review) => review?.reviewId ?? review?.id ?? null;
 
-export default function ReviewList({ productId, refreshKey, onEditReview, onRequireLogin }) {
+export default function ReviewList({ productId, refreshKey, onEditReview, onRequireLogin, sortKey, shadeFilter }) {
 	const [reviews, setReviews] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const [currentUser, setCurrentUser] = useState(null);
@@ -67,7 +67,7 @@ export default function ReviewList({ productId, refreshKey, onEditReview, onRequ
 		setLoading(true);
 		setToast({ message: "", type: "info" });
 
-		getReviews(productId)
+		getReviews(productId, 0, 10, { sort: sortKey, filter: shadeFilter })
 			.then((data) => {
 				if (!isMounted) return;
 				applyReviews(data);
@@ -84,7 +84,7 @@ export default function ReviewList({ productId, refreshKey, onEditReview, onRequ
 		return () => {
 			isMounted = false;
 		};
-	}, [productId, refreshKey]);
+	}, [productId, refreshKey, sortKey, shadeFilter]);
 
 	useEffect(() => {
 		if (!productId) return;
@@ -93,7 +93,7 @@ export default function ReviewList({ productId, refreshKey, onEditReview, onRequ
 			getCurrentUser()
 				.then(setCurrentUser)
 				.catch(() => setCurrentUser(null));
-			getReviews(productId)
+			getReviews(productId, 0, 10, { sort: sortKey, filter: shadeFilter })
 				.then(applyReviews)
 				.catch(() =>
 					setToast({ message: "Failed to load reviews.", type: "error" })
@@ -111,7 +111,7 @@ export default function ReviewList({ productId, refreshKey, onEditReview, onRequ
 			window.removeEventListener("auth:login", handleAuthLogin);
 			window.removeEventListener("auth:logout", handleAuthLogout);
 		};
-	}, [productId]);
+	}, [productId, sortKey, shadeFilter]);
 
 	const handleUpvote = async (review) => {
 		setActionMessage("");
