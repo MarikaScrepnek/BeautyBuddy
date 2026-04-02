@@ -176,8 +176,12 @@ $env:SPRING_DATASOURCE_PASSWORD="your_password"
 - Developing social interaction systems (upvotes, comments, reports, Q&A)
 - Coordinating frontend-backend integration across multiple feature domains
 
-## Next Improvements
+## In Development
 
-- Add deployment configuration and hosted demo links
-- Add automated test coverage details and quality badges
-- Add architecture diagram and sequence diagrams for key flows
+This project is still actively in development and is not feature-complete yet.
+
+- Some features are still being refined or expanded
+- UI and interaction details are being iterated based on testing and feedback
+- Additional hardening work is planned for production readiness (testing, deployment, and monitoring)
+
+The repository is updated as new improvements are implemented.
