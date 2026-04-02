@@ -120,7 +120,7 @@ export default function Products() {
 
         <div className="products-header-actions wishlist-header-actions">
           <div className="sort-filter-wrapper">
-            <Tooltip message="Sort" position="top">
+            <Tooltip message="Sort" position="bottom">
               <button style={{ fontSize: "18px" }} className="sort-button" onClick={() => handleSort(null)}>
                 <FaSort />
               </button>
@@ -136,7 +136,7 @@ export default function Products() {
           </div>
 
           <div className="sort-filter-wrapper">
-            <Tooltip message="Filter" position="top">
+            <Tooltip message="Filter" position="bottom">
               <button className="filter-button" onClick={() => handleFilter(null)}>
                 <FaFilter />
               </button>
