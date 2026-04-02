@@ -12,7 +12,7 @@ import Toast from "../../../components/ui/Toast";
 import { addToBreakoutList, getBreakoutListProducts, removeFromBreakoutList } from "../../breakout/api/breakoutListApi";
 import { getAllRoutineItems } from "../../routines/api/routineApi";
 
-export default function ProductList({ searchQuery, onLoadingChange }) {
+export default function ProductList({ searchQuery, sortKey, filterOption, onLoadingChange }) {
 
   const [selectedItemRoutine, setSelectedItemRoutine] = useState(null);
   const [wishlistItems, setWishlistItems] = useState([]);
@@ -179,6 +179,17 @@ export default function ProductList({ searchQuery, onLoadingChange }) {
   const [exchangeRate, setExchangeRate] = useState(1);
   const [priceMap, setPriceMap] = useState({});
 
+  function getFilterParams(option) {
+    switch (option) {
+      case "Skincare":
+      case "Makeup":
+      case "Haircare":
+        return { category: option };
+      default:
+        return { category: null };
+    }
+  }
+
   async function handleInlineReviewSubmitted(productId) {
     try {
       const res = await fetch(`http://localhost:8080/api/products/${productId}`);
@@ -198,7 +209,17 @@ export default function ProductList({ searchQuery, onLoadingChange }) {
     const query = searchQuery || "";
     setLoading(true);
     onLoadingChange?.(true);
-    fetch(`http://localhost:8080/api/products/search?q=${query}`)
+    const params = new URLSearchParams();
+    if (query) params.set("q", query);
+    if (sortKey) params.set("sort", sortKey);
+    const { category } = getFilterParams(filterOption);
+    if (category) params.set("category", category);
+
+    const url = params.toString()
+      ? `http://localhost:8080/api/products/search?${params.toString()}`
+      : `http://localhost:8080/api/products/search`;
+
+    fetch(url)
       .then(res => res.json())
       .then(data => {
           setProducts(data);
@@ -210,7 +231,7 @@ export default function ProductList({ searchQuery, onLoadingChange }) {
         setLoading(false);
         onLoadingChange?.(false);
       });
-  }, [searchQuery]);
+  }, [searchQuery, sortKey, filterOption]);
 
   useEffect(() => {
     async function fetchRate() {

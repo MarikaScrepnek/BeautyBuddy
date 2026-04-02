@@ -1,6 +1,7 @@
 package com.beautybuddy.product;
 
 import java.util.List;
+import java.util.Comparator;
 
 import com.beautybuddy.common.DTOMapper;
 import com.beautybuddy.ingredient.dto.MayContainIngredientDTO;
@@ -36,10 +37,39 @@ public class ProductController {
     }
 
     @GetMapping("/search")
-    public List<ProductDTO> searchProducts(@RequestParam("q") String query) {
-        return productRepository.searchByProductOrBrand(query).stream()
+    public List<ProductDTO> searchProducts(
+        @RequestParam(value = "q", required = false, defaultValue = "") String query,
+        @RequestParam(required = false) String sort,
+        @RequestParam(required = false) String category
+    ) {
+        List<Product> products = query == null || query.isBlank()
+            ? productRepository.findAll()
+            : productRepository.searchByProductOrBrand(query);
+
+        List<Product> filtered = products.stream()
+            .filter(product -> category == null || category.isBlank()
+                || (product.getCategory() != null
+                    && product.getCategory().getBaseCategory() != null
+                    && category.equalsIgnoreCase(product.getCategory().getBaseCategory().getName())))
+            .sorted(buildProductComparator(sort))
+            .toList();
+
+        return filtered.stream()
                 .map(DTOMapper::toProductDTO)
                 .toList();
+    }
+
+    private Comparator<Product> buildProductComparator(String sortKey) {
+        String effectiveSortKey = sortKey == null ? "added_desc" : sortKey;
+        return switch (effectiveSortKey) {
+            case "added_asc" -> Comparator.comparing(Product::getCreatedAt, Comparator.nullsLast(Comparator.naturalOrder()));
+            case "price_asc" -> Comparator.comparing(Product::getPrice, Comparator.nullsLast(Comparator.naturalOrder()));
+            case "price_desc" -> Comparator.comparing(Product::getPrice, Comparator.nullsLast(Comparator.reverseOrder()));
+            case "rating_asc" -> Comparator.comparing(Product::getRating, Comparator.nullsLast(Comparator.naturalOrder()));
+            case "rating_desc" -> Comparator.comparing(Product::getRating, Comparator.nullsLast(Comparator.reverseOrder()));
+            case "added_desc" -> Comparator.comparing(Product::getCreatedAt, Comparator.nullsLast(Comparator.reverseOrder()));
+            default -> Comparator.comparing(Product::getCreatedAt, Comparator.nullsLast(Comparator.reverseOrder()));
+        };
     }
 
     @GetMapping("/{id}")

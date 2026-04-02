@@ -22,6 +22,21 @@ export default function SortFilterPopup({ isOpen, onClose, type, page, onSelect,
                 "Makeup",
                 "Haircare"
             ]);
+        
+        } else if (type === "sort" && page === "products") {
+            setOptions([
+                "Price: Low to High",
+                "Price: High to Low",
+                "Rating: High to Low",
+                "Rating: Low to High"
+            ]);
+
+        } else if (type === "filter" && page === "products") {
+            setOptions([
+                "Skincare",
+                "Makeup",
+                "Haircare"
+            ]);
             
         } else if (type === "sort" && page === "productDetails") {
             setOptions([

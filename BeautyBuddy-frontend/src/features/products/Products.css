@@ -27,11 +27,19 @@
 }
 
 .search-container {
-    position: relative;
     display: flex;
-    align-items: center;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
     margin-top: 20px;
     width: 100%;
+}
+
+.product-search-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
 }
 
 .search-bar {
@@ -60,4 +68,10 @@
 
 .search-button:hover {
   color: #333;
+}
+
+.products-header-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
 }
