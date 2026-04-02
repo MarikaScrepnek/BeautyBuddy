@@ -9,6 +9,8 @@ import { FaSearch } from "react-icons/fa";
 
 import "./Discussions.css";
 import Tooltip from "../../components/ui/Tooltip";
+import { FaSort } from "react-icons/fa";
+import { FaFilter } from "react-icons/fa";
 
 export default function Discussions() {
   const [discussions, setDiscussions] = useState([]);
@@ -75,17 +77,6 @@ export default function Discussions() {
   return (
     <div>
       <div className="discussions-header-container">
-        <div className="discussions-button-row">
-            <Tooltip message="Create a Discussion" position="left">
-            <button onClick={() => {
-              if (!isLoggedIn) {
-                setShowLoginModal(true);
-                return;
-              }
-              setShowModal(true);
-            }} className="plus-sign">+</button>
-            </Tooltip>
-        </div>
         <div className="discussions-search-center">
           <div className="discussions-search-container">
             <div className="discussions-search">
@@ -109,6 +100,28 @@ export default function Discussions() {
               </button>
             </div>
           </div>
+
+          <Tooltip message="Filter" position="bottom">
+              <button className="filter-sort-button" onClick={() => handleFilter(null)}>
+                  <FaFilter />
+              </button>
+          </Tooltip>
+
+          <Tooltip message="Sort" position="bottom">
+            <button style={{ fontSize: "18px" }} className="filter-sort-button" onClick={() => handleSort(null)}>
+                <FaSort />
+            </button>
+          </Tooltip>
+
+          <Tooltip message="Create a Discussion" position="bottom">
+            <button onClick={() => {
+              if (!isLoggedIn) {
+                setShowLoginModal(true);
+                return;
+              }
+              setShowModal(true);
+            }} className="plus-sign">+</button>
+          </Tooltip>
         </div>
       </div>
       {loading ? (

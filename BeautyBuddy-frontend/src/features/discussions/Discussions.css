@@ -59,6 +59,23 @@
   width: 100%;
   margin-top: 12px;
   margin-bottom: 12px;
+  gap: 12px;
+}
+
+.filter-sort-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    color: #333;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+}
+.filter-sort-button:hover {
+    transform: translateY(-2px);    
+}
+.filter-sort-button:active {
+    transform: translateY(0);
 }
 
 .discussions-search-container {
