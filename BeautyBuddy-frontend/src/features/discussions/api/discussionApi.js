@@ -1,12 +1,16 @@
-export async function getDiscussions(page = 0, size = 10) {
-    const res = await fetch(`http://localhost:8080/api/discussions?page=${page}&size=${size}`, {
+export async function getDiscussions(page = 0, size = 10, sort = null) {
+    const params = new URLSearchParams({ page: String(page), size: String(size) });
+    if (sort) params.set("sort", sort);
+    const res = await fetch(`http://localhost:8080/api/discussions?${params.toString()}`, {
         credentials: 'include'
     });
     return res.json();
 }
 
-export async function searchDiscussions(query) {
-    const res = await fetch(`http://localhost:8080/api/discussions/search?query=${encodeURIComponent(query)}`, {
+export async function searchDiscussions(query, sort = null, page = 0, size = 10) {
+    const params = new URLSearchParams({ query: String(query), page: String(page), size: String(size) });
+    if (sort) params.set("sort", sort);
+    const res = await fetch(`http://localhost:8080/api/discussions/search?${params.toString()}`, {
         credentials: 'include'
     });
     return res.json();

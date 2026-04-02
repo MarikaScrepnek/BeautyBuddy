@@ -37,6 +37,7 @@ public class DiscussionController {
     public ResponseEntity<Page<DisplayDiscussionDTO>> getDiscussions(
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") int size,
+        @RequestParam(required = false) String sort,
         Authentication authentication
     ) {
         String userEmail = null;
@@ -44,7 +45,7 @@ public class DiscussionController {
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
             userEmail = userDetails.getEmail();
         }
-        Page<DisplayDiscussionDTO> discussions = discussionService.getDiscussions(userEmail, page, size);
+        Page<DisplayDiscussionDTO> discussions = discussionService.getDiscussions(userEmail, page, size, sort);
         return ResponseEntity.ok(discussions);
     }
 
@@ -53,6 +54,7 @@ public class DiscussionController {
         @RequestParam String query,
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") int size,
+        @RequestParam(required = false) String sort,
         Authentication authentication
     ) {
         String userEmail = null;
@@ -60,7 +62,7 @@ public class DiscussionController {
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
             userEmail = userDetails.getEmail();
         }
-        Page<DisplayDiscussionDTO> discussions = discussionService.searchDiscussions(userEmail, query, page, size);
+        Page<DisplayDiscussionDTO> discussions = discussionService.searchDiscussions(userEmail, query, page, size, sort);
         return ResponseEntity.ok(discussions);
     }
 

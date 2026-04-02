@@ -294,7 +294,7 @@ function PostCard({ post, isDiscussion, currentUser, isLoggedIn, onReport, onUpv
   );
 }
 
-export default function DiscussionCard({ id, createdAt, title, text, authorUsername, upvoteCount, commentCount, comments = [], hasUpvoted, hasReported, searchTerm }) {
+export default function DiscussionCard({ id, createdAt, title, text, authorUsername, upvoteCount, commentCount, comments = [], hasUpvoted, hasReported, searchTerm, sortKey }) {
   const [reportModalOpen, setReportModalOpen] = useState(false);
   const [reportTarget, setReportTarget] = useState(null);
   const [showLeaveComment, setShowLeaveComment] = useState(false);
@@ -342,7 +342,7 @@ export default function DiscussionCard({ id, createdAt, title, text, authorUsern
   }, []);
 
   const refreshComments = async () => {
-    const discussions = await getDiscussions();
+    const discussions = await getDiscussions(0, 10, sortKey);
     const discussion = (Array.isArray(discussions) ? discussions : discussions.content || []).find(d => d.id === id);
     setLocalComments(discussion?.comments || []);
     const map = {};

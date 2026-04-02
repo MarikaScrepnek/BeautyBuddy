@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.beautybuddy.discussion.dto.AddDiscussionCommentDTO;
@@ -57,6 +58,44 @@ public class DiscussionService {
         discussion.setText(discussionDTO.text());
         discussion.setUser(user);
         discussionRepository.save(discussion);
+    }
+
+    private PageRequest buildDiscussionPageRequest(int page, int size, String sortKey) {
+        String effectiveSortKey = sortKey == null ? "created_desc" : sortKey;
+        Sort sort = switch (effectiveSortKey) {
+            case "helpful_desc" -> Sort.by(Sort.Direction.DESC, "upvoteCount");
+            case "created_asc" -> Sort.by(Sort.Direction.ASC, "createdAt");
+            case "created_desc" -> Sort.by(Sort.Direction.DESC, "createdAt");
+            default -> Sort.by(Sort.Direction.DESC, "createdAt");
+        };
+        return PageRequest.of(page, size, sort);
+    }
+
+    private DisplayDiscussionDTO toDisplayDiscussionDTO(Discussion discussion, User currentUser) {
+        return new DisplayDiscussionDTO(
+            discussion.getId(),
+            discussion.getCreatedAt(),
+            discussion.getTitle(),
+            discussion.getText(),
+            discussion.getUser().getUsername(),
+            discussion.getUpvoteCount(),
+            discussion.getComments().size(),
+            discussion.getComments().stream()
+                .map(comment -> new DisplayCommentDTO(
+                    comment.getParentDiscussionComment() != null ? comment.getParentDiscussionComment().getId() : null,
+                    comment.getId(),
+                    comment.getCreatedAt(),
+                    comment.getText(),
+                    comment.getUser().getUsername(),
+                    comment.getUpvoteCount(),
+                    comment.getReplyCount(),
+                    currentUser != null && discussionCommentUpvoteRepository.findByUserAndDiscussionComment(currentUser, comment).isPresent(),
+                    currentUser != null && discussionCommentReportRepository.findByUserAndDiscussionComment(currentUser, comment).isPresent()
+                ))
+                .toList(),
+            currentUser != null && discussionUpvoteRepository.findByUserAndDiscussion(currentUser, discussion).isPresent(),
+            currentUser != null && discussionReportRepository.findByUserAndDiscussion(currentUser, discussion).isPresent()
+        );
     }
 
     @Transactional
@@ -152,38 +191,17 @@ public class DiscussionService {
         discussionCommentRepository.save(comment);
     }
 
-    public Page<DisplayDiscussionDTO> getDiscussions(String userEmail, int page, int size) {
+    public Page<DisplayDiscussionDTO> getDiscussions(String userEmail, int page, int size, String sortKey) {
         User currentUser = userRepository.findByEmail(userEmail).orElse(null);
-        return discussionRepository.findAll(PageRequest.of(page, size))
-            .map(discussion -> new DisplayDiscussionDTO(
-                discussion.getId(),
-                discussion.getCreatedAt(),
-                discussion.getTitle(),
-                discussion.getText(),
-                discussion.getUser().getUsername(),
-                discussion.getUpvoteCount(),
-                discussion.getComments().size(),
-                discussion.getComments().stream()
-                    .map(comment -> new DisplayCommentDTO(
-                        comment.getParentDiscussionComment() != null ? comment.getParentDiscussionComment().getId() : null,
-                        comment.getId(),
-                        comment.getCreatedAt(),
-                        comment.getText(),
-                        comment.getUser().getUsername(),
-                        comment.getUpvoteCount(),
-                        comment.getReplyCount(),
-                        discussionCommentUpvoteRepository.findByUserAndDiscussionComment(currentUser, comment).isPresent(),
-                        discussionCommentReportRepository.findByUserAndDiscussionComment(currentUser, comment).isPresent()
-                    ))
-                    .toList(),
-                discussionUpvoteRepository.findByUserAndDiscussion(currentUser, discussion).isPresent(),
-                discussionReportRepository.findByUserAndDiscussion(currentUser, discussion).isPresent()
-            ));
+        PageRequest pageRequest = buildDiscussionPageRequest(page, size, sortKey);
+        return discussionRepository.findAll(pageRequest)
+            .map(discussion -> toDisplayDiscussionDTO(discussion, currentUser));
     }
 
-    public Page<DisplayDiscussionDTO> searchDiscussions(String userEmail, String query, int page, int size) {
+    public Page<DisplayDiscussionDTO> searchDiscussions(String userEmail, String query, int page, int size, String sortKey) {
         User currentUser = userRepository.findByEmail(userEmail).orElse(null);
-        Page<Discussion> results = discussionRepository.findAll(PageRequest.of(page, size));
+        PageRequest pageRequest = buildDiscussionPageRequest(page, size, sortKey);
+        Page<Discussion> results = discussionRepository.findAll(pageRequest);
         String lowerQuery = query == null ? "" : query.toLowerCase();
         List<DisplayDiscussionDTO> filtered = results.getContent().stream()
             .filter(discussion -> {

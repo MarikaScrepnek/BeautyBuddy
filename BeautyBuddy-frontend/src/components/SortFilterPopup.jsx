@@ -31,6 +31,12 @@ export default function SortFilterPopup({ isOpen, onClose, type, page, onSelect,
                 "Highest Rating",
                 "Lowest Rating"
             ]);
+        } else if (type === "sort" && page === "discussions") {
+            setOptions([
+                "Most Helpful",
+                "Newest",
+                "Oldest"
+            ]);
         } else if (type === "filter" && page === "productDetails") {
             setOptions(shades?.map(s => s.shadeName) || []);
         } else {

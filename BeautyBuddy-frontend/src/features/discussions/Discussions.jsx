@@ -6,11 +6,11 @@ import CreateDiscussionModal from "./modals/CreateDiscussionModal";
 import AuthModal from "../auth/modals/AuthModal";
 
 import { FaSearch } from "react-icons/fa";
+import { FaSort } from "react-icons/fa";
 
 import "./Discussions.css";
 import Tooltip from "../../components/ui/Tooltip";
-import { FaSort } from "react-icons/fa";
-import { FaFilter } from "react-icons/fa";
+import SortFilterPopup from "../../components/SortFilterPopup";
 
 export default function Discussions() {
   const [discussions, setDiscussions] = useState([]);
@@ -20,6 +20,8 @@ export default function Discussions() {
   const [activeSearchTerm, setActiveSearchTerm] = useState("");
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [currentSort, setCurrentSort] = useState("created_desc");
+  const [sortOptionsOpen, setSortOptionsOpen] = useState(false);
 
   useEffect(() => {
     getCurrentUser()
@@ -35,16 +37,45 @@ export default function Discussions() {
     };
   }, []);
 
-  const refreshDiscussions = () => {
+  function mapSortOptionToKey(option) {
+    switch (option) {
+      case "Most Helpful":
+        return "helpful_desc";
+      case "Newest":
+        return "created_desc";
+      case "Oldest":
+        return "created_asc";
+      default:
+        return null;
+    }
+  }
+
+  function mapSortKeyToOption(key) {
+    switch (key) {
+      case "helpful_desc":
+        return "Most Helpful";
+      case "created_asc":
+        return "Oldest";
+      case "created_desc":
+      default:
+        return "Newest";
+    }
+  }
+
+  const loadDiscussions = async ({ sortKey = currentSort, query = activeSearchTerm } = {}) => {
     setLoading(true);
-    getDiscussions().then((data) => {
+    try {
+      const data = query.trim()
+        ? await searchDiscussions(query, sortKey)
+        : await getDiscussions(0, 10, sortKey);
       setDiscussions(Array.isArray(data) ? data : data.content || []);
+    } finally {
       setLoading(false);
-    });
+    }
   };
   
   useEffect(() => {
-    refreshDiscussions();
+    loadDiscussions();
   }, []);
 
   const handleCreateDiscussion = async (title, text) => {
@@ -54,7 +85,7 @@ export default function Discussions() {
     }
     const success = await createDiscussion(title, text);
     if (success) {
-      refreshDiscussions();
+      await loadDiscussions({ query: activeSearchTerm });
       return true;
     }
     return false;
@@ -63,15 +94,30 @@ export default function Discussions() {
   const handleSearchDiscussions = () => {
     if (!searchQuery.trim()) {
       setActiveSearchTerm("");
-      refreshDiscussions();
+      loadDiscussions({ query: "" });
       return;
     }
-    setLoading(true);
-    searchDiscussions(searchQuery).then((data) => {
-      setDiscussions(Array.isArray(data) ? data : data.content || []);
-      setActiveSearchTerm(searchQuery);
-      setLoading(false);
-    });
+    setActiveSearchTerm(searchQuery);
+    loadDiscussions({ query: searchQuery });
+  };
+
+  function handleSelect(type, option) {
+    if (type === "sort") {
+      handleSort(option);
+    }
+  }
+
+  async function handleSort(option) {
+    setSortOptionsOpen((open) => !open);
+    if (!option) return;
+
+    const nextSortKey = mapSortOptionToKey(option);
+    if (!nextSortKey || nextSortKey === currentSort) {
+      return;
+    }
+
+    setCurrentSort(nextSortKey);
+    await loadDiscussions({ sortKey: nextSortKey, query: activeSearchTerm });
   };
 
   return (
@@ -101,11 +147,21 @@ export default function Discussions() {
             </div>
           </div>
 
-          <Tooltip message="Sort" position="bottom">
-            <button style={{ fontSize: "20px" }} className="filter-sort-button" onClick={() => handleSort(null)}>
-                <FaSort />
-            </button>
-          </Tooltip>
+          <div className="sort-filter-wrapper">
+            <Tooltip message="Sort" position="bottom">
+              <button style={{ fontSize: "20px" }} className="filter-sort-button" onClick={() => handleSort(null)}>
+                  <FaSort />
+              </button>
+            </Tooltip>
+            <SortFilterPopup
+              isOpen={sortOptionsOpen}
+              onClose={() => setSortOptionsOpen(false)}
+              type="sort"
+              page="discussions"
+              onSelect={handleSelect}
+              selectedOption={mapSortKeyToOption(currentSort)}
+            />
+          </div>
 
           <Tooltip message="Create a Discussion" position="bottom">
             <button onClick={() => {
@@ -124,7 +180,7 @@ export default function Discussions() {
         <div>No discussions yet.</div>
       ) : (
         discussions.map((d) => (
-          <DiscussionCard key={d.id} {...d} searchTerm={activeSearchTerm} />
+          <DiscussionCard key={d.id} {...d} searchTerm={activeSearchTerm} sortKey={currentSort} />
         ))
       )}
       <CreateDiscussionModal
