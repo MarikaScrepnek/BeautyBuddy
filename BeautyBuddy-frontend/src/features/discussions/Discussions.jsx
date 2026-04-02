@@ -101,14 +101,8 @@ export default function Discussions() {
             </div>
           </div>
 
-          <Tooltip message="Filter" position="bottom">
-              <button className="filter-sort-button" onClick={() => handleFilter(null)}>
-                  <FaFilter />
-              </button>
-          </Tooltip>
-
           <Tooltip message="Sort" position="bottom">
-            <button style={{ fontSize: "18px" }} className="filter-sort-button" onClick={() => handleSort(null)}>
+            <button style={{ fontSize: "20px" }} className="filter-sort-button" onClick={() => handleSort(null)}>
                 <FaSort />
             </button>
           </Tooltip>
