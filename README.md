@@ -92,7 +92,7 @@ npm run dev
 
 ## Portfolio Notes
 
-- This project is intentionally broad to demonstrate cross-functional software engineering skills rather than a single isolated feature.
+- This project is designed to showcase end-to-end software engineering across frontend, backend, security, and data layers, rather than focusing on a single feature.
 - The codebase emphasizes maintainability through feature modules, service boundaries, and migration-backed persistence.
 - The API includes authenticated and unauthenticated paths to reflect realistic user journeys.
 
