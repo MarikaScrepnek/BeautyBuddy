@@ -1,7 +1,9 @@
-const API_BASE_URL = 'http://localhost:8080/api/auth';
+import { API_BASE_URL } from '../../../config/apiBase';
+
+const AUTH_BASE = `${API_BASE_URL}/api/auth`;
 
 export async function registerUser(email, username, password) {
-    const res = await fetch(`${API_BASE_URL}/register`, {
+    const res = await fetch(`${AUTH_BASE}/register`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -12,7 +14,7 @@ export async function registerUser(email, username, password) {
 }
 
 export async function loginUser(email, password) {
-    const res = await fetch(`${API_BASE_URL}/login`, {
+    const res = await fetch(`${AUTH_BASE}/login`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -27,7 +29,7 @@ export async function loginUser(email, password) {
 }
 
 export async function getCurrentUser() {
-    const res = await fetch(`${API_BASE_URL}/me`, {
+    const res = await fetch(`${AUTH_BASE}/me`, {
         method: 'GET',
         credentials: 'include',
     });
@@ -39,7 +41,7 @@ export async function getCurrentUser() {
 }
 
 export async function logoutUser() {
-    const res = await fetch(`${API_BASE_URL}/logout`, {
+    const res = await fetch(`${AUTH_BASE}/logout`, {
         method: 'POST',
         credentials: 'include',
     });

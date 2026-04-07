@@ -1,5 +1,7 @@
+import { API_BASE_URL } from '../../../config/apiBase';
+
 export async function submitReview(productId, shadeName, rating, title, text, imageLinks) {
-    const response = await fetch('http://localhost:8080/api/reviews/add', {
+    const response = await fetch(`${API_BASE_URL}/api/reviews/add`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -18,7 +20,7 @@ export async function submitReview(productId, shadeName, rating, title, text, im
 }
 
 export async function editReview(reviewId, shadeName, rating, title, text, imageLinks) {
-    const response = await fetch(`http://localhost:8080/api/reviews/${reviewId}/edit`, {
+    const response = await fetch(`${API_BASE_URL}/api/reviews/${reviewId}/edit`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -36,7 +38,7 @@ export async function editReview(reviewId, shadeName, rating, title, text, image
 }
 
 export async function deleteReview(reviewId) {
-    const response = await fetch(`http://localhost:8080/api/reviews/${reviewId}`, {
+    const response = await fetch(`${API_BASE_URL}/api/reviews/${reviewId}`, {
         method: 'DELETE',
         credentials: 'include'
     });
@@ -44,7 +46,7 @@ export async function deleteReview(reviewId) {
 }
 
 export async function getAverageRating(productId) {
-    const response = await fetch(`http://localhost:8080/api/reviews/${productId}/average-rating`);
+    const response = await fetch(`${API_BASE_URL}/api/reviews/${productId}/average-rating`);
     return response.json();
 }
 
@@ -56,14 +58,14 @@ export async function getReviews(productId, page = 0, size = 10, options = {}) {
     if (options.sort) params.set("sort", options.sort);
     if (options.filter) params.set("filter", options.filter);
 
-    const response = await fetch(`http://localhost:8080/api/reviews/${productId}?${params.toString()}`, {
+    const response = await fetch(`${API_BASE_URL}/api/reviews/${productId}?${params.toString()}`, {
         credentials: 'include'
     });
     return response.json();
 }
 
 export async function upvoteReview(reviewId) {
-    const response = await fetch(`http://localhost:8080/api/reviews/${reviewId}/upvote`, {
+    const response = await fetch(`${API_BASE_URL}/api/reviews/${reviewId}/upvote`, {
         method: 'POST',
         credentials: 'include'
     });
@@ -71,7 +73,7 @@ export async function upvoteReview(reviewId) {
 }
 
 export async function removeUpvoteReview(reviewId) {
-    const response = await fetch(`http://localhost:8080/api/reviews/${reviewId}/upvote`, {
+    const response = await fetch(`${API_BASE_URL}/api/reviews/${reviewId}/upvote`, {
         method: 'DELETE',
         credentials: 'include'
     });
@@ -79,7 +81,7 @@ export async function removeUpvoteReview(reviewId) {
 }
 
 export async function reportReview(reviewId, reason) {
-    const response = await fetch(`http://localhost:8080/api/reviews/${reviewId}/report`, {
+    const response = await fetch(`${API_BASE_URL}/api/reviews/${reviewId}/report`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -99,7 +101,7 @@ export async function searchReviews(productId, query, page = 0, size = 10, optio
     if (options.sort) params.set("sort", options.sort);
     if (options.filter) params.set("filter", options.filter);
 
-    const response = await fetch(`http://localhost:8080/api/reviews/${productId}/search?${params.toString()}`, {
+    const response = await fetch(`${API_BASE_URL}/api/reviews/${productId}/search?${params.toString()}`, {
         credentials: 'include'
     });
     return response.json();

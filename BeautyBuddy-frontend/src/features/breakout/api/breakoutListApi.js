@@ -1,6 +1,8 @@
+import { API_BASE_URL } from '../../../config/apiBase';
+
 export async function addToBreakoutList(type, id) {
     if (type === "ingredient") {
-        const response = await fetch(`http://localhost:8080/api/breakout-list/add`, {
+        const response = await fetch(`${API_BASE_URL}/api/breakout-list/add`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -11,7 +13,7 @@ export async function addToBreakoutList(type, id) {
     return response.ok;
     }
     else if (type === "product") {
-        const response = await fetch(`http://localhost:8080/api/breakout-list/add`, {
+        const response = await fetch(`${API_BASE_URL}/api/breakout-list/add`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -24,7 +26,7 @@ export async function addToBreakoutList(type, id) {
 }
 
 export async function getBreakoutListProducts() {
-    const response = await fetch(`http://localhost:8080/api/breakout-list/products`, {
+    const response = await fetch(`${API_BASE_URL}/api/breakout-list/products`, {
         method: "GET",
         credentials: "include"
     });
@@ -32,7 +34,7 @@ export async function getBreakoutListProducts() {
 }
 
 export async function getBreakoutListIngredients() {
-    const response = await fetch(`http://localhost:8080/api/breakout-list/ingredients`, {
+    const response = await fetch(`${API_BASE_URL}/api/breakout-list/ingredients`, {
         method: "GET",
         credentials: "include"
     });
@@ -41,7 +43,7 @@ export async function getBreakoutListIngredients() {
 
 export async function removeFromBreakoutList(type, id) {
     if (type === "ingredient") {
-        const response = await fetch(`http://localhost:8080/api/breakout-list/remove`, {
+        const response = await fetch(`${API_BASE_URL}/api/breakout-list/remove`, {
         method: "DELETE",
         credentials: "include",
         headers: {
@@ -51,7 +53,7 @@ export async function removeFromBreakoutList(type, id) {
     return response.ok;
     }
     else if (type === "product") {
-        const response = await fetch(`http://localhost:8080/api/breakout-list/remove`, {
+        const response = await fetch(`${API_BASE_URL}/api/breakout-list/remove`, {
         method: "DELETE",
         credentials: "include",
         headers: {

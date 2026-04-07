@@ -1,7 +1,9 @@
+import { API_BASE_URL } from '../../../config/apiBase';
+
 export async function getDiscussions(page = 0, size = 10, sort = null) {
     const params = new URLSearchParams({ page: String(page), size: String(size) });
     if (sort) params.set("sort", sort);
-    const res = await fetch(`http://localhost:8080/api/discussions?${params.toString()}`, {
+    const res = await fetch(`${API_BASE_URL}/api/discussions?${params.toString()}`, {
         credentials: 'include'
     });
     return res.json();
@@ -10,14 +12,14 @@ export async function getDiscussions(page = 0, size = 10, sort = null) {
 export async function searchDiscussions(query, sort = null, page = 0, size = 10) {
     const params = new URLSearchParams({ query: String(query), page: String(page), size: String(size) });
     if (sort) params.set("sort", sort);
-    const res = await fetch(`http://localhost:8080/api/discussions/search?${params.toString()}`, {
+    const res = await fetch(`${API_BASE_URL}/api/discussions/search?${params.toString()}`, {
         credentials: 'include'
     });
     return res.json();
 }
 
 export async function createDiscussion( title, text ) {
-    const response = await fetch(`http://localhost:8080/api/discussions`, {
+    const response = await fetch(`${API_BASE_URL}/api/discussions`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -27,7 +29,7 @@ export async function createDiscussion( title, text ) {
 }
 
 export async function editDiscussion(discussionId, title, text) {
-    const response = await fetch(`http://localhost:8080/api/discussions/${discussionId}/edit`, {
+    const response = await fetch(`${API_BASE_URL}/api/discussions/${discussionId}/edit`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -37,7 +39,7 @@ export async function editDiscussion(discussionId, title, text) {
 }
 
 export async function createComment(discussionId, parentDiscussionCommentId, text) {
-    const response = await fetch(`http://localhost:8080/api/discussions/${discussionId}/comment`, {
+    const response = await fetch(`${API_BASE_URL}/api/discussions/${discussionId}/comment`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -47,7 +49,7 @@ export async function createComment(discussionId, parentDiscussionCommentId, tex
 }
 
 export async function editComment(commentId, text) {
-    const response = await fetch(`http://localhost:8080/api/discussions/comments/${commentId}/edit`, {
+    const response = await fetch(`${API_BASE_URL}/api/discussions/comments/${commentId}/edit`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -57,7 +59,7 @@ export async function editComment(commentId, text) {
 }
 
 export async function upvoteDiscussion(discussionId) {
-    const response = await fetch(`http://localhost:8080/api/discussions/${discussionId}/upvote`, {
+    const response = await fetch(`${API_BASE_URL}/api/discussions/${discussionId}/upvote`, {
         method: "POST",
         credentials: "include",
     });
@@ -65,7 +67,7 @@ export async function upvoteDiscussion(discussionId) {
 }
 
 export async function removeUpvoteDiscussion(discussionId) {
-    const response = await fetch(`http://localhost:8080/api/discussions/${discussionId}/upvote`, {
+    const response = await fetch(`${API_BASE_URL}/api/discussions/${discussionId}/upvote`, {
         method: "DELETE",
         credentials: "include",
     });
@@ -73,7 +75,7 @@ export async function removeUpvoteDiscussion(discussionId) {
 }
 
 export async function upvoteComment(commentId) {
-    const response = await fetch(`http://localhost:8080/api/discussions/comments/${commentId}/upvote`, {
+    const response = await fetch(`${API_BASE_URL}/api/discussions/comments/${commentId}/upvote`, {
         method: "POST",
         credentials: "include",
     });
@@ -81,7 +83,7 @@ export async function upvoteComment(commentId) {
 }
 
 export async function removeUpvoteComment(commentId) {
-    const response = await fetch(`http://localhost:8080/api/discussions/comments/${commentId}/upvote`, {
+    const response = await fetch(`${API_BASE_URL}/api/discussions/comments/${commentId}/upvote`, {
         method: "DELETE",
         credentials: "include",
     });
@@ -89,7 +91,7 @@ export async function removeUpvoteComment(commentId) {
 }
 
 export async function reportDiscussion(discussionId, reason) {
-    const response = await fetch(`http://localhost:8080/api/discussions/${discussionId}/report`, {
+    const response = await fetch(`${API_BASE_URL}/api/discussions/${discussionId}/report`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -99,7 +101,7 @@ export async function reportDiscussion(discussionId, reason) {
 }
 
 export async function reportComment(commentId, reason) {
-    const response = await fetch(`http://localhost:8080/api/discussions/comments/${commentId}/report`, {
+    const response = await fetch(`${API_BASE_URL}/api/discussions/comments/${commentId}/report`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

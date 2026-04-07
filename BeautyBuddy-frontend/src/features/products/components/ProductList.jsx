@@ -192,7 +192,7 @@ export default function ProductList({ searchQuery, sortKey, filterOption, onLoad
 
   async function handleInlineReviewSubmitted(productId) {
     try {
-      const res = await fetch(`http://localhost:8080/api/products/${productId}`);
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'}/api/products/${productId}`);
       if (!res.ok) return;
       const updated = await res.json();
       setProducts(prev =>
@@ -215,9 +215,10 @@ export default function ProductList({ searchQuery, sortKey, filterOption, onLoad
     const { category } = getFilterParams(filterOption);
     if (category) params.set("category", category);
 
+    const base = `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'}/api/products/search`;
     const url = params.toString()
-      ? `http://localhost:8080/api/products/search?${params.toString()}`
-      : `http://localhost:8080/api/products/search`;
+      ? `${base}?${params.toString()}`
+      : base;
 
     fetch(url)
       .then(res => res.json())
