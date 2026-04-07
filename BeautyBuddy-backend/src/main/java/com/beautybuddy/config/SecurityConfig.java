@@ -46,7 +46,7 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of(
             "http://localhost:5173", // Vite dev default
-            "http://localhost:5174", // Vite dev when 5173 is taken
+            "http://localhost:5174", // Vite dev backup
             "http://4.206.222.136:5173" // frontend served from VM
         ));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
