@@ -30,12 +30,3 @@ function App() {
 }
 
 export default App
-
-/*
-
-$env:JWT_SECRET_KEY="RDf2fJEaXHWQWtu9zFu59E9Ncgsg1aAUJGbFYc1dMc5yCxA8sdno8HWu9WsuGL51KnA0AGXrauixJ3ZNLAnE3rB9Pdq6s7i427ac"
-mvn spring-boot:run
-
-npm.cmd run dev
-
-*/
