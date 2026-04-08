@@ -109,7 +109,7 @@ public class AuthService {
     public boolean login(String email, String rawPassword) {
         email = email.trim().toLowerCase();
         User user = userRepo.findByEmail(email)
-            .orElseThrow(() -> new RuntimeException("Invalid credentials"));
+            .orElseThrow(() -> new RuntimeException("user not found"));
 
         return encoder.matches(rawPassword, user.getPasswordHash());
     }
