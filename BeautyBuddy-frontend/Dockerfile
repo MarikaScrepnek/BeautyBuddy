@@ -1,19 +1,26 @@
-# Use Node LTS
-FROM node:22-slim
-
+# ---- Stage 1: Build ----
+FROM node:22-slim AS build
 WORKDIR /app
 
-COPY package*.json ./
+COPY BeautyBuddy/BeautyBuddy-frontend /app
 RUN npm install --legacy-peer-deps
-
-COPY . .
-
-# Build the frontend
-ARG VITE_API_BASE_URL
-ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
-
 RUN npm run build
 
-# Serve static files
+# ---- Stage 2: Serve ----
+FROM node:22-slim
+WORKDIR /app
+
+# Install only the server
 RUN npm install -g serve
+
+# Copy only the built dist folder
+COPY --from=build /app/dist ./dist
+
+# Expose port
+EXPOSE 5173
+
+# Use runtime ENV from docker-compose
+ENV VITE_API_BASE_URL=""
+
+# Start server
 CMD ["serve", "-s", "dist", "-l", "5173"]
