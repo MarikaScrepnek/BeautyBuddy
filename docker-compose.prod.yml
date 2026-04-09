@@ -3,8 +3,8 @@ version: "3.9"
 services:
   backend:
     build: ./BeautyBuddy-backend
-    expose:
-      - "8080"
+    ports:
+      - "8080:8080"
     environment:
       - JWT_SECRET_KEY=${JWT_SECRET_KEY}
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/${POSTGRES_DB}
@@ -16,8 +16,8 @@ services:
 
   frontend:
     build: ./BeautyBuddy-frontend
-    expose:
-      - 80
+    ports:
+      - "3000:80"
     depends_on:
       - backend
     restart: unless-stopped
