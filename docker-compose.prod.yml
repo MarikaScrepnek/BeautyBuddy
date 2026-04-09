@@ -12,6 +12,7 @@ services:
       - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
     depends_on:
       - db
+    restart: unless-stopped
 
   frontend:
     build: ./BeautyBuddy-frontend
@@ -19,6 +20,7 @@ services:
       - "5173:80"
     depends_on:
       - backend
+    restart: unless-stopped
 
   db:
     image: postgres:15
@@ -26,3 +28,4 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    restart: unless-stopped
