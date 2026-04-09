@@ -1,7 +1,7 @@
 import { API_BASE_URL } from '../../../config/apiBase';
 
 export async function getMakeupRoutines() {
-    const response = await fetch(`${API_BASE_URL}/api/routines/makeup`, {
+    const response = await fetch(`${API_BASE_URL}/routines/makeup`, {
         method: "GET",
         credentials: "include",
     });
@@ -12,7 +12,7 @@ export async function getMakeupRoutines() {
 }
 
 export async function getSkincareRoutines() {
-    const response = await fetch(`${API_BASE_URL}/api/routines/skincare`, {
+    const response = await fetch(`${API_BASE_URL}/routines/skincare`, {
         method: "GET",
         credentials: "include",
     });
@@ -23,7 +23,7 @@ export async function getSkincareRoutines() {
 }
 
 export async function getHaircareRoutine() {
-    const response = await fetch(`${API_BASE_URL}/api/routines/haircare`, {
+    const response = await fetch(`${API_BASE_URL}/routines/haircare`, {
         method: "GET",
         credentials: "include",
     });
@@ -34,7 +34,7 @@ export async function getHaircareRoutine() {
 }
 
 export async function createMakeupRoutine(occasion, name, notes) {
-    const response = await fetch(`${API_BASE_URL}/api/routines/makeup`, {
+    const response = await fetch(`${API_BASE_URL}/routines/makeup`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -49,7 +49,7 @@ export async function createMakeupRoutine(occasion, name, notes) {
 }
 
 export async function addProductToRoutine(routineId, productId, shadeName) {
-    const response = await fetch(`${API_BASE_URL}/api/routines/${routineId}/add-product`, {
+    const response = await fetch(`${API_BASE_URL}/routines/${routineId}/add-product`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -64,7 +64,7 @@ export async function addProductToRoutine(routineId, productId, shadeName) {
 }
 
 export async function updateRoutine(updatedData) {
-    const response = await fetch(`${API_BASE_URL}/api/routines/${updatedData.routineId}`, {
+    const response = await fetch(`${API_BASE_URL}/routines/${updatedData.routineId}`, {
         method: "PUT",
         credentials: "include",
         headers: {
@@ -79,7 +79,7 @@ export async function updateRoutine(updatedData) {
 }
 
 export async function getAllRoutineItems() {
-    const response = await fetch(`${API_BASE_URL}/api/routines/items`, {
+    const response = await fetch(`${API_BASE_URL}/routines/items`, {
         method: "GET",
         credentials: "include",
     });
@@ -90,7 +90,7 @@ export async function getAllRoutineItems() {
 }
 
 export async function deleteRoutineItem(routineId,itemId, shadeName) {
-    const response = await fetch(`${API_BASE_URL}/api/routines/${routineId}/${itemId}`, {
+    const response = await fetch(`${API_BASE_URL}/routines/${routineId}/${itemId}`, {
         method: "DELETE",
         credentials: "include",
         headers: {

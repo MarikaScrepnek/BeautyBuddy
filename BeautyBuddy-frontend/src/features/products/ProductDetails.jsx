@@ -212,7 +212,7 @@ export default function ProductDetails() {
 
     const loadProduct = () => {
         setLoading(true);
-        fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'}/api/products/${productId}`)
+        fetch(`/api/products/${productId}`)
             .then(res => res.json())
             .then(setData)
             .catch(console.error)

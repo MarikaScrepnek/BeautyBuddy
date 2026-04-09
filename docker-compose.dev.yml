@@ -21,8 +21,6 @@ services:
     working_dir: /app
     volumes:
       - ./BeautyBuddy-frontend:/app
-    environment:
-      - VITE_API_BASE_URL=http://localhost:8080
     command: bash -c "npm install --legacy-peer-deps && npm run dev -- --host 0.0.0.0"
     ports:
       - "5173:5173"

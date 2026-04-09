@@ -7,14 +7,14 @@ export async function getQuestionsForProduct(productId, page = 0, size = 10, opt
     });
     if (options.sort) params.set("sort", options.sort);
 
-    const res = await fetch(`${API_BASE_URL}/api/questions/${productId}?${params.toString()}`, {
+    const res = await fetch(`${API_BASE_URL}/questions/${productId}?${params.toString()}`, {
         credentials: 'include'
     });
     return res.json();
 }
 
 export async function submitQuestion(productId, text) {
-    const res = await fetch(`${API_BASE_URL}/api/questions/ask`, {
+    const res = await fetch(`${API_BASE_URL}/questions/ask`, {
         method: 'POST',
         credentials: 'include',
         headers: {
@@ -26,7 +26,7 @@ export async function submitQuestion(productId, text) {
 }
 
 export async function submitAnswer(questionId, text) {
-    const res = await fetch(`${API_BASE_URL}/api/answers/submit`, {
+    const res = await fetch(`${API_BASE_URL}/answers/submit`, {
         method: 'POST',
         credentials: 'include',
         headers: {
@@ -38,7 +38,7 @@ export async function submitAnswer(questionId, text) {
 }
 
 export async function editQuestion(questionId, text) {
-    const res = await fetch(`${API_BASE_URL}/api/questions/${questionId}/edit`, {
+    const res = await fetch(`${API_BASE_URL}/questions/${questionId}/edit`, {
         method: 'POST',
         credentials: 'include',
         headers: {
@@ -50,7 +50,7 @@ export async function editQuestion(questionId, text) {
 }
 
 export async function editAnswer(answerId, text) {
-    const res = await fetch(`${API_BASE_URL}/api/answers/${answerId}/edit`, {
+    const res = await fetch(`${API_BASE_URL}/answers/${answerId}/edit`, {
         method: 'POST',
         credentials: 'include',
         headers: {
@@ -62,7 +62,7 @@ export async function editAnswer(answerId, text) {
 }
 
 export async function removeQuestion(questionId) {
-    const res = await fetch(`${API_BASE_URL}/api/questions/${questionId}`, {
+    const res = await fetch(`${API_BASE_URL}/questions/${questionId}`, {
         method: 'DELETE',
         credentials: 'include'
     });
@@ -70,7 +70,7 @@ export async function removeQuestion(questionId) {
 }
 
 export async function removeAnswer(answerId) {
-    const res = await fetch(`${API_BASE_URL}/api/answers/${answerId}`, {
+    const res = await fetch(`${API_BASE_URL}/answers/${answerId}`, {
         method: 'DELETE',
         credentials: 'include'
     });
@@ -78,7 +78,7 @@ export async function removeAnswer(answerId) {
 }
 
 export async function upvoteQuestion(questionId) {
-    const res = await fetch(`${API_BASE_URL}/api/questions/${questionId}/upvote`, {
+    const res = await fetch(`${API_BASE_URL}/questions/${questionId}/upvote`, {
         method: 'POST',
         credentials: 'include'
     });
@@ -86,7 +86,7 @@ export async function upvoteQuestion(questionId) {
 }
 
 export async function upvoteAnswer(answerId) {
-    const res = await fetch(`${API_BASE_URL}/api/answers/${answerId}/upvote`, {
+    const res = await fetch(`${API_BASE_URL}/answers/${answerId}/upvote`, {
         method: 'POST',
         credentials: 'include'
     });
@@ -94,7 +94,7 @@ export async function upvoteAnswer(answerId) {
 }
 
 export async function removeUpvoteQuestion(questionId) {
-    const res = await fetch(`${API_BASE_URL}/api/questions/${questionId}/upvote`, {
+    const res = await fetch(`${API_BASE_URL}/questions/${questionId}/upvote`, {
         method: 'DELETE',
         credentials: 'include'
     });
@@ -102,7 +102,7 @@ export async function removeUpvoteQuestion(questionId) {
 }
 
 export async function removeUpvoteAnswer(answerId) {
-    const res = await fetch(`${API_BASE_URL}/api/answers/${answerId}/upvote`, {
+    const res = await fetch(`${API_BASE_URL}/answers/${answerId}/upvote`, {
         method: 'DELETE',
         credentials: 'include'
     });
@@ -110,7 +110,7 @@ export async function removeUpvoteAnswer(answerId) {
 }
 
 export async function reportQuestion(questionId, reason) {
-    const res = await fetch(`${API_BASE_URL}/api/questions/${questionId}/report`, {
+    const res = await fetch(`${API_BASE_URL}/questions/${questionId}/report`, {
         method: 'POST',
         credentials: 'include',
         headers: {
@@ -122,7 +122,7 @@ export async function reportQuestion(questionId, reason) {
 }
 
 export async function reportAnswer(answerId, reason) {
-    const res = await fetch(`${API_BASE_URL}/api/answers/${answerId}/report`, {
+    const res = await fetch(`${API_BASE_URL}/answers/${answerId}/report`, {
         method: 'POST',
         credentials: 'include',
         headers: {
@@ -141,7 +141,7 @@ export async function searchQuestions(productId, query, page = 0, size = 10, opt
     });
     if (options.sort) params.set("sort", options.sort);
 
-    const response = await fetch(`${API_BASE_URL}/api/questions/${productId}/search?${params.toString()}`, {
+    const response = await fetch(`${API_BASE_URL}/questions/${productId}/search?${params.toString()}`, {
         credentials: 'include'
     });
     return response.json();

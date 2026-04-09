@@ -1,7 +1,7 @@
 import { API_BASE_URL } from '../../../config/apiBase';
 
 export async function addToWishlist(productId, shadeName) {
-  const res = await fetch(`${API_BASE_URL}/api/wishlist/add`, {
+  const res = await fetch(`${API_BASE_URL}/wishlist/add`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -13,7 +13,7 @@ export async function addToWishlist(productId, shadeName) {
 }
 
 export async function removeFromWishlist(productId, shadeName) {
-  const res = await fetch(`${API_BASE_URL}/api/wishlist/remove`, {
+  const res = await fetch(`${API_BASE_URL}/wishlist/remove`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -32,7 +32,7 @@ export async function getWishlist({ sort, category, priceRange, query } = {}) {
   if (query) params.set("query", query);
 
   const qs = params.toString();
-  const base = `${API_BASE_URL}/api/wishlist`;
+  const base = `${API_BASE_URL}/wishlist`;
   const url = qs ? `${base}?${qs}` : base;
 
   const res = await fetch(url, {

@@ -1,7 +1,7 @@
 import { API_BASE_URL } from '../../../config/apiBase';
 
 export default function getIngredients(page = 0, size = 10, searchQuery = "") {
-    let url = `${API_BASE_URL}/api/ingredients?page=${page}&size=${size}`;
+    let url = `${API_BASE_URL}/ingredients?page=${page}&size=${size}`;
     if (searchQuery) {
         url += `&search=${encodeURIComponent(searchQuery)}`;
     }

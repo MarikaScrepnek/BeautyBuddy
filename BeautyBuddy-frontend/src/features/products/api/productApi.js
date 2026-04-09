@@ -1,12 +1,12 @@
 import { API_BASE_URL } from '../../../config/apiBase';
 
 export async function getProducts() {
-  const res = await fetch(`${API_BASE_URL}/api/products`);
+  const res = await fetch(`${API_BASE_URL}/products`);
     return res.json();
   }
 
 export async function reportProduct(productId, reason) {
-    const response = await fetch(`${API_BASE_URL}/api/products/${productId}/report`, {
+    const response = await fetch(`${API_BASE_URL}/products/${productId}/report`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
