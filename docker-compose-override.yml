@@ -1,0 +1,13 @@
+version: "3.9"
+services:
+  backend:
+    environment:
+      - JWT_SECRET_KEY=localdevkey123
+    ports:
+      - "8080:8080"
+
+  frontend:
+    environment:
+      - VITE_API_BASE_URL=http://localhost:8080
+    ports:
+      - "5173:5173"
