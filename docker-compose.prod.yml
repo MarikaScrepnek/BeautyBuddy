@@ -1,26 +1,22 @@
 version: "3.9"
+
 services:
   backend:
     build: ./BeautyBuddy-backend
-    env_file:
-      - .env
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${POSTGRES_DB}
-      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
-      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "8080:8080"
-    restart: always
+    environment:
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/${POSTGRES_DB}
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
     depends_on:
       - db
 
   frontend:
     build: ./BeautyBuddy-frontend
-    env_file:
-      - .env
     ports:
       - "5173:5173"
-    restart: always
 
   db:
     image: postgres:15
@@ -28,9 +24,3 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    restart: always
-
-volumes:
-  postgres_data:

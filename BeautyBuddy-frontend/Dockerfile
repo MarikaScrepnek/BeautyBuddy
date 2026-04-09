@@ -2,7 +2,7 @@
 FROM node:22-slim AS build
 WORKDIR /app
 
-COPY BeautyBuddy/BeautyBuddy-frontend /app
+COPY . .
 RUN npm install --legacy-peer-deps
 RUN npm run build
 
@@ -18,9 +18,6 @@ COPY --from=build /app/dist ./dist
 
 # Expose port
 EXPOSE 5173
-
-# Use runtime ENV from docker-compose
-ENV VITE_API_BASE_URL=""
 
 # Start server
 CMD ["serve", "-s", "dist", "-l", "5173"]
