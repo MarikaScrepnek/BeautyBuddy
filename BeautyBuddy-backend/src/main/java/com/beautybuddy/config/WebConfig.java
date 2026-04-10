@@ -15,7 +15,8 @@ public class WebConfig {
                 registry.addMapping("/api/**")
                         .allowedOrigins(
                             "http://localhost:5173",
-                            "http://4.206.222.136:5173"
+                            "https://beautybuddy.ca",
+                            "https://www.beautybuddy.ca"
                         )
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowCredentials(true);
