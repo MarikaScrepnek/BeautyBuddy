@@ -26,12 +26,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain)
             throws ServletException, IOException {
-
-        if (request.getRequestURI().startsWith("/api/auth/")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-        
         String jwt = null;
 
         if (request.getCookies() != null) {
@@ -48,14 +42,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             User user = userRepository.findByEmail(email).orElse(null);
             if (user != null) {
                 CustomUserDetails userDetails = new CustomUserDetails(
-                user.getId(), user.getUsername(), user.getEmail(), user.getPasswordHash()
-            );
-            UsernamePasswordAuthenticationToken auth =
-                    new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-            auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-            SecurityContextHolder.getContext().setAuthentication(auth);
+                    user.getId(), user.getUsername(), user.getEmail(), user.getPasswordHash()
+                );
+                UsernamePasswordAuthenticationToken auth =
+                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(auth);
+            }
         }
-    }
 
         filterChain.doFilter(request, response);
     }

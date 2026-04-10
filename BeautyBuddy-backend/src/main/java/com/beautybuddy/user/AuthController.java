@@ -11,6 +11,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Cookie;
 
@@ -47,7 +48,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Map<String, String>> login(@RequestBody Map<String, String> request) {
+    public ResponseEntity<Map<String, String>> login(@RequestBody Map<String, String> request, HttpServletRequest httpRequest) {
         try {
             boolean success = authService.login(
                 request.get("email"),
@@ -56,10 +57,13 @@ public class AuthController {
             if (success) {
                 String jwt = JwtUtil.generateToken(request.get("email"));
 
+                boolean isSecure = httpRequest.isSecure()
+                    || "https".equalsIgnoreCase(httpRequest.getHeader("X-Forwarded-Proto"));
+
                 ResponseCookie cookie = ResponseCookie.from("jwt", jwt)
                     .httpOnly(true)
-                    .secure(false) //CHANGE TO TRUE IN PRODUCTION
-                    .sameSite("Lax") //CHANGE TO STRICT IN PRODUCTION
+                    .secure(isSecure)
+                    .sameSite("Strict")
                     .path("/")
                     .maxAge(24 * 60 * 60)
                     .build();
@@ -94,10 +98,13 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(HttpServletResponse response) {
+    public ResponseEntity<?> logout(HttpServletRequest httpRequest, HttpServletResponse response) {
+        boolean isSecure = httpRequest.isSecure()
+            || "https".equalsIgnoreCase(httpRequest.getHeader("X-Forwarded-Proto"));
+
         Cookie cookie = new Cookie("jwt", "");
         cookie.setHttpOnly(true);
-        cookie.setSecure(true);
+        cookie.setSecure(isSecure);
         cookie.setPath("/");
         cookie.setMaxAge(0);
 
