@@ -47,7 +47,8 @@ public class SecurityConfig {
         configuration.setAllowedOrigins(List.of(
             "http://localhost:5173", // Vite dev default
             "http://localhost:5174", // Vite dev backup
-            "http://4.206.222.136:5173" // frontend served from VM
+            "https://beautybuddy.ca",
+            "https://www.beautybuddy.ca"
         ));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
