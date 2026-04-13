@@ -1,5 +1,9 @@
 # BeautyBuddy
 
+🌐 Live Demo: https://beautybuddy.ca  
+
+⚠️ Note: This project is still in active development and may contain incomplete features or UI inconsistencies. It is deployed to demonstrate cloud infrastructure and full-stack integration.
+
 ⚠️ For Viewing Only: This project is public for portfolio/review purposes. No reuse allowed.
 
 BeautyBuddy is a full-stack beauty community platform built for product discovery, social proof, and personalized routines. Users can browse products, write reviews, ask product questions, join discussions, and track routines, wishlist items, and breakout triggers.
