@@ -26,4 +26,9 @@ services:
     - GF_SERVER_ROOT_URL=https://grafana.beautybuddy.ca
     - GF_SERVER_DOMAIN=grafana.beautybuddy.ca
     - GF_SERVER_SERVE_FROM_SUB_PATH=false
+    volumes:
+    - grafana-storage:/var/lib/grafana
     restart: unless-stopped
+
+volumes:
+  grafana-data:
