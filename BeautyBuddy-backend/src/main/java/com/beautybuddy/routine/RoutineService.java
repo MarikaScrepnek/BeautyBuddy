@@ -24,6 +24,9 @@ import com.beautybuddy.user.UserRepository;
 import com.beautybuddy.user.entity.User;
 import com.beautybuddy.review.ReviewRepository;
 
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
+
 @Service
 public class RoutineService {
     private final UserRepository userRepository;
@@ -33,13 +36,30 @@ public class RoutineService {
     private final ProductShadeRepository productShadeRepository;
     private final ReviewRepository reviewRepository;
 
-    public RoutineService(UserRepository userRepository, CategoryRepository categoryRepository, RoutineRepository routineRepository, ReviewRepository reviewRepository, ProductRepository productRepository, ProductShadeRepository productShadeRepository) {
+    private final Counter routineCreationCounter;
+    private final Counter routineUpdateCounter;
+    private final Counter routineAddProductCounter;
+    private final Counter routineRemoveProductCounter;
+
+    public RoutineService(UserRepository userRepository, CategoryRepository categoryRepository, RoutineRepository routineRepository, ReviewRepository reviewRepository, ProductRepository productRepository, ProductShadeRepository productShadeRepository, MeterRegistry meterRegistry) {
         this.userRepository = userRepository;
         this.categoryRepository = categoryRepository;
         this.routineRepository = routineRepository;
         this.productRepository = productRepository;
         this.productShadeRepository = productShadeRepository;
         this.reviewRepository = reviewRepository;
+        this.routineCreationCounter = Counter.builder("routine_creation_total")
+            .description("Total number of routines created")
+            .register(meterRegistry);
+        this.routineUpdateCounter = Counter.builder("routine_update_total")
+            .description("Total number of routines updated")
+            .register(meterRegistry);
+        this.routineAddProductCounter = Counter.builder("routine_add_product_total")
+            .description("Total number of products added to routines")
+            .register(meterRegistry);
+        this.routineRemoveProductCounter = Counter.builder("routine_remove_product_total")
+            .description("Total number of products removed from routines")
+            .register(meterRegistry);
     }
 
     public List<DisplayRoutineDTO> getMakeupRoutines(String userEmail) {
@@ -113,6 +133,7 @@ public class RoutineService {
         routine.setOccasion(request.occasion());
 
         routineRepository.save(routine);
+        routineCreationCounter.increment();
     }
 
     public void addProductToRoutine(String userEmail, Long routineId, AddToRoutineRequestDTO request) {
@@ -146,6 +167,7 @@ public class RoutineService {
 
         routine.getItems().add(item);
         routineRepository.save(routine);
+        routineAddProductCounter.increment();
     }
 
     public DisplayRoutineDTO updateRoutine(String userEmail, DisplayRoutineDTO request) {
@@ -201,6 +223,7 @@ public class RoutineService {
         routine.setNotes(request.notes());
         routine.setUpdatedAt(now);
         routineRepository.save(routine);
+        routineUpdateCounter.increment();
         return DTOMapper.toDisplayRoutineDTO(routine, reviewRepository);
     }
 
@@ -235,6 +258,7 @@ public class RoutineService {
 
         itemToRemove.setValidTo(LocalDateTime.now());
         routineRepository.save(routine);
+        routineRemoveProductCounter.increment();
     }
     
 }
