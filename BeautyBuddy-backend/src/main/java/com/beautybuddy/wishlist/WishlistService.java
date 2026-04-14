@@ -19,6 +19,9 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
+
 @Service
 public class WishlistService {
     private final UserRepository userRepository;
@@ -26,11 +29,20 @@ public class WishlistService {
     private final ProductShadeRepository shadeRepository;
     private final WishlistItemRepository wishlistItemRepository;
 
-    public WishlistService(UserRepository userRepository, ProductRepository productRepository, ProductShadeRepository shadeRepository, WishlistItemRepository wishlistItemRepository) {
+    private final Counter wishlistAddCounter;
+    private final Counter wishlistRemoveCounter;
+
+    public WishlistService(UserRepository userRepository, ProductRepository productRepository, ProductShadeRepository shadeRepository, WishlistItemRepository wishlistItemRepository, MeterRegistry meterRegistry) {
         this.userRepository = userRepository;
         this.productRepository = productRepository;
         this.shadeRepository = shadeRepository;
         this.wishlistItemRepository = wishlistItemRepository;
+        this.wishlistAddCounter = Counter.builder("wishlist_add_total")
+                .description("Total number of items added to wishlists")
+                .register(meterRegistry);
+        this.wishlistRemoveCounter = Counter.builder("wishlist_remove_total")
+                .description("Total number of items removed from wishlists")
+                .register(meterRegistry);
     }
 
     @Transactional
@@ -59,6 +71,7 @@ public class WishlistService {
         item.setShade(shade);
 
         wishlistItemRepository.save(item);
+        wishlistAddCounter.increment();
     }
 
     public List<WishlistItemDTO> getWishlistItems(String username) {
@@ -217,6 +230,7 @@ public class WishlistService {
         }
         if (target != null) {
             wishlistItemRepository.delete(target);
+            wishlistRemoveCounter.increment();
         } else {
             throw new RuntimeException("Wishlist item not found");
         }
