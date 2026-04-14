@@ -30,6 +30,9 @@ import com.beautybuddy.review.entity.Review;
 import com.beautybuddy.user.UserRepository;
 import com.beautybuddy.user.entity.User;
 
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
+
 @Service
 public class ReportService {
     private final UserRepository userRepository;
@@ -45,12 +48,20 @@ public class ReportService {
     private final DiscussionReportRepository discussionReportRepository;
     private final DiscussionCommentReportRepository discussionCommentReportRepository;
     private final ProductReportRepository productReportRepository;
+
+    private final Counter reviewReportCounter;
+    private final Counter questionReportCounter;
+    private final Counter answerReportCounter;
+    private final Counter discussionReportCounter;
+    private final Counter discussionCommentReportCounter;
+    private final Counter productReportCounter;
+
     public ReportService(UserRepository userRepository, ReviewRepository reviewRepository,
                          QuestionRepository questionRepository, AnswerRepository answerRepository,
                          DiscussionRepository discussionRepository, DiscussionCommentRepository discussionCommentRepository,
                          ProductRepository productRepository, ReviewReportRepository reviewReportRepository, QuestionReportRepository questionReportRepository,
                          AnswerReportRepository answerReportRepository, DiscussionReportRepository discussionReportRepository,
-                         DiscussionCommentReportRepository discussionCommentReportRepository, ProductReportRepository productReportRepository) {
+                         DiscussionCommentReportRepository discussionCommentReportRepository, ProductReportRepository productReportRepository, MeterRegistry meterRegistry) {
         this.reviewRepository = reviewRepository;
         this.userRepository = userRepository;
         this.questionRepository = questionRepository;
@@ -64,6 +75,24 @@ public class ReportService {
         this.answerReportRepository = answerReportRepository;
         this.discussionReportRepository = discussionReportRepository;
         this.discussionCommentReportRepository = discussionCommentReportRepository;
+        this.reviewReportCounter = Counter.builder("reviews_reported_total")
+            .description("Total number of reviews reported")
+            .register(meterRegistry);
+        this.questionReportCounter = Counter.builder("questions_reported_total")
+            .description("Total number of questions reported")
+            .register(meterRegistry);
+        this.answerReportCounter = Counter.builder("answers_reported_total")
+            .description("Total number of answers reported")
+            .register(meterRegistry);
+        this.discussionReportCounter = Counter.builder("discussions_reported_total")
+            .description("Total number of discussions reported")
+            .register(meterRegistry);
+        this.discussionCommentReportCounter = Counter.builder("discussion_comments_reported_total")
+            .description("Total number of discussion comments reported")
+            .register(meterRegistry);
+        this.productReportCounter = Counter.builder("products_reported_total")
+            .description("Total number of products reported")
+            .register(meterRegistry);
     }
 
     @Transactional
@@ -83,6 +112,7 @@ public class ReportService {
             newReport.setReason(reason);
 
             reviewReportRepository.save(newReport);
+            reviewReportCounter.increment();
         }
         else if (targetType.equals("question")) {
             Question question = questionRepository.findById(targetId)
@@ -96,6 +126,7 @@ public class ReportService {
             newReport.setReason(reason);
 
             questionReportRepository.save(newReport);
+            questionReportCounter.increment();
         }
         else if (targetType.equals("answer")) {
             Answer answer = answerRepository.findById(targetId)
@@ -109,6 +140,7 @@ public class ReportService {
             newReport.setReason(reason);
 
             answerReportRepository.save(newReport);
+            answerReportCounter.increment();
         }
         else if (targetType.equals("discussion")) {
             Discussion discussion = discussionRepository.findById(targetId)
@@ -122,6 +154,7 @@ public class ReportService {
             newReport.setReason(reason);
 
             discussionReportRepository.save(newReport);
+            discussionReportCounter.increment();
         }
         else if (targetType.equals("discussion_comment")) {
             DiscussionComment discussionComment = discussionCommentRepository.findById(targetId)
@@ -135,6 +168,7 @@ public class ReportService {
             newReport.setReason(reason);
 
             discussionCommentReportRepository.save(newReport);
+            discussionCommentReportCounter.increment();
         }
         else if (targetType.equals("product")) {
             Product product = productRepository.findById(targetId)
@@ -148,6 +182,7 @@ public class ReportService {
             newReport.setReason(reason);
 
             productReportRepository.save(newReport);
+            productReportCounter.increment();
         }
         else {
             throw new RuntimeException("Invalid target type");
