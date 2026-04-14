@@ -28,6 +28,9 @@ import org.springframework.data.domain.Sort;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
+
 @Service
 @Transactional(readOnly = true)
 public class ReviewService {
@@ -38,13 +41,18 @@ public class ReviewService {
     private final ReviewReportRepository reviewReportRepository;
     private final ReviewUpvoteRepository reviewUpvoteRepository;
 
-    public ReviewService(ReviewRepository reviewRepository, ReviewReportRepository reviewReportRepository, UserRepository userRepository, ProductRepository productRepository, ProductShadeRepository productShadeRepository, ReviewUpvoteRepository reviewUpvoteRepository) {
+    private final Counter reviewCounter;
+
+    public ReviewService(ReviewRepository reviewRepository, ReviewReportRepository reviewReportRepository, UserRepository userRepository, ProductRepository productRepository, ProductShadeRepository productShadeRepository, ReviewUpvoteRepository reviewUpvoteRepository, MeterRegistry meterRegistry) {
         this.reviewRepository = reviewRepository;
         this.userRepository = userRepository;
         this.productRepository = productRepository;
         this.productShadeRepository = productShadeRepository;
         this.reviewReportRepository = reviewReportRepository;
         this.reviewUpvoteRepository = reviewUpvoteRepository;
+        this.reviewCounter = Counter.builder("reviews_total")
+            .description("Total number of reviews")
+            .register(meterRegistry);
     }
 
     @Transactional
@@ -87,6 +95,7 @@ public class ReviewService {
         newReview.setReviewImages(reviewImages);
 
         reviewRepository.save(newReview);
+        reviewCounter.increment();
     }
 
     @Transactional
