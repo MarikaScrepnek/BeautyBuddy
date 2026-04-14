@@ -16,6 +16,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
+
 @Service
 public class AuthService {
     private final UserRepository userRepo;
@@ -25,7 +28,12 @@ public class AuthService {
     private final RoutineRepository routineRepository;
     private final BreakoutListRepository breakoutListRepo;
 
-    public AuthService(UserRepository userRepo, PasswordEncoder encoder, RoutineService routineService, CategoryRepository categoryRepository, RoutineRepository routineRepository, BreakoutListRepository breakoutListRepo) {
+    private final Counter userSignupCounter;
+
+    public AuthService(UserRepository userRepo, PasswordEncoder encoder, RoutineService routineService, CategoryRepository categoryRepository, RoutineRepository routineRepository, BreakoutListRepository breakoutListRepo, MeterRegistry meterRegistry) {
+        this.userSignupCounter = Counter.builder("user_signups_total")
+            .description("Total number of user signups")
+            .register(meterRegistry);
         this.userRepo = userRepo;
         this.encoder = encoder;
         this.categoryRepository = categoryRepository;
@@ -48,6 +56,7 @@ public class AuthService {
         user.setWishlist(wishlist);
 
         userRepo.save(user);
+        userSignupCounter.increment();
 
         Category makeupCategory = categoryRepository.findByName("Makeup")
         .orElseThrow(() -> new RuntimeException("Can't find category"));
