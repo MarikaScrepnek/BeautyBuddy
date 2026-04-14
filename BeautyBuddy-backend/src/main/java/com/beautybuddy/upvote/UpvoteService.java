@@ -26,6 +26,9 @@ import com.beautybuddy.upvote.repo.DiscussionUpvoteRepository;
 import com.beautybuddy.upvote.repo.QuestionUpvoteRepository;
 import com.beautybuddy.upvote.repo.ReviewUpvoteRepository;
 
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
+
 @Service
 public class UpvoteService {
     private final ReviewRepository reviewRepository;
@@ -40,7 +43,13 @@ public class UpvoteService {
     private final DiscussionCommentRepository discussionCommentRepository;
     private final DiscussionCommentUpvoteRepository discussionCommentUpvoteRepository;
 
-    public UpvoteService(ReviewRepository reviewRepository, UserRepository userRepository, ReviewUpvoteRepository reviewUpvoteRepository, QuestionRepository questionRepository, QuestionUpvoteRepository questionUpvoteRepository, AnswerRepository answerRepository, AnswerUpvoteRepository answerUpvoteRepository, DiscussionRepository discussionRepository, DiscussionUpvoteRepository discussionUpvoteRepository, DiscussionCommentRepository discussionCommentRepository, DiscussionCommentUpvoteRepository discussionCommentUpvoteRepository) {
+    private final Counter reviewUpvoteCounter;
+    private final Counter questionUpvoteCounter;
+    private final Counter answerUpvoteCounter;
+    private final Counter discussionUpvoteCounter;
+    private final Counter discussionCommentUpvoteCounter;
+
+    public UpvoteService(ReviewRepository reviewRepository, UserRepository userRepository, ReviewUpvoteRepository reviewUpvoteRepository, QuestionRepository questionRepository, QuestionUpvoteRepository questionUpvoteRepository, AnswerRepository answerRepository, AnswerUpvoteRepository answerUpvoteRepository, DiscussionRepository discussionRepository, DiscussionUpvoteRepository discussionUpvoteRepository, DiscussionCommentRepository discussionCommentRepository, DiscussionCommentUpvoteRepository discussionCommentUpvoteRepository, MeterRegistry meterRegistry) {
         this.reviewRepository = reviewRepository;
         this.userRepository = userRepository;
         this.reviewUpvoteRepository = reviewUpvoteRepository;
@@ -52,6 +61,21 @@ public class UpvoteService {
         this.discussionUpvoteRepository = discussionUpvoteRepository;
         this.discussionCommentRepository = discussionCommentRepository;
         this.discussionCommentUpvoteRepository = discussionCommentUpvoteRepository;
+        this.reviewUpvoteCounter = Counter.builder("reviews_upvoted_total")
+            .description("Total number of reviews upvoted")
+            .register(meterRegistry);
+        this.questionUpvoteCounter = Counter.builder("questions_upvoted_total")
+            .description("Total number of questions upvoted")
+            .register(meterRegistry);
+        this.answerUpvoteCounter = Counter.builder("answers_upvoted_total")
+            .description("Total number of answers upvoted")
+            .register(meterRegistry);
+        this.discussionUpvoteCounter = Counter.builder("discussions_upvoted_total")
+            .description("Total number of discussions upvoted")
+            .register(meterRegistry);
+        this.discussionCommentUpvoteCounter = Counter.builder("discussion_comments_upvoted_total")
+            .description("Total number of discussion comments upvoted")
+            .register(meterRegistry);
     }
 
     @Transactional
@@ -70,6 +94,7 @@ public class UpvoteService {
             newUpvote.setReview(review);
 
             reviewUpvoteRepository.save(newUpvote);
+            reviewUpvoteCounter.increment();
         }
         else if (targetType.equals("question")) {
             Question question = questionRepository.findById(targetId)
@@ -83,6 +108,7 @@ public class UpvoteService {
             newUpvote.setQuestion(question);
 
             questionUpvoteRepository.save(newUpvote);
+            questionUpvoteCounter.increment();
         }
         else if (targetType.equals("answer")) {
             Answer answer = answerRepository.findById(targetId)
@@ -95,6 +121,7 @@ public class UpvoteService {
             newUpvote.setAnswer(answer);
 
             answerUpvoteRepository.save(newUpvote);
+            answerUpvoteCounter.increment();
         }
         else if (targetType.equals("discussion")) {
             Discussion discussion = discussionRepository.findById(targetId)
@@ -108,6 +135,7 @@ public class UpvoteService {
             newUpvote.setDiscussion(discussion);
 
             discussionUpvoteRepository.save(newUpvote);
+            discussionUpvoteCounter.increment();
         }
         else if (targetType.equals("discussion_comment")) {
             DiscussionComment comment = discussionCommentRepository.findById(targetId)
@@ -121,6 +149,7 @@ public class UpvoteService {
             newUpvote.setDiscussionComment(comment);
 
             discussionCommentUpvoteRepository.save(newUpvote);
+            discussionCommentUpvoteCounter.increment();
         }
         else {
             throw new RuntimeException("Invalid target type");
