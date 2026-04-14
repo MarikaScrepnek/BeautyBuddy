@@ -28,6 +28,9 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
+
 @Service
 public class QAService {
     private final UserRepository userRepository;
@@ -38,10 +41,14 @@ public class QAService {
     private final AnswerUpvoteRepository answerUpvoteRepository;
     private final QuestionReportRepository questionReportRepository;
     private final AnswerReportRepository answerReportRepository;
+
+    private final Counter questionCreatedCounter;
+    private final Counter answerCreatedCounter;
+
     public QAService(UserRepository userRepository, ProductRepository productRepository,
                      QuestionRepository questionRepository, AnswerRepository answerRepository,
                      QuestionUpvoteRepository questionUpvoteRepository, AnswerUpvoteRepository answerUpvoteRepository,
-                     QuestionReportRepository questionReportRepository, AnswerReportRepository answerReportRepository) {
+                     QuestionReportRepository questionReportRepository, AnswerReportRepository answerReportRepository, MeterRegistry meterRegistry) {
         this.userRepository = userRepository;
         this.productRepository = productRepository;
         this.questionRepository = questionRepository;
@@ -50,6 +57,12 @@ public class QAService {
         this.answerUpvoteRepository = answerUpvoteRepository;
         this.questionReportRepository = questionReportRepository;
         this.answerReportRepository = answerReportRepository;
+        this.questionCreatedCounter = Counter.builder("questions_created_total")
+            .description("Total number of questions created")
+            .register(meterRegistry);
+        this.answerCreatedCounter = Counter.builder("answers_created_total")
+            .description("Total number of answers created")
+            .register(meterRegistry);
     }
 
     @Transactional
@@ -64,6 +77,7 @@ public class QAService {
         newQuestion.setProduct(product);
         newQuestion.setText(question.text());
         questionRepository.save(newQuestion);
+        questionCreatedCounter.increment();
     }
 
     @Transactional
@@ -114,6 +128,7 @@ public class QAService {
         newAnswer.setText(answerText);
         question.getAnswers().add(newAnswer);
         questionRepository.save(question);
+        answerCreatedCounter.increment();
     }
 
     @Transactional
