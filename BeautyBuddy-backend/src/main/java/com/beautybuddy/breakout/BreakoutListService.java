@@ -21,6 +21,9 @@ import com.beautybuddy.product.repo.ProductRepository;
 import com.beautybuddy.user.UserRepository;
 import com.beautybuddy.user.entity.User;
 
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
+
 @Service
 public class BreakoutListService {
     private final UserRepository userRepository;
@@ -30,12 +33,21 @@ public class BreakoutListService {
     private final BreakoutListProductRepository breakoutListProductRepository;
     private final BreakoutListIngredientRepository breakoutListIngredientRepository;
 
-    public BreakoutListService(UserRepository userRepository, ProductRepository productRepository, IngredientRepository ingredientRepository, BreakoutListProductRepository breakoutListProductRepository, BreakoutListIngredientRepository breakoutListIngredientRepository) {
+    private final Counter breakoutListAddCounter;
+    private final Counter breakoutListRemoveCounter;
+
+    public BreakoutListService(UserRepository userRepository, ProductRepository productRepository, IngredientRepository ingredientRepository, BreakoutListProductRepository breakoutListProductRepository, BreakoutListIngredientRepository breakoutListIngredientRepository, MeterRegistry meterRegistry) {
         this.userRepository = userRepository;
         this.productRepository = productRepository;
         this.ingredientRepository = ingredientRepository;
         this.breakoutListProductRepository = breakoutListProductRepository;
         this.breakoutListIngredientRepository = breakoutListIngredientRepository;
+        this.breakoutListAddCounter = Counter.builder("breakout_list_add_total")
+            .description("Total number of items added to breakout lists")
+            .register(meterRegistry);
+        this.breakoutListRemoveCounter = Counter.builder("breakout_list_remove_total")
+            .description("Total number of items removed from breakout lists")
+            .register(meterRegistry);
     }
 
     public void addToBreakoutList(String userEmail, AddToBreakoutListDTO addToBreakoutListDTO) {
@@ -51,6 +63,7 @@ public class BreakoutListService {
             breakoutListProduct.setProduct(product);
 
             breakoutListProductRepository.save(breakoutListProduct);
+            breakoutListAddCounter.increment();
         }
         else if (addToBreakoutListDTO.ingredientId() != null) {
             Ingredient ingredient = ingredientRepository.findById(addToBreakoutListDTO.ingredientId())
@@ -61,6 +74,7 @@ public class BreakoutListService {
             breakoutListIngredient.setIngredient(ingredient);
 
             breakoutListIngredientRepository.save(breakoutListIngredient);
+            breakoutListAddCounter.increment();
         }
         else {
             throw new RuntimeException("Either productId or ingredientId must be provided");
@@ -98,11 +112,13 @@ public class BreakoutListService {
             BreakoutListProduct breakoutListProduct = breakoutListProductRepository.findByBreakoutListIdAndProductId(user.getBreakoutList().getId(), removeFromBreakoutListDTO.productId())
                 .orElseThrow(() -> new RuntimeException("Product not found in breakout list"));
             breakoutListProductRepository.delete(breakoutListProduct);
+            breakoutListRemoveCounter.increment();
         }
         else if (removeFromBreakoutListDTO.ingredientId() != null) {
             BreakoutListIngredient breakoutListIngredient = breakoutListIngredientRepository.findByBreakoutListIdAndIngredientId(user.getBreakoutList().getId(), removeFromBreakoutListDTO.ingredientId())
                 .orElseThrow(() -> new RuntimeException("Ingredient not found in breakout list"));
             breakoutListIngredientRepository.delete(breakoutListIngredient);
+            breakoutListRemoveCounter.increment();
         }
         else {
             throw new RuntimeException("Either productId or ingredientId must be provided");
