@@ -8,14 +8,12 @@ services:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
       - "127.0.0.1:9090:9090"
-    restart: unless-stopped
 
   node-exporter:
     image: prom/node-exporter
     container_name: node-exporter
     ports:
       - "127.0.0.1:9100:9100"
-    restart: unless-stopped
 
   grafana:
     image: grafana/grafana
@@ -28,7 +26,6 @@ services:
     - GF_SERVER_SERVE_FROM_SUB_PATH=false
     volumes:
     - grafana-storage:/var/lib/grafana
-    restart: unless-stopped
 
 volumes:
   grafana-storage:
