@@ -50,7 +50,7 @@ public class ReviewService {
         this.productShadeRepository = productShadeRepository;
         this.reviewReportRepository = reviewReportRepository;
         this.reviewUpvoteRepository = reviewUpvoteRepository;
-        this.reviewCounter = Counter.builder("reviews_total")
+        this.reviewCounter = Counter.builder("product_reviews_total")
             .description("Total number of reviews")
             .register(meterRegistry);
     }
