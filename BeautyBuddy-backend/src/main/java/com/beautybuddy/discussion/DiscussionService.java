@@ -26,6 +26,9 @@ import com.beautybuddy.user.entity.User;
 
 import jakarta.transaction.Transactional;
 
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
+
 @Service
 public class DiscussionService {
     private final UserRepository userRepository;
@@ -38,7 +41,10 @@ public class DiscussionService {
     private final DiscussionReportRepository discussionReportRepository;
     private final DiscussionCommentReportRepository discussionCommentReportRepository;
 
-    public DiscussionService(UserRepository userRepository, DiscussionRepository discussionRepository, DiscussionCommentRepository discussionCommentRepository, DiscussionUpvoteRepository discussionUpvoteRepository, DiscussionCommentUpvoteRepository discussionCommentUpvoteRepository, DiscussionReportRepository discussionReportRepository, DiscussionCommentReportRepository discussionCommentReportRepository) {
+    private final Counter discussionsCreatedCounter;
+    private final Counter commentsCreatedCounter;
+
+    public DiscussionService(UserRepository userRepository, DiscussionRepository discussionRepository, DiscussionCommentRepository discussionCommentRepository, DiscussionUpvoteRepository discussionUpvoteRepository, DiscussionCommentUpvoteRepository discussionCommentUpvoteRepository, DiscussionReportRepository discussionReportRepository, DiscussionCommentReportRepository discussionCommentReportRepository, MeterRegistry meterRegistry) {
         this.userRepository = userRepository;
         this.discussionRepository = discussionRepository;
         this.discussionCommentRepository = discussionCommentRepository;
@@ -46,6 +52,12 @@ public class DiscussionService {
         this.discussionCommentUpvoteRepository = discussionCommentUpvoteRepository;
         this.discussionReportRepository = discussionReportRepository;
         this.discussionCommentReportRepository = discussionCommentReportRepository;
+        this.discussionsCreatedCounter = Counter.builder("discussions.created")
+            .description("Number of discussions created")
+            .register(meterRegistry);
+        this.commentsCreatedCounter = Counter.builder("comments.created")
+            .description("Number of comments created")
+            .register(meterRegistry);
     }
 
     @Transactional
@@ -58,6 +70,7 @@ public class DiscussionService {
         discussion.setText(discussionDTO.text());
         discussion.setUser(user);
         discussionRepository.save(discussion);
+        discussionsCreatedCounter.increment();
     }
 
     private PageRequest buildDiscussionPageRequest(int page, int size, String sortKey) {
@@ -143,7 +156,7 @@ public class DiscussionService {
             .orElseThrow(() -> new RuntimeException("User not found"));
         Discussion discussion = discussionRepository.findById(discussionId)
             .orElseThrow(() -> new RuntimeException("Discussion not found"));
-        
+        commentsCreatedCounter.increment();
         DiscussionComment comment = new DiscussionComment();
         comment.setDiscussion(discussion);
         comment.setText(commentDTO.text());
