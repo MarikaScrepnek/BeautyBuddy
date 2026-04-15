@@ -52,10 +52,10 @@ public class DiscussionService {
         this.discussionCommentUpvoteRepository = discussionCommentUpvoteRepository;
         this.discussionReportRepository = discussionReportRepository;
         this.discussionCommentReportRepository = discussionCommentReportRepository;
-        this.discussionsCreatedCounter = Counter.builder("discussions.created")
+        this.discussionsCreatedCounter = Counter.builder("discussions_created_total")
             .description("Number of discussions created")
             .register(meterRegistry);
-        this.commentsCreatedCounter = Counter.builder("comments.created")
+        this.commentsCreatedCounter = Counter.builder("comments_created_total")
             .description("Number of comments created")
             .register(meterRegistry);
     }
