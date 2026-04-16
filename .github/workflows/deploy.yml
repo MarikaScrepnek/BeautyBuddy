@@ -18,20 +18,20 @@ jobs:
       # ---- BACKEND ----
       - name: Build backend
         run: |
-          docker build -t ghcr.io/${{ github.repository }}-backend:latest ./BeautyBuddy-backend
+          docker build -t ghcr.io/marikascrepnek/beautybuddy-backend:latest ./BeautyBuddy-backend
 
       - name: Push backend
         run: |
-          docker push ghcr.io/${{ github.repository }}-backend:latest
+          docker push ghcr.io/marikascrepnek/beautybuddy-backend:latest
 
       # ---- FRONTEND ----
       - name: Build frontend
         run: |
-          docker build -t ghcr.io/${{ github.repository }}-frontend:latest ./BeautyBuddy-frontend
+          docker build -t ghcr.io/marikascrepnek/beautybuddy-frontend:latest ./BeautyBuddy-frontend
 
       - name: Push frontend
         run: |
-          docker push ghcr.io/${{ github.repository }}-frontend:latest
+          docker push ghcr.io/marikascrepnek/beautybuddy-frontend:latest
 
   deploy:
     needs: build-and-push
