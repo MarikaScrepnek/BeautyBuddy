@@ -1,6 +1,6 @@
 services:
   backend:
-    build: ./BeautyBuddy-backend
+    image: ghcr.io/marikascrepnek/beautybuddy-backend:latest
     ports:
       - "8080:8080"
     environment:
@@ -13,7 +13,7 @@ services:
     restart: unless-stopped
 
   frontend:
-    build: ./BeautyBuddy-frontend
+    image: ghcr.io/marikascrepnek/beautybuddy-frontend:latest
     ports:
       - "3000:80"
     depends_on:
