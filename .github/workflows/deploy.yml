@@ -46,5 +46,5 @@ jobs:
           key: ${{ secrets.VM_SSH_KEY }}
           script: |
             cd ~/BeautyBuddy
-            docker compose pull
-            docker compose up -d
+            docker compose -p beautybuddy -f docker-compose.prod.yml pull
+            docker compose -p beautybuddy -f docker-compose.prod.yml up -d --remove-orphans
