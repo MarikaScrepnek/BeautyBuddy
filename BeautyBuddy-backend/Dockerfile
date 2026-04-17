@@ -20,4 +20,4 @@ COPY --from=build /app/target/*.jar app.jar
 EXPOSE 8080
 
 # Run the application
-ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom","-Xms128m", "-Xmx512m", "-XX:+ExitOnOutOfMemoryError", "-XX:+HeapDumpOnOutOfMemoryError", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom","-Xms128m", "-Xmx256m", "-XX:+ExitOnOutOfMemoryError", "-XX:+HeapDumpOnOutOfMemoryError", "-jar", "app.jar"]
