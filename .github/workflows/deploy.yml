@@ -46,6 +46,13 @@ jobs:
           key: ${{ secrets.VM_SSH_KEY }}
           script: |
             cd ~/BeautyBuddy
+
             docker compose -p beautybuddy -f docker-compose.prod.yml pull
-            docker compose -p beautybuddy -f docker-compose.prod.yml up -d --remove-orphans
-            docker system prune -f
+
+            docker compose -p beautybuddy -f docker-compose.prod.yml up -d --no-deps backend_green
+            timeout 60 bash -c 'until curl -fs http://localhost:8082/actuator/health; do sleep 2; done'
+
+            docker compose -p beautybuddy -f docker-compose.prod.yml up -d --no-deps backend_blue
+            timeout 60 bash -c 'until curl -fs http://localhost:8081/actuator/health; do sleep 2; done'
+
+            docker image prune -f

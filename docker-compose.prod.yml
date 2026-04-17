@@ -1,8 +1,8 @@
 services:
-  backend:
+  backend_blue:
     image: ghcr.io/marikascrepnek/beautybuddy-backend:latest
     ports:
-      - "8080:8080"
+      - "8081:8080"
     environment:
       - JWT_SECRET_KEY=${JWT_SECRET_KEY}
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/${POSTGRES_DB}
@@ -12,12 +12,46 @@ services:
       - db
     restart: unless-stopped
 
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  backend_green:
+    image: ghcr.io/marikascrepnek/beautybuddy-backend:latest
+    ports:
+      - "8082:8080"
+    environment:
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/${POSTGRES_DB}
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+    depends_on:
+      - db
+    restart: unless-stopped
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+
   frontend:
     image: ghcr.io/marikascrepnek/beautybuddy-frontend:latest
     ports:
       - "3000:80"
-    depends_on:
-      - backend
     restart: unless-stopped
 
   db:
@@ -29,6 +63,11 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     restart: unless-stopped
+
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   node-exporter:
     image: prom/node-exporter
