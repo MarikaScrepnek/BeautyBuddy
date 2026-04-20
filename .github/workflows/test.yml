@@ -8,6 +8,8 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
 
     steps:
       - name: Checkout code
@@ -26,6 +28,16 @@ jobs:
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-maven-
+
+      - name: Verify CI prerequisites
+        shell: bash
+        run: |
+          if [ -z "$JWT_SECRET_KEY" ]; then
+            echo "Missing required repository secret: JWT_SECRET_KEY"
+            exit 1
+          fi
+
+          docker info >/dev/null
 
       - name: Run tests
         working-directory: BeautyBuddy-backend

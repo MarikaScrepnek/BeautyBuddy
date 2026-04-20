@@ -2,7 +2,7 @@ package com.beautybuddy.integration;
 
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.Assertions;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -129,11 +129,11 @@ public class AuthIT extends BaseIntegrationTest {
     }
 
     private void requireJwtSecret() {
-      String jwtSecret = System.getenv("JWT_SECRET_KEY");
-      if (jwtSecret == null || jwtSecret.isBlank()) {
-        jwtSecret = System.getProperty("JWT_SECRET_KEY");
-      }
-      Assumptions.assumeTrue(jwtSecret != null && !jwtSecret.isBlank(),
-          "JWT_SECRET_KEY is required for JWT integration tests");
+        String jwtSecret = System.getenv("JWT_SECRET_KEY");
+        if (jwtSecret == null || jwtSecret.isBlank()) {
+            jwtSecret = System.getProperty("JWT_SECRET_KEY");
+        }
+        Assertions.assertTrue(jwtSecret != null && !jwtSecret.isBlank(),
+                "JWT_SECRET_KEY is required for JWT integration tests");
     }
 }
