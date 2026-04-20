@@ -16,7 +16,10 @@ public class JwtUtil {
     private static SecretKey getSigningKey() {
         String secretB64 = System.getenv("JWT_SECRET_KEY");
         if (secretB64 == null || secretB64.isBlank()) {
-            throw new IllegalStateException("JWT_SECRET_KEY env var is missing");
+            secretB64 = System.getProperty("JWT_SECRET_KEY");
+        }
+        if (secretB64 == null || secretB64.isBlank()) {
+            throw new IllegalStateException("JWT_SECRET_KEY is missing (env var or JVM system property)");
         }
 
         byte[] keyBytes = Decoders.BASE64.decode(secretB64);
