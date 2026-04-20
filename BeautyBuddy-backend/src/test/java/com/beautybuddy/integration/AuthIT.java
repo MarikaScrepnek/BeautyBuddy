@@ -3,6 +3,7 @@ package com.beautybuddy.integration;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Assertions;
+import jakarta.servlet.http.Cookie;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -83,10 +84,11 @@ public class AuthIT extends BaseIntegrationTest {
         requireJwtSecret();
         String email = registerUser("meuser");
         MvcResult loginResult = login(email, "password123");
-        String cookie = loginResult.getResponse().getHeader("Set-Cookie");
+      Cookie jwtCookie = loginResult.getResponse().getCookie("jwt");
+      Assertions.assertNotNull(jwtCookie, "Expected JWT cookie to be present after login");
 
         mockMvc.perform(get("/api/auth/me")
-                        .header("Cookie", cookie))
+          .cookie(jwtCookie))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.email").value(email));
     }
