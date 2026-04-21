@@ -2,6 +2,7 @@ package com.beautybuddy.integration;
 
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Assertions;
 import org.springframework.http.MediaType;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -60,10 +61,27 @@ public class DiscussionIT extends BaseIntegrationTest {
         String marker = "discussion-search-" + System.nanoTime();
         createDiscussionAndGetId(email, marker, marker);
 
-        mockMvc.perform(get("/api/discussions/search")
+        var result = mockMvc.perform(get("/api/discussions/search")
                         .param("query", marker)
                         .cookie(jwtCookieForEmail(email)))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andReturn();
+
+        var root = objectMapper.readTree(result.getResponse().getContentAsString());
+        var content = root.get("content");
+        Assertions.assertTrue(content != null && content.isArray() && !content.isEmpty(),
+                "Expected discussion search to return at least one result");
+
+        boolean found = false;
+        for (var discussionNode : content) {
+            String title = discussionNode.hasNonNull("title") ? discussionNode.get("title").asText() : "";
+            String text = discussionNode.hasNonNull("text") ? discussionNode.get("text").asText() : "";
+            if (marker.equals(title) || marker.equals(text)) {
+                found = true;
+                break;
+            }
+        }
+        Assertions.assertTrue(found, "Expected discussion search results to contain the created marker");
     }
 
     @Test

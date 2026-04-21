@@ -2,6 +2,7 @@ package com.beautybuddy.integration;
 
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Assertions;
 import org.springframework.http.MediaType;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -59,11 +60,25 @@ public class QAIT extends BaseIntegrationTest {
                         .cookie(jwtCookieForEmail(email)))
                 .andExpect(status().isOk());
 
-        mockMvc.perform(get("/api/questions/" + productId + "/search")
+        var result = mockMvc.perform(get("/api/questions/" + productId + "/search")
                         .param("query", marker)
                         .cookie(jwtCookieForEmail(email)))
                 .andExpect(status().isOk())
-                .andExpect(status().isOk());
+                .andReturn();
+
+        var root = objectMapper.readTree(result.getResponse().getContentAsString());
+        var content = root.get("content");
+        Assertions.assertTrue(content != null && content.isArray() && !content.isEmpty(),
+                "Expected question search to return at least one result");
+
+        boolean found = false;
+        for (var questionNode : content) {
+            if (marker.equals(questionNode.get("text").asText())) {
+                found = true;
+                break;
+            }
+        }
+        Assertions.assertTrue(found, "Expected question search results to contain the created marker text");
     }
 
     @Test
