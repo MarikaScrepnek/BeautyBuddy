@@ -5,6 +5,8 @@ import jakarta.servlet.http.Cookie;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -104,40 +107,152 @@ public abstract class BaseIntegrationTest {
                 return jwtCookie.getValue();
         }
 
+        protected Cookie jwtCookieForEmail(String email) throws Exception {
+            return new Cookie("jwt", loginAndGetJwt(email));
+        }
+
         protected String createQuestionAndGetId(String email) throws Exception {
-                String request = """
-                {
-                    "title": "Test question",
-                    "content": "Question content"
-                }
-                """;
+            Long productId = getAnyProductId();
+            String marker = "qa-question-" + System.nanoTime();
+            String request = """
+            {
+              "productId": %d,
+              "text": "%s"
+            }
+            """.formatted(productId, marker);
 
-                MvcResult result = mockMvc.perform(post("/api/questions")
-                                                .contentType(MediaType.APPLICATION_JSON)
-                                                .content(request)
-                                                .cookie(new Cookie("jwt", loginAndGetJwt(email))))
-                                .andExpect(status().isCreated())
-                                .andReturn();
+            mockMvc.perform(post("/api/questions/ask")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(request)
+                    .cookie(jwtCookieForEmail(email)))
+                .andExpect(status().isOk());
 
-                return objectMapper.readTree(result.getResponse().getContentAsString()).get("id").asText();
+            String encodedQuery = URLEncoder.encode(marker, StandardCharsets.UTF_8);
+            MvcResult searchResult = mockMvc.perform(get("/api/questions/" + productId + "/search?query=" + encodedQuery)
+                    .cookie(jwtCookieForEmail(email)))
+                .andExpect(status().isOk())
+                .andReturn();
+
+            var root = objectMapper.readTree(searchResult.getResponse().getContentAsString());
+            var content = root.get("content");
+            Assertions.assertTrue(content != null && content.isArray() && !content.isEmpty(),
+                "Expected created question to appear in search results");
+            return content.get(0).get("id").asText();
         }
 
         protected String createAnswerAndGetId(String email, String questionId) throws Exception {
+            long qId = Long.parseLong(questionId);
+            Long productId = findProductIdForQuestion(qId);
+            String marker = "qa-answer-" + System.nanoTime();
+            String request = """
+            {
+              "questionId": %d,
+              "text": "%s"
+            }
+            """.formatted(qId, marker);
+
+            mockMvc.perform(post("/api/answers/submit")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(request)
+                    .cookie(jwtCookieForEmail(email)))
+                .andExpect(status().isOk());
+
+            MvcResult listResult = mockMvc.perform(get("/api/questions/" + productId)
+                    .cookie(jwtCookieForEmail(email)))
+                .andExpect(status().isOk())
+                .andReturn();
+
+            var root = objectMapper.readTree(listResult.getResponse().getContentAsString());
+            var content = root.get("content");
+            Assertions.assertNotNull(content, "Expected paged question content");
+
+            for (var questionNode : content) {
+                if (questionNode.get("id").asLong() != qId) {
+                    continue;
+                }
+                var answers = questionNode.get("answers");
+                if (answers == null || !answers.isArray()) {
+                    continue;
+                }
+                for (var answerNode : answers) {
+                    if (marker.equals(answerNode.get("text").asText())) {
+                        return answerNode.get("id").asText();
+                    }
+                }
+            }
+
+            throw new AssertionError("Expected created answer to appear in question answers");
+        }
+
+        protected Long findProductIdForQuestion(long questionId) throws Exception {
+            MvcResult productsResult = mockMvc.perform(get("/api/products"))
+                .andExpect(status().isOk())
+                .andReturn();
+            var products = objectMapper.readTree(productsResult.getResponse().getContentAsString());
+            Assertions.assertTrue(products.isArray() && !products.isEmpty(), "Expected seeded products to exist");
+
+            for (var productNode : products) {
+                long productId = productNode.get("id").asLong();
+                MvcResult questionsResult = mockMvc.perform(get("/api/questions/" + productId))
+                    .andExpect(status().isOk())
+                    .andReturn();
+
+                var questionsRoot = objectMapper.readTree(questionsResult.getResponse().getContentAsString());
+                var content = questionsRoot.get("content");
+                if (content == null || !content.isArray()) {
+                    continue;
+                }
+                for (var questionNode : content) {
+                    if (questionNode.get("id").asLong() == questionId) {
+                        return productId;
+                    }
+                }
+            }
+
+            throw new AssertionError("Could not locate product for question id " + questionId);
+        }
+
+                protected Long getAnyProductId() throws Exception {
+                MvcResult result = mockMvc.perform(get("/api/products"))
+                    .andExpect(status().isOk())
+                    .andReturn();
+
+                var products = objectMapper.readTree(result.getResponse().getContentAsString());
+                Assertions.assertTrue(products.isArray() && !products.isEmpty(), "Expected seeded products to exist");
+                return products.get(0).get("id").asLong();
+                }
+
+                protected Long createReviewAndGetId(String email) throws Exception {
+                Long productId = getAnyProductId();
+                String marker = "review-it-" + System.nanoTime();
                 String request = """
                 {
-                    "content": "Test answer"
+                  "productId": %d,
+                  "rating": 5,
+                  "title": "%s",
+                  "text": "%s"
                 }
-                """;
+                """.formatted(productId, marker, marker);
 
-                MvcResult result = mockMvc.perform(post("/api/questions/" + questionId + "/answers")
-                                                .contentType(MediaType.APPLICATION_JSON)
-                                                .content(request)
-                                                .cookie(new Cookie("jwt", loginAndGetJwt(email))))
-                                .andExpect(status().isCreated())
-                                .andReturn();
+                mockMvc.perform(post("/api/reviews/add")
+                        .cookie(jwtCookieForEmail(email))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(request))
+                    .andExpect(status().isOk());
 
-                return objectMapper.readTree(result.getResponse().getContentAsString()).get("id").asText();
-        }
+                String encodedQuery = URLEncoder.encode(marker, StandardCharsets.UTF_8);
+                MvcResult searchResult = mockMvc.perform(get("/api/reviews/" + productId + "/search?query=" + encodedQuery)
+                        .cookie(jwtCookieForEmail(email)))
+                    .andExpect(status().isOk())
+                    .andReturn();
+
+                var root = objectMapper.readTree(searchResult.getResponse().getContentAsString());
+                var content = root.get("content");
+                Assertions.assertTrue(content != null && content.isArray() && !content.isEmpty(),
+                    "Expected created review to appear in search results");
+
+                return content.get(0).get("reviewId").asLong();
+                }
 
         protected String uniqueEmail() {
                 return "user" + System.nanoTime() + "@example.com";
