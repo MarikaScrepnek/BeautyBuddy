@@ -222,6 +222,136 @@ public abstract class BaseIntegrationTest {
                 return products.get(0).get("id").asLong();
                 }
 
+            protected String getAnyProductName() throws Exception {
+                MvcResult result = mockMvc.perform(get("/api/products"))
+                    .andExpect(status().isOk())
+                    .andReturn();
+
+                var products = objectMapper.readTree(result.getResponse().getContentAsString());
+                Assertions.assertTrue(products.isArray() && !products.isEmpty(), "Expected seeded products to exist");
+                return products.get(0).get("name").asText();
+            }
+
+            protected Long getAnyIngredientId() throws Exception {
+                MvcResult result = mockMvc.perform(get("/api/ingredients"))
+                    .andExpect(status().isOk())
+                    .andReturn();
+
+                var ingredientsRoot = objectMapper.readTree(result.getResponse().getContentAsString());
+                var content = ingredientsRoot.get("content");
+                Assertions.assertTrue(content != null && content.isArray() && !content.isEmpty(),
+                    "Expected seeded ingredients to exist");
+                return content.get(0).get("id").asLong();
+            }
+
+            protected void addToWishlist(String email, Long productId, String shadeName) throws Exception {
+                String request = """
+                {
+                  "productId": %d,
+                  "shadeName": %s
+                }
+                """.formatted(productId, shadeName == null ? "null" : "\"" + shadeName + "\"");
+
+                mockMvc.perform(post("/api/wishlist/add")
+                        .cookie(jwtCookieForEmail(email))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(request))
+                    .andExpect(status().isOk());
+            }
+
+            protected void addProductToBreakoutList(String email, Long productId) throws Exception {
+                String request = """
+                {
+                  "productId": %d,
+                  "ingredientId": null
+                }
+                """.formatted(productId);
+
+                mockMvc.perform(post("/api/breakout-list/add")
+                        .cookie(jwtCookieForEmail(email))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(request))
+                    .andExpect(status().isOk());
+            }
+
+            protected void addIngredientToBreakoutList(String email, Long ingredientId) throws Exception {
+                String request = """
+                {
+                  "productId": null,
+                  "ingredientId": %d
+                }
+                """.formatted(ingredientId);
+
+                mockMvc.perform(post("/api/breakout-list/add")
+                        .cookie(jwtCookieForEmail(email))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(request))
+                    .andExpect(status().isOk());
+            }
+
+            protected void removeFromBreakoutList(String email, Long productId, Long ingredientId) throws Exception {
+                String request = """
+                {
+                  "productId": %s,
+                  "ingredientId": %s
+                }
+                """.formatted(productId == null ? "null" : productId.toString(),
+                    ingredientId == null ? "null" : ingredientId.toString());
+
+                mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete("/api/breakout-list/remove")
+                        .cookie(jwtCookieForEmail(email))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(request))
+                    .andExpect(status().isOk());
+            }
+
+            protected Long createMakeupRoutineAndGetId(String email) throws Exception {
+                String routineName = "routine-it-" + System.nanoTime();
+                String request = """
+                {
+                  "occasion": "EVENT",
+                  "name": "%s",
+                  "notes": "integration test routine"
+                }
+                """.formatted(routineName);
+
+                mockMvc.perform(post("/api/routines/makeup")
+                        .cookie(jwtCookieForEmail(email))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(request))
+                    .andExpect(status().isOk());
+
+                MvcResult routinesResult = mockMvc.perform(get("/api/routines/makeup")
+                        .cookie(jwtCookieForEmail(email)))
+                    .andExpect(status().isOk())
+                    .andReturn();
+
+                var routines = objectMapper.readTree(routinesResult.getResponse().getContentAsString());
+                Assertions.assertTrue(routines.isArray(), "Expected routine list to be an array");
+                for (var routine : routines) {
+                    if (routineName.equals(routine.get("name").asText())) {
+                        return routine.get("routineId").asLong();
+                    }
+                }
+
+                throw new AssertionError("Expected created routine to appear in makeup routines list");
+            }
+
+            protected void addProductToRoutine(String email, Long routineId, Long productId, String shadeName) throws Exception {
+                String request = """
+                {
+                  "productId": %d,
+                  "shadeName": %s
+                }
+                """.formatted(productId, shadeName == null ? "null" : "\"" + shadeName + "\"");
+
+                mockMvc.perform(post("/api/routines/" + routineId + "/add-product")
+                        .cookie(jwtCookieForEmail(email))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(request))
+                    .andExpect(status().isOk());
+            }
+
                 protected Long createReviewAndGetId(String email) throws Exception {
                 Long productId = getAnyProductId();
                 String marker = "review-it-" + System.nanoTime();
