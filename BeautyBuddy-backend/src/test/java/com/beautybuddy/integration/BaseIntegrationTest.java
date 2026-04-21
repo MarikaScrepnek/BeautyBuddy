@@ -254,6 +254,91 @@ public abstract class BaseIntegrationTest {
                 return content.get(0).get("reviewId").asLong();
                 }
 
+            protected Long createDiscussionAndGetId(String email) throws Exception {
+                String marker = "discussion-it-" + System.nanoTime();
+                return createDiscussionAndGetId(email, marker, marker);
+            }
+
+            protected Long createDiscussionAndGetId(String email, String title, String text) throws Exception {
+                String request = """
+                {
+                  "title": "%s",
+                  "text": "%s"
+                }
+                """.formatted(title, text);
+
+                mockMvc.perform(post("/api/discussions")
+                                .cookie(jwtCookieForEmail(email))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(request))
+                        .andExpect(status().isOk());
+
+                String encodedQuery = URLEncoder.encode(title, StandardCharsets.UTF_8);
+                MvcResult searchResult = mockMvc.perform(get("/api/discussions/search?query=" + encodedQuery)
+                                .cookie(jwtCookieForEmail(email)))
+                        .andExpect(status().isOk())
+                        .andReturn();
+
+                var root = objectMapper.readTree(searchResult.getResponse().getContentAsString());
+                var content = root.get("content");
+                Assertions.assertTrue(content != null && content.isArray() && !content.isEmpty(),
+                        "Expected created discussion to appear in search results");
+
+                for (var discussionNode : content) {
+                    if (title.equals(discussionNode.get("title").asText())) {
+                        return discussionNode.get("id").asLong();
+                    }
+                }
+
+                throw new AssertionError("Expected created discussion to be present in search content");
+            }
+
+            protected Long createDiscussionCommentAndGetId(String email, long discussionId) throws Exception {
+                String marker = "discussion-comment-it-" + System.nanoTime();
+                return createDiscussionCommentAndGetId(email, discussionId, marker);
+            }
+
+            protected Long createDiscussionCommentAndGetId(String email, long discussionId, String text) throws Exception {
+                String request = """
+                {
+                  "parentDiscussionCommentId": null,
+                  "text": "%s"
+                }
+                """.formatted(text);
+
+                mockMvc.perform(post("/api/discussions/" + discussionId + "/comment")
+                                .cookie(jwtCookieForEmail(email))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(request))
+                        .andExpect(status().isOk());
+
+                MvcResult discussionsResult = mockMvc.perform(get("/api/discussions")
+                                .cookie(jwtCookieForEmail(email)))
+                        .andExpect(status().isOk())
+                        .andReturn();
+
+                var root = objectMapper.readTree(discussionsResult.getResponse().getContentAsString());
+                var content = root.get("content");
+                Assertions.assertNotNull(content, "Expected paged discussions content");
+
+                for (var discussionNode : content) {
+                    if (discussionNode.get("id").asLong() != discussionId) {
+                        continue;
+                    }
+                    var comments = discussionNode.get("comments");
+                    if (comments == null || !comments.isArray()) {
+                        continue;
+                    }
+                    for (var commentNode : comments) {
+                        if (text.equals(commentNode.get("text").asText())) {
+                            return commentNode.get("id").asLong();
+                        }
+                    }
+                }
+
+                throw new AssertionError("Expected created comment to appear in discussion comments");
+            }
+
         protected String uniqueEmail() {
                 return "user" + System.nanoTime() + "@example.com";
         }
