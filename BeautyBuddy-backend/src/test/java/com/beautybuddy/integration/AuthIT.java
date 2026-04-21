@@ -2,10 +2,8 @@ package com.beautybuddy.integration;
 
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Assertions;
 import jakarta.servlet.http.Cookie;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MvcResult;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -83,59 +81,11 @@ public class AuthIT extends BaseIntegrationTest {
     void me_withCookie_returnsCurrentUser() throws Exception {
         requireJwtSecret();
         String email = registerUser("meuser");
-        MvcResult loginResult = login(email, "password123");
-      Cookie jwtCookie = loginResult.getResponse().getCookie("jwt");
-      Assertions.assertNotNull(jwtCookie, "Expected JWT cookie to be present after login");
+        Cookie jwtCookie = new Cookie("jwt", loginAndGetJwt(email));
 
         mockMvc.perform(get("/api/auth/me")
           .cookie(jwtCookie))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.email").value(email));
-    }
-
-    private String registerUser(String usernamePrefix) throws Exception {
-        String email = uniqueEmail();
-        String request = """
-        {
-          "username": "%s",
-          "email": "%s",
-          "password": "password123"
-        }
-        """.formatted(usernamePrefix + System.nanoTime(), email);
-
-        mockMvc.perform(post("/api/auth/register")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(request))
-                .andExpect(status().isCreated());
-
-        return email;
-    }
-
-    private MvcResult login(String email, String password) throws Exception {
-        String request = """
-        {
-          "email": "%s",
-          "password": "%s"
-        }
-        """.formatted(email, password);
-
-        return mockMvc.perform(post("/api/auth/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(request))
-                .andExpect(status().isOk())
-                .andReturn();
-    }
-
-    private String uniqueEmail() {
-        return "user" + System.nanoTime() + "@example.com";
-    }
-
-    private void requireJwtSecret() {
-        String jwtSecret = System.getenv("JWT_SECRET_KEY");
-        if (jwtSecret == null || jwtSecret.isBlank()) {
-            jwtSecret = System.getProperty("JWT_SECRET_KEY");
-        }
-        Assertions.assertTrue(jwtSecret != null && !jwtSecret.isBlank(),
-                "JWT_SECRET_KEY is required for JWT integration tests");
     }
 }
