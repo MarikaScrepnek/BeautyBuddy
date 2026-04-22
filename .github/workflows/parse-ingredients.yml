@@ -40,9 +40,9 @@ jobs:
           script: |
             cd ~/BeautyBuddy
             if docker compose -p beautybuddy -f docker-compose.prod.yml ps -q backend_green >/dev/null && [ -n "$(docker compose -p beautybuddy -f docker-compose.prod.yml ps -q backend_green)" ]; then
-              docker compose -p beautybuddy -f docker-compose.prod.yml exec -T backend_green java -jar /app/app.jar parse
+              docker compose -p beautybuddy -f docker-compose.prod.yml exec -T backend_green java -jar /app/app.jar parse --server.port=0
             elif docker compose -p beautybuddy -f docker-compose.prod.yml ps -q backend_blue >/dev/null && [ -n "$(docker compose -p beautybuddy -f docker-compose.prod.yml ps -q backend_blue)" ]; then
-              docker compose -p beautybuddy -f docker-compose.prod.yml exec -T backend_blue java -jar /app/app.jar parse
+              docker compose -p beautybuddy -f docker-compose.prod.yml exec -T backend_blue java -jar /app/app.jar parse --server.port=0
             else
               echo "No running backend container found (backend_green or backend_blue)."
               echo "Deploy first, then re-run parse job."
