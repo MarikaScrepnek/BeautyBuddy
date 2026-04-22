@@ -8,6 +8,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
+      SPRING_PROFILES_ACTIVE: prod
       JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
       SPRING_DATASOURCE_URL: ${{ secrets.DB_URL }}
       SPRING_DATASOURCE_USERNAME: ${{ secrets.DB_USERNAME }}
