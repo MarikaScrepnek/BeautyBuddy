@@ -6,7 +6,12 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.net.URLEncoder;
+import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,9 +23,9 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.testcontainers.DockerClientFactory;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -29,10 +34,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-@Testcontainers(disabledWithoutDocker = true)
 public abstract class BaseIntegrationTest {
 
+    private static final String DB_HOST = "localhost";
+    private static final int DB_PORT = 5432;
+    private static final String DEFAULT_DB_USER = "postgres";
+    private static final String DEFAULT_DB_PASSWORD = "postgres";
+    private static final String TEST_DB_NAME = "beautybuddy_it_" + System.currentTimeMillis();
+    private static final boolean USE_TESTCONTAINERS = isDockerAvailableForTestcontainers();
+
     static {
+        configureWindowsDockerHostForTestcontainers();
+
         // Keep secrets out of source code: read local .env only if process env is not set.
         if (isBlank(System.getenv("JWT_SECRET_KEY")) && isBlank(System.getProperty("JWT_SECRET_KEY"))) {
             String fromEnvFile = loadFromDotEnv("JWT_SECRET_KEY");
@@ -42,9 +55,9 @@ public abstract class BaseIntegrationTest {
         }
     }
 
-        // Managed by JUnit 5 Testcontainers extension; lifecycle is not manual here.
-        @SuppressWarnings("resource")
-        @Container
+    // Managed by JUnit 5 Testcontainers extension; lifecycle is not manual here.
+    @SuppressWarnings("resource")
+    @Container
     static final PostgreSQLContainer<?> POSTGRES =
             new PostgreSQLContainer<>("postgres:15-alpine")
                     .withDatabaseName("beautybuddy_test")
@@ -53,9 +66,21 @@ public abstract class BaseIntegrationTest {
 
     @DynamicPropertySource
     static void registerProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", POSTGRES::getJdbcUrl);
-        registry.add("spring.datasource.username", POSTGRES::getUsername);
-        registry.add("spring.datasource.password", POSTGRES::getPassword);
+        if (USE_TESTCONTAINERS) {
+            POSTGRES.start();
+            registry.add("spring.datasource.url", POSTGRES::getJdbcUrl);
+            registry.add("spring.datasource.username", POSTGRES::getUsername);
+            registry.add("spring.datasource.password", POSTGRES::getPassword);
+        } else {
+            ensureComposeDbIsReachable();
+            String dbUser = valueOrDefault("POSTGRES_USER", DEFAULT_DB_USER);
+            String dbPassword = valueOrDefault("POSTGRES_PASSWORD", DEFAULT_DB_PASSWORD);
+            ensureIsolatedTestDatabase(dbUser, dbPassword, TEST_DB_NAME);
+
+            registry.add("spring.datasource.url", () -> "jdbc:postgresql://" + DB_HOST + ":" + DB_PORT + "/" + TEST_DB_NAME);
+            registry.add("spring.datasource.username", () -> dbUser);
+            registry.add("spring.datasource.password", () -> dbPassword);
+        }
         registry.add("spring.jpa.hibernate.ddl-auto", () -> "validate");
         registry.add("spring.flyway.enabled", () -> "true");
     }
@@ -68,13 +93,14 @@ public abstract class BaseIntegrationTest {
 
         protected String registerUser(String usernamePrefix) throws Exception {
                 String email = uniqueEmail();
+                String username = validUsername(usernamePrefix);
                 String request = """
                 {
                     "username": "%s",
                     "email": "%s",
                     "password": "password123"
                 }
-                """.formatted(usernamePrefix + System.nanoTime(), email);
+                """.formatted(username, email);
 
                 mockMvc.perform(post("/api/auth/register")
                                                 .contentType(MediaType.APPLICATION_JSON)
@@ -526,5 +552,78 @@ public abstract class BaseIntegrationTest {
 
     private static boolean isBlank(String value) {
         return value == null || value.isBlank();
+    }
+
+    private static void configureWindowsDockerHostForTestcontainers() {
+        String osName = System.getProperty("os.name", "").toLowerCase();
+        if (!osName.contains("win")) {
+            return;
+        }
+        if (!isBlank(System.getProperty("docker.host")) || !isBlank(System.getenv("DOCKER_HOST"))) {
+            return;
+        }
+        System.setProperty("docker.host", "npipe:////./pipe/dockerDesktopLinuxEngine");
+    }
+
+    private static boolean isDockerAvailableForTestcontainers() {
+        try {
+            return DockerClientFactory.instance().isDockerAvailable();
+        } catch (Throwable ignored) {
+            return false;
+        }
+    }
+
+    private static void ensureComposeDbIsReachable() {
+        try (Socket ignored = new Socket(DB_HOST, DB_PORT)) {
+            // Port is open and reachable.
+        } catch (IOException ex) {
+            throw new IllegalStateException(
+                    "Integration tests require PostgreSQL at " + DB_HOST + ":" + DB_PORT
+                            + ". Start it with `docker compose -f docker-compose.dev.yml up db` from the repository root.",
+                    ex);
+        }
+    }
+
+    private static String valueOrDefault(String key, String defaultValue) {
+        String value = System.getenv(key);
+        if (!isBlank(value)) {
+            return value;
+        }
+        value = System.getProperty(key);
+        if (!isBlank(value)) {
+            return value;
+        }
+        value = loadFromDotEnv(key);
+        if (!isBlank(value)) {
+            return value;
+        }
+        return defaultValue;
+    }
+
+    private static void ensureIsolatedTestDatabase(String dbUser, String dbPassword, String dbName) {
+        String adminUrl = "jdbc:postgresql://" + DB_HOST + ":" + DB_PORT + "/postgres";
+        try (Connection connection = DriverManager.getConnection(adminUrl, dbUser, dbPassword);
+             Statement statement = connection.createStatement()) {
+            statement.execute("CREATE DATABASE \"" + dbName + "\"");
+        } catch (SQLException ex) {
+            if (!"42P04".equals(ex.getSQLState())) {
+                throw new IllegalStateException("Unable to create isolated integration-test database '" + dbName + "'.", ex);
+            }
+        }
+    }
+
+    private static String validUsername(String usernamePrefix) {
+        String base = usernamePrefix == null ? "user" : usernamePrefix;
+        base = base.replaceAll("[^a-zA-Z0-9_]", "_");
+        if (base.isBlank()) {
+            base = "user";
+        }
+
+        String suffix = Long.toUnsignedString(System.nanoTime(), 36);
+        int maxPrefixLength = Math.max(1, 30 - suffix.length() - 1);
+        if (base.length() > maxPrefixLength) {
+            base = base.substring(0, maxPrefixLength);
+        }
+        return base + "_" + suffix;
     }
 }
