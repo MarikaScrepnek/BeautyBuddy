@@ -17,13 +17,8 @@ public class IngredientController {
 
     private final IngredientRepository ingredientRepository;
 
-    private final ProductIngredientService productIngredientService;
-    private final MayContainIngredientService mayContainIngredientService;
-
-    public IngredientController(IngredientRepository ingredientRepository, ProductIngredientService productIngredientService, MayContainIngredientService mayContainIngredientService) {
+    public IngredientController(IngredientRepository ingredientRepository) {
         this.ingredientRepository = ingredientRepository;
-        this.productIngredientService = productIngredientService;
-        this.mayContainIngredientService = mayContainIngredientService;
     }
 
     @GetMapping
@@ -61,13 +56,5 @@ public class IngredientController {
         }
         return ingredientRepository.findByCanonicalIdNull(pageable)
             .map(DTOMapper::toIngredientDTO);
-    }
-
-    // this should be changed before release as its not the most secure way to do this
-    @GetMapping("/parse")
-    public String parseIngredients() {
-        productIngredientService.parseIngredientsForAllProducts();
-        mayContainIngredientService.parseIngredientsForAllProducts();
-        return "Ingredients parsed!";
     }
 }
