@@ -9,7 +9,9 @@ jobs:
 
     env:
       JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
-      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: ${{ secrets.DB_URL }}
+      SPRING_DATASOURCE_USERNAME: ${{ secrets.DB_USERNAME }}
+      SPRING_DATASOURCE_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
     steps:
       - name: Checkout code
