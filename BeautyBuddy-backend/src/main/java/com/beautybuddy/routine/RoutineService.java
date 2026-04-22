@@ -251,8 +251,23 @@ public class RoutineService {
             throw new RuntimeException("Unauthorized");
         }
 
+        String normalizedShadeName = shadeName;
+        if (normalizedShadeName != null) {
+            normalizedShadeName = normalizedShadeName.trim();
+            if ((normalizedShadeName.startsWith("\"") && normalizedShadeName.endsWith("\""))
+                    || (normalizedShadeName.startsWith("'") && normalizedShadeName.endsWith("'"))) {
+                normalizedShadeName = normalizedShadeName.substring(1, normalizedShadeName.length() - 1);
+            }
+            if (normalizedShadeName.isBlank() || "null".equalsIgnoreCase(normalizedShadeName)) {
+                normalizedShadeName = null;
+            }
+        }
+        final String shadeNameForMatch = normalizedShadeName;
+
         RoutineItem itemToRemove = routine.getItems().stream()
-            .filter(item -> item.getProduct().getId().equals(productId) && item.getValidTo() == null && (shadeName == null || (item.getShade() != null && shadeName.equals(item.getShade().getShadeName()))))
+            .filter(item -> item.getProduct().getId().equals(productId)
+                && item.getValidTo() == null
+                && (shadeNameForMatch == null || (item.getShade() != null && shadeNameForMatch.equals(item.getShade().getShadeName()))))
             .findFirst()
             .orElseThrow(() -> new RuntimeException("Product not found in routine"));
 

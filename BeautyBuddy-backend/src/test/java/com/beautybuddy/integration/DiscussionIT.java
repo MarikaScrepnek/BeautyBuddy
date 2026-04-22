@@ -119,7 +119,7 @@ public class DiscussionIT extends BaseIntegrationTest {
     }
 
     @Test
-    void editDiscussion_notOwner_returnsServerError() throws Exception {
+    void editDiscussion_notOwner_returnsForbidden() throws Exception {
         String email1 = registerUser("discussionuser6");
         String email2 = registerUser("discussionuser7");
         Long discussionId = createDiscussionAndGetId(email1);
@@ -135,7 +135,7 @@ public class DiscussionIT extends BaseIntegrationTest {
                         .cookie(jwtCookieForEmail(email2))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(request))
-                .andExpect(status().is5xxServerError());
+        .andExpect(status().isForbidden());
     }
 
     @Test
@@ -155,14 +155,14 @@ public class DiscussionIT extends BaseIntegrationTest {
     }
 
     @Test
-    void deleteDiscussion_notOwner_returnsServerError() throws Exception {
+    void deleteDiscussion_notOwner_returnsForbidden() throws Exception {
         String email1 = registerUser("discussionuser10");
         String email2 = registerUser("discussionuser11");
         Long discussionId = createDiscussionAndGetId(email1);
 
         mockMvc.perform(delete("/api/discussions/" + discussionId)
                         .cookie(jwtCookieForEmail(email2)))
-                .andExpect(status().is5xxServerError());
+          .andExpect(status().isForbidden());
     }
 
     @Test
@@ -204,7 +204,7 @@ public class DiscussionIT extends BaseIntegrationTest {
     }
 
     @Test
-    void editComment_notOwner_returnsServerError() throws Exception {
+    void editComment_notOwner_returnsForbidden() throws Exception {
         String email1 = registerUser("commentuser3");
         String email2 = registerUser("commentuser4");
         Long discussionId = createDiscussionAndGetId(email1);
@@ -220,7 +220,7 @@ public class DiscussionIT extends BaseIntegrationTest {
                         .cookie(jwtCookieForEmail(email2))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(request))
-                .andExpect(status().is5xxServerError());
+          .andExpect(status().isForbidden());
     }
 
     @Test
@@ -235,7 +235,7 @@ public class DiscussionIT extends BaseIntegrationTest {
     }
 
     @Test
-    void deleteComment_notOwner_returnsServerError() throws Exception {
+    void deleteComment_notOwner_returnsForbidden() throws Exception {
         String email1 = registerUser("commentuser6");
         String email2 = registerUser("commentuser7");
         Long discussionId = createDiscussionAndGetId(email1);
@@ -243,7 +243,7 @@ public class DiscussionIT extends BaseIntegrationTest {
 
         mockMvc.perform(delete("/api/discussions/" + discussionId + "/comment/" + commentId)
                         .cookie(jwtCookieForEmail(email2)))
-                .andExpect(status().is5xxServerError());
+          .andExpect(status().isForbidden());
     }
 
     @Test

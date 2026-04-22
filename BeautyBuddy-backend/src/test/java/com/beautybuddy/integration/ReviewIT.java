@@ -185,8 +185,8 @@ public class ReviewIT extends BaseIntegrationTest {
 
         boolean found = false;
         for (var reviewNode : content) {
-            String title = reviewNode.hasNonNull("title") ? reviewNode.get("title").asText() : "";
-            String text = reviewNode.hasNonNull("text") ? reviewNode.get("text").asText() : "";
+            String title = reviewNode.hasNonNull("reviewTitle") ? reviewNode.get("reviewTitle").asText() : "";
+            String text = reviewNode.hasNonNull("reviewText") ? reviewNode.get("reviewText").asText() : "";
             if (marker.equals(title) || marker.equals(text)) {
                 found = true;
                 break;

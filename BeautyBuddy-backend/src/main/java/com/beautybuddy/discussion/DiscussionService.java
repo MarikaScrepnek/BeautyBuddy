@@ -8,6 +8,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.beautybuddy.discussion.dto.AddDiscussionCommentDTO;
 import com.beautybuddy.discussion.dto.AddDiscussionDTO;
@@ -118,7 +120,7 @@ public class DiscussionService {
         Discussion discussion = discussionRepository.findById(discussionId)
             .orElseThrow(() -> new RuntimeException("Discussion not found"));
         if (!discussion.getUser().getId().equals(user.getId())) {
-            throw new RuntimeException("Unauthorized");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Unauthorized");
         }
 
         if (discussion.getReplyCount() > 0) {
@@ -144,7 +146,7 @@ public class DiscussionService {
         Discussion discussion = discussionRepository.findById(discussionId)
             .orElseThrow(() -> new RuntimeException("Discussion not found"));
         if (!discussion.getUser().getId().equals(user.getId())) {
-            throw new RuntimeException("Unauthorized");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Unauthorized");
         }
         discussion.setDeletedAt(LocalDateTime.now());
         discussionRepository.save(discussion);
@@ -178,7 +180,7 @@ public class DiscussionService {
             .orElseThrow(() -> new RuntimeException("Comment not found"));
 
         if (!comment.getUser().getId().equals(user.getId())) {
-            throw new RuntimeException("Unauthorized");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Unauthorized");
         }
 
         if (comment.getReplyCount() > 0) {
@@ -198,7 +200,7 @@ public class DiscussionService {
             .orElseThrow(() -> new RuntimeException("Comment not found"));
 
         if (!comment.getUser().getId().equals(user.getId())) {
-            throw new RuntimeException("Unauthorized");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Unauthorized");
         }
         comment.setDeletedAt(LocalDateTime.now());
         discussionCommentRepository.save(comment);
