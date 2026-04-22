@@ -1,0 +1,36 @@
+name: Parse Ingredients Job
+
+on:
+  workflow_dispatch:
+
+jobs:
+  parse:
+    runs-on: ubuntu-latest
+
+    env:
+      JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
+      SPRING_PROFILES_ACTIVE: prod
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Cache Maven
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+
+      - name: Build project
+        working-directory: BeautyBuddy-backend
+        run: mvn clean package -DskipTests
+
+      - name: Run parse job
+        working-directory: BeautyBuddy-backend
+        run: java -jar target/*.jar parse
