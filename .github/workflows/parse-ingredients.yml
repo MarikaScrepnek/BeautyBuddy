@@ -8,32 +8,43 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      SPRING_PROFILES_ACTIVE: prod
-      JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
-      SPRING_DATASOURCE_URL: ${{ secrets.SPRING_DATASOURCE_URL }}
-      SPRING_DATASOURCE_USERNAME: ${{ secrets.SPRING_DATASOURCE_USERNAME }}
-      SPRING_DATASOURCE_PASSWORD: ${{ secrets.SPRING_DATASOURCE_PASSWORD }}
+      VM_HOST: ${{ secrets.VM_HOST }}
+      VM_USER: ${{ secrets.VM_USER }}
+      VM_SSH_KEY: ${{ secrets.VM_SSH_KEY }}
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - name: Verify parse job prerequisites
+        shell: bash
+        run: |
+          if [ -z "$VM_HOST" ]; then
+            echo "Missing required repository secret: VM_HOST"
+            exit 1
+          fi
 
-      - name: Set up Java
-        uses: actions/setup-java@v3
+          if [ -z "$VM_USER" ]; then
+            echo "Missing required repository secret: VM_USER"
+            exit 1
+          fi
+
+          if [ -z "$VM_SSH_KEY" ]; then
+            echo "Missing required repository secret: VM_SSH_KEY"
+            exit 1
+          fi
+
+      - name: Run parse job on VM
+        uses: appleboy/ssh-action@v1.0.0
         with:
-          distribution: temurin
-          java-version: 21
-
-      - name: Cache Maven
-        uses: actions/cache@v3
-        with:
-          path: ~/.m2
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-
-      - name: Build project
-        working-directory: BeautyBuddy-backend
-        run: mvn clean package -DskipTests
-
-      - name: Run parse job
-        working-directory: BeautyBuddy-backend
-        run: java -jar target/*.jar parse
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.VM_SSH_KEY }}
+          script: |
+            cd ~/BeautyBuddy
+            if docker compose -p beautybuddy -f docker-compose.prod.yml ps -q backend_green >/dev/null && [ -n "$(docker compose -p beautybuddy -f docker-compose.prod.yml ps -q backend_green)" ]; then
+              docker compose -p beautybuddy -f docker-compose.prod.yml exec -T backend_green java -jar /app/app.jar parse
+            elif docker compose -p beautybuddy -f docker-compose.prod.yml ps -q backend_blue >/dev/null && [ -n "$(docker compose -p beautybuddy -f docker-compose.prod.yml ps -q backend_blue)" ]; then
+              docker compose -p beautybuddy -f docker-compose.prod.yml exec -T backend_blue java -jar /app/app.jar parse
+            else
+              echo "No running backend container found (backend_green or backend_blue)."
+              echo "Deploy first, then re-run parse job."
+              exit 1
+            fi
