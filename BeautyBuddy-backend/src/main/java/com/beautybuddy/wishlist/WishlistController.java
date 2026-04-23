@@ -15,6 +15,7 @@ import com.beautybuddy.security.CustomUserDetails;
 import com.beautybuddy.wishlist.dto.AddToWishlistRequestDTO;
 import com.beautybuddy.wishlist.dto.WishlistItemDTO;
 
+
 @RestController
 @RequestMapping("/api/wishlist")
 public class WishlistController {

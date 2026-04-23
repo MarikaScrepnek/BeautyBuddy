@@ -3,11 +3,14 @@ package com.beautybuddy.routine;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.beautybuddy.category.Category;
 import com.beautybuddy.category.CategoryRepository;
 import com.beautybuddy.common.DTOMapper;
+import com.beautybuddy.config.RedisCacheConfig;
 import com.beautybuddy.product.entity.Product;
 import com.beautybuddy.product.entity.ProductShade;
 import com.beautybuddy.product.repo.ProductRepository;
@@ -62,6 +65,7 @@ public class RoutineService {
             .register(meterRegistry);
     }
 
+    @Cacheable(cacheNames = RedisCacheConfig.ROUTINE_CACHE, key = "#userEmail + ':makeup'")
     public List<DisplayRoutineDTO> getMakeupRoutines(String userEmail) {
         User user = userRepository.findByEmail(userEmail)
             .orElseThrow(() -> new RuntimeException("User not found"));
@@ -82,6 +86,7 @@ public class RoutineService {
             .toList();
     }
 
+    @Cacheable(cacheNames = RedisCacheConfig.ROUTINE_CACHE, key = "#userEmail + ':skincare'")
     public List<DisplayRoutineDTO> getSkincareRoutines(String userEmail) {
         User user = userRepository.findByEmail(userEmail)
             .orElseThrow(() -> new RuntimeException("User not found"));
@@ -101,6 +106,7 @@ public class RoutineService {
             .toList();
     }
 
+    @Cacheable(cacheNames = RedisCacheConfig.ROUTINE_CACHE, key = "#userEmail + ':haircare'")
     public DisplayRoutineDTO getHaircareRoutine(String userEmail) {
         User user = userRepository.findByEmail(userEmail)
             .orElseThrow(() -> new RuntimeException("User not found"));
@@ -114,6 +120,7 @@ public class RoutineService {
         return DTOMapper.toDisplayRoutineDTO(routines.get(0), reviewRepository);
     }
 
+    @CacheEvict(cacheNames = RedisCacheConfig.ROUTINE_CACHE, allEntries = true)
     public void createMakeupRoutine(String userEmail, CreateMakeupRoutineRequestDTO request) {
         Category category = categoryRepository.findByName("Makeup")
             .orElseThrow(() -> new RuntimeException("Category not found"));
@@ -136,6 +143,7 @@ public class RoutineService {
         routineCreationCounter.increment();
     }
 
+    @CacheEvict(cacheNames = RedisCacheConfig.ROUTINE_CACHE, allEntries = true)
     public void addProductToRoutine(String userEmail, Long routineId, AddToRoutineRequestDTO request) {
         User user = userRepository.findByEmail(userEmail)
             .orElseThrow(() -> new RuntimeException("User not found"));
@@ -170,6 +178,7 @@ public class RoutineService {
         routineAddProductCounter.increment();
     }
 
+    @CacheEvict(cacheNames = RedisCacheConfig.ROUTINE_CACHE, allEntries = true)
     public DisplayRoutineDTO updateRoutine(String userEmail, DisplayRoutineDTO request) {
         User user = userRepository.findByEmail(userEmail)
             .orElseThrow(() -> new RuntimeException("User not found"));
@@ -227,6 +236,7 @@ public class RoutineService {
         return DTOMapper.toDisplayRoutineDTO(routine, reviewRepository);
     }
 
+    @Cacheable(cacheNames = RedisCacheConfig.ROUTINE_CACHE, key = "#userEmail + ':items'")
     public List<Long> getAllRoutineItems(String userEmail) {
         User user = userRepository.findByEmail(userEmail)
             .orElseThrow(() -> new RuntimeException("User not found"));
@@ -240,6 +250,7 @@ public class RoutineService {
             .toList();
     }
 
+    @CacheEvict(cacheNames = RedisCacheConfig.ROUTINE_CACHE, allEntries = true)
     public void removeProductFromRoutine(String userEmail, Long routineId, Long productId, String shadeName) {
         User user = userRepository.findByEmail(userEmail)
             .orElseThrow(() -> new RuntimeException("User not found"));

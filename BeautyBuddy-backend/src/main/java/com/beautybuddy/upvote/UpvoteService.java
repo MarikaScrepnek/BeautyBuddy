@@ -1,8 +1,11 @@
 package com.beautybuddy.upvote;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.beautybuddy.config.RedisCacheConfig;
 import com.beautybuddy.upvote.entity.AnswerUpvote;
 import com.beautybuddy.upvote.entity.DiscussionCommentUpvote;
 import com.beautybuddy.upvote.entity.DiscussionUpvote;
@@ -79,6 +82,14 @@ public class UpvoteService {
     }
 
     @Transactional
+    @Caching(evict = {
+        @CacheEvict(cacheNames = RedisCacheConfig.DISCUSSION_FEED_CACHE, allEntries = true),
+        @CacheEvict(cacheNames = RedisCacheConfig.DISCUSSION_SEARCH_FEED_CACHE, allEntries = true),
+        @CacheEvict(cacheNames = RedisCacheConfig.REVIEW_FEED_CACHE, allEntries = true),
+        @CacheEvict(cacheNames = RedisCacheConfig.REVIEW_SEARCH_FEED_CACHE, allEntries = true),
+        @CacheEvict(cacheNames = RedisCacheConfig.QA_FEED_CACHE, allEntries = true),
+        @CacheEvict(cacheNames = RedisCacheConfig.QA_SEARCH_FEED_CACHE, allEntries = true)
+    })
     public void upvote(String email, String targetType, Long targetId) {
         User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new RuntimeException("User not found"));
@@ -157,6 +168,14 @@ public class UpvoteService {
     }
 
     @Transactional
+    @Caching(evict = {
+        @CacheEvict(cacheNames = RedisCacheConfig.DISCUSSION_FEED_CACHE, allEntries = true),
+        @CacheEvict(cacheNames = RedisCacheConfig.DISCUSSION_SEARCH_FEED_CACHE, allEntries = true),
+        @CacheEvict(cacheNames = RedisCacheConfig.REVIEW_FEED_CACHE, allEntries = true),
+        @CacheEvict(cacheNames = RedisCacheConfig.REVIEW_SEARCH_FEED_CACHE, allEntries = true),
+        @CacheEvict(cacheNames = RedisCacheConfig.QA_FEED_CACHE, allEntries = true),
+        @CacheEvict(cacheNames = RedisCacheConfig.QA_SEARCH_FEED_CACHE, allEntries = true)
+    })
     public void removeUpvote(String email, String targetType, Long targetId) {
         User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new RuntimeException("User not found"));

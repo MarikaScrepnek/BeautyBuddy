@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Comparator;
 
 import com.beautybuddy.common.DTOMapper;
+import com.beautybuddy.config.RedisCacheConfig;
 import com.beautybuddy.ingredient.dto.MayContainIngredientDTO;
 import com.beautybuddy.ingredient.dto.ProductIngredientDTO;
 import com.beautybuddy.product.dto.ProductDTO;
@@ -14,6 +15,7 @@ import com.beautybuddy.report.ReportRequestDTO;
 import com.beautybuddy.security.CustomUserDetails;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.core.Authentication;
 
@@ -73,6 +75,7 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
+    @Cacheable(cacheNames = RedisCacheConfig.PRODUCT_DETAILS_CACHE, key = "#productId")
     public ProductDTO getProduct(@PathVariable("id") Long productId) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product not found"));

@@ -4,6 +4,7 @@ import com.beautybuddy.product.entity.Product;
 import com.beautybuddy.product.entity.ProductShade;
 import com.beautybuddy.product.repo.ProductRepository;
 import com.beautybuddy.product.repo.ProductShadeRepository;
+import com.beautybuddy.config.RedisCacheConfig;
 import com.beautybuddy.report.repo.ReviewReportRepository;
 import com.beautybuddy.review.dto.DisplayReviewDTO;
 import com.beautybuddy.review.dto.SubmitReviewDTO;
@@ -14,6 +15,9 @@ import com.beautybuddy.user.entity.User;
 import com.beautybuddy.upvote.repo.ReviewUpvoteRepository;
 import com.beautybuddy.review.dto.EditReviewDTO;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,6 +60,10 @@ public class ReviewService {
     }
 
     @Transactional
+    @Caching(evict = {
+        @CacheEvict(cacheNames = RedisCacheConfig.REVIEW_FEED_CACHE, allEntries = true),
+        @CacheEvict(cacheNames = RedisCacheConfig.REVIEW_SEARCH_FEED_CACHE, allEntries = true)
+    })
     public void addReview(String email, SubmitReviewDTO review) {
         User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new RuntimeException("User not found"));
@@ -99,6 +107,10 @@ public class ReviewService {
     }
 
     @Transactional
+    @Caching(evict = {
+        @CacheEvict(cacheNames = RedisCacheConfig.REVIEW_FEED_CACHE, allEntries = true),
+        @CacheEvict(cacheNames = RedisCacheConfig.REVIEW_SEARCH_FEED_CACHE, allEntries = true)
+    })
     public void editReview(String email, Long reviewId, EditReviewDTO review) {
         User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new RuntimeException("User not found"));
@@ -138,6 +150,10 @@ public class ReviewService {
     }
 
     @Transactional
+    @Caching(evict = {
+        @CacheEvict(cacheNames = RedisCacheConfig.REVIEW_FEED_CACHE, allEntries = true),
+        @CacheEvict(cacheNames = RedisCacheConfig.REVIEW_SEARCH_FEED_CACHE, allEntries = true)
+    })
     public void removeReview(String email, Long reviewId) {
         User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new RuntimeException("User not found"));
@@ -169,6 +185,10 @@ public class ReviewService {
         return PageRequest.of(page, size, sort);
     }
 
+    @Cacheable(
+        cacheNames = RedisCacheConfig.REVIEW_FEED_CACHE,
+        key = "#productId + ':' + #page + ':' + #size + ':' + T(java.util.Objects).toString(#sortKey, 'created_desc') + ':' + T(java.util.Objects).toString(#shadeFilter, '') + ':' + T(java.util.Objects).toString(#userEmail, 'anonymous')"
+    )
     public Page<DisplayReviewDTO> getReviewsForProduct(Long productId, int page, int size, String sortKey, String shadeFilter, String userEmail) {
         final User currentUser = userEmail != null
             ? userRepository.findByEmail(userEmail).orElse(null)
@@ -232,6 +252,10 @@ public class ReviewService {
         });
     }
 
+    @Cacheable(
+        cacheNames = RedisCacheConfig.REVIEW_SEARCH_FEED_CACHE,
+        key = "#productId + ':' + T(java.util.Objects).toString(#query, '') + ':' + #page + ':' + #size + ':' + T(java.util.Objects).toString(#sortKey, 'created_desc') + ':' + T(java.util.Objects).toString(#shadeFilter, '') + ':' + T(java.util.Objects).toString(#userEmail, 'anonymous')"
+    )
     public Page<DisplayReviewDTO> searchReviewsForProduct(Long productId, String query, int page, int size, String sortKey, String shadeFilter, String userEmail) {
         final User currentUser = userEmail != null
             ? userRepository.findByEmail(userEmail).orElse(null)
