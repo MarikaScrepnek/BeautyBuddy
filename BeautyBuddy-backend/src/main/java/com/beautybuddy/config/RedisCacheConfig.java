@@ -9,7 +9,6 @@ import org.springframework.cache.CacheManager;
 import org.springframework.cache.interceptor.CacheErrorHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -21,7 +20,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 @Configuration
-@Profile("!test")
 public class RedisCacheConfig {
 
     private static final Logger log = LoggerFactory.getLogger(RedisCacheConfig.class);
