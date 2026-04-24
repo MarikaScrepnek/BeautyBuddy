@@ -2,7 +2,12 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME_BACKEND: marikascrepnek/beautybuddy-backend
+  IMAGE_NAME_FRONTEND: marikascrepnek/beautybuddy-frontend
 
 jobs:
   build-and-push:
@@ -10,28 +15,32 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Login to GHCR
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-      # ---- BACKEND ----
-      - name: Build backend
+      # ---------------- BACKEND ----------------
+      - name: Build backend image
         run: |
-          docker build -t ghcr.io/marikascrepnek/beautybuddy-backend:latest ./BeautyBuddy-backend
+          docker build \
+            -t $REGISTRY/$IMAGE_NAME_BACKEND:${{ github.sha }} \
+            ./BeautyBuddy-backend
 
-      - name: Push backend
+      - name: Push backend image
         run: |
-          docker push ghcr.io/marikascrepnek/beautybuddy-backend:latest
+          docker push $REGISTRY/$IMAGE_NAME_BACKEND:${{ github.sha }}
 
-      # ---- FRONTEND ----
-      - name: Build frontend
+      # ---------------- FRONTEND ----------------
+      - name: Build frontend image
         run: |
-          docker build -t ghcr.io/marikascrepnek/beautybuddy-frontend:latest ./BeautyBuddy-frontend
+          docker build \
+            -t $REGISTRY/$IMAGE_NAME_FRONTEND:${{ github.sha }} \
+            ./BeautyBuddy-frontend
 
-      - name: Push frontend
+      - name: Push frontend image
         run: |
-          docker push ghcr.io/marikascrepnek/beautybuddy-frontend:latest
+          docker push $REGISTRY/$IMAGE_NAME_FRONTEND:${{ github.sha }}
 
   deploy:
     needs: build-and-push
@@ -47,12 +56,34 @@ jobs:
           script: |
             cd ~/BeautyBuddy
 
-            docker compose -p beautybuddy -f docker-compose.prod.yml pull
+            export TAG=${{ github.sha }}
 
-            docker compose -p beautybuddy -f docker-compose.prod.yml up -d --no-deps backend_green
+            echo "Deploying version: $TAG"
+
+            # Pull images
+            docker pull ghcr.io/marikascrepnek/beautybuddy-backend:$TAG
+            docker pull ghcr.io/marikascrepnek/beautybuddy-frontend:$TAG
+
+            # STEP 1: Deploy GREEN (inactive target)
+            TAG=$TAG docker compose -p beautybuddy -f docker-compose.prod.yml up -d backend_green
+
+            # STEP 2: Wait for GREEN health
             timeout 60 bash -c 'until curl -fs http://localhost:8082/actuator/health; do sleep 2; done'
 
-            docker compose -p beautybuddy -f docker-compose.prod.yml up -d --no-deps backend_blue
+            echo "Switching traffic to GREEN"
+
+            # STEP 3: SWITCH NGINX (8081 → 8082)
+            sudo sed -i 's/8081/8082/' /etc/nginx/sites-enabled/beautybuddy
+            sudo nginx -s reload
+
+            # STEP 4: Stop BLUE (old version)
+            docker compose -p beautybuddy -f docker-compose.prod.yml stop backend_blue
+
+            # STEP 5: Start BLUE as standby for next deploy
+            TAG=$TAG docker compose -p beautybuddy -f docker-compose.prod.yml up -d backend_blue
+
+            # STEP 6: Wait for BLUE warm standby
             timeout 60 bash -c 'until curl -fs http://localhost:8081/actuator/health; do sleep 2; done'
 
+            # cleanup
             docker image prune -f
