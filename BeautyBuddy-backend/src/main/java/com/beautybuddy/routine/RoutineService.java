@@ -1,7 +1,9 @@
 package com.beautybuddy.routine;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -83,7 +85,7 @@ public class RoutineService {
 
         return routines.stream()
             .map(routine -> DTOMapper.toDisplayRoutineDTO(routine, reviewRepository))
-            .toList();
+            .collect(Collectors.toCollection(ArrayList::new));
     }
 
     @Cacheable(cacheNames = RedisCacheConfig.ROUTINE_CACHE, key = "#userEmail + ':skincare'")
@@ -103,7 +105,7 @@ public class RoutineService {
 
         return routines.stream()
             .map(routine -> DTOMapper.toDisplayRoutineDTO(routine, reviewRepository))
-            .toList();
+            .collect(Collectors.toCollection(ArrayList::new));
     }
 
     @Cacheable(cacheNames = RedisCacheConfig.ROUTINE_CACHE, key = "#userEmail + ':haircare'")
@@ -247,7 +249,7 @@ public class RoutineService {
             .flatMap(routine -> routine.getItems().stream())
             .filter(item -> item.getValidTo() == null)
             .map(item -> item.getProduct().getId())
-            .toList();
+            .collect(Collectors.toCollection(ArrayList::new));
     }
 
     @CacheEvict(cacheNames = RedisCacheConfig.ROUTINE_CACHE, allEntries = true)

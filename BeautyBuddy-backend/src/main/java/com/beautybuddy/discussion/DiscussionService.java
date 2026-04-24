@@ -1,7 +1,9 @@
 package com.beautybuddy.discussion;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -17,6 +19,7 @@ import org.springframework.web.server.ResponseStatusException;
 import com.beautybuddy.config.RedisCacheConfig;
 import com.beautybuddy.discussion.dto.AddDiscussionCommentDTO;
 import com.beautybuddy.discussion.dto.AddDiscussionDTO;
+import com.beautybuddy.discussion.dto.CachedDiscussionPageDTO;
 import com.beautybuddy.discussion.dto.DisplayDiscussionDTO;
 import com.beautybuddy.discussion.dto.DisplayCommentDTO;
 import com.beautybuddy.discussion.entity.Discussion;
@@ -31,12 +34,18 @@ import com.beautybuddy.user.UserRepository;
 import com.beautybuddy.user.entity.User;
 
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 
 @Service
 public class DiscussionService {
+    @Autowired
+    @Lazy
+    private DiscussionService self;
+
     private final UserRepository userRepository;
     private final DiscussionRepository discussionRepository;
     private final DiscussionCommentRepository discussionCommentRepository;
@@ -115,7 +124,7 @@ public class DiscussionService {
                     currentUser != null && discussionCommentUpvoteRepository.findByUserAndDiscussionComment(currentUser, comment).isPresent(),
                     currentUser != null && discussionCommentReportRepository.findByUserAndDiscussionComment(currentUser, comment).isPresent()
                 ))
-                .toList(),
+                .collect(Collectors.toCollection(ArrayList::new)),
             currentUser != null && discussionUpvoteRepository.findByUserAndDiscussion(currentUser, discussion).isPresent(),
             currentUser != null && discussionReportRepository.findByUserAndDiscussion(currentUser, discussion).isPresent()
         );
@@ -234,22 +243,33 @@ public class DiscussionService {
         discussionCommentRepository.save(comment);
     }
 
+    public Page<DisplayDiscussionDTO> getDiscussions(String userEmail, int page, int size, String sortKey) {
+        return self.getDiscussionsCached(userEmail, page, size, sortKey).toPage();
+    }
+
     @Cacheable(
         cacheNames = RedisCacheConfig.DISCUSSION_FEED_CACHE,
         key = "T(java.util.Objects).toString(#userEmail, 'anonymous') + ':' + #page + ':' + #size + ':' + T(java.util.Objects).toString(#sortKey, 'created_desc')"
     )
-    public Page<DisplayDiscussionDTO> getDiscussions(String userEmail, int page, int size, String sortKey) {
+    public CachedDiscussionPageDTO getDiscussionsCached(String userEmail, int page, int size, String sortKey) {
         User currentUser = userRepository.findByEmail(userEmail).orElse(null);
         PageRequest pageRequest = buildDiscussionPageRequest(page, size, sortKey);
-        return discussionRepository.findAll(pageRequest)
-            .map(discussion -> toDisplayDiscussionDTO(discussion, currentUser));
+        Page<Discussion> discussions = discussionRepository.findAll(pageRequest);
+        List<DisplayDiscussionDTO> content = discussions.getContent().stream()
+            .map(discussion -> toDisplayDiscussionDTO(discussion, currentUser))
+            .collect(Collectors.toCollection(ArrayList::new));
+        return CachedDiscussionPageDTO.fromPage(new PageImpl<>(content, pageRequest, discussions.getTotalElements()));
+    }
+
+    public Page<DisplayDiscussionDTO> searchDiscussions(String userEmail, String query, int page, int size, String sortKey) {
+        return self.searchDiscussionsCached(userEmail, query, page, size, sortKey).toPage();
     }
 
     @Cacheable(
         cacheNames = RedisCacheConfig.DISCUSSION_SEARCH_FEED_CACHE,
         key = "T(java.util.Objects).toString(#userEmail, 'anonymous') + ':' + T(java.util.Objects).toString(#query, '') + ':' + #page + ':' + #size + ':' + T(java.util.Objects).toString(#sortKey, 'created_desc')"
     )
-    public Page<DisplayDiscussionDTO> searchDiscussions(String userEmail, String query, int page, int size, String sortKey) {
+    public CachedDiscussionPageDTO searchDiscussionsCached(String userEmail, String query, int page, int size, String sortKey) {
         User currentUser = userRepository.findByEmail(userEmail).orElse(null);
         PageRequest pageRequest = buildDiscussionPageRequest(page, size, sortKey);
         Page<Discussion> results = discussionRepository.findAll(pageRequest);
@@ -278,14 +298,14 @@ public class DiscussionService {
                         comment.getUser().getUsername(),
                         comment.getUpvoteCount(),
                         comment.getReplyCount(),
-                        discussionCommentUpvoteRepository.findByUserAndDiscussionComment(currentUser, comment).isPresent(),
-                        discussionCommentReportRepository.findByUserAndDiscussionComment(currentUser, comment).isPresent()
+                        currentUser != null && discussionCommentUpvoteRepository.findByUserAndDiscussionComment(currentUser, comment).isPresent(),
+                        currentUser != null && discussionCommentReportRepository.findByUserAndDiscussionComment(currentUser, comment).isPresent()
                     ))
-                    .toList(),
-                discussionUpvoteRepository.findByUserAndDiscussion(currentUser, discussion).isPresent(),
-                discussionReportRepository.findByUserAndDiscussion(currentUser, discussion).isPresent()
+                    .collect(Collectors.toCollection(ArrayList::new)),
+                currentUser != null && discussionUpvoteRepository.findByUserAndDiscussion(currentUser, discussion).isPresent(),
+                currentUser != null && discussionReportRepository.findByUserAndDiscussion(currentUser, discussion).isPresent()
             ))
-            .toList();
-        return new PageImpl<>(filtered, PageRequest.of(page, size), filtered.size());
+            .collect(Collectors.toCollection(ArrayList::new));
+        return CachedDiscussionPageDTO.fromPage(new PageImpl<>(filtered, PageRequest.of(page, size), filtered.size()));
     }
 }
