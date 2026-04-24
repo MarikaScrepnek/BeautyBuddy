@@ -1,18 +1,14 @@
 name: CI/CD Pipeline
-
 on:
   push:
     branches: ["main"]
-
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME_BACKEND: marikascrepnek/beautybuddy-backend
   IMAGE_NAME_FRONTEND: marikascrepnek/beautybuddy-frontend
-
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -20,7 +16,6 @@ jobs:
       - name: Login to GHCR
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-      # ---------------- BACKEND ----------------
       - name: Build backend image
         run: |
           docker build \
@@ -28,10 +23,8 @@ jobs:
             ./BeautyBuddy-backend
 
       - name: Push backend image
-        run: |
-          docker push $REGISTRY/$IMAGE_NAME_BACKEND:${{ github.sha }}
+        run: docker push $REGISTRY/$IMAGE_NAME_BACKEND:${{ github.sha }}
 
-      # ---------------- FRONTEND ----------------
       - name: Build frontend image
         run: |
           docker build \
@@ -39,13 +32,11 @@ jobs:
             ./BeautyBuddy-frontend
 
       - name: Push frontend image
-        run: |
-          docker push $REGISTRY/$IMAGE_NAME_FRONTEND:${{ github.sha }}
+        run: docker push $REGISTRY/$IMAGE_NAME_FRONTEND:${{ github.sha }}
 
   deploy:
     needs: build-and-push
     runs-on: ubuntu-latest
-
     steps:
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.0.0
@@ -54,36 +45,44 @@ jobs:
           username: ${{ secrets.VM_USER }}
           key: ${{ secrets.VM_SSH_KEY }}
           script: |
+            set -e
             cd ~/BeautyBuddy
-
             export TAG=${{ github.sha }}
-
             echo "Deploying version: $TAG"
 
-            # Pull images
             docker pull ghcr.io/marikascrepnek/beautybuddy-backend:$TAG
             docker pull ghcr.io/marikascrepnek/beautybuddy-frontend:$TAG
 
-            # STEP 1: Deploy GREEN (inactive target)
-            TAG=$TAG docker compose -p beautybuddy -f docker-compose.prod.yml up -d backend_green
+            # Determine which slot nginx is currently pointing at
+            if sudo grep -q "server localhost:8081;" /etc/nginx/sites-enabled/beautybuddy; then
+              ACTIVE=blue
+              ACTIVE_PORT=8081
+              INACTIVE=green
+              INACTIVE_PORT=8082
+            else
+              ACTIVE=green
+              ACTIVE_PORT=8082
+              INACTIVE=blue
+              INACTIVE_PORT=8081
+            fi
 
-            # STEP 2: Wait for GREEN health
-            timeout 60 bash -c 'until curl -fs http://localhost:8082/actuator/health; do sleep 2; done'
+            echo "Active: $ACTIVE ($ACTIVE_PORT) → deploying to: $INACTIVE ($INACTIVE_PORT)"
 
-            echo "Switching traffic to GREEN"
+            # STEP 1: Deploy new image to the inactive slot
+            TAG=$TAG docker compose -p beautybuddy -f docker-compose.prod.yml up -d backend_$INACTIVE
 
-            # STEP 3: SWITCH NGINX (8081 → 8082)
-            sudo sed -i 's/8081/8082/' /etc/nginx/sites-enabled/beautybuddy
-            sudo nginx -s reload
+            # STEP 2: Wait for inactive slot to be healthy
+            echo "Waiting for $INACTIVE to be healthy..."
+            timeout 60 bash -c "until curl -fs http://localhost:$INACTIVE_PORT/actuator/health; do sleep 2; done"
 
-            # STEP 4: Stop BLUE (old version)
-            docker compose -p beautybuddy -f docker-compose.prod.yml stop backend_blue
+            # STEP 3: Switch nginx to the new slot (targets upstream block specifically)
+            echo "Switching traffic to $INACTIVE ($INACTIVE_PORT)"
+            sudo sed -i "s/server localhost:$ACTIVE_PORT;/server localhost:$INACTIVE_PORT;/" /etc/nginx/sites-enabled/beautybuddy
+            sudo nginx -t && sudo nginx -s reload
 
-            # STEP 5: Start BLUE as standby for next deploy
-            TAG=$TAG docker compose -p beautybuddy -f docker-compose.prod.yml up -d backend_blue
+            # STEP 4: Stop the old active slot
+            docker compose -p beautybuddy -f docker-compose.prod.yml stop backend_$ACTIVE
 
-            # STEP 6: Wait for BLUE warm standby
-            timeout 60 bash -c 'until curl -fs http://localhost:8081/actuator/health; do sleep 2; done'
+            echo "Deploy complete. Now serving from $INACTIVE on port $INACTIVE_PORT"
 
-            # cleanup
             docker image prune -f
