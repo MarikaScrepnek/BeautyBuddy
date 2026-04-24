@@ -27,10 +27,6 @@ public class RedisCacheConfig {
     private static final Logger log = LoggerFactory.getLogger(RedisCacheConfig.class);
 
     public static final String PRODUCT_DETAILS_CACHE = "product-details-v2";
-    public static final String PRODUCT_LIST_CACHE = "product-list-v1";
-    public static final String PRODUCT_SEARCH_CACHE = "product-search-v1";
-    public static final String PRODUCT_INGREDIENTS_CACHE = "product-ingredients-v1";
-    public static final String PRODUCT_MAY_CONTAIN_CACHE = "product-may-contain-v1";
     public static final String DISCUSSION_FEED_CACHE = "discussion-feed-v3";
     public static final String DISCUSSION_SEARCH_FEED_CACHE = "discussion-search-feed-v3";
     public static final String REVIEW_FEED_CACHE = "review-feed-v3";
