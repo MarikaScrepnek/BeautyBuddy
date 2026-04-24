@@ -1,6 +1,6 @@
 services:
   backend_blue:
-    image: ghcr.io/marikascrepnek/beautybuddy-backend:latest
+    image: ghcr.io/marikascrepnek/beautybuddy-backend:${TAG}
     ports:
       - "8081:8080"
     environment:
@@ -8,25 +8,27 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/${POSTGRES_DB}
       - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
       - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
-      - REDIS_HOST=redis
+      - SPRING_DATA_REDIS_HOST=redis
+      - SPRING_DATA_REDIS_PORT=6379
+      - SPRING_DATA_REDIS_PASSWORD=${REDIS_PASSWORD}
     depends_on:
       - db
       - redis
     restart: unless-stopped
 
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/actuator/health | grep UP || exit 1"]
       interval: 10s
       timeout: 3s
       retries: 5
-    
+
     logging:
       options:
         max-size: "10m"
         max-file: "3"
-
+  
   backend_green:
-    image: ghcr.io/marikascrepnek/beautybuddy-backend:latest
+    image: ghcr.io/marikascrepnek/beautybuddy-backend:${TAG}
     ports:
       - "8082:8080"
     environment:
@@ -34,26 +36,27 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/${POSTGRES_DB}
       - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
       - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
-      - REDIS_HOST=redis
+      - SPRING_DATA_REDIS_HOST=redis
+      - SPRING_DATA_REDIS_PORT=6379
+      - SPRING_DATA_REDIS_PASSWORD=${REDIS_PASSWORD}
     depends_on:
       - db
       - redis
     restart: unless-stopped
 
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/actuator/health | grep UP || exit 1"]
       interval: 10s
       timeout: 3s
       retries: 5
-    
+
     logging:
       options:
         max-size: "10m"
         max-file: "3"
 
-
   frontend:
-    image: ghcr.io/marikascrepnek/beautybuddy-frontend:latest
+    image: ghcr.io/marikascrepnek/beautybuddy-frontend:${TAG}
     ports:
       - "3000:80"
     restart: unless-stopped
@@ -73,11 +76,31 @@ services:
         max-size: "10m"
         max-file: "3"
 
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - backend_blue
+      - backend_green
+
   redis:
     image: redis:7-alpine
-    restart: unless-stopped
+    container_name: beautybuddy-redis-prod
+    ports:
+      - "6379:6379"
     volumes:
       - redis-data:/data
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
+    restart: unless-stopped
+
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
 
     logging:
       options:
