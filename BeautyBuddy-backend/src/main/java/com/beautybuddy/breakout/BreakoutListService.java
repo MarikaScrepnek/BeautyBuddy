@@ -3,6 +3,8 @@ package com.beautybuddy.breakout;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.beautybuddy.breakout.dto.AddToBreakoutListDTO;
@@ -13,6 +15,7 @@ import com.beautybuddy.breakout.entity.BreakoutListProduct;
 import com.beautybuddy.breakout.repo.BreakoutListIngredientRepository;
 import com.beautybuddy.breakout.repo.BreakoutListProductRepository;
 import com.beautybuddy.common.DTOMapper;
+import com.beautybuddy.config.RedisCacheConfig;
 import com.beautybuddy.ingredient.dto.IngredientDTO;
 import com.beautybuddy.ingredient.entity.Ingredient;
 import com.beautybuddy.ingredient.repo.IngredientRepository;
@@ -50,6 +53,7 @@ public class BreakoutListService {
             .register(meterRegistry);
     }
 
+    @CacheEvict(cacheNames = RedisCacheConfig.BREAKOUT_LIST_CACHE, allEntries = true)
     public void addToBreakoutList(String userEmail, AddToBreakoutListDTO addToBreakoutListDTO) {
         User user = userRepository.findByEmail(userEmail)
             .orElseThrow(() -> new RuntimeException("User not found"));
@@ -81,6 +85,7 @@ public class BreakoutListService {
         }
     }
 
+    @Cacheable(cacheNames = RedisCacheConfig.BREAKOUT_LIST_CACHE, key = "#userEmail + ':products'")
     public Set<DisplayBreakoutListProductDTO> getBreakoutListProducts (String userEmail) {
         User user = userRepository.findByEmail(userEmail)
             .orElseThrow(() -> new RuntimeException("User not found"));
@@ -92,6 +97,7 @@ public class BreakoutListService {
         return products;
     }
 
+    @Cacheable(cacheNames = RedisCacheConfig.BREAKOUT_LIST_CACHE, key = "#userEmail + ':ingredients'")
     public Set<IngredientDTO> getBreakoutListIngredients(String userEmail) {
         User user = userRepository.findByEmail(userEmail)
             .orElseThrow(() -> new RuntimeException("User not found"));
@@ -104,6 +110,7 @@ public class BreakoutListService {
         return ingredients;
     }
 
+    @CacheEvict(cacheNames = RedisCacheConfig.BREAKOUT_LIST_CACHE, allEntries = true)
     public void removeFromBreakoutList(String userEmail, AddToBreakoutListDTO removeFromBreakoutListDTO) {
         User user = userRepository.findByEmail(userEmail)
             .orElseThrow(() -> new RuntimeException("User not found"));

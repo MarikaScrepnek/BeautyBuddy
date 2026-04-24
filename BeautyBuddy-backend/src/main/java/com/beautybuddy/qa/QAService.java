@@ -6,6 +6,7 @@ import com.beautybuddy.qa.dto.SubmitAnswerDTO;
 import com.beautybuddy.qa.dto.SubmitQuestionDTO;
 import com.beautybuddy.qa.dto.DisplayAnswerDTO;
 import com.beautybuddy.qa.dto.DisplayQuestionWithAnswersDTO;
+import com.beautybuddy.config.RedisCacheConfig;
 import com.beautybuddy.report.repo.AnswerReportRepository;
 import com.beautybuddy.report.repo.QuestionReportRepository;
 import com.beautybuddy.upvote.repo.AnswerUpvoteRepository;
@@ -21,6 +22,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Page;
@@ -66,6 +70,10 @@ public class QAService {
     }
 
     @Transactional
+    @Caching(evict = {
+        @CacheEvict(cacheNames = RedisCacheConfig.QA_FEED_CACHE, allEntries = true),
+        @CacheEvict(cacheNames = RedisCacheConfig.QA_SEARCH_FEED_CACHE, allEntries = true)
+    })
     public void addQuestion(String email, SubmitQuestionDTO question) {
         Question newQuestion = new Question();
         User user = userRepository.findByEmail(email)
@@ -81,6 +89,10 @@ public class QAService {
     }
 
     @Transactional
+    @Caching(evict = {
+        @CacheEvict(cacheNames = RedisCacheConfig.QA_FEED_CACHE, allEntries = true),
+        @CacheEvict(cacheNames = RedisCacheConfig.QA_SEARCH_FEED_CACHE, allEntries = true)
+    })
     public void editQuestion(String email, EditQuestionDTO question) {
         Question oldQuestion = questionRepository.findById(question.questionId())
             .orElseThrow(() -> new RuntimeException("Question not found"));
@@ -100,6 +112,10 @@ public class QAService {
     }
 
     @Transactional
+    @Caching(evict = {
+        @CacheEvict(cacheNames = RedisCacheConfig.QA_FEED_CACHE, allEntries = true),
+        @CacheEvict(cacheNames = RedisCacheConfig.QA_SEARCH_FEED_CACHE, allEntries = true)
+    })
     public void removeQuestion(String email, Long questionId) {
         Question question = questionRepository.findById(questionId)
             .orElseThrow(() -> new RuntimeException("Question not found"));
@@ -115,6 +131,10 @@ public class QAService {
 
 
     @Transactional
+    @Caching(evict = {
+        @CacheEvict(cacheNames = RedisCacheConfig.QA_FEED_CACHE, allEntries = true),
+        @CacheEvict(cacheNames = RedisCacheConfig.QA_SEARCH_FEED_CACHE, allEntries = true)
+    })
     public void addAnswer(String email, SubmitAnswerDTO answer) {
         Answer newAnswer = new Answer();
         User user = userRepository.findByEmail(email)
@@ -132,6 +152,10 @@ public class QAService {
     }
 
     @Transactional
+    @Caching(evict = {
+        @CacheEvict(cacheNames = RedisCacheConfig.QA_FEED_CACHE, allEntries = true),
+        @CacheEvict(cacheNames = RedisCacheConfig.QA_SEARCH_FEED_CACHE, allEntries = true)
+    })
     public void editAnswer(String email, EditAnswerDTO answer) {
         Answer oldAnswer = answerRepository.findById(answer.answerId())
             .orElseThrow(() -> new RuntimeException("Answer not found"));
@@ -145,6 +169,10 @@ public class QAService {
     }
 
     @Transactional
+    @Caching(evict = {
+        @CacheEvict(cacheNames = RedisCacheConfig.QA_FEED_CACHE, allEntries = true),
+        @CacheEvict(cacheNames = RedisCacheConfig.QA_SEARCH_FEED_CACHE, allEntries = true)
+    })
     public void removeAnswer(String email, Long answerId) {
         Answer answer = answerRepository.findById(answerId)
             .orElseThrow(() -> new RuntimeException("Answer not found"));
@@ -170,6 +198,10 @@ public class QAService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(
+        cacheNames = RedisCacheConfig.QA_FEED_CACHE,
+        key = "#productId + ':' + #page + ':' + #size + ':' + T(java.util.Objects).toString(#sortKey, 'created_desc') + ':' + T(java.util.Objects).toString(#userEmail, 'anonymous')"
+    )
     public Page<DisplayQuestionWithAnswersDTO> getQuestionsAndAnswersForProduct(Long productId, int page, int size, String sortKey, String userEmail) {
         final User currentUser = userEmail != null
             ? userRepository.findByEmail(userEmail).orElse(null)
@@ -229,6 +261,10 @@ public class QAService {
         return new PageImpl<>(mapped, questions.getPageable(), mapped.size());
     }
 
+    @Cacheable(
+        cacheNames = RedisCacheConfig.QA_SEARCH_FEED_CACHE,
+        key = "#productId + ':' + T(java.util.Objects).toString(#query, '') + ':' + #page + ':' + #size + ':' + T(java.util.Objects).toString(#sortKey, 'created_desc') + ':' + T(java.util.Objects).toString(#userEmail, 'anonymous')"
+    )
     public Page<DisplayQuestionWithAnswersDTO> searchQuestionsAndAnswersForProduct(Long productId, String query, int page, int size, String sortKey, String userEmail) {
         final User currentUser = userEmail != null
             ? userRepository.findByEmail(userEmail).orElse(null)

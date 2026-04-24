@@ -1,5 +1,6 @@
 package com.beautybuddy.wishlist;
 
+import com.beautybuddy.config.RedisCacheConfig;
 import com.beautybuddy.product.entity.Product;
 import com.beautybuddy.product.entity.ProductShade;
 import com.beautybuddy.product.repo.ProductRepository;
@@ -16,6 +17,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,6 +49,7 @@ public class WishlistService {
     }
 
     @Transactional
+    @CacheEvict(cacheNames = RedisCacheConfig.WISHLIST_CACHE, allEntries = true)
     public void addToWishlist(String email, AddToWishlistRequestDTO request) {
         User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new RuntimeException("User not found"));
@@ -74,6 +78,7 @@ public class WishlistService {
         wishlistAddCounter.increment();
     }
 
+    @Cacheable(cacheNames = RedisCacheConfig.WISHLIST_CACHE, key = "#username")
     public List<WishlistItemDTO> getWishlistItems(String username) {
         List<WishlistItem> items = wishlistItemRepository.findByWishlist_User_Email(username);
         List<WishlistItemDTO> result = new ArrayList<>();
@@ -103,6 +108,7 @@ public class WishlistService {
         return result;
     }
 
+    @Cacheable(cacheNames = RedisCacheConfig.WISHLIST_CACHE, key = "#username + ':' + T(java.util.Objects).toString(#sort, '') + ':' + T(java.util.Objects).toString(#query, '') + ':' + T(java.util.Objects).toString(#category, '') + ':' + T(java.util.Objects).toString(#priceRange, '')")
     public List<WishlistItemDTO> getWishlist(
         String username,
         String sort,          // e.g. "price_asc", "rating_desc", "added_desc"
@@ -214,6 +220,7 @@ public class WishlistService {
     }
 
     @Transactional
+    @CacheEvict(cacheNames = RedisCacheConfig.WISHLIST_CACHE, allEntries = true)
     public void removeFromWishlist(String email, AddToWishlistRequestDTO request) {
         List<WishlistItem> items = wishlistItemRepository.findByWishlist_User_Email(email);
         WishlistItem target = null;

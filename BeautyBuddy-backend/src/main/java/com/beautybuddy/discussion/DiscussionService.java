@@ -3,6 +3,9 @@ package com.beautybuddy.discussion;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -11,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.beautybuddy.config.RedisCacheConfig;
 import com.beautybuddy.discussion.dto.AddDiscussionCommentDTO;
 import com.beautybuddy.discussion.dto.AddDiscussionDTO;
 import com.beautybuddy.discussion.dto.DisplayDiscussionDTO;
@@ -63,6 +67,10 @@ public class DiscussionService {
     }
 
     @Transactional
+    @Caching(evict = {
+        @CacheEvict(cacheNames = RedisCacheConfig.DISCUSSION_FEED_CACHE, allEntries = true),
+        @CacheEvict(cacheNames = RedisCacheConfig.DISCUSSION_SEARCH_FEED_CACHE, allEntries = true)
+    })
     public void addDiscussion(String userEmail, AddDiscussionDTO discussionDTO) {
         User user = userRepository.findByEmail(userEmail)
             .orElseThrow(() -> new RuntimeException("User not found"));
@@ -114,6 +122,10 @@ public class DiscussionService {
     }
 
     @Transactional
+    @Caching(evict = {
+        @CacheEvict(cacheNames = RedisCacheConfig.DISCUSSION_FEED_CACHE, allEntries = true),
+        @CacheEvict(cacheNames = RedisCacheConfig.DISCUSSION_SEARCH_FEED_CACHE, allEntries = true)
+    })
     public void editDiscussion(String userEmail, Long discussionId, AddDiscussionDTO updatedDiscussionDTO) {
         User user = userRepository.findByEmail(userEmail)
             .orElseThrow(() -> new RuntimeException("User not found"));
@@ -140,6 +152,10 @@ public class DiscussionService {
     }
 
     @Transactional
+    @Caching(evict = {
+        @CacheEvict(cacheNames = RedisCacheConfig.DISCUSSION_FEED_CACHE, allEntries = true),
+        @CacheEvict(cacheNames = RedisCacheConfig.DISCUSSION_SEARCH_FEED_CACHE, allEntries = true)
+    })
     public void deleteDiscussion(String userEmail, Long discussionId) {
         User user = userRepository.findByEmail(userEmail)
             .orElseThrow(() -> new RuntimeException("User not found"));
@@ -153,6 +169,10 @@ public class DiscussionService {
     }
 
     @Transactional
+    @Caching(evict = {
+        @CacheEvict(cacheNames = RedisCacheConfig.DISCUSSION_FEED_CACHE, allEntries = true),
+        @CacheEvict(cacheNames = RedisCacheConfig.DISCUSSION_SEARCH_FEED_CACHE, allEntries = true)
+    })
     public void addComment(String userEmail, Long discussionId, AddDiscussionCommentDTO commentDTO) {
         User user = userRepository.findByEmail(userEmail)
             .orElseThrow(() -> new RuntimeException("User not found"));
@@ -173,6 +193,10 @@ public class DiscussionService {
     }
 
     @Transactional
+    @Caching(evict = {
+        @CacheEvict(cacheNames = RedisCacheConfig.DISCUSSION_FEED_CACHE, allEntries = true),
+        @CacheEvict(cacheNames = RedisCacheConfig.DISCUSSION_SEARCH_FEED_CACHE, allEntries = true)
+    })
     public void editComment(String userEmail, Long commentId, String text) {
         User user = userRepository.findByEmail(userEmail)
             .orElseThrow(() -> new RuntimeException("User not found"));
@@ -193,6 +217,10 @@ public class DiscussionService {
     }
 
     @Transactional
+    @Caching(evict = {
+        @CacheEvict(cacheNames = RedisCacheConfig.DISCUSSION_FEED_CACHE, allEntries = true),
+        @CacheEvict(cacheNames = RedisCacheConfig.DISCUSSION_SEARCH_FEED_CACHE, allEntries = true)
+    })
     public void deleteComment(String userEmail, Long commentId) {
         User user = userRepository.findByEmail(userEmail)
             .orElseThrow(() -> new RuntimeException("User not found"));
@@ -206,6 +234,10 @@ public class DiscussionService {
         discussionCommentRepository.save(comment);
     }
 
+    @Cacheable(
+        cacheNames = RedisCacheConfig.DISCUSSION_FEED_CACHE,
+        key = "T(java.util.Objects).toString(#userEmail, 'anonymous') + ':' + #page + ':' + #size + ':' + T(java.util.Objects).toString(#sortKey, 'created_desc')"
+    )
     public Page<DisplayDiscussionDTO> getDiscussions(String userEmail, int page, int size, String sortKey) {
         User currentUser = userRepository.findByEmail(userEmail).orElse(null);
         PageRequest pageRequest = buildDiscussionPageRequest(page, size, sortKey);
@@ -213,6 +245,10 @@ public class DiscussionService {
             .map(discussion -> toDisplayDiscussionDTO(discussion, currentUser));
     }
 
+    @Cacheable(
+        cacheNames = RedisCacheConfig.DISCUSSION_SEARCH_FEED_CACHE,
+        key = "T(java.util.Objects).toString(#userEmail, 'anonymous') + ':' + T(java.util.Objects).toString(#query, '') + ':' + #page + ':' + #size + ':' + T(java.util.Objects).toString(#sortKey, 'created_desc')"
+    )
     public Page<DisplayDiscussionDTO> searchDiscussions(String userEmail, String query, int page, int size, String sortKey) {
         User currentUser = userRepository.findByEmail(userEmail).orElse(null);
         PageRequest pageRequest = buildDiscussionPageRequest(page, size, sortKey);
