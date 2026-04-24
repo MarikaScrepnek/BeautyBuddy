@@ -14,11 +14,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -85,16 +83,6 @@ public abstract class BaseIntegrationTest {
         }
         registry.add("spring.jpa.hibernate.ddl-auto", () -> "validate");
         registry.add("spring.flyway.enabled", () -> "true");
-    }
-
-    @Autowired
-    private RedisConnectionFactory redisConnectionFactory;
-
-    @BeforeEach
-    void flushRedis() {
-        try (var connection = redisConnectionFactory.getConnection()) {
-            connection.serverCommands().flushAll();
-        }
     }
 
     @Autowired
