@@ -27,6 +27,10 @@ public class RedisCacheConfig {
     private static final Logger log = LoggerFactory.getLogger(RedisCacheConfig.class);
 
     public static final String PRODUCT_DETAILS_CACHE = "product-details-v2";
+    public static final String PRODUCT_LIST_CACHE = "product-list-v1";
+    public static final String PRODUCT_SEARCH_CACHE = "product-search-v1";
+    public static final String PRODUCT_INGREDIENTS_CACHE = "product-ingredients-v1";
+    public static final String PRODUCT_MAY_CONTAIN_CACHE = "product-may-contain-v1";
     public static final String DISCUSSION_FEED_CACHE = "discussion-feed-v3";
     public static final String DISCUSSION_SEARCH_FEED_CACHE = "discussion-search-feed-v3";
     public static final String REVIEW_FEED_CACHE = "review-feed-v3";
@@ -60,6 +64,10 @@ public class RedisCacheConfig {
         return RedisCacheManager.builder(connectionFactory)
             .cacheDefaults(feedDefaults)
             .withCacheConfiguration(PRODUCT_DETAILS_CACHE, feedDefaults.entryTtl(Duration.ofMinutes(20)))
+            .withCacheConfiguration(PRODUCT_LIST_CACHE, feedDefaults.entryTtl(Duration.ofMinutes(10)))
+            .withCacheConfiguration(PRODUCT_SEARCH_CACHE, feedDefaults.entryTtl(Duration.ofMinutes(5)))
+            .withCacheConfiguration(PRODUCT_INGREDIENTS_CACHE, feedDefaults.entryTtl(Duration.ofMinutes(20)))
+            .withCacheConfiguration(PRODUCT_MAY_CONTAIN_CACHE, feedDefaults.entryTtl(Duration.ofMinutes(20)))
             .withCacheConfiguration(DISCUSSION_FEED_CACHE, feedDefaults)
             .withCacheConfiguration(DISCUSSION_SEARCH_FEED_CACHE, feedDefaults)
             .withCacheConfiguration(REVIEW_FEED_CACHE, feedDefaults)

@@ -2,6 +2,8 @@ package com.beautybuddy.product;
 
 import java.util.List;
 import java.util.Comparator;
+import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 import com.beautybuddy.common.DTOMapper;
 import com.beautybuddy.config.RedisCacheConfig;
@@ -32,13 +34,15 @@ public class ProductController {
     }
 
     @GetMapping
+    @Cacheable(cacheNames = RedisCacheConfig.PRODUCT_LIST_CACHE, key = "'all'")
     public List<ProductDTO> getAllProducts() {
         return productRepository.findAll().stream()
                 .map(DTOMapper::toProductDTO)
-                .toList();
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     @GetMapping("/search")
+    @Cacheable(cacheNames = RedisCacheConfig.PRODUCT_SEARCH_CACHE, key = "T(java.util.Objects).toString(#query, '') + ':' + T(java.util.Objects).toString(#sort, 'added_desc') + ':' + T(java.util.Objects).toString(#category, '')")
     public List<ProductDTO> searchProducts(
         @RequestParam(value = "q", required = false, defaultValue = "") String query,
         @RequestParam(required = false) String sort,
@@ -54,11 +58,11 @@ public class ProductController {
                     && product.getCategory().getBaseCategory() != null
                     && category.equalsIgnoreCase(product.getCategory().getBaseCategory().getName())))
             .sorted(buildProductComparator(sort))
-            .toList();
+            .collect(Collectors.toCollection(ArrayList::new));
 
         return filtered.stream()
                 .map(DTOMapper::toProductDTO)
-                .toList();
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     private Comparator<Product> buildProductComparator(String sortKey) {
@@ -83,21 +87,23 @@ public class ProductController {
     }
 
     @GetMapping("/{id}/ingredients")
+        @Cacheable(cacheNames = RedisCacheConfig.PRODUCT_INGREDIENTS_CACHE, key = "#productId")
     public List<ProductIngredientDTO> getProductIngredients(@PathVariable("id") Long productId) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
         return product.getProductIngredients().stream()
                 .map(DTOMapper::toProductIngredientDTO)
-                .toList();
+            .collect(Collectors.toCollection(ArrayList::new));
     }
 
     @GetMapping("/{id}/maycontain")
+        @Cacheable(cacheNames = RedisCacheConfig.PRODUCT_MAY_CONTAIN_CACHE, key = "#productId")
     public List<MayContainIngredientDTO> getMayContainIngredients(@PathVariable("id") Long productId) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
         return product.getMayContainIngredients().stream()
                 .map(DTOMapper::toMayContainIngredientDTO)
-                .toList();
+            .collect(Collectors.toCollection(ArrayList::new));
     }
 
     @PostMapping("/{id}/report")
