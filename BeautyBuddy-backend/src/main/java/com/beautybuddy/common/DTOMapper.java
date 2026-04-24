@@ -105,7 +105,11 @@ public class DTOMapper {
         LocalDateTime now = LocalDateTime.now();
 
         List<RoutineItem> validItems = routine.getItems().stream()
-            .filter(item -> item.getValidFrom().isBefore(now) && (item.getValidTo() == null || item.getValidTo().isAfter(now)))
+            .filter(item ->
+                item.getValidFrom() != null &&
+                item.getValidFrom().isBefore(now) &&
+                (item.getValidTo() == null || item.getValidTo().isAfter(now))
+            )
             .sorted(Comparator.comparingInt(RoutineItem::getStepOrder))
             .toList();
 
@@ -136,13 +140,17 @@ public class DTOMapper {
                 item.getId(),
                 item.getProduct().getId(),
                 item.getProduct().getName(),
-                item.getProduct().getBrand().getName(),
+                item.getProduct().getBrand() != null
+                    ? item.getProduct().getBrand().getName()
+                    : null,
                 item.getShade() != null ? item.getShade().getShadeName() : null,
                 item.getProduct().getProductShades().stream()
                     .sorted(Comparator.comparing(ProductShade::getShadeNumber))
                     .map(DTOMapper::toProductShadeDTO)
                     .toList(),
-                item.getProduct().getCategory().getName(),
+                item.getProduct().getCategory() != null
+                    ? item.getProduct().getCategory().getName()
+                    : null,
                 item.getShade() != null && item.getShade().getImageLink() != null
                     ? item.getShade().getImageLink()
                     : item.getProduct().getImageLink(),
@@ -185,7 +193,9 @@ public class DTOMapper {
             blp.getId(),
             blp.getProduct().getId(),
             blp.getProduct().getName(),
-            blp.getProduct().getBrand().getName(),
+            blp.getProduct().getBrand() != null
+                ? blp.getProduct().getBrand().getName()
+                : null,
             blp.getProduct().getImageLink(),
             blp.getProduct().getProductIngredients().stream()
                 .sorted(Comparator.comparingInt(ProductIngredient::getPosition))
