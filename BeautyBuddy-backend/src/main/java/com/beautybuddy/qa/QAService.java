@@ -1,6 +1,7 @@
 package com.beautybuddy.qa;
 
 import com.beautybuddy.qa.dto.EditAnswerDTO;
+import com.beautybuddy.qa.dto.CachedQuestionPageDTO;
 import com.beautybuddy.qa.dto.EditQuestionDTO;
 import com.beautybuddy.qa.dto.SubmitAnswerDTO;
 import com.beautybuddy.qa.dto.SubmitQuestionDTO;
@@ -17,10 +18,13 @@ import com.beautybuddy.product.entity.Product;
 import com.beautybuddy.product.repo.ProductRepository;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -37,6 +41,10 @@ import io.micrometer.core.instrument.MeterRegistry;
 
 @Service
 public class QAService {
+    @Autowired
+    @Lazy
+    private QAService self;
+
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
     private final QuestionRepository questionRepository;
@@ -198,11 +206,15 @@ public class QAService {
     }
 
     @Transactional(readOnly = true)
+    public Page<DisplayQuestionWithAnswersDTO> getQuestionsAndAnswersForProduct(Long productId, int page, int size, String sortKey, String userEmail) {
+        return self.getQuestionsAndAnswersForProductCached(productId, page, size, sortKey, userEmail).toPage();
+    }
+
     @Cacheable(
         cacheNames = RedisCacheConfig.QA_FEED_CACHE,
         key = "#productId + ':' + #page + ':' + #size + ':' + T(java.util.Objects).toString(#sortKey, 'created_desc') + ':' + T(java.util.Objects).toString(#userEmail, 'anonymous')"
     )
-    public Page<DisplayQuestionWithAnswersDTO> getQuestionsAndAnswersForProduct(Long productId, int page, int size, String sortKey, String userEmail) {
+    public CachedQuestionPageDTO getQuestionsAndAnswersForProductCached(Long productId, int page, int size, String sortKey, String userEmail) {
         final User currentUser = userEmail != null
             ? userRepository.findByEmail(userEmail).orElse(null)
             : null;
@@ -242,7 +254,7 @@ public class QAService {
                     currentUser != null
                         && answerUpvoteRepository.findByUserAndAnswer(currentUser, answer).isPresent()
                 ))
-                .toList();
+                .collect(Collectors.toCollection(ArrayList::new));
 
             return new DisplayQuestionWithAnswersDTO(
                 question.getId(),
@@ -256,16 +268,20 @@ public class QAService {
                 answers
             );
         })
-            .toList();
+            .collect(Collectors.toCollection(ArrayList::new));
 
-        return new PageImpl<>(mapped, questions.getPageable(), mapped.size());
+        return CachedQuestionPageDTO.fromPage(new PageImpl<>(mapped, questions.getPageable(), mapped.size()));
+    }
+
+    public Page<DisplayQuestionWithAnswersDTO> searchQuestionsAndAnswersForProduct(Long productId, String query, int page, int size, String sortKey, String userEmail) {
+        return self.searchQuestionsAndAnswersForProductCached(productId, query, page, size, sortKey, userEmail).toPage();
     }
 
     @Cacheable(
         cacheNames = RedisCacheConfig.QA_SEARCH_FEED_CACHE,
         key = "#productId + ':' + T(java.util.Objects).toString(#query, '') + ':' + #page + ':' + #size + ':' + T(java.util.Objects).toString(#sortKey, 'created_desc') + ':' + T(java.util.Objects).toString(#userEmail, 'anonymous')"
     )
-    public Page<DisplayQuestionWithAnswersDTO> searchQuestionsAndAnswersForProduct(Long productId, String query, int page, int size, String sortKey, String userEmail) {
+    public CachedQuestionPageDTO searchQuestionsAndAnswersForProductCached(Long productId, String query, int page, int size, String sortKey, String userEmail) {
         final User currentUser = userEmail != null
             ? userRepository.findByEmail(userEmail).orElse(null)
             : null;
@@ -306,7 +322,7 @@ public class QAService {
                         currentUser != null
                             && answerUpvoteRepository.findByUserAndAnswer(currentUser, answer).isPresent()
                     ))
-                    .toList();
+                    .collect(Collectors.toCollection(ArrayList::new));
 
                 return new DisplayQuestionWithAnswersDTO(
                     question.getId(),
@@ -320,8 +336,8 @@ public class QAService {
                     answers
                 );
             })
-            .toList();
+            .collect(Collectors.toCollection(ArrayList::new));
 
-        return new PageImpl<>(mapped, questions.getPageable(), mapped.size());
+        return CachedQuestionPageDTO.fromPage(new PageImpl<>(mapped, questions.getPageable(), mapped.size()));
     }
 }

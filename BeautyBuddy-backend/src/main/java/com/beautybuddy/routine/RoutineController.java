@@ -23,36 +23,47 @@ import com.beautybuddy.security.CustomUserDetails;
 public class RoutineController {
     private final RoutineService routineService;
 
+    private CustomUserDetails getUserDetails(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return null;
+        }
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof CustomUserDetails userDetails) {
+            return userDetails;
+        }
+        return null;
+    }
+
     public RoutineController(RoutineService routineService) {
         this.routineService = routineService;
     }
 
     @GetMapping("/makeup")
     public ResponseEntity<List<DisplayRoutineDTO>> getMakeupRoutines(Authentication authentication) {
-        if (authentication == null || !authentication.isAuthenticated()) {
+        CustomUserDetails userDetails = getUserDetails(authentication);
+        if (userDetails == null) {
             return ResponseEntity.status(401).build();
         }
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         List<DisplayRoutineDTO> routines = routineService.getMakeupRoutines(userDetails.getEmail());
         return ResponseEntity.ok(routines);
     }
 
     @GetMapping("/skincare")
     public ResponseEntity<List<DisplayRoutineDTO>> getSkincareRoutines(Authentication authentication) {
-        if (authentication == null || !authentication.isAuthenticated()) {
+        CustomUserDetails userDetails = getUserDetails(authentication);
+        if (userDetails == null) {
             return ResponseEntity.status(401).build();
         }
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         List<DisplayRoutineDTO> routines = routineService.getSkincareRoutines(userDetails.getEmail());
         return ResponseEntity.ok(routines);
     }
 
     @GetMapping("/haircare")
     public ResponseEntity<DisplayRoutineDTO> getHaircareRoutines(Authentication authentication) {
-        if (authentication == null || !authentication.isAuthenticated()) {
+        CustomUserDetails userDetails = getUserDetails(authentication);
+        if (userDetails == null) {
             return ResponseEntity.status(401).build();
         }
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         DisplayRoutineDTO routine = routineService.getHaircareRoutine(userDetails.getEmail());
         return ResponseEntity.ok(routine);
     }
@@ -64,20 +75,20 @@ public class RoutineController {
 
     @PostMapping("/makeup")
     public ResponseEntity<Void> createMakeupRoutine(Authentication authentication, @RequestBody CreateMakeupRoutineRequestDTO request) {
-        if (authentication == null || !authentication.isAuthenticated()) {
+        CustomUserDetails userDetails = getUserDetails(authentication);
+        if (userDetails == null) {
             return ResponseEntity.status(401).build();
         }
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         routineService.createMakeupRoutine(userDetails.getEmail(), request);
         return ResponseEntity.ok().build();
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<DisplayRoutineDTO> updateRoutine(Authentication authentication, @PathVariable Long id, @RequestBody DisplayRoutineDTO request) {
-        if (authentication == null || !authentication.isAuthenticated()) {
+        CustomUserDetails userDetails = getUserDetails(authentication);
+        if (userDetails == null) {
             return ResponseEntity.status(401).build();
         }
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         DisplayRoutineDTO updatedRoutine = routineService.updateRoutine(userDetails.getEmail(), request);
         return ResponseEntity.ok(updatedRoutine);
     }
@@ -89,10 +100,10 @@ public class RoutineController {
 
     @PostMapping("/{id}/add-product")
     public ResponseEntity<Void> addProductToRoutine(Authentication authentication, @PathVariable Long id, @RequestBody AddToRoutineRequestDTO request) {
-        if (authentication == null || !authentication.isAuthenticated()) {
+        CustomUserDetails userDetails = getUserDetails(authentication);
+        if (userDetails == null) {
             return ResponseEntity.status(401).build();
         }
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         routineService.addProductToRoutine(userDetails.getEmail(), id, request);
         return ResponseEntity.ok().build();
     }
@@ -104,20 +115,20 @@ public class RoutineController {
 
     @DeleteMapping("/{routineId}/{productId}")
     public ResponseEntity<Void> removeProductFromRoutine(Authentication authentication, @PathVariable Long routineId, @PathVariable Long productId, @RequestBody(required = false) String shadeName) {
-        if (authentication == null || !authentication.isAuthenticated()) {
+        CustomUserDetails userDetails = getUserDetails(authentication);
+        if (userDetails == null) {
             return ResponseEntity.status(401).build();
         }
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         routineService.removeProductFromRoutine(userDetails.getEmail(), routineId, productId, shadeName);
         return ResponseEntity.ok().build();
     }
 
     @GetMapping("/items")
     public ResponseEntity<List<Long>> getAllRoutineItems(Authentication authentication) {
-        if (authentication == null || !authentication.isAuthenticated()) {
+        CustomUserDetails userDetails = getUserDetails(authentication);
+        if (userDetails == null) {
             return ResponseEntity.status(401).build();
         }
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         List<Long> items = routineService.getAllRoutineItems(userDetails.getEmail());
         return ResponseEntity.ok(items);
     }

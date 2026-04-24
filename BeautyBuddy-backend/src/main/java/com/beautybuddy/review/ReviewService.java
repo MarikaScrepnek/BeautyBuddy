@@ -6,6 +6,7 @@ import com.beautybuddy.product.repo.ProductRepository;
 import com.beautybuddy.product.repo.ProductShadeRepository;
 import com.beautybuddy.config.RedisCacheConfig;
 import com.beautybuddy.report.repo.ReviewReportRepository;
+import com.beautybuddy.review.dto.CachedReviewPageDTO;
 import com.beautybuddy.review.dto.DisplayReviewDTO;
 import com.beautybuddy.review.dto.SubmitReviewDTO;
 import com.beautybuddy.review.entity.Review;
@@ -23,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -31,6 +33,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -38,6 +42,10 @@ import io.micrometer.core.instrument.MeterRegistry;
 @Service
 @Transactional(readOnly = true)
 public class ReviewService {
+    @Autowired
+    @Lazy
+    private ReviewService self;
+
     private final ReviewRepository reviewRepository;
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
@@ -185,11 +193,15 @@ public class ReviewService {
         return PageRequest.of(page, size, sort);
     }
 
+    public Page<DisplayReviewDTO> getReviewsForProduct(Long productId, int page, int size, String sortKey, String shadeFilter, String userEmail) {
+        return self.getReviewsForProductCached(productId, page, size, sortKey, shadeFilter, userEmail).toPage();
+    }
+
     @Cacheable(
         cacheNames = RedisCacheConfig.REVIEW_FEED_CACHE,
         key = "#productId + ':' + #page + ':' + #size + ':' + T(java.util.Objects).toString(#sortKey, 'created_desc') + ':' + T(java.util.Objects).toString(#shadeFilter, '') + ':' + T(java.util.Objects).toString(#userEmail, 'anonymous')"
     )
-    public Page<DisplayReviewDTO> getReviewsForProduct(Long productId, int page, int size, String sortKey, String shadeFilter, String userEmail) {
+    public CachedReviewPageDTO getReviewsForProductCached(Long productId, int page, int size, String sortKey, String shadeFilter, String userEmail) {
         final User currentUser = userEmail != null
             ? userRepository.findByEmail(userEmail).orElse(null)
             : null;
@@ -216,17 +228,17 @@ public class ReviewService {
 
         List<Review> filteredReviews = reviewPage.getContent().stream()
             .filter(review -> !reportedReviewIds.contains(review.getId()))
-            .toList();
+            .collect(Collectors.toCollection(ArrayList::new));
 
         Page<Review> filteredPage = new PageImpl<>(
             filteredReviews,
             reviewPage.getPageable(),
             filteredReviews.size()
         );
-        return filteredPage.map(review -> {
+        Page<DisplayReviewDTO> mappedPage = filteredPage.map(review -> {
             List<String> imageLinks = review.getReviewImages().stream()
                 .map(img -> img.getImageLink())
-                .toList();
+            .collect(Collectors.toCollection(ArrayList::new));
 
             String shadeName = review.getProductShade() != null
                 ? review.getProductShade().getShadeName()
@@ -250,13 +262,18 @@ public class ReviewService {
                 hasUpvoted
             );
         });
+        return CachedReviewPageDTO.fromPage(mappedPage);
+    }
+
+    public Page<DisplayReviewDTO> searchReviewsForProduct(Long productId, String query, int page, int size, String sortKey, String shadeFilter, String userEmail) {
+        return self.searchReviewsForProductCached(productId, query, page, size, sortKey, shadeFilter, userEmail).toPage();
     }
 
     @Cacheable(
         cacheNames = RedisCacheConfig.REVIEW_SEARCH_FEED_CACHE,
         key = "#productId + ':' + T(java.util.Objects).toString(#query, '') + ':' + #page + ':' + #size + ':' + T(java.util.Objects).toString(#sortKey, 'created_desc') + ':' + T(java.util.Objects).toString(#shadeFilter, '') + ':' + T(java.util.Objects).toString(#userEmail, 'anonymous')"
     )
-    public Page<DisplayReviewDTO> searchReviewsForProduct(Long productId, String query, int page, int size, String sortKey, String shadeFilter, String userEmail) {
+    public CachedReviewPageDTO searchReviewsForProductCached(Long productId, String query, int page, int size, String sortKey, String shadeFilter, String userEmail) {
         final User currentUser = userEmail != null
             ? userRepository.findByEmail(userEmail).orElse(null)
             : null;
@@ -285,17 +302,17 @@ public class ReviewService {
 
         List<Review> filteredReviews = reviewPage.getContent().stream()
             .filter(review -> !reportedReviewIds.contains(review.getId()))
-            .toList();
+            .collect(Collectors.toCollection(ArrayList::new));
 
         Page<Review> filteredPage = new PageImpl<>(
             filteredReviews,
             reviewPage.getPageable(),
             filteredReviews.size()
         );
-        return filteredPage.map(review -> {
+        Page<DisplayReviewDTO> mappedPage = filteredPage.map(review -> {
             List<String> imageLinks = review.getReviewImages().stream()
                 .map(img -> img.getImageLink())
-                .toList();
+            .collect(Collectors.toCollection(ArrayList::new));
 
             String shadeName = review.getProductShade() != null
                 ? review.getProductShade().getShadeName()
@@ -319,5 +336,6 @@ public class ReviewService {
                 hasUpvoted
             );
         });
+        return CachedReviewPageDTO.fromPage(mappedPage);
     }
 }
