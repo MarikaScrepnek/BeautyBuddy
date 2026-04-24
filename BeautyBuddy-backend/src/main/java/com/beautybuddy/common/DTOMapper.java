@@ -29,6 +29,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class DTOMapper {
 
@@ -73,17 +74,17 @@ public class DTOMapper {
         List<IngredientDTO> ingredients = product.getProductIngredients().stream()
             .sorted(Comparator.comparingInt(ProductIngredient::getPosition))
             .map(pi -> toIngredientDTO(pi.getIngredient()))
-            .toList();
+            .collect(Collectors.toList());
 
         List<IngredientDTO> mayContain = product.getMayContainIngredients().stream()
             .map(mci -> toIngredientDTO(mci.getIngredient()))
             .sorted(Comparator.comparing(IngredientDTO::name))
-            .toList();
+            .collect(Collectors.toList());
 
         List<ProductShadeDTO> shades = product.getProductShades().stream()
             .sorted(Comparator.comparing(ProductShade::getShadeNumber))
             .map(DTOMapper::toProductShadeDTO)
-            .toList();
+            .collect(Collectors.toList());
 
         return new ProductDTO(
                 product.getId(),
@@ -111,7 +112,7 @@ public class DTOMapper {
                 (item.getValidTo() == null || item.getValidTo().isAfter(now))
             )
             .sorted(Comparator.comparingInt(RoutineItem::getStepOrder))
-            .toList();
+            .collect(Collectors.toList());
 
         List<DisplayRoutineItemDTO> itemDTOs = new ArrayList<>();
         for (RoutineItem item : validItems) {
@@ -147,7 +148,7 @@ public class DTOMapper {
                 item.getProduct().getProductShades().stream()
                     .sorted(Comparator.comparing(ProductShade::getShadeNumber))
                     .map(DTOMapper::toProductShadeDTO)
-                    .toList(),
+                    .collect(Collectors.toList()),
                 item.getProduct().getCategory() != null
                     ? item.getProduct().getCategory().getName()
                     : null,
@@ -200,7 +201,7 @@ public class DTOMapper {
             blp.getProduct().getProductIngredients().stream()
                 .sorted(Comparator.comparingInt(ProductIngredient::getPosition))
                 .map(pi -> toIngredientDTO(pi.getIngredient()))
-                .toList()
+                .collect(Collectors.toList())
         );
     }
 }
