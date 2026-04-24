@@ -7,7 +7,9 @@ import java.util.stream.Collectors;
 
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.beautybuddy.category.Category;
 import com.beautybuddy.category.CategoryRepository;
@@ -116,7 +118,7 @@ public class RoutineService {
         List<Routine> routines = routineRepository.findByUserIdAndCategoryName(user.getId(), "Haircare");
 
         if (routines.isEmpty()) {
-            throw new RuntimeException("No haircare routine found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No haircare routine found");
         }
 
         return DTOMapper.toDisplayRoutineDTO(routines.get(0), reviewRepository);

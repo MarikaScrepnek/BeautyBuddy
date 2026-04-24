@@ -27,14 +27,14 @@ public class RedisCacheConfig {
     private static final Logger log = LoggerFactory.getLogger(RedisCacheConfig.class);
 
     public static final String PRODUCT_DETAILS_CACHE = "product-details-v2";
-    public static final String DISCUSSION_FEED_CACHE = "discussion-feed-v2";
-    public static final String DISCUSSION_SEARCH_FEED_CACHE = "discussion-search-feed-v2";
-    public static final String REVIEW_FEED_CACHE = "review-feed-v2";
-    public static final String REVIEW_SEARCH_FEED_CACHE = "review-search-feed-v2";
-    public static final String QA_FEED_CACHE = "qa-feed-v2";
-    public static final String QA_SEARCH_FEED_CACHE = "qa-search-feed-v2";
+    public static final String DISCUSSION_FEED_CACHE = "discussion-feed-v3";
+    public static final String DISCUSSION_SEARCH_FEED_CACHE = "discussion-search-feed-v3";
+    public static final String REVIEW_FEED_CACHE = "review-feed-v3";
+    public static final String REVIEW_SEARCH_FEED_CACHE = "review-search-feed-v3";
+    public static final String QA_FEED_CACHE = "qa-feed-v3";
+    public static final String QA_SEARCH_FEED_CACHE = "qa-search-feed-v3";
     public static final String WISHLIST_CACHE = "wishlist-v1";
-    public static final String ROUTINE_CACHE = "routine-v1";
+    public static final String ROUTINE_CACHE = "routine-v2";
     public static final String BREAKOUT_LIST_CACHE = "breakout-list-v1";
 
     @Bean
@@ -45,7 +45,7 @@ public class RedisCacheConfig {
         // Embeds type info so Jackson knows what to deserialize back to
         mapper.activateDefaultTyping(
             mapper.getPolymorphicTypeValidator(),
-            ObjectMapper.DefaultTyping.NON_FINAL
+            ObjectMapper.DefaultTyping.EVERYTHING
         );
 
         GenericJackson2JsonRedisSerializer serializer = new GenericJackson2JsonRedisSerializer(mapper);
