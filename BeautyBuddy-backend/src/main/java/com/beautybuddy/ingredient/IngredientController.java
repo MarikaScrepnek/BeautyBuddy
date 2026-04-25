@@ -25,7 +25,7 @@ public class IngredientController {
     public Page<IngredientDTO> getIngredients(Pageable pageable, @RequestParam(required = false) String search) {
         if (search != null && !search.trim().isEmpty()) {
             Page<IngredientDTO> canonicalMatches = ingredientRepository
-                .findByCanonicalIdNullAndNameContaining(pageable, search)
+                .findByCanonicalIdNullAndNameContainingIgnoreCaseOrderByNameAsc(search, pageable)
                 .map(DTOMapper::toIngredientDTO);
 
             if (!canonicalMatches.isEmpty()) {
@@ -35,7 +35,7 @@ public class IngredientController {
             // If no canonical ingredients match, try non-canonical ones and
             // return their canonical ingredient with the non-canonical name in brackets.
             return ingredientRepository
-                .findByCanonicalIdNotNullAndNameContaining(pageable, search)
+                .findByCanonicalIdNotNullAndNameContainingIgnoreCaseOrderByNameAsc(search, pageable)
                 .map(nonCanonical -> {
                     Long canonicalId = nonCanonical.getCanonicalId();
                     // Fallback to nonCanonical itself if canonical not found
@@ -54,7 +54,7 @@ public class IngredientController {
                     return new IngredientDTO(canonical.getId(), displayName);
                 });
         }
-        return ingredientRepository.findByCanonicalIdNull(pageable)
+            return ingredientRepository.findByCanonicalIdNullOrderByNameAsc(pageable)
             .map(DTOMapper::toIngredientDTO);
     }
 }
