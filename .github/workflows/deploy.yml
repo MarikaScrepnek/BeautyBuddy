@@ -85,4 +85,6 @@ jobs:
 
             echo "Deploy complete. Now serving from $INACTIVE on port $INACTIVE_PORT"
 
+            docker compose -p beautybuddy -f docker-compose.prod.yml up -d frontend
+
             docker image prune -f
