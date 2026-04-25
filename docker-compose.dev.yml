@@ -4,15 +4,20 @@ services:
     working_dir: /app
     volumes:
       - ./BeautyBuddy-backend:/app
+      - ~/.m2:/root/.m2  # Cache Maven dependencies
     environment:
       - JWT_SECRET_KEY=${JWT_SECRET_KEY}
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/${POSTGRES_DB}
       - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
       - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
       - REDIS_HOST=redis
-    command: bash -c "mvn spring-boot:run"
+      - SPRING_PROFILES_ACTIVE=dev
+      - SPRING_DEVTOOLS_RESTART_POLL_INTERVAL=2000
+      - SPRING_DEVTOOLS_RESTART_QUIET_PERIOD=1000
+    command: bash -c "mvn spring-boot:run -Dspring-boot.run.jvmArguments='-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005'"
     ports:
       - "8080:8080"
+      - "5005:5005"  # Debug port
     depends_on:
       - db
       - redis
@@ -22,7 +27,12 @@ services:
     working_dir: /app
     volumes:
       - ./BeautyBuddy-frontend:/app
-    command: bash -c "npm install --legacy-peer-deps && npm run dev -- --host 0.0.0.0"
+      - /app/node_modules  # Prevent node_modules from being overwritten
+    environment:
+      - VITE_HMR_HOST=localhost
+      - VITE_HMR_PORT=5173
+      - VITE_HMR_PROTOCOL=ws
+    command: bash -c "npm install --legacy-peer-deps && npm run dev -- --host 0.0.0.0 --port 5173"
     ports:
       - "5173:5173"
 
