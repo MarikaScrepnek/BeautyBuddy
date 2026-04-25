@@ -1,5 +1,6 @@
 import { getBreakoutListIngredients, getBreakoutListProducts, removeFromBreakoutList } from "../api/breakoutListApi";
 import { GiTrashCan } from "react-icons/gi";
+import { FaFlask, FaBoxOpen } from "react-icons/fa";
 import "./BreakoutList.css";
 
 import { useEffect, useState } from "react";
@@ -67,7 +68,16 @@ export default function BreakoutList() {
             {ingredientsSelected && (
                 <>
                 {breakoutListIngredients.length === 0 ? (
-                    <p>Your breakout list is empty. Click the + button to add ingredients.</p>
+                    <div className="breakout-empty-state">
+                        <div className="breakout-empty-icon-wrap">
+                            <FaFlask className="breakout-empty-icon" />
+                        </div>
+                        <h3>Your ingredient list is empty</h3>
+                        <p>Add ingredients you want to avoid.</p>
+                        <button className="breakout-empty-button" onClick={() => setAddIngredientModalOpen(true)}>
+                            Add Ingredients
+                        </button>
+                    </div>
                 ) : (
                     <ul>
                         {breakoutListIngredients.map((ingredient) => (
@@ -81,15 +91,21 @@ export default function BreakoutList() {
                         ))}
                     </ul>
                 )}
-                <Tooltip message="Request new ingredient">
-                    <button className="add-ingredient" onClick={() => setAddIngredientModalOpen(true)}>
-                        +
-                    </button>
-                </Tooltip>
                 </>
             )}
 
             {productsSelected && (
+                <>
+                {breakoutListProducts.length === 0 ? (
+                    <div className="breakout-empty-state">
+                        <div className="breakout-empty-icon-wrap breakout-empty-icon-wrap--products">
+                            <FaBoxOpen className="breakout-empty-icon" />
+                        </div>
+                        <h3>Your product list is empty</h3>
+                        <p>Mark products that have broken you out in the past.</p>
+                        <p className="breakout-empty-note">Use the <span className="breakout-empty-note-exclamation">!</span> button on product pages to add items to this list.</p>
+                    </div>
+                ) : (
                 <ul>
                     {breakoutListProducts.map((product, index) => (
                         <React.Fragment key={product.id}>
@@ -127,6 +143,8 @@ export default function BreakoutList() {
                         </React.Fragment>
                     ))}
                 </ul>
+                )}
+                </>
             )}
         </div>
         {addIngredientModalOpen && (
