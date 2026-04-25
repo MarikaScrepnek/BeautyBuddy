@@ -17,7 +17,8 @@ services:
       - GF_SERVER_DOMAIN=localhost
       - GF_SERVER_SERVE_FROM_SUB_PATH=false
     volumes:
-      - grafana-storage:/var/lib/grafana
+      - beautybuddy_grafana-storage:/var/lib/grafana
 
 volumes:
-  grafana-storage:
+  beautybuddy_grafana-storage:
+    external: true
