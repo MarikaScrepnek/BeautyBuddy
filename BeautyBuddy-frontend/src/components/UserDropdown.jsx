@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { FaChevronDown } from "react-icons/fa";
+import { Link } from "react-router-dom";
 
 import "./UserDropdown.css";
 
@@ -33,7 +34,7 @@ export default function UserDropdown({ user, onSignOut }) {
       </button>
 
       <div className={`user-dropdown-menu ${isOpen ? "show" : ""}`}>
-        <a href="/settings" className="dropdown-item">Settings</a>
+        <Link to="/settings" className="dropdown-item" onClick={() => setIsOpen(false)}>Settings</Link>
         <button onClick={onSignOut} className="dropdown-item">Sign Out</button>
       </div>
     </div>
