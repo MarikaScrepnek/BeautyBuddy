@@ -2,8 +2,6 @@ import { useState, useEffect } from "react";
 import AuthModal from "../../auth/modals/AuthModal";
 import { getCurrentUser } from "../../auth/api/authApi";
 
-import { createDiscussion } from "../api/discussionApi";
-
 import "./CreateDiscussionModal.css";
 
 export default function CreateDiscussionModal({ open, onClose, onCreate }) {
@@ -39,13 +37,14 @@ export default function CreateDiscussionModal({ open, onClose, onCreate }) {
     setLoading(true);
     setError(null);
     try {
-      const created = await createDiscussion(title, text);
-      setTitle("");
-      setText("");
-      if (onCreate) {
-        onCreate(created || { title, text });
+      const success = onCreate ? await onCreate(title, text) : false;
+      if (success) {
+        setTitle("");
+        setText("");
+        onClose();
+      } else {
+        setError("Failed to create discussion");
       }
-      onClose();
     } catch (err) {
       setError("Failed to create discussion");
     } finally {

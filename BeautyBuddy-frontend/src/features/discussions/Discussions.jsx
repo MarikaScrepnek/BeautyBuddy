@@ -7,6 +7,7 @@ import AuthModal from "../auth/modals/AuthModal";
 
 import { FaSearch } from "react-icons/fa";
 import { FaSort } from "react-icons/fa";
+import { FaCommentDots } from "react-icons/fa6";
 
 import "./Discussions.css";
 import Tooltip from "../../components/ui/Tooltip";
@@ -85,7 +86,8 @@ export default function Discussions() {
     }
     const success = await createDiscussion(title, text);
     if (success) {
-      await loadDiscussions({ query: activeSearchTerm });
+        setShowModal(false);
+        await loadDiscussions({ sortKey: currentSort, query: activeSearchTerm });
       return true;
     }
     return false;
@@ -122,11 +124,12 @@ export default function Discussions() {
 
   return (
     <div>
-      <div className="discussions-header-container">
-        <div className="discussions-search-center">
-          <div className="discussions-search-container">
-            <div className="discussions-search">
-              <input
+      {discussions.length > 0 && (
+        <div className="discussions-header-container">
+          <div className="discussions-search-center">
+            <div className="discussions-search-container">
+              <div className="discussions-search">
+                <input
                   type="text"
                   className="discussions-search-bar"
                   placeholder="Search discussions..."
@@ -174,10 +177,22 @@ export default function Discussions() {
           </Tooltip>
         </div>
       </div>
+      )}
       {loading ? (
-        <div>Loading...</div>
+        <div className="loading">Loading discussions...</div>
       ) : discussions.length === 0 ? (
-        <div>No discussions yet.</div>
+        <div className="empty-state-container">
+          <FaCommentDots className="empty-state-icon" />
+          <h2 className="empty-state-title">No Discussions Yet</h2>
+          <p className="empty-state-text">Be the first to start a conversation!</p>
+          <button className="empty-state-button" onClick={() => {
+            if (!isLoggedIn) {
+              setShowLoginModal(true);
+              return;
+            }
+            setShowModal(true);
+          }}>Create the First Discussion</button>
+        </div>
       ) : (
         discussions.map((d) => (
           <DiscussionCard key={d.id} {...d} searchTerm={activeSearchTerm} sortKey={currentSort} />
@@ -187,7 +202,6 @@ export default function Discussions() {
         open={showModal}
         onClose={() => {
           setShowModal(false);
-          refreshDiscussions();
         }}
         onCreate={handleCreateDiscussion}
       />
