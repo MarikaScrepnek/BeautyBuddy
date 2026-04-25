@@ -13,6 +13,7 @@ import BreakoutList from '../breakout/components/BreakoutList';
 
 export default function MyRoutines() {
   // log in
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState("");
 
@@ -34,7 +35,8 @@ export default function MyRoutines() {
         setIsLoggedIn(true);
         setUsername(user.username);
       })
-      .catch(() => setIsLoggedIn(false));
+      .catch(() => setIsLoggedIn(false))
+      .finally(() => setIsAuthLoading(false));
 
     getMakeupRoutines()
       .then((data) => {
@@ -60,7 +62,11 @@ export default function MyRoutines() {
 
   return (
     <>
-    {!isLoggedIn ? (
+    {isAuthLoading ? (
+
+      <div className='loading'>Loading your routines...</div>
+
+    ) : !isLoggedIn ? (
 
       <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '80vh'}}>
           <h1 style={{fontSize: '2rem', color: '#555'}}>Login to view your routines...</h1>
