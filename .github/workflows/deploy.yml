@@ -73,7 +73,7 @@ jobs:
 
             # STEP 2: Wait for inactive slot to be healthy
             echo "Waiting for $INACTIVE to be healthy..."
-            timeout 60 bash -c "until curl -fs http://localhost:$INACTIVE_PORT/actuator/health; do sleep 2; done"
+            timeout 120 bash -c "until curl -sf http://localhost:$INACTIVE_PORT/actuator/health/readiness | grep UP; do sleep 2; done"
 
             # STEP 3: Switch nginx to the new slot (targets upstream block specifically)
             echo "Switching traffic to $INACTIVE ($INACTIVE_PORT)"
@@ -85,6 +85,7 @@ jobs:
 
             echo "Deploy complete. Now serving from $INACTIVE on port $INACTIVE_PORT"
 
-            docker compose -p beautybuddy -f docker-compose.prod.yml up -d frontend
-
+            docker pull ghcr.io/marikascrepnek/beautybuddy-frontend:$TAG
+            docker compose -p beautybuddy -f docker-compose.prod.yml up -d --no-deps --force-recreate frontend
+            
             docker image prune -f
