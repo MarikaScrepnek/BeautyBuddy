@@ -8,6 +8,7 @@ import Discussions from '../features/discussions/Discussions';
 import NavigationBar from '../components/NavigationBar';
 import ProductDetails from '../features/products/ProductDetails';
 import Feed from '../features/feed/Feed';
+import Settings from '../features/settings/Settings';
 
 function App() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -22,7 +23,7 @@ function App() {
           <Route path="/profile" element={<MyRoutines />} />
           <Route path="/my-feed" element={<Feed />} />
           <Route path='/products/:productId' element={<ProductDetails />} />
-          <Route path="/settings" element={<div>Settings Page (to be implemented)</div>} />
+          <Route path="/settings" element={<Settings />} />
         </Route>
       </Routes>
     </>
