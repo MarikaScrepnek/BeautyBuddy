@@ -58,8 +58,8 @@ export default function NavigationBar() {
             <NavLink to="/discussions" className={({ isActive }) => isActive ? 'active-link' : undefined}>Discussions</NavLink>
             {!isLoggedIn ? (
               <>
-                <Tooltip message="Please log in to view your routines" position="bottom">
-                  <p className="not-logged-in-links">Routines</p>
+                <Tooltip message="Please log in to view your profile" position="bottom">
+                  <p className="not-logged-in-links">Profile</p>
                 </Tooltip>
                 <Tooltip message={"Please log in to view your feed"} position="bottom">
                   <p className="not-logged-in-links">Feed</p>
