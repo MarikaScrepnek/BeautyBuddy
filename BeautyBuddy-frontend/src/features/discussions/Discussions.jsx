@@ -19,10 +19,14 @@ export default function Discussions() {
   const [showModal, setShowModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeSearchTerm, setActiveSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentSort, setCurrentSort] = useState("created_desc");
   const [sortOptionsOpen, setSortOptionsOpen] = useState(false);
+
+  const pageSize = 10;
 
   useEffect(() => {
     getCurrentUser()
@@ -63,20 +67,29 @@ export default function Discussions() {
     }
   }
 
-  const loadDiscussions = async ({ sortKey = currentSort, query = activeSearchTerm } = {}) => {
+  const loadDiscussions = async ({ page = currentPage, sortKey = currentSort, query = activeSearchTerm } = {}) => {
     setLoading(true);
     try {
       const data = query.trim()
-        ? await searchDiscussions(query, sortKey)
-        : await getDiscussions(0, 10, sortKey);
-      setDiscussions(Array.isArray(data) ? data : data.content || []);
+        ? await searchDiscussions(query, sortKey, page, pageSize)
+        : await getDiscussions(page, pageSize, sortKey);
+      const items = Array.isArray(data) ? data : data?.content || [];
+      const resolvedTotalPages = typeof data?.totalPages === "number"
+        ? data.totalPages
+        : typeof data?.totalElements === "number"
+          ? Math.ceil(data.totalElements / pageSize)
+          : (items.length === pageSize ? page + 2 : page + 1);
+
+      setDiscussions(items);
+      setCurrentPage(typeof data?.number === "number" ? data.number : page);
+      setTotalPages(resolvedTotalPages > 0 ? resolvedTotalPages : (items.length ? 1 : 0));
     } finally {
       setLoading(false);
     }
   };
   
   useEffect(() => {
-    loadDiscussions();
+    loadDiscussions({ page: 0 });
   }, []);
 
   const handleCreateDiscussion = async (title, text) => {
@@ -87,7 +100,7 @@ export default function Discussions() {
     const success = await createDiscussion(title, text);
     if (success) {
         setShowModal(false);
-        await loadDiscussions({ sortKey: currentSort, query: activeSearchTerm });
+        await loadDiscussions({ page: currentPage, sortKey: currentSort, query: activeSearchTerm });
       return true;
     }
     return false;
@@ -96,11 +109,13 @@ export default function Discussions() {
   const handleSearchDiscussions = () => {
     if (!searchQuery.trim()) {
       setActiveSearchTerm("");
-      loadDiscussions({ query: "" });
+      setCurrentPage(0);
+      loadDiscussions({ page: 0, query: "" });
       return;
     }
     setActiveSearchTerm(searchQuery);
-    loadDiscussions({ query: searchQuery });
+    setCurrentPage(0);
+    loadDiscussions({ page: 0, query: searchQuery });
   };
 
   function handleSelect(type, option) {
@@ -118,8 +133,9 @@ export default function Discussions() {
       return;
     }
 
+    setCurrentPage(0);
     setCurrentSort(nextSortKey);
-    await loadDiscussions({ sortKey: nextSortKey, query: activeSearchTerm });
+    await loadDiscussions({ page: 0, sortKey: nextSortKey, query: activeSearchTerm });
   };
 
   return (
@@ -194,9 +210,36 @@ export default function Discussions() {
           }}>Create the First Discussion</button>
         </div>
       ) : (
-        discussions.map((d) => (
-          <DiscussionCard key={d.id} {...d} searchTerm={activeSearchTerm} sortKey={currentSort} />
-        ))
+        <>
+          <div className="discussions-list">
+            {discussions.map((d) => (
+              <DiscussionCard key={d.id} {...d} searchTerm={activeSearchTerm} sortKey={currentSort} />
+            ))}
+          </div>
+          {(totalPages > 1 || currentPage > 0) && (
+            <div className="discussions-pagination">
+              <button
+                type="button"
+                className="discussions-page-btn"
+                onClick={() => loadDiscussions({ page: Math.max(0, currentPage - 1) })}
+                disabled={currentPage <= 0}
+              >
+                Previous
+              </button>
+              <span className="discussions-page-label">
+                Page {currentPage + 1} of {totalPages}
+              </span>
+              <button
+                type="button"
+                className="discussions-page-btn"
+                onClick={() => loadDiscussions({ page: currentPage + 1 })}
+                disabled={totalPages > 0 ? currentPage >= totalPages - 1 : discussions.length < pageSize}
+              >
+                Next
+              </button>
+            </div>
+          )}
+        </>
       )}
       <CreateDiscussionModal
         open={showModal}

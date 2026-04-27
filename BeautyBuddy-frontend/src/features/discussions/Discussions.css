@@ -195,3 +195,45 @@
   transform: translateY(0);
   box-shadow: 0 2px 8px rgba(231, 155, 219, 0.3);
 }
+
+.discussions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.discussions-pagination {
+  margin-top: 10px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.discussions-page-btn {
+  border: 1px solid #d1d5db;
+  background: #fff;
+  color: #374151;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.discussions-page-btn:hover:not(:disabled) {
+  background: #f9fafb;
+}
+
+.discussions-page-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.discussions-page-label {
+  font-size: 0.9rem;
+  color: #6b7280;
+  font-weight: 500;
+}
