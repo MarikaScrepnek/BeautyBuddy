@@ -9,12 +9,13 @@
     justify-content: center;
     padding: 20px;
     overflow-x: hidden;
+    overflow-y: hidden;
 }
 
 .add-ingredient-modal {
     width: min(100%, 680px);
     max-width: calc(100vw - 24px);
-    max-height: min(82vh, 760px);
+    max-height: min(82vh, 800px);
     overflow-y: hidden;
     overflow-x: hidden;
     background: #ffffff;
@@ -85,6 +86,7 @@
     margin-bottom: 12px;
     max-width: 100%;
     overflow-x: hidden;
+    overflow-y: hidden;
 }
 
 .add-ingredient-list {
