@@ -1,10 +1,14 @@
+import Searchbar from '../../components/ui/Searchbar';
+import './Feed.css';
+
 export default function Feed() {
 
     return (
 
-        <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '80vh'}}>
-            <h1 style={{fontSize: '2rem', color: '#555'}}>Feed coming soon...</h1>
-        </div>
+            <div className="feed-container">
+                    <Searchbar placeholder="Search for users..." />
+                Follow users to view their activity here!
+            </div>
 
     );
 }
