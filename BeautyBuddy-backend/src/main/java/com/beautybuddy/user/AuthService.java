@@ -1,26 +1,29 @@
 package com.beautybuddy.user;
 
-import com.beautybuddy.user.entity.User;
-import com.beautybuddy.wishlist.entity.Wishlist;
+import java.time.LocalDateTime;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
 import com.beautybuddy.breakout.entity.BreakoutList;
 import com.beautybuddy.breakout.repo.BreakoutListRepository;
 import com.beautybuddy.category.Category;
 import com.beautybuddy.category.CategoryRepository;
 import com.beautybuddy.routine.RoutineService;
 import com.beautybuddy.routine.entity.OccasionEnum;
-import com.beautybuddy.routine.entity.TimeOfDayEnum;
 import com.beautybuddy.routine.entity.Routine;
+import com.beautybuddy.routine.entity.TimeOfDayEnum;
 import com.beautybuddy.routine.repo.RoutineRepository;
-
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import java.time.LocalDateTime;
+import com.beautybuddy.user.entity.User;
+import com.beautybuddy.user.repo.UserRepository;
+import com.beautybuddy.wishlist.entity.Wishlist;
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 
 @Service
 public class AuthService {
+
     private final UserRepository userRepo;
     private final PasswordEncoder encoder;
 
@@ -32,8 +35,8 @@ public class AuthService {
 
     public AuthService(UserRepository userRepo, PasswordEncoder encoder, RoutineService routineService, CategoryRepository categoryRepository, RoutineRepository routineRepository, BreakoutListRepository breakoutListRepo, MeterRegistry meterRegistry) {
         this.userSignupCounter = Counter.builder("user_signups_total")
-            .description("Total number of user signups")
-            .register(meterRegistry);
+                .description("Total number of user signups")
+                .register(meterRegistry);
         this.userRepo = userRepo;
         this.encoder = encoder;
         this.categoryRepository = categoryRepository;
@@ -59,15 +62,15 @@ public class AuthService {
         userSignupCounter.increment();
 
         Category makeupCategory = categoryRepository.findByName("Makeup")
-        .orElseThrow(() -> new RuntimeException("Can't find category"));
+                .orElseThrow(() -> new RuntimeException("Can't find category"));
 
         Category skincareCategory = categoryRepository.findByName("Skincare")
-        .orElseThrow(() -> new RuntimeException("Can't find category"));
+                .orElseThrow(() -> new RuntimeException("Can't find category"));
 
         Category haircareCategory = categoryRepository.findByName("Haircare")
-        .orElseThrow(() -> new RuntimeException("Can't find category"));
+                .orElseThrow(() -> new RuntimeException("Can't find category"));
 
-        Routine casualMakeupRoutine  = new Routine();
+        Routine casualMakeupRoutine = new Routine();
         casualMakeupRoutine.setUser(user);
         casualMakeupRoutine.setCategory(makeupCategory);
         casualMakeupRoutine.setNotes("A simple and natural makeup routine for everyday wear.");
@@ -75,7 +78,7 @@ public class AuthService {
         casualMakeupRoutine.setIsSystem(true);
         routineRepository.save(casualMakeupRoutine);
 
-        Routine baseGlamRoutine  = new Routine();
+        Routine baseGlamRoutine = new Routine();
         baseGlamRoutine.setUser(user);
         baseGlamRoutine.setCategory(makeupCategory);
         baseGlamRoutine.setNotes("An elevated makeup routine for special occasions.");
@@ -118,7 +121,7 @@ public class AuthService {
     public boolean login(String email, String rawPassword) {
         email = email.trim().toLowerCase();
         User user = userRepo.findByEmail(email)
-            .orElseThrow(() -> new RuntimeException("user not found"));
+                .orElseThrow(() -> new RuntimeException("user not found"));
 
         return encoder.matches(rawPassword, user.getPasswordHash());
     }
