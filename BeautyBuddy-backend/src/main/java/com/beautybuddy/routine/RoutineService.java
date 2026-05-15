@@ -27,7 +27,7 @@ import com.beautybuddy.routine.entity.OccasionEnum;
 import com.beautybuddy.routine.entity.Routine;
 import com.beautybuddy.routine.entity.RoutineItem;
 import com.beautybuddy.routine.repo.RoutineRepository;
-import com.beautybuddy.user.UserRepository;
+import com.beautybuddy.user.repo.UserRepository;
 import com.beautybuddy.user.entity.User;
 import com.beautybuddy.review.ReviewRepository;
 
@@ -36,6 +36,7 @@ import io.micrometer.core.instrument.MeterRegistry;
 
 @Service
 public class RoutineService {
+
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
     private final RoutineRepository routineRepository;
@@ -56,23 +57,23 @@ public class RoutineService {
         this.productShadeRepository = productShadeRepository;
         this.reviewRepository = reviewRepository;
         this.routineCreationCounter = Counter.builder("routine_creation_total")
-            .description("Total number of routines created")
-            .register(meterRegistry);
+                .description("Total number of routines created")
+                .register(meterRegistry);
         this.routineUpdateCounter = Counter.builder("routine_update_total")
-            .description("Total number of routines updated")
-            .register(meterRegistry);
+                .description("Total number of routines updated")
+                .register(meterRegistry);
         this.routineAddProductCounter = Counter.builder("routine_add_product_total")
-            .description("Total number of products added to routines")
-            .register(meterRegistry);
+                .description("Total number of products added to routines")
+                .register(meterRegistry);
         this.routineRemoveProductCounter = Counter.builder("routine_remove_product_total")
-            .description("Total number of products removed from routines")
-            .register(meterRegistry);
+                .description("Total number of products removed from routines")
+                .register(meterRegistry);
     }
 
     @Cacheable(cacheNames = RedisCacheConfig.ROUTINE_CACHE, key = "#userEmail + ':makeup'")
     public List<DisplayRoutineDTO> getMakeupRoutines(String userEmail) {
         User user = userRepository.findByEmail(userEmail)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
         List<Routine> routines = routineRepository.findByUserIdAndCategoryName(user.getId(), "Makeup");
 
@@ -86,14 +87,14 @@ public class RoutineService {
         });
 
         return routines.stream()
-            .map(routine -> DTOMapper.toDisplayRoutineDTO(routine, reviewRepository))
-            .collect(Collectors.toCollection(ArrayList::new));
+                .map(routine -> DTOMapper.toDisplayRoutineDTO(routine, reviewRepository))
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     @Cacheable(cacheNames = RedisCacheConfig.ROUTINE_CACHE, key = "#userEmail + ':skincare'")
     public List<DisplayRoutineDTO> getSkincareRoutines(String userEmail) {
         User user = userRepository.findByEmail(userEmail)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
         List<Routine> routines = routineRepository.findByUserIdAndCategoryName(user.getId(), "Skincare");
 
@@ -106,14 +107,14 @@ public class RoutineService {
         });
 
         return routines.stream()
-            .map(routine -> DTOMapper.toDisplayRoutineDTO(routine, reviewRepository))
-            .collect(Collectors.toCollection(ArrayList::new));
+                .map(routine -> DTOMapper.toDisplayRoutineDTO(routine, reviewRepository))
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     @Cacheable(cacheNames = RedisCacheConfig.ROUTINE_CACHE, key = "#userEmail + ':haircare'")
     public DisplayRoutineDTO getHaircareRoutine(String userEmail) {
         User user = userRepository.findByEmail(userEmail)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
         List<Routine> routines = routineRepository.findByUserIdAndCategoryName(user.getId(), "Haircare");
 
@@ -127,16 +128,16 @@ public class RoutineService {
     @CacheEvict(cacheNames = RedisCacheConfig.ROUTINE_CACHE, allEntries = true)
     public void createMakeupRoutine(String userEmail, CreateMakeupRoutineRequestDTO request) {
         Category category = categoryRepository.findByName("Makeup")
-            .orElseThrow(() -> new RuntimeException("Category not found"));
+                .orElseThrow(() -> new RuntimeException("Category not found"));
 
         User user = userRepository.findByEmail(userEmail)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
         if (request.occasion() == OccasionEnum.CASUAL || request.occasion() == OccasionEnum.GLAM) {
             throw new RuntimeException("Cannot create routine for this occasion");
         }
-        
-        Routine routine  = new Routine();
+
+        Routine routine = new Routine();
         routine.setUser(user);
         routine.setCategory(category);
         routine.setName(request.name());
@@ -150,27 +151,27 @@ public class RoutineService {
     @CacheEvict(cacheNames = RedisCacheConfig.ROUTINE_CACHE, allEntries = true)
     public void addProductToRoutine(String userEmail, Long routineId, AddToRoutineRequestDTO request) {
         User user = userRepository.findByEmail(userEmail)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("User not found"));
         Product product = productRepository.findById(request.productId())
-            .orElseThrow(() -> new RuntimeException("Product not found"));
+                .orElseThrow(() -> new RuntimeException("Product not found"));
         ProductShade shade = null;
         if (request.shadeName() != null && !request.shadeName().isEmpty()) {
             shade = productShadeRepository.findByProductAndShadeName(product, request.shadeName())
-                .orElseThrow(() -> new RuntimeException("Shade not found"));
+                    .orElseThrow(() -> new RuntimeException("Shade not found"));
         }
         if (!product.getProductShades().isEmpty() && shade == null) {
             shade = productShadeRepository.findByProductAndShadeNumber(product, 1)
-                .orElseThrow(() -> new RuntimeException("Default shade not found"));
+                    .orElseThrow(() -> new RuntimeException("Default shade not found"));
         }
 
         Routine routine = routineRepository.findByIdAndUserEmail(routineId, userEmail)
-            .orElseThrow(() -> new RuntimeException("Routine not found"));
+                .orElseThrow(() -> new RuntimeException("Routine not found"));
         if (!routine.getUser().getId().equals(user.getId())) {
             throw new RuntimeException("Unauthorized");
         }
 
         Integer stepOrder = routine.getItems().size() + 1;
-            
+
         RoutineItem item = new RoutineItem();
         item.setRoutine(routine);
         item.setProduct(product);
@@ -185,10 +186,10 @@ public class RoutineService {
     @CacheEvict(cacheNames = RedisCacheConfig.ROUTINE_CACHE, allEntries = true)
     public DisplayRoutineDTO updateRoutine(String userEmail, DisplayRoutineDTO request) {
         User user = userRepository.findByEmail(userEmail)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("User not found"));
         Routine routine = routineRepository.findById(request.routineId())
-            .orElseThrow(() -> new RuntimeException("Routine not found"));
-        
+                .orElseThrow(() -> new RuntimeException("Routine not found"));
+
         if (!routine.getUser().getId().equals(user.getId())) {
             throw new RuntimeException("Unauthorized");
         }
@@ -203,11 +204,11 @@ public class RoutineService {
         int stepOrder = 1;
         for (DisplayRoutineItemDTO itemDTO : request.items()) {
             Product product = productRepository.findById(itemDTO.productId())
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+                    .orElseThrow(() -> new RuntimeException("Product not found"));
             ProductShade shade = null;
             if (itemDTO.productShadeName() != null) {
                 shade = productShadeRepository.findByProductAndShadeName(product, itemDTO.productShadeName())
-                    .orElseThrow(() -> new RuntimeException("Shade not found"));
+                        .orElseThrow(() -> new RuntimeException("Shade not found"));
             }
 
             if (itemDTO.productNotes() != null && itemDTO.productNotes().length() > 126) {
@@ -243,24 +244,24 @@ public class RoutineService {
     @Cacheable(cacheNames = RedisCacheConfig.ROUTINE_CACHE, key = "#userEmail + ':items'")
     public List<Long> getAllRoutineItems(String userEmail) {
         User user = userRepository.findByEmail(userEmail)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
         List<Routine> routines = routineRepository.findByUserId(user.getId());
 
         return routines.stream()
-            .flatMap(routine -> routine.getItems().stream())
-            .filter(item -> item.getValidTo() == null)
-            .map(item -> item.getProduct().getId())
-            .collect(Collectors.toCollection(ArrayList::new));
+                .flatMap(routine -> routine.getItems().stream())
+                .filter(item -> item.getValidTo() == null)
+                .map(item -> item.getProduct().getId())
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     @CacheEvict(cacheNames = RedisCacheConfig.ROUTINE_CACHE, allEntries = true)
     public void removeProductFromRoutine(String userEmail, Long routineId, Long productId, String shadeName) {
         User user = userRepository.findByEmail(userEmail)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
         Routine routine = routineRepository.findByIdAndUserEmail(routineId, userEmail)
-            .orElseThrow(() -> new RuntimeException("Routine not found"));
+                .orElseThrow(() -> new RuntimeException("Routine not found"));
 
         if (!routine.getUser().getId().equals(user.getId())) {
             throw new RuntimeException("Unauthorized");
@@ -280,15 +281,15 @@ public class RoutineService {
         final String shadeNameForMatch = normalizedShadeName;
 
         RoutineItem itemToRemove = routine.getItems().stream()
-            .filter(item -> item.getProduct().getId().equals(productId)
+                .filter(item -> item.getProduct().getId().equals(productId)
                 && item.getValidTo() == null
                 && (shadeNameForMatch == null || (item.getShade() != null && shadeNameForMatch.equals(item.getShade().getShadeName()))))
-            .findFirst()
-            .orElseThrow(() -> new RuntimeException("Product not found in routine"));
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Product not found in routine"));
 
         itemToRemove.setValidTo(LocalDateTime.now());
         routineRepository.save(routine);
         routineRemoveProductCounter.increment();
     }
-    
+
 }
