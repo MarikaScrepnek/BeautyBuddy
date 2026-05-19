@@ -11,7 +11,7 @@ import com.beautybuddy.review.dto.DisplayReviewDTO;
 import com.beautybuddy.review.dto.SubmitReviewDTO;
 import com.beautybuddy.review.entity.Review;
 import com.beautybuddy.review.entity.ReviewImage;
-import com.beautybuddy.user.UserRepository;
+import com.beautybuddy.user.repo.UserRepository;
 import com.beautybuddy.user.entity.User;
 import com.beautybuddy.upvote.repo.ReviewUpvoteRepository;
 import com.beautybuddy.review.dto.EditReviewDTO;
@@ -42,6 +42,7 @@ import io.micrometer.core.instrument.MeterRegistry;
 @Service
 @Transactional(readOnly = true)
 public class ReviewService {
+
     @Autowired
     @Lazy
     private ReviewService self;
@@ -63,8 +64,8 @@ public class ReviewService {
         this.reviewReportRepository = reviewReportRepository;
         this.reviewUpvoteRepository = reviewUpvoteRepository;
         this.reviewCounter = Counter.builder("product_reviews_total")
-            .description("Total number of reviews")
-            .register(meterRegistry);
+                .description("Total number of reviews")
+                .register(meterRegistry);
     }
 
     @Transactional
@@ -74,30 +75,30 @@ public class ReviewService {
     })
     public void addReview(String email, SubmitReviewDTO review) {
         User user = userRepository.findByEmail(email)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("User not found"));
         Product product = productRepository.findById(review.productId())
-            .orElseThrow(() -> new RuntimeException("Product not found"));
+                .orElseThrow(() -> new RuntimeException("Product not found"));
         ProductShade shade = null;
         if (review.shadeName() != null) {
             shade = productShadeRepository.findByProductAndShadeName(product, review.shadeName())
-                .orElseThrow(() -> new RuntimeException("Shade not found"));
+                    .orElseThrow(() -> new RuntimeException("Shade not found"));
         }
         if (!product.getProductShades().isEmpty() && shade == null) {
             shade = productShadeRepository.findByProductAndShadeNumber(product, 1)
-                .orElseThrow(() -> new RuntimeException("Default shade not found"));
+                    .orElseThrow(() -> new RuntimeException("Default shade not found"));
         }
         BigDecimal rating = review.rating();
         String reviewTitle = review.title();
         String reviewText = review.text();
         List<ReviewImage> reviewImages = review.imageLinks() == null ? List.of() : review.imageLinks().stream()
-            .map(link -> {
-                ReviewImage img = new ReviewImage();
-                img.setImageLink(link);
-                img.setCreatedAt(LocalDateTime.now());
-                return img;
-            })
-            .toList();
-                    
+                .map(link -> {
+                    ReviewImage img = new ReviewImage();
+                    img.setImageLink(link);
+                    img.setCreatedAt(LocalDateTime.now());
+                    return img;
+                })
+                .toList();
+
         Review newReview = new Review();
         newReview.setUser(user);
         newReview.setProduct(product);
@@ -121,16 +122,16 @@ public class ReviewService {
     })
     public void editReview(String email, Long reviewId, EditReviewDTO review) {
         User user = userRepository.findByEmail(email)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("User not found"));
         Review existingReview = reviewRepository.findById(reviewId)
-            .orElseThrow(() -> new RuntimeException("Review not found"));
+                .orElseThrow(() -> new RuntimeException("Review not found"));
         if (existingReview.getUser().getId() != user.getId()) {
             throw new RuntimeException("User not authorized to edit this review");
         } else {
             ProductShade shade = null;
             if (review.shadeName() != null) {
                 shade = productShadeRepository.findByProductAndShadeName(existingReview.getProduct(), review.shadeName())
-                    .orElseThrow(() -> new RuntimeException("Shade not found"));
+                        .orElseThrow(() -> new RuntimeException("Shade not found"));
             }
             existingReview.setProductShade(shade);
             existingReview.setRating(review.rating());
@@ -139,15 +140,15 @@ public class ReviewService {
 
             // Handle review images
             List<ReviewImage> newImages = review.imageLinks() == null ? List.of() : review.imageLinks().stream()
-                .map(link -> {
-                    ReviewImage img = new ReviewImage();
-                    img.setImageLink(link);
-                    img.setCreatedAt(LocalDateTime.now());
-                    img.setReview(existingReview);
-                    return img;
-                })
-                .toList();
-            
+                    .map(link -> {
+                        ReviewImage img = new ReviewImage();
+                        img.setImageLink(link);
+                        img.setCreatedAt(LocalDateTime.now());
+                        img.setReview(existingReview);
+                        return img;
+                    })
+                    .toList();
+
             // Remove old images
             existingReview.getReviewImages().clear();
             // Add new images
@@ -164,9 +165,9 @@ public class ReviewService {
     })
     public void removeReview(String email, Long reviewId) {
         User user = userRepository.findByEmail(email)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("User not found"));
         Review existingReview = reviewRepository.findById(reviewId)
-            .orElseThrow(() -> new RuntimeException("Review not found"));
+                .orElseThrow(() -> new RuntimeException("Review not found"));
         if (existingReview.getUser().getId() != user.getId()) {
             throw new RuntimeException("User not authorized to delete this review");
         } else {
@@ -183,12 +184,18 @@ public class ReviewService {
     private PageRequest buildReviewPageRequest(int page, int size, String sortKey) {
         String effectiveSortKey = sortKey == null ? "created_desc" : sortKey;
         Sort sort = switch (effectiveSortKey) {
-            case "helpful_desc" -> Sort.by(Sort.Direction.DESC, "upvoteCount");
-            case "created_asc" -> Sort.by(Sort.Direction.ASC, "createdAt");
-            case "rating_desc" -> Sort.by(Sort.Direction.DESC, "rating");
-            case "rating_asc" -> Sort.by(Sort.Direction.ASC, "rating");
-            case "created_desc" -> Sort.by(Sort.Direction.DESC, "createdAt");
-            default -> Sort.by(Sort.Direction.DESC, "createdAt");
+            case "helpful_desc" ->
+                Sort.by(Sort.Direction.DESC, "upvoteCount");
+            case "created_asc" ->
+                Sort.by(Sort.Direction.ASC, "createdAt");
+            case "rating_desc" ->
+                Sort.by(Sort.Direction.DESC, "rating");
+            case "rating_asc" ->
+                Sort.by(Sort.Direction.ASC, "rating");
+            case "created_desc" ->
+                Sort.by(Sort.Direction.DESC, "createdAt");
+            default ->
+                Sort.by(Sort.Direction.DESC, "createdAt");
         };
         return PageRequest.of(page, size, sort);
     }
@@ -198,68 +205,68 @@ public class ReviewService {
     }
 
     @Cacheable(
-        cacheNames = RedisCacheConfig.REVIEW_FEED_CACHE,
-        key = "#productId + ':' + #page + ':' + #size + ':' + T(java.util.Objects).toString(#sortKey, 'created_desc') + ':' + T(java.util.Objects).toString(#shadeFilter, '') + ':' + T(java.util.Objects).toString(#userEmail, 'anonymous')"
+            cacheNames = RedisCacheConfig.REVIEW_FEED_CACHE,
+            key = "#productId + ':' + #page + ':' + #size + ':' + T(java.util.Objects).toString(#sortKey, 'created_desc') + ':' + T(java.util.Objects).toString(#shadeFilter, '') + ':' + T(java.util.Objects).toString(#userEmail, 'anonymous')"
     )
     public CachedReviewPageDTO getReviewsForProductCached(Long productId, int page, int size, String sortKey, String shadeFilter, String userEmail) {
         final User currentUser = userEmail != null
-            ? userRepository.findByEmail(userEmail).orElse(null)
-            : null;
+                ? userRepository.findByEmail(userEmail).orElse(null)
+                : null;
         PageRequest pageRequest = buildReviewPageRequest(page, size, sortKey);
         Page<Review> reviewPage;
         if (shadeFilter != null && !shadeFilter.isBlank()) {
             reviewPage = reviewRepository.findByProduct_IdAndProductShade_ShadeNameIgnoreCaseAndDeletedAtIsNullAndApprovedTrue(
-                productId,
-                shadeFilter,
-                pageRequest
+                    productId,
+                    shadeFilter,
+                    pageRequest
             );
         } else {
             reviewPage = reviewRepository.findByProduct_IdAndDeletedAtIsNullAndApprovedTrue(
-                productId,
-                pageRequest
+                    productId,
+                    pageRequest
             );
         }
 
         Set<Long> reportedReviewIds = currentUser == null
-            ? Set.of()
-            : reviewReportRepository.findAllByUser(currentUser).stream()
-                .map(report -> report.getReview().getId())
-                .collect(Collectors.toSet());
+                ? Set.of()
+                : reviewReportRepository.findAllByUser(currentUser).stream()
+                        .map(report -> report.getReview().getId())
+                        .collect(Collectors.toSet());
 
         List<Review> filteredReviews = reviewPage.getContent().stream()
-            .filter(review -> !reportedReviewIds.contains(review.getId()))
-            .collect(Collectors.toCollection(ArrayList::new));
+                .filter(review -> !reportedReviewIds.contains(review.getId()))
+                .collect(Collectors.toCollection(ArrayList::new));
 
         Page<Review> filteredPage = new PageImpl<>(
-            filteredReviews,
-            reviewPage.getPageable(),
-            filteredReviews.size()
+                filteredReviews,
+                reviewPage.getPageable(),
+                filteredReviews.size()
         );
         Page<DisplayReviewDTO> mappedPage = filteredPage.map(review -> {
             List<String> imageLinks = review.getReviewImages().stream()
-                .map(img -> img.getImageLink())
-            .collect(Collectors.toCollection(ArrayList::new));
+                    .map(img -> img.getImageLink())
+                    .collect(Collectors.toCollection(ArrayList::new));
 
             String shadeName = review.getProductShade() != null
-                ? review.getProductShade().getShadeName()
-                : null;
+                    ? review.getProductShade().getShadeName()
+                    : null;
 
             boolean hasUpvoted = currentUser != null
-                && reviewUpvoteRepository.findByUserAndReview(currentUser, review).isPresent();
+                    && reviewUpvoteRepository.findByUserAndReview(currentUser, review).isPresent();
 
             return new DisplayReviewDTO(
-                review.getId(),
-                review.getUser().getUsername(),
-                review.getUser().getAvatarLink(),
-                review.getRating(),
-                review.getCreatedAt(),
-                review.getProduct().getId(),
-                shadeName,
-                review.getTitle(),
-                review.getText(),
-                imageLinks,
-                review.getUpvoteCount(),
-                hasUpvoted
+                    review.getId(),
+                    review.getUser().getUsername(),
+                    review.getUser().getAvatarLink(),
+                    review.getRating(),
+                    review.getCreatedAt(),
+                    review.getProduct().getId(),
+                    shadeName,
+                    review.getTitle(),
+                    review.getText(),
+                    imageLinks,
+                    review.getUpvoteCount(),
+                    hasUpvoted
             );
         });
         return CachedReviewPageDTO.fromPage(mappedPage);
@@ -270,70 +277,70 @@ public class ReviewService {
     }
 
     @Cacheable(
-        cacheNames = RedisCacheConfig.REVIEW_SEARCH_FEED_CACHE,
-        key = "#productId + ':' + T(java.util.Objects).toString(#query, '') + ':' + #page + ':' + #size + ':' + T(java.util.Objects).toString(#sortKey, 'created_desc') + ':' + T(java.util.Objects).toString(#shadeFilter, '') + ':' + T(java.util.Objects).toString(#userEmail, 'anonymous')"
+            cacheNames = RedisCacheConfig.REVIEW_SEARCH_FEED_CACHE,
+            key = "#productId + ':' + T(java.util.Objects).toString(#query, '') + ':' + #page + ':' + #size + ':' + T(java.util.Objects).toString(#sortKey, 'created_desc') + ':' + T(java.util.Objects).toString(#shadeFilter, '') + ':' + T(java.util.Objects).toString(#userEmail, 'anonymous')"
     )
     public CachedReviewPageDTO searchReviewsForProductCached(Long productId, String query, int page, int size, String sortKey, String shadeFilter, String userEmail) {
         final User currentUser = userEmail != null
-            ? userRepository.findByEmail(userEmail).orElse(null)
-            : null;
+                ? userRepository.findByEmail(userEmail).orElse(null)
+                : null;
         PageRequest pageRequest = buildReviewPageRequest(page, size, sortKey);
         Page<Review> reviewPage;
         if (shadeFilter != null && !shadeFilter.isBlank()) {
             reviewPage = reviewRepository.searchByProductAndShadeAndText(
-                productId,
-                shadeFilter,
-                query,
-                pageRequest
+                    productId,
+                    shadeFilter,
+                    query,
+                    pageRequest
             );
         } else {
             reviewPage = reviewRepository.searchByProductAndText(
-                productId,
-                query,
-                pageRequest
+                    productId,
+                    query,
+                    pageRequest
             );
         }
 
         Set<Long> reportedReviewIds = currentUser == null
-            ? Set.of()
-            : reviewReportRepository.findAllByUser(currentUser).stream()
-                .map(report -> report.getReview().getId())
-                .collect(Collectors.toSet());
+                ? Set.of()
+                : reviewReportRepository.findAllByUser(currentUser).stream()
+                        .map(report -> report.getReview().getId())
+                        .collect(Collectors.toSet());
 
         List<Review> filteredReviews = reviewPage.getContent().stream()
-            .filter(review -> !reportedReviewIds.contains(review.getId()))
-            .collect(Collectors.toCollection(ArrayList::new));
+                .filter(review -> !reportedReviewIds.contains(review.getId()))
+                .collect(Collectors.toCollection(ArrayList::new));
 
         Page<Review> filteredPage = new PageImpl<>(
-            filteredReviews,
-            reviewPage.getPageable(),
-            filteredReviews.size()
+                filteredReviews,
+                reviewPage.getPageable(),
+                filteredReviews.size()
         );
         Page<DisplayReviewDTO> mappedPage = filteredPage.map(review -> {
             List<String> imageLinks = review.getReviewImages().stream()
-                .map(img -> img.getImageLink())
-            .collect(Collectors.toCollection(ArrayList::new));
+                    .map(img -> img.getImageLink())
+                    .collect(Collectors.toCollection(ArrayList::new));
 
             String shadeName = review.getProductShade() != null
-                ? review.getProductShade().getShadeName()
-                : null;
+                    ? review.getProductShade().getShadeName()
+                    : null;
 
             boolean hasUpvoted = currentUser != null
-                && reviewUpvoteRepository.findByUserAndReview(currentUser, review).isPresent();
+                    && reviewUpvoteRepository.findByUserAndReview(currentUser, review).isPresent();
 
             return new DisplayReviewDTO(
-                review.getId(),
-                review.getUser().getUsername(),
-                review.getUser().getAvatarLink(),
-                review.getRating(),
-                review.getCreatedAt(),
-                review.getProduct().getId(),
-                shadeName,
-                review.getTitle(),
-                review.getText(),
-                imageLinks,
-                review.getUpvoteCount(),
-                hasUpvoted
+                    review.getId(),
+                    review.getUser().getUsername(),
+                    review.getUser().getAvatarLink(),
+                    review.getRating(),
+                    review.getCreatedAt(),
+                    review.getProduct().getId(),
+                    shadeName,
+                    review.getTitle(),
+                    review.getText(),
+                    imageLinks,
+                    review.getUpvoteCount(),
+                    hasUpvoted
             );
         });
         return CachedReviewPageDTO.fromPage(mappedPage);
