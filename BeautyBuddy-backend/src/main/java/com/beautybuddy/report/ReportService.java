@@ -30,7 +30,7 @@ import com.beautybuddy.report.repo.QuestionReportRepository;
 import com.beautybuddy.report.repo.ReviewReportRepository;
 import com.beautybuddy.review.ReviewRepository;
 import com.beautybuddy.review.entity.Review;
-import com.beautybuddy.user.UserRepository;
+import com.beautybuddy.user.repo.UserRepository;
 import com.beautybuddy.user.entity.User;
 
 import io.micrometer.core.instrument.Counter;
@@ -38,6 +38,7 @@ import io.micrometer.core.instrument.MeterRegistry;
 
 @Service
 public class ReportService {
+
     private final UserRepository userRepository;
     private final ReviewRepository reviewRepository;
     private final QuestionRepository questionRepository;
@@ -60,11 +61,11 @@ public class ReportService {
     private final Counter productReportCounter;
 
     public ReportService(UserRepository userRepository, ReviewRepository reviewRepository,
-                         QuestionRepository questionRepository, AnswerRepository answerRepository,
-                         DiscussionRepository discussionRepository, DiscussionCommentRepository discussionCommentRepository,
-                         ProductRepository productRepository, ReviewReportRepository reviewReportRepository, QuestionReportRepository questionReportRepository,
-                         AnswerReportRepository answerReportRepository, DiscussionReportRepository discussionReportRepository,
-                         DiscussionCommentReportRepository discussionCommentReportRepository, ProductReportRepository productReportRepository, MeterRegistry meterRegistry) {
+            QuestionRepository questionRepository, AnswerRepository answerRepository,
+            DiscussionRepository discussionRepository, DiscussionCommentRepository discussionCommentRepository,
+            ProductRepository productRepository, ReviewReportRepository reviewReportRepository, QuestionReportRepository questionReportRepository,
+            AnswerReportRepository answerReportRepository, DiscussionReportRepository discussionReportRepository,
+            DiscussionCommentReportRepository discussionCommentReportRepository, ProductReportRepository productReportRepository, MeterRegistry meterRegistry) {
         this.reviewRepository = reviewRepository;
         this.userRepository = userRepository;
         this.questionRepository = questionRepository;
@@ -79,23 +80,23 @@ public class ReportService {
         this.discussionReportRepository = discussionReportRepository;
         this.discussionCommentReportRepository = discussionCommentReportRepository;
         this.reviewReportCounter = Counter.builder("reviews_reported_total")
-            .description("Total number of reviews reported")
-            .register(meterRegistry);
+                .description("Total number of reviews reported")
+                .register(meterRegistry);
         this.questionReportCounter = Counter.builder("questions_reported_total")
-            .description("Total number of questions reported")
-            .register(meterRegistry);
+                .description("Total number of questions reported")
+                .register(meterRegistry);
         this.answerReportCounter = Counter.builder("answers_reported_total")
-            .description("Total number of answers reported")
-            .register(meterRegistry);
+                .description("Total number of answers reported")
+                .register(meterRegistry);
         this.discussionReportCounter = Counter.builder("discussions_reported_total")
-            .description("Total number of discussions reported")
-            .register(meterRegistry);
+                .description("Total number of discussions reported")
+                .register(meterRegistry);
         this.discussionCommentReportCounter = Counter.builder("discussion_comments_reported_total")
-            .description("Total number of discussion comments reported")
-            .register(meterRegistry);
+                .description("Total number of discussion comments reported")
+                .register(meterRegistry);
         this.productReportCounter = Counter.builder("products_reported_total")
-            .description("Total number of products reported")
-            .register(meterRegistry);
+                .description("Total number of products reported")
+                .register(meterRegistry);
     }
 
     @Transactional
@@ -109,14 +110,14 @@ public class ReportService {
     })
     public void report(String email, String reason, String targetType, Long targetId) {
         User user = userRepository.findByEmail(email)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("User not found"));
         if (targetType.equals("review")) {
             Review review = reviewRepository.findById(targetId)
-                .orElseThrow(() -> new RuntimeException("Review not found"));
+                    .orElseThrow(() -> new RuntimeException("Review not found"));
             if (reviewReportRepository.findByUserAndReview(user, review).isPresent()) {
                 return;
             }
-        
+
             ReviewReport newReport = new ReviewReport();
             newReport.setUser(user);
             newReport.setReview(review);
@@ -124,10 +125,9 @@ public class ReportService {
 
             reviewReportRepository.save(newReport);
             reviewReportCounter.increment();
-        }
-        else if (targetType.equals("question")) {
+        } else if (targetType.equals("question")) {
             Question question = questionRepository.findById(targetId)
-                .orElseThrow(() -> new RuntimeException("Question not found"));
+                    .orElseThrow(() -> new RuntimeException("Question not found"));
             if (questionReportRepository.findByUserAndQuestion(user, question).isPresent()) {
                 return;
             }
@@ -138,10 +138,9 @@ public class ReportService {
 
             questionReportRepository.save(newReport);
             questionReportCounter.increment();
-        }
-        else if (targetType.equals("answer")) {
+        } else if (targetType.equals("answer")) {
             Answer answer = answerRepository.findById(targetId)
-                .orElseThrow(() -> new RuntimeException("Answer not found"));
+                    .orElseThrow(() -> new RuntimeException("Answer not found"));
             if (answerReportRepository.findByUserAndAnswer(user, answer).isPresent()) {
                 return;
             }
@@ -152,10 +151,9 @@ public class ReportService {
 
             answerReportRepository.save(newReport);
             answerReportCounter.increment();
-        }
-        else if (targetType.equals("discussion")) {
+        } else if (targetType.equals("discussion")) {
             Discussion discussion = discussionRepository.findById(targetId)
-                .orElseThrow(() -> new RuntimeException("Discussion not found"));
+                    .orElseThrow(() -> new RuntimeException("Discussion not found"));
             if (discussionReportRepository.findByUserAndDiscussion(user, discussion).isPresent()) {
                 return;
             }
@@ -166,10 +164,9 @@ public class ReportService {
 
             discussionReportRepository.save(newReport);
             discussionReportCounter.increment();
-        }
-        else if (targetType.equals("discussion_comment")) {
+        } else if (targetType.equals("discussion_comment")) {
             DiscussionComment discussionComment = discussionCommentRepository.findById(targetId)
-                .orElseThrow(() -> new RuntimeException("Discussion comment not found"));
+                    .orElseThrow(() -> new RuntimeException("Discussion comment not found"));
             if (discussionCommentReportRepository.findByUserAndDiscussionComment(user, discussionComment).isPresent()) {
                 return;
             }
@@ -180,10 +177,9 @@ public class ReportService {
 
             discussionCommentReportRepository.save(newReport);
             discussionCommentReportCounter.increment();
-        }
-        else if (targetType.equals("product")) {
+        } else if (targetType.equals("product")) {
             Product product = productRepository.findById(targetId)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+                    .orElseThrow(() -> new RuntimeException("Product not found"));
             if (productReportRepository.findByUserAndProduct(user, product).isPresent()) {
                 return;
             }
@@ -194,8 +190,7 @@ public class ReportService {
 
             productReportRepository.save(newReport);
             productReportCounter.increment();
-        }
-        else {
+        } else {
             throw new RuntimeException("Invalid target type");
         }
     }

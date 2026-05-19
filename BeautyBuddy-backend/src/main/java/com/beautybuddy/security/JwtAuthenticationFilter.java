@@ -6,7 +6,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import com.beautybuddy.user.UserRepository;
+import com.beautybuddy.user.repo.UserRepository;
 import com.beautybuddy.user.entity.User;
 
 import jakarta.servlet.ServletException;
@@ -18,13 +18,14 @@ import jakarta.servlet.FilterChain;
 import java.io.IOException;
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+
     @Autowired
     private UserRepository userRepository;
-    
+
     @Override
     protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain)
+            HttpServletResponse response,
+            FilterChain filterChain)
             throws ServletException, IOException {
         String jwt = null;
 
@@ -42,10 +43,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             User user = userRepository.findByEmail(email).orElse(null);
             if (user != null) {
                 CustomUserDetails userDetails = new CustomUserDetails(
-                    user.getId(), user.getUsername(), user.getEmail(), user.getPasswordHash()
+                        user.getId(), user.getUsername(), user.getEmail(), user.getPasswordHash()
                 );
-                UsernamePasswordAuthenticationToken auth =
-                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                UsernamePasswordAuthenticationToken auth
+                        = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(auth);
             }
@@ -53,5 +54,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         filterChain.doFilter(request, response);
     }
-    
+
 }

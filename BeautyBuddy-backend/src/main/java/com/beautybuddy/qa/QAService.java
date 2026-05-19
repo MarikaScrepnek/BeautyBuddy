@@ -1,46 +1,47 @@
 package com.beautybuddy.qa;
 
-import com.beautybuddy.qa.dto.EditAnswerDTO;
-import com.beautybuddy.qa.dto.CachedQuestionPageDTO;
-import com.beautybuddy.qa.dto.EditQuestionDTO;
-import com.beautybuddy.qa.dto.SubmitAnswerDTO;
-import com.beautybuddy.qa.dto.SubmitQuestionDTO;
-import com.beautybuddy.qa.dto.DisplayAnswerDTO;
-import com.beautybuddy.qa.dto.DisplayQuestionWithAnswersDTO;
-import com.beautybuddy.config.RedisCacheConfig;
-import com.beautybuddy.report.repo.AnswerReportRepository;
-import com.beautybuddy.report.repo.QuestionReportRepository;
-import com.beautybuddy.upvote.repo.AnswerUpvoteRepository;
-import com.beautybuddy.upvote.repo.QuestionUpvoteRepository;
-import com.beautybuddy.user.UserRepository;
-import com.beautybuddy.user.entity.User;
-import com.beautybuddy.product.entity.Product;
-import com.beautybuddy.product.repo.ProductRepository;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.beautybuddy.config.RedisCacheConfig;
+import com.beautybuddy.product.entity.Product;
+import com.beautybuddy.product.repo.ProductRepository;
+import com.beautybuddy.qa.dto.CachedQuestionPageDTO;
+import com.beautybuddy.qa.dto.DisplayAnswerDTO;
+import com.beautybuddy.qa.dto.DisplayQuestionWithAnswersDTO;
+import com.beautybuddy.qa.dto.EditAnswerDTO;
+import com.beautybuddy.qa.dto.EditQuestionDTO;
+import com.beautybuddy.qa.dto.SubmitAnswerDTO;
+import com.beautybuddy.qa.dto.SubmitQuestionDTO;
+import com.beautybuddy.report.repo.AnswerReportRepository;
+import com.beautybuddy.report.repo.QuestionReportRepository;
+import com.beautybuddy.upvote.repo.AnswerUpvoteRepository;
+import com.beautybuddy.upvote.repo.QuestionUpvoteRepository;
+import com.beautybuddy.user.entity.User;
+import com.beautybuddy.user.repo.UserRepository;
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 
 @Service
 public class QAService {
+
     @Autowired
     @Lazy
     private QAService self;
@@ -58,9 +59,9 @@ public class QAService {
     private final Counter answerCreatedCounter;
 
     public QAService(UserRepository userRepository, ProductRepository productRepository,
-                     QuestionRepository questionRepository, AnswerRepository answerRepository,
-                     QuestionUpvoteRepository questionUpvoteRepository, AnswerUpvoteRepository answerUpvoteRepository,
-                     QuestionReportRepository questionReportRepository, AnswerReportRepository answerReportRepository, MeterRegistry meterRegistry) {
+            QuestionRepository questionRepository, AnswerRepository answerRepository,
+            QuestionUpvoteRepository questionUpvoteRepository, AnswerUpvoteRepository answerUpvoteRepository,
+            QuestionReportRepository questionReportRepository, AnswerReportRepository answerReportRepository, MeterRegistry meterRegistry) {
         this.userRepository = userRepository;
         this.productRepository = productRepository;
         this.questionRepository = questionRepository;
@@ -70,11 +71,11 @@ public class QAService {
         this.questionReportRepository = questionReportRepository;
         this.answerReportRepository = answerReportRepository;
         this.questionCreatedCounter = Counter.builder("questions_created_total")
-            .description("Total number of questions created")
-            .register(meterRegistry);
+                .description("Total number of questions created")
+                .register(meterRegistry);
         this.answerCreatedCounter = Counter.builder("answers_created_total")
-            .description("Total number of answers created")
-            .register(meterRegistry);
+                .description("Total number of answers created")
+                .register(meterRegistry);
     }
 
     @Transactional
@@ -85,9 +86,9 @@ public class QAService {
     public void addQuestion(String email, SubmitQuestionDTO question) {
         Question newQuestion = new Question();
         User user = userRepository.findByEmail(email)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("User not found"));
         Product product = productRepository.findById(question.productId())
-            .orElseThrow(() -> new RuntimeException("Product not found"));
+                .orElseThrow(() -> new RuntimeException("Product not found"));
 
         newQuestion.setUser(user);
         newQuestion.setProduct(product);
@@ -103,9 +104,9 @@ public class QAService {
     })
     public void editQuestion(String email, EditQuestionDTO question) {
         Question oldQuestion = questionRepository.findById(question.questionId())
-            .orElseThrow(() -> new RuntimeException("Question not found"));
+                .orElseThrow(() -> new RuntimeException("Question not found"));
         User user = userRepository.findByEmail(email)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
         if (!oldQuestion.getUser().getId().equals(user.getId())) {
             throw new RuntimeException("User is not authorized to edit this question");
@@ -126,17 +127,15 @@ public class QAService {
     })
     public void removeQuestion(String email, Long questionId) {
         Question question = questionRepository.findById(questionId)
-            .orElseThrow(() -> new RuntimeException("Question not found"));
+                .orElseThrow(() -> new RuntimeException("Question not found"));
         User user = userRepository.findByEmail(email)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("User not found"));
         if (!question.getUser().getId().equals(user.getId())) {
             throw new RuntimeException("User is not authorized to delete this question");
         }
         question.setDeletedAt(LocalDateTime.now());
         questionRepository.save(question);
     }
-
-
 
     @Transactional
     @Caching(evict = {
@@ -146,9 +145,9 @@ public class QAService {
     public void addAnswer(String email, SubmitAnswerDTO answer) {
         Answer newAnswer = new Answer();
         User user = userRepository.findByEmail(email)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("User not found"));
         Question question = questionRepository.findById(answer.questionId())
-            .orElseThrow(() -> new RuntimeException("Question not found"));
+                .orElseThrow(() -> new RuntimeException("Question not found"));
         String answerText = answer.text();
 
         newAnswer.setUser(user);
@@ -166,9 +165,9 @@ public class QAService {
     })
     public void editAnswer(String email, EditAnswerDTO answer) {
         Answer oldAnswer = answerRepository.findById(answer.answerId())
-            .orElseThrow(() -> new RuntimeException("Answer not found"));
+                .orElseThrow(() -> new RuntimeException("Answer not found"));
         User user = userRepository.findByEmail(email)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("User not found"));
         if (!oldAnswer.getUser().getId().equals(user.getId())) {
             throw new RuntimeException("User is not authorized to edit this answer");
         }
@@ -183,9 +182,9 @@ public class QAService {
     })
     public void removeAnswer(String email, Long answerId) {
         Answer answer = answerRepository.findById(answerId)
-            .orElseThrow(() -> new RuntimeException("Answer not found"));
+                .orElseThrow(() -> new RuntimeException("Answer not found"));
         User user = userRepository.findByEmail(email)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("User not found"));
         if (!answer.getUser().getId().equals(user.getId())) {
             throw new RuntimeException("User is not authorized to delete this answer");
         }
@@ -197,10 +196,14 @@ public class QAService {
     private PageRequest buildQuestionPageRequest(int page, int size, String sortKey) {
         String effectiveSortKey = sortKey == null ? "created_desc" : sortKey;
         Sort sort = switch (effectiveSortKey) {
-            case "helpful_desc" -> Sort.by(Sort.Direction.DESC, "upvoteCount");
-            case "created_asc" -> Sort.by(Sort.Direction.ASC, "createdAt");
-            case "created_desc" -> Sort.by(Sort.Direction.DESC, "createdAt");
-            default -> Sort.by(Sort.Direction.DESC, "createdAt");
+            case "helpful_desc" ->
+                Sort.by(Sort.Direction.DESC, "upvoteCount");
+            case "created_asc" ->
+                Sort.by(Sort.Direction.ASC, "createdAt");
+            case "created_desc" ->
+                Sort.by(Sort.Direction.DESC, "createdAt");
+            default ->
+                Sort.by(Sort.Direction.DESC, "createdAt");
         };
         return PageRequest.of(page, size, sort);
     }
@@ -211,64 +214,64 @@ public class QAService {
     }
 
     @Cacheable(
-        cacheNames = RedisCacheConfig.QA_FEED_CACHE,
-        key = "#productId + ':' + #page + ':' + #size + ':' + T(java.util.Objects).toString(#sortKey, 'created_desc') + ':' + T(java.util.Objects).toString(#userEmail, 'anonymous')"
+            cacheNames = RedisCacheConfig.QA_FEED_CACHE,
+            key = "#productId + ':' + #page + ':' + #size + ':' + T(java.util.Objects).toString(#sortKey, 'created_desc') + ':' + T(java.util.Objects).toString(#userEmail, 'anonymous')"
     )
     public CachedQuestionPageDTO getQuestionsAndAnswersForProductCached(Long productId, int page, int size, String sortKey, String userEmail) {
         final User currentUser = userEmail != null
-            ? userRepository.findByEmail(userEmail).orElse(null)
-            : null;
+                ? userRepository.findByEmail(userEmail).orElse(null)
+                : null;
         PageRequest pageRequest = buildQuestionPageRequest(page, size, sortKey);
         Page<Question> questions = questionRepository
-            .findByProduct_IdAndDeletedAtIsNullAndApprovedTrue(
-                productId,
-                pageRequest
-            );
+                .findByProduct_IdAndDeletedAtIsNullAndApprovedTrue(
+                        productId,
+                        pageRequest
+                );
 
         Set<Long> reportedQuestionIds = currentUser == null
-            ? Set.of()
-            : questionReportRepository.findAllByUser(currentUser).stream()
-                .map(report -> report.getQuestion().getId())
-                .collect(Collectors.toSet());
+                ? Set.of()
+                : questionReportRepository.findAllByUser(currentUser).stream()
+                        .map(report -> report.getQuestion().getId())
+                        .collect(Collectors.toSet());
 
         Set<Long> reportedAnswerIds = currentUser == null
-            ? Set.of()
-            : answerReportRepository.findAllByUser(currentUser).stream()
-                .map(report -> report.getAnswer().getId())
-                .collect(Collectors.toSet());
+                ? Set.of()
+                : answerReportRepository.findAllByUser(currentUser).stream()
+                        .map(report -> report.getAnswer().getId())
+                        .collect(Collectors.toSet());
 
         List<DisplayQuestionWithAnswersDTO> mapped = questions.getContent().stream()
-            .filter(question -> !reportedQuestionIds.contains(question.getId()))
-            .map(question -> {
-            List<DisplayAnswerDTO> answers = question.getAnswers().stream()
-                .filter(answer -> answer.getDeletedAt() == null && answer.isApproved())
-                .filter(answer -> !reportedAnswerIds.contains(answer.getId()))
-                .sorted(Comparator.comparing(Answer::getCreatedAt))
-                .map(answer -> new DisplayAnswerDTO(
-                    answer.getId(),
-                    question.getId(),
-                    answer.getText(),
-                    answer.getUser().getUsername(),
-                    answer.getCreatedAt(),
-                    answer.getUpvoteCount(),
-                    currentUser != null
-                        && answerUpvoteRepository.findByUserAndAnswer(currentUser, answer).isPresent()
-                ))
-                .collect(Collectors.toCollection(ArrayList::new));
+                .filter(question -> !reportedQuestionIds.contains(question.getId()))
+                .map(question -> {
+                    List<DisplayAnswerDTO> answers = question.getAnswers().stream()
+                            .filter(answer -> answer.getDeletedAt() == null && answer.isApproved())
+                            .filter(answer -> !reportedAnswerIds.contains(answer.getId()))
+                            .sorted(Comparator.comparing(Answer::getCreatedAt))
+                            .map(answer -> new DisplayAnswerDTO(
+                            answer.getId(),
+                            question.getId(),
+                            answer.getText(),
+                            answer.getUser().getUsername(),
+                            answer.getCreatedAt(),
+                            answer.getUpvoteCount(),
+                            currentUser != null
+                            && answerUpvoteRepository.findByUserAndAnswer(currentUser, answer).isPresent()
+                    ))
+                            .collect(Collectors.toCollection(ArrayList::new));
 
-            return new DisplayQuestionWithAnswersDTO(
-                question.getId(),
-                question.getProduct().getId(),
-                question.getText(),
-                question.getUser().getUsername(),
-                question.getCreatedAt(),
-                question.getUpvoteCount(),
-                currentUser != null
-                    && questionUpvoteRepository.findByUserAndQuestion(currentUser, question).isPresent(),
-                answers
-            );
-        })
-            .collect(Collectors.toCollection(ArrayList::new));
+                    return new DisplayQuestionWithAnswersDTO(
+                            question.getId(),
+                            question.getProduct().getId(),
+                            question.getText(),
+                            question.getUser().getUsername(),
+                            question.getCreatedAt(),
+                            question.getUpvoteCount(),
+                            currentUser != null
+                            && questionUpvoteRepository.findByUserAndQuestion(currentUser, question).isPresent(),
+                            answers
+                    );
+                })
+                .collect(Collectors.toCollection(ArrayList::new));
 
         return CachedQuestionPageDTO.fromPage(new PageImpl<>(mapped, questions.getPageable(), mapped.size()));
     }
@@ -278,65 +281,65 @@ public class QAService {
     }
 
     @Cacheable(
-        cacheNames = RedisCacheConfig.QA_SEARCH_FEED_CACHE,
-        key = "#productId + ':' + T(java.util.Objects).toString(#query, '') + ':' + #page + ':' + #size + ':' + T(java.util.Objects).toString(#sortKey, 'created_desc') + ':' + T(java.util.Objects).toString(#userEmail, 'anonymous')"
+            cacheNames = RedisCacheConfig.QA_SEARCH_FEED_CACHE,
+            key = "#productId + ':' + T(java.util.Objects).toString(#query, '') + ':' + #page + ':' + #size + ':' + T(java.util.Objects).toString(#sortKey, 'created_desc') + ':' + T(java.util.Objects).toString(#userEmail, 'anonymous')"
     )
     public CachedQuestionPageDTO searchQuestionsAndAnswersForProductCached(Long productId, String query, int page, int size, String sortKey, String userEmail) {
         final User currentUser = userEmail != null
-            ? userRepository.findByEmail(userEmail).orElse(null)
-            : null;
+                ? userRepository.findByEmail(userEmail).orElse(null)
+                : null;
         PageRequest pageRequest = buildQuestionPageRequest(page, size, sortKey);
         Page<Question> questions = questionRepository
-            .searchQuestionsByProductAndQuery(
-                productId,
-                query,
-                pageRequest
-            );
+                .searchQuestionsByProductAndQuery(
+                        productId,
+                        query,
+                        pageRequest
+                );
 
         Set<Long> reportedQuestionIds = currentUser == null
-            ? Set.of()
-            : questionReportRepository.findAllByUser(currentUser).stream()
-                .map(report -> report.getQuestion().getId())
-                .collect(Collectors.toSet());
+                ? Set.of()
+                : questionReportRepository.findAllByUser(currentUser).stream()
+                        .map(report -> report.getQuestion().getId())
+                        .collect(Collectors.toSet());
 
         Set<Long> reportedAnswerIds = currentUser == null
-            ? Set.of()
-            : answerReportRepository.findAllByUser(currentUser).stream()
-                .map(report -> report.getAnswer().getId())
-                .collect(Collectors.toSet());
+                ? Set.of()
+                : answerReportRepository.findAllByUser(currentUser).stream()
+                        .map(report -> report.getAnswer().getId())
+                        .collect(Collectors.toSet());
 
         List<DisplayQuestionWithAnswersDTO> mapped = questions.getContent().stream()
-            .filter(question -> !reportedQuestionIds.contains(question.getId()))
-            .map(question -> {
-                List<DisplayAnswerDTO> answers = question.getAnswers().stream()
-                    .filter(answer -> answer.getDeletedAt() == null && answer.isApproved())
-                    .filter(answer -> !reportedAnswerIds.contains(answer.getId()))
-                    .sorted(Comparator.comparing(Answer::getCreatedAt))
-                    .map(answer -> new DisplayAnswerDTO(
-                        answer.getId(),
-                        question.getId(),
-                        answer.getText(),
-                        answer.getUser().getUsername(),
-                        answer.getCreatedAt(),
-                        answer.getUpvoteCount(),
-                        currentUser != null
+                .filter(question -> !reportedQuestionIds.contains(question.getId()))
+                .map(question -> {
+                    List<DisplayAnswerDTO> answers = question.getAnswers().stream()
+                            .filter(answer -> answer.getDeletedAt() == null && answer.isApproved())
+                            .filter(answer -> !reportedAnswerIds.contains(answer.getId()))
+                            .sorted(Comparator.comparing(Answer::getCreatedAt))
+                            .map(answer -> new DisplayAnswerDTO(
+                            answer.getId(),
+                            question.getId(),
+                            answer.getText(),
+                            answer.getUser().getUsername(),
+                            answer.getCreatedAt(),
+                            answer.getUpvoteCount(),
+                            currentUser != null
                             && answerUpvoteRepository.findByUserAndAnswer(currentUser, answer).isPresent()
                     ))
-                    .collect(Collectors.toCollection(ArrayList::new));
+                            .collect(Collectors.toCollection(ArrayList::new));
 
-                return new DisplayQuestionWithAnswersDTO(
-                    question.getId(),
-                    question.getProduct().getId(),
-                    question.getText(),
-                    question.getUser().getUsername(),
-                    question.getCreatedAt(),
-                    question.getUpvoteCount(),
-                    currentUser != null
-                        && questionUpvoteRepository.findByUserAndQuestion(currentUser, question).isPresent(),
-                    answers
-                );
-            })
-            .collect(Collectors.toCollection(ArrayList::new));
+                    return new DisplayQuestionWithAnswersDTO(
+                            question.getId(),
+                            question.getProduct().getId(),
+                            question.getText(),
+                            question.getUser().getUsername(),
+                            question.getCreatedAt(),
+                            question.getUpvoteCount(),
+                            currentUser != null
+                            && questionUpvoteRepository.findByUserAndQuestion(currentUser, question).isPresent(),
+                            answers
+                    );
+                })
+                .collect(Collectors.toCollection(ArrayList::new));
 
         return CachedQuestionPageDTO.fromPage(new PageImpl<>(mapped, questions.getPageable(), mapped.size()));
     }
