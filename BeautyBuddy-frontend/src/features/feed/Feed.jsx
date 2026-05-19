@@ -1,4 +1,5 @@
 import Searchbar from '../../components/ui/Searchbar';
+import UserSearch from '../user/components/UserSearch';
 import './Feed.css';
 
 export default function Feed() {
@@ -6,7 +7,7 @@ export default function Feed() {
     return (
 
             <div className="feed-container">
-                    <Searchbar placeholder="Search for users..." />
+                    <UserSearch placeholder="Search for users..." />
                 Follow users to view their activity here!
             </div>
 
