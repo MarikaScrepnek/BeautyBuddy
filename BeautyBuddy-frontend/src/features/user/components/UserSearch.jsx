@@ -1,4 +1,6 @@
 import { searchUsers } from "../api/userApi";
+import { useState } from "react";
+import Searchbar from "../../../components/ui/Searchbar";
 
 export default function UserSearch() {
 
