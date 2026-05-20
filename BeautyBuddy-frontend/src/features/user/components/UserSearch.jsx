@@ -26,9 +26,9 @@ export default function UserSearch() {
                 {users.length > 0 ? (
                     <div className="user-list">
                         {users.map(user => (
-                            <div key={user.id} className="user-card">
-                                <h3>{user.name}</h3>
-                                <p>{user.email}</p>
+                            <div key={user.username} className="user-card">
+                                <h3>{user.username}</h3>
+                                <p>{user.profilePictureUrl}</p>
                             </div>
                         ))}
                     </div>
