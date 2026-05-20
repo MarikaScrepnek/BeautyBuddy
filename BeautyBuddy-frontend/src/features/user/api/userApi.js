@@ -1,5 +1,5 @@
 export async function searchUsers(query) {
-    const res = await fetch(`/api/users/search?q=${encodeURIComponent(query)}`, {
+    const res = await fetch(`/api/users/search?query=${encodeURIComponent(query)}`, {
         method: 'GET',
         credentials: 'include',
     });
