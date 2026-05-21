@@ -2,6 +2,8 @@ import { searchUsers } from "../api/userApi";
 import { useState } from "react";
 import Searchbar from "../../../components/ui/Searchbar";
 
+import "./UserSearch.css";
+
 export default function UserSearch() {
 
     const [users, setUsers] = useState([]);
@@ -21,21 +23,28 @@ export default function UserSearch() {
 
     return (
 
-            <div className="feed-container">
+            <>
                     <Searchbar placeholder="Search for users..." onSearch={handleSearch} />
                 {users.length > 0 ? (
                     <div className="user-list">
                         {users.map(user => (
                             <div key={user.username} className="user-card">
                                 <h3>{user.username}</h3>
-                                <p>{user.profilePictureUrl}</p>
+                                {user.profilePictureUrl && 
+                                    <img src={user.profilePictureUrl}/>
+                                } :
+                                {
+                                    <div className="user-avatar-fallback">
+                                        {user.username.charAt(0).toUpperCase()}
+                                    </div>
+                                }
                             </div>
                         ))}
                     </div>
                 ) : (
                     <p>No users found.</p>
                 )}
-            </div>
+            </>
 
     );
 }
