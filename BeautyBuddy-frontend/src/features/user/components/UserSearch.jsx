@@ -31,16 +31,19 @@ export default function UserSearch({ isSearching, setIsSearching }) {
                     {users.length > 0 ? (
                         <div className="user-list">
                             {users.map(user => (
-                                <div key={user.username} className="user-card">
-                                    <h3>{user.username}</h3>
-                                    {user.profilePictureUrl && 
+                                <div key={user.username} className="user-card" onClick={() => {
+                                    // Implement navigation to user profile here, e.g., using React Router
+                                    // navigate(`/profile/${user.username}`);
+                                }}>
+                                    {user.profilePictureUrl ? (
                                         <img src={user.profilePictureUrl}/>
-                                    } :
-                                    {
+                                    ) : (
                                         <div className="user-avatar-fallback">
                                             {user.username.charAt(0).toUpperCase()}
                                         </div>
-                                    }
+                                    )}
+                                    <h3>{user.username}</h3>
+                                    <button>Follow</button>
                                 </div>
                             ))}
                         </div>
