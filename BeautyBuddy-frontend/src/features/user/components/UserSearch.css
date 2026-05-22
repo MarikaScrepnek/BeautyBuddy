@@ -1,3 +1,15 @@
+.user-card {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  border-radius: 8px;
+  background-color: #f3f4f6; /* gray-100 */
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  gap: 10px;
+}
+
 .user-avatar-fallback {
   width: 32px;
   height: 32px;
