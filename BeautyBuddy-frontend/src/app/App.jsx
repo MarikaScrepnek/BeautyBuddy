@@ -20,8 +20,8 @@ function App() {
           <Route path="/" element={<Navigate to="/products" />} />
           <Route path="/products" element={<Products />} />
           <Route path="/discussions" element={<Discussions />} />
-          <Route path="/profile" element={<MyRoutines />} />
-          <Route path="/my-feed" element={<Feed />} />
+          <Route path="/users/:username" element={<MyRoutines />} />
+          <Route path="/feed" element={<Feed />} />
           <Route path='/products/:productId' element={<ProductDetails />} />
           <Route path="/settings" element={<Settings />} />
         </Route>
