@@ -27,6 +27,8 @@ export default function MyRoutines() {
 
   const[createModalOpen, setCreateModalOpen] = useState(false);
 
+  const [isOwner, setIsOwner] = useState(false);
+
   // on mount
   useEffect(() => {
 
@@ -34,6 +36,7 @@ export default function MyRoutines() {
       .then((user) => {
         setIsLoggedIn(true);
         setUsername(user.username);
+        setIsOwner(user.username === window.location.pathname.split("/").slice(-1)[0]);
       })
       .catch(() => setIsLoggedIn(false))
       .finally(() => setIsAuthLoading(false));
@@ -64,9 +67,9 @@ export default function MyRoutines() {
     <>
     {isAuthLoading ? (
 
-      <div className='loading'>Loading your routines...</div>
+      <div className='loading'>Loading routines...</div>
 
-    ) : !isLoggedIn ? (
+    ) : !isLoggedIn && !isOwner ? (
 
       <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '80vh'}}>
           <h1 style={{fontSize: '2rem', color: '#555'}}>Login to view your routines...</h1>
@@ -76,7 +79,7 @@ export default function MyRoutines() {
 
   <div className='routines-page-container'>
 
-    {isLoggedIn && (
+    {isLoggedIn && isOwner && (
       <p style={{textAlign: "center", textDecoration: "underline", textDecorationColor: "#f0cef0"}}>Welcome back, {username}!</p>
     )}
 
@@ -129,9 +132,11 @@ export default function MyRoutines() {
                 {routine.name || (routine.occasion.charAt(0).toUpperCase() + routine.occasion.slice(1).toLowerCase())}
               </li>
             ))}
+            {isOwner && (
             <button className="create-button" onClick={() => setCreateModalOpen(true)} style={{margin: "1rem", width: "calc(100% - 2rem)"}}>
                 + New Routine
             </button>
+            )}
 
             <li style={{padding: "1rem", fontWeight: "bold", fontSize: "1.1rem", color: "#6c63ff", background: "transparent"}}>
               Skincare Routines
