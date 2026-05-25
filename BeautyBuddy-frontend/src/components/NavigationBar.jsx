@@ -67,8 +67,8 @@ export default function NavigationBar() {
               </>
             ) : (
               <>
-              <NavLink to="/profile" className={({ isActive }) => isActive ? 'active-link' : undefined}>Profile</NavLink>
-              <NavLink to="/my-feed" className={({ isActive }) => isActive ? 'active-link' : undefined}>Feed</NavLink>
+              <NavLink to={`/users/${currentUser?.username}`} className={({ isActive }) => isActive ? 'active-link' : undefined}>Profile</NavLink>
+              <NavLink to="/feed" className={({ isActive }) => isActive ? 'active-link' : undefined}>Feed</NavLink>
               </>
             )}
           </nav>
