@@ -188,15 +188,15 @@ export default function MyRoutines() {
         }
 
         {makeupRoutines.some(r => r.routineId === selected) && selectedRoutine &&
-          <SelectedRoutine userName={username} routine={selectedRoutine} routineType="Makeup" />
+          <SelectedRoutine userName={username} routine={selectedRoutine} routineType="Makeup" isOwner={isOwner} />
         }
 
         {skincareRoutines.some(r => r.routineId === selected) && selectedRoutine &&
-          <SelectedRoutine userName={username} routine={selectedRoutine} routineType="Skincare" />
+          <SelectedRoutine userName={username} routine={selectedRoutine} routineType="Skincare" isOwner={isOwner} />
         }
 
         {haircareRoutine.routineId === selected && selectedRoutine &&
-          <SelectedRoutine userName={username} routine={selectedRoutine} routineType="Haircare" />
+          <SelectedRoutine userName={username} routine={selectedRoutine} routineType="Haircare" isOwner={isOwner} />
         }
 
       </main>

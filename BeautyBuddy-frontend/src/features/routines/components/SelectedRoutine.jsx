@@ -10,7 +10,7 @@ import ReviewStars from '../../../components/ui/ReviewStars';
 
 import './SelectedRoutine.css';
 
-export default function MakeupRoutines( { userName, routine, routineType } ) {
+export default function MakeupRoutines( { userName, routine, routineType, isOwner } ) {
     const notesRef = useRef(null);
 
     const[isEditingRoutine, setIsEditingRoutine] = useState(false);
@@ -224,7 +224,11 @@ export default function MakeupRoutines( { userName, routine, routineType } ) {
                         <button className="cancel-button" style={{width:"120px", marginTop: '18px'}} onClick={() => {setEditedRoutine(routine); setIsEditingRoutine(false);}}>Undo Changes</button>
                     </div>
                 ) : (
-                    <button className="edit-button" onClick={() => setIsEditingRoutine(true)}>Edit Routine</button>
+                    <>
+                    {isOwner && (
+                        <button className="edit-button" onClick={() => setIsEditingRoutine(true)}>Edit Routine</button>
+                    )}
+                    </>
                 )}
             </div>
 
