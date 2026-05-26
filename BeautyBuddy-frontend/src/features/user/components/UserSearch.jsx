@@ -1,11 +1,13 @@
 import { searchUsers } from "../api/userApi";
 import { useState } from "react";
 import Searchbar from "../../../components/ui/Searchbar";
+import { useNavigate } from "react-router-dom";
 
 import "./UserSearch.css";
 
 export default function UserSearch({ isSearching, setIsSearching }) {
 
+    const navigate = useNavigate();
     const [users, setUsers] = useState([]);
 
     async function handleSearch(query) {
@@ -32,8 +34,7 @@ export default function UserSearch({ isSearching, setIsSearching }) {
                         <div className="user-list">
                             {users.map(user => (
                                 <div key={user.username} className="user-card" onClick={() => {
-                                    // Implement navigation to user profile here, e.g., using React Router
-                                    // navigate(`/profile/${user.username}`);
+                                    navigate(`/users/${user.username}`);
                                 }}>
                                     {user.profilePictureUrl ? (
                                         <img src={user.profilePictureUrl}/>
