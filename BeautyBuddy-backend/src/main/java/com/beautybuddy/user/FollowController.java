@@ -22,7 +22,7 @@ public class FollowController {
         this.followService = followService;
     }
 
-    @PostMapping("/{username}/follow")
+    @PostMapping("/{username}")
     public ResponseEntity<Void> followUser(Authentication authentication, @PathVariable String username) {
         if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.status(401).build();
