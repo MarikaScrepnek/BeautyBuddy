@@ -10,9 +10,9 @@ import com.beautybuddy.user.entity.UserFollow;
 
 public interface FollowRepository extends JpaRepository<UserFollow, Long> {
 
-    boolean existsByFollowerAndFollowed(Long followerId, Long followedId);
+    boolean existsByFollower_IdAndFollowed_Id(Long followerId, Long followedId);
 
-    Optional<UserFollow> findByFollowerAndFollowed(Long followerId, Long followedId);
+    Optional<UserFollow> findByFollower_IdAndFollowed_Id(Long followerId, Long followedId);
 
     Page<UserFollow> findByFollowedUsername(String username, Pageable pageable);
 
