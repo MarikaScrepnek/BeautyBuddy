@@ -28,7 +28,7 @@ public class FollowController {
             return ResponseEntity.status(401).build();
         }
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        if (!userDetails.getUsername().equals(username)) {
+        if (userDetails.getUsername().equals(username)) {
             return ResponseEntity.badRequest().build();
         }
         followService.followUser(userDetails.getUsername(), username);
@@ -41,7 +41,7 @@ public class FollowController {
             return ResponseEntity.status(401).build();
         }
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        if (!userDetails.getUsername().equals(username)) {
+        if (userDetails.getUsername().equals(username)) {
             return ResponseEntity.badRequest().build();
         }
         followService.unfollowUser(userDetails.getUsername(), username);
