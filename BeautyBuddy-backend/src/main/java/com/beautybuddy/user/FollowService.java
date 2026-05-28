@@ -39,7 +39,22 @@ public class FollowService {
     }
 
     public void unfollowUser(String followerUsername, String followeeUsername) {
-        // Implement unfollow logic here
+        User follower = userRepo.findByUsername(followerUsername)
+                .orElseThrow(() -> new RuntimeException("Follower not found"));
+        User followee = userRepo.findByUsername(followeeUsername)
+                .orElseThrow(() -> new RuntimeException("Followee not found"));
+
+        if (follower.getId().equals(followee.getId())) {
+            throw new RuntimeException("Cannot unfollow yourself");
+        }
+
+        if (!followRepo.existsByFollowerAndFollowed(follower.getId(), followee.getId())) {
+            throw new RuntimeException("Not following this user");
+        }
+
+        UserFollow follow = followRepo.findByFollowerAndFollowed(follower.getId(), followee.getId())
+                .orElseThrow(() -> new RuntimeException("Not following this user"));
+        followRepo.delete(follow);
     }
 
     /* public List<UserSearchDTO> getFollowers(String username) {
