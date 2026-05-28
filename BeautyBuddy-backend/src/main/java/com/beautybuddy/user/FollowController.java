@@ -1,11 +1,13 @@
 package com.beautybuddy.user;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.beautybuddy.security.CustomUserDetails;
 
 @RestController
 @RequestMapping("/api/follow")
@@ -17,15 +19,29 @@ public class FollowController {
         this.followService = followService;
     }
 
-    @PostMapping("/{userId}/follow")
-    public ResponseEntity<Void> followUser(@PathVariable Long userId) {
-        followService.followUser(userId);
+    @PostMapping("/{username}/follow")
+    public ResponseEntity<Void> followUser(Authentication authentication, @PathVariable String username) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(401).build();
+        }
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        if (!userDetails.getUsername().equals(username)) {
+            return ResponseEntity.badRequest().build();
+        }
+        followService.followUser(userDetails.getUsername(), username);
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/{userId}/unfollow")
-    public ResponseEntity<Void> unfollowUser(@PathVariable Long userId) {
-        followService.unfollowUser(userId);
+    @PostMapping("/{username}/unfollow")
+    public ResponseEntity<Void> unfollowUser(Authentication authentication, @PathVariable String username) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(401).build();
+        }
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        if (!userDetails.getUsername().equals(username)) {
+            return ResponseEntity.badRequest().build();
+        }
+        followService.unfollowUser(userDetails.getUsername(), username);
         return ResponseEntity.ok().build();
     }
 
