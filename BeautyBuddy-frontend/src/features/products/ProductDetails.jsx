@@ -25,7 +25,8 @@ import Toast from "../../components/ui/Toast";
 import { deleteReview, getReviews, submitReview, editReview } from "../reviews/api/reviewApi";
 import { reportProduct } from "./api/productApi";
 import { getQuestionsForProduct, submitQuestion } from "../questions/api/qaApi";
-import { addToBreakoutList } from "../breakout/api/breakoutListApi";
+import { addToBreakoutList, getBreakoutListProducts, removeFromBreakoutList } from "../breakout/api/breakoutListApi";
+import { getAllRoutineItems } from "../routines/api/routineApi";
 import Tooltip from "../../components/ui/Tooltip";
 
 import { FaFilter, FaSort } from "react-icons/fa";
@@ -44,6 +45,8 @@ export default function ProductDetails() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [currentUser, setCurrentUser] = useState(null);
     const [wishlistItems, setWishlistItems] = useState([]);
+    const [breakoutListItems, setBreakoutListItems] = useState([]);
+    const [routineItems, setRoutineItems] = useState([]);
     const [isTogglingWishlist, setIsTogglingWishlist] = useState(false);
     const [showLoginModal, setShowLoginModal] = useState(false);
     const [toast, setToast] = useState(null);
@@ -174,6 +177,24 @@ export default function ProductDetails() {
         }
     };
 
+    const loadBreakoutList = async () => {
+        try {
+            const items = await getBreakoutListProducts();
+            setBreakoutListItems(items);
+        } catch {
+            setBreakoutListItems([]);
+        }
+    };
+
+    const loadRoutineItems = async () => {
+        try {
+            const items = await getAllRoutineItems();
+            setRoutineItems(items);
+        } catch {
+            setRoutineItems([]);
+        }
+    };
+
     useEffect(() => {
         const handleAuthLogin = () => {
             getCurrentUser()
@@ -181,6 +202,8 @@ export default function ProductDetails() {
                     setIsLoggedIn(true);
                     setCurrentUser(user);
                     loadWishlist();
+                    loadBreakoutList();
+                    loadRoutineItems();
                 })
                 .catch(() => {
                     setIsLoggedIn(false);
@@ -192,6 +215,8 @@ export default function ProductDetails() {
             setIsLoggedIn(false);
             setCurrentUser(null);
             setWishlistItems([]);
+            setBreakoutListItems([]);
+            setRoutineItems([]);
         };
 
         window.addEventListener("auth:login", handleAuthLogin);
@@ -205,8 +230,12 @@ export default function ProductDetails() {
     useEffect(() => {
         if (isLoggedIn) {
             loadWishlist();
+            loadBreakoutList();
+            loadRoutineItems();
         } else {
             setWishlistItems([]);
+            setBreakoutListItems([]);
+            setRoutineItems([]);
         }
     }, [isLoggedIn]);
 
@@ -334,6 +363,14 @@ export default function ProductDetails() {
         })
     );
 
+    const isInBreakoutList = Boolean(
+        data && breakoutListItems.some((item) => item.productId === data.id)
+    );
+
+    const isInRoutine = Boolean(
+        data && routineItems.includes(data.id)
+    );
+
     const handleToggleWishlist = async () => {
         if (!isLoggedIn) {
             setShowLoginModal(true);
@@ -382,8 +419,19 @@ export default function ProductDetails() {
             setShowLoginModal(true);
             return;
         }
+        if (isInBreakoutList) {
+            try {
+                await removeFromBreakoutList("product", id);
+                setBreakoutListItems((items) => items.filter((item) => item.productId !== id));
+                showToast("Removed from breakout list", "info");
+            } catch (error) {
+                showToast("Failed to remove from breakout list", "error");
+            }
+            return;
+        }
         try {
             await addToBreakoutList("product", id);
+            setBreakoutListItems((items) => [...items, { productId: id }]);
             showToast("Added to breakout list", "success");
         } catch (error) {
             showToast("Failed to add to breakout list", "error");
@@ -740,13 +788,17 @@ export default function ProductDetails() {
                         </div>
 
                         <div className="action-icon" onClick={handleAddToRoutine}>
-                            <span className="icon">+</span>
-                            <span className="tooltip">Add to {data.category.baseCategoryName} Routine</span>
+                                                        <span className="icon" style={isInRoutine ? { color: "#1a8ec4" } : undefined}>+</span>
+                                                        <span className="tooltip">
+                                                            {isInRoutine ? "Add to another routine" : `Add to ${data.category.baseCategoryName} Routine`}
+                                                        </span>
                         </div>
 
-                        <div className="action-icon" onClick={() => handleAddToBreakoutList(data.id)}>
-                            <span className="icon">!</span>
-                            <span className="tooltip">Add to Breakout List</span>
+                                                <div className="action-icon" onClick={() => handleAddToBreakoutList(data.id)}>
+                                                        <span className="icon" style={isInBreakoutList ? { color: "red", fontSize: "0.95em" } : { fontSize: "0.95em" }}>!</span>
+                                                        <span className="tooltip">
+                                                            {isInBreakoutList ? "Remove from Breakout List" : "Add to Breakout List"}
+                                                        </span>
                         </div>
 
                     </div>
