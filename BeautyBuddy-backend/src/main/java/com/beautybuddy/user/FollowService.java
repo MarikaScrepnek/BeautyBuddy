@@ -24,6 +24,14 @@ public class FollowService {
         User followee = userRepo.findByUsername(followeeUsername)
                 .orElseThrow(() -> new RuntimeException("Followee not found"));
 
+        if (follower.getId().equals(followee.getId())) {
+            throw new RuntimeException("Cannot follow yourself");
+        }
+
+        if (followRepo.existsByFollowerAndFollowed(follower.getId(), followee.getId())) {
+            throw new RuntimeException("Already following this user");
+        }
+
         UserFollow follow = new UserFollow();
         follow.setFollower(follower);
         follow.setFollowed(followee);
