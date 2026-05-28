@@ -31,7 +31,7 @@ public class FollowService {
             throw new RuntimeException("Cannot follow yourself");
         }
 
-        if (followRepo.existsByFollowerAndFollowed(follower.getId(), followee.getId())) {
+        if (followRepo.existsByFollower_IdAndFollowed_Id(follower.getId(), followee.getId())) {
             throw new RuntimeException("Already following this user");
         }
 
@@ -51,11 +51,11 @@ public class FollowService {
             throw new RuntimeException("Cannot unfollow yourself");
         }
 
-        if (!followRepo.existsByFollowerAndFollowed(follower.getId(), followee.getId())) {
+        if (!followRepo.existsByFollower_IdAndFollowed_Id(follower.getId(), followee.getId())) {
             throw new RuntimeException("Not following this user");
         }
 
-        UserFollow follow = followRepo.findByFollowerAndFollowed(follower.getId(), followee.getId())
+        UserFollow follow = followRepo.findByFollower_IdAndFollowed_Id(follower.getId(), followee.getId())
                 .orElseThrow(() -> new RuntimeException("Not following this user"));
         followRepo.delete(follow);
     }
