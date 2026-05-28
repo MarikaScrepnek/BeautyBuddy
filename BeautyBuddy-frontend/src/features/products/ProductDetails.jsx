@@ -167,7 +167,7 @@ export default function ProductDetails() {
 
     const loadWishlist = async () => {
         try {
-            const items = await getWishlist();
+            const items = await getWishlist(currentUser?.username);
             setWishlistItems(items);
         } catch {
             setWishlistItems([]);
@@ -1130,6 +1130,7 @@ export default function ProductDetails() {
                 productId={data.id}
                 shadeName={selectedShade?.shadeName ?? ""}
                 onClose={() => setAddToRoutineOpen(false)}
+                username={currentUser?.username}
             />
         )}
 
