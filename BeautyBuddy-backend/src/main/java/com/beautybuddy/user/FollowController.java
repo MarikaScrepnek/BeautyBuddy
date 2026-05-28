@@ -1,13 +1,16 @@
 package com.beautybuddy.user;
 
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.beautybuddy.security.CustomUserDetails;
+import com.beautybuddy.user.dto.UserSearchDTO;
 
 @RestController
 @RequestMapping("/api/follow")
@@ -45,15 +48,15 @@ public class FollowController {
         return ResponseEntity.ok().build();
     }
 
-    /* @GetMapping("/{userId}/followers")
-    public ResponseEntity<List<UserSearchDTO>> getFollowers(@PathVariable Long userId) {
-        List<UserSearchDTO> followers = followService.getFollowers(userId);
+    @GetMapping("/{username}/followers")
+    public ResponseEntity<Page<UserSearchDTO>> getFollowers(@PathVariable String username) {
+        Page<UserSearchDTO> followers = followService.getFollowers(username);
         return ResponseEntity.ok(followers);
     }
 
-    @GetMapping("/{userId}/following")
-    public ResponseEntity<List<UserSearchDTO>> getFollowing(@PathVariable Long userId) {
-        List<UserSearchDTO> following = followService.getFollowing(userId);
+    @GetMapping("/{username}/following")
+    public ResponseEntity<Page<UserSearchDTO>> getFollowing(@PathVariable String username) {
+        Page<UserSearchDTO> following = followService.getFollowing(username);
         return ResponseEntity.ok(following);
-    } */
+    }
 }
