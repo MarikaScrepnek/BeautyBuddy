@@ -1,40 +1,40 @@
 package com.beautybuddy.review;
 
-import com.beautybuddy.product.entity.Product;
-import com.beautybuddy.product.entity.ProductShade;
-import com.beautybuddy.product.repo.ProductRepository;
-import com.beautybuddy.product.repo.ProductShadeRepository;
-import com.beautybuddy.config.RedisCacheConfig;
-import com.beautybuddy.report.repo.ReviewReportRepository;
-import com.beautybuddy.review.dto.CachedReviewPageDTO;
-import com.beautybuddy.review.dto.DisplayReviewDTO;
-import com.beautybuddy.review.dto.SubmitReviewDTO;
-import com.beautybuddy.review.entity.Review;
-import com.beautybuddy.review.entity.ReviewImage;
-import com.beautybuddy.user.repo.UserRepository;
-import com.beautybuddy.user.entity.User;
-import com.beautybuddy.upvote.repo.ReviewUpvoteRepository;
-import com.beautybuddy.review.dto.EditReviewDTO;
-
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import java.util.Set;
-import java.util.stream.Collectors;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.beautybuddy.config.RedisCacheConfig;
+import com.beautybuddy.product.entity.Product;
+import com.beautybuddy.product.entity.ProductShade;
+import com.beautybuddy.product.repo.ProductRepository;
+import com.beautybuddy.product.repo.ProductShadeRepository;
+import com.beautybuddy.report.repo.ReviewReportRepository;
+import com.beautybuddy.review.dto.CachedReviewPageDTO;
+import com.beautybuddy.review.dto.DisplayReviewDTO;
+import com.beautybuddy.review.dto.EditReviewDTO;
+import com.beautybuddy.review.dto.SubmitReviewDTO;
+import com.beautybuddy.review.entity.Review;
+import com.beautybuddy.review.entity.ReviewImage;
+import com.beautybuddy.upvote.repo.ReviewUpvoteRepository;
+import com.beautybuddy.user.entity.User;
+import com.beautybuddy.user.repo.UserRepository;
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -125,7 +125,7 @@ public class ReviewService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
         Review existingReview = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new RuntimeException("Review not found"));
-        if (existingReview.getUser().getId() != user.getId()) {
+        if (!Objects.equals(existingReview.getUser().getId(), user.getId())) {
             throw new RuntimeException("User not authorized to edit this review");
         } else {
             ProductShade shade = null;
@@ -168,7 +168,7 @@ public class ReviewService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
         Review existingReview = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new RuntimeException("Review not found"));
-        if (existingReview.getUser().getId() != user.getId()) {
+        if (!Objects.equals(existingReview.getUser().getId(), user.getId())) {
             throw new RuntimeException("User not authorized to delete this review");
         } else {
             existingReview.setDeletedAt(LocalDateTime.now());
