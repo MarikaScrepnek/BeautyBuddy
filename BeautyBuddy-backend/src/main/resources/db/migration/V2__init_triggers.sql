@@ -173,7 +173,7 @@ BEGIN
         -- Increment followers_count for followed user
         UPDATE account 
         SET followers_count = followers_count + 1 
-        WHERE id = NEW.followed_id;
+        WHERE id = NEW.following_id;
         
     ELSIF TG_OP = 'DELETE' THEN
         -- Decrement following_count for follower
@@ -184,7 +184,7 @@ BEGIN
         -- Decrement followers_count for followed user
         UPDATE account 
         SET followers_count = GREATEST(0, followers_count - 1)
-        WHERE id = OLD.followed_id;
+        WHERE id = OLD.following_id;
     END IF;
     
     RETURN NULL;
