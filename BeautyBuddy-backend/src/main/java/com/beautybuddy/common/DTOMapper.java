@@ -1,5 +1,12 @@
 package com.beautybuddy.common;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.beautybuddy.brand.Brand;
 import com.beautybuddy.brand.BrandDTO;
 import com.beautybuddy.breakout.dto.DisplayBreakoutListProductDTO;
@@ -22,14 +29,9 @@ import com.beautybuddy.routine.dto.DisplayRoutineDTO;
 import com.beautybuddy.routine.dto.DisplayRoutineItemDTO;
 import com.beautybuddy.routine.entity.Routine;
 import com.beautybuddy.routine.entity.RoutineItem;
+import com.beautybuddy.user.dto.UserSearchDTO;
 import com.beautybuddy.user.entity.User;
-
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
+import com.beautybuddy.user.repo.FollowRepository;
 
 public class DTOMapper {
 
@@ -72,19 +74,19 @@ public class DTOMapper {
 
     public static ProductDTO toProductDTO(Product product) {
         List<IngredientDTO> ingredients = product.getProductIngredients().stream()
-            .sorted(Comparator.comparingInt(ProductIngredient::getPosition))
-            .map(pi -> toIngredientDTO(pi.getIngredient()))
-            .collect(Collectors.toList());
+                .sorted(Comparator.comparingInt(ProductIngredient::getPosition))
+                .map(pi -> toIngredientDTO(pi.getIngredient()))
+                .collect(Collectors.toList());
 
         List<IngredientDTO> mayContain = product.getMayContainIngredients().stream()
-            .map(mci -> toIngredientDTO(mci.getIngredient()))
-            .sorted(Comparator.comparing(IngredientDTO::name))
-            .collect(Collectors.toList());
+                .map(mci -> toIngredientDTO(mci.getIngredient()))
+                .sorted(Comparator.comparing(IngredientDTO::name))
+                .collect(Collectors.toList());
 
         List<ProductShadeDTO> shades = product.getProductShades().stream()
-            .sorted(Comparator.comparing(ProductShade::getShadeNumber))
-            .map(DTOMapper::toProductShadeDTO)
-            .collect(Collectors.toList());
+                .sorted(Comparator.comparing(ProductShade::getShadeNumber))
+                .map(DTOMapper::toProductShadeDTO)
+                .collect(Collectors.toList());
 
         return new ProductDTO(
                 product.getId(),
@@ -106,102 +108,117 @@ public class DTOMapper {
         LocalDateTime now = LocalDateTime.now();
 
         List<RoutineItem> validItems = routine.getItems().stream()
-            .filter(item ->
-                item.getValidFrom() != null &&
-                item.getValidFrom().isBefore(now) &&
-                (item.getValidTo() == null || item.getValidTo().isAfter(now))
-            )
-            .sorted(Comparator.comparingInt(RoutineItem::getStepOrder))
-            .collect(Collectors.toList());
+                .filter(item
+                        -> item.getValidFrom() != null
+                && item.getValidFrom().isBefore(now)
+                && (item.getValidTo() == null || item.getValidTo().isAfter(now))
+                )
+                .sorted(Comparator.comparingInt(RoutineItem::getStepOrder))
+                .collect(Collectors.toList());
 
         List<DisplayRoutineItemDTO> itemDTOs = new ArrayList<>();
         for (RoutineItem item : validItems) {
             BigDecimal rating = null;
             if (item.getShade() != null) {
                 rating = reviewRepository
-                    .findByProduct_IdAndProductShade_IdAndUser_IdAndDeletedAtIsNull(
-                        item.getProduct().getId(),
-                        item.getShade().getId(),
-                        user.getId()
-                    )
-                    .map(Review::getRating)
-                    .orElse(null);
+                        .findByProduct_IdAndProductShade_IdAndUser_IdAndDeletedAtIsNull(
+                                item.getProduct().getId(),
+                                item.getShade().getId(),
+                                user.getId()
+                        )
+                        .map(Review::getRating)
+                        .orElse(null);
             }
             if (item.getShade() == null) {
                 rating = reviewRepository
-                    .findByProduct_IdAndUser_IdAndDeletedAtIsNull(
-                        item.getProduct().getId(),
-                        user.getId()
-                    )
-                    .map(Review::getRating)
-                    .orElse(null);
+                        .findByProduct_IdAndUser_IdAndDeletedAtIsNull(
+                                item.getProduct().getId(),
+                                user.getId()
+                        )
+                        .map(Review::getRating)
+                        .orElse(null);
             }
 
             DisplayRoutineItemDTO dto = new DisplayRoutineItemDTO(
-                item.getId(),
-                item.getProduct().getId(),
-                item.getProduct().getName(),
-                item.getProduct().getBrand() != null
+                    item.getId(),
+                    item.getProduct().getId(),
+                    item.getProduct().getName(),
+                    item.getProduct().getBrand() != null
                     ? item.getProduct().getBrand().getName()
                     : null,
-                item.getShade() != null ? item.getShade().getShadeName() : null,
-                item.getProduct().getProductShades().stream()
-                    .sorted(Comparator.comparing(ProductShade::getShadeNumber))
-                    .map(DTOMapper::toProductShadeDTO)
-                    .collect(Collectors.toList()),
-                item.getProduct().getCategory() != null
+                    item.getShade() != null ? item.getShade().getShadeName() : null,
+                    item.getProduct().getProductShades().stream()
+                            .sorted(Comparator.comparing(ProductShade::getShadeNumber))
+                            .map(DTOMapper::toProductShadeDTO)
+                            .collect(Collectors.toList()),
+                    item.getProduct().getCategory() != null
                     ? item.getProduct().getCategory().getName()
                     : null,
-                item.getShade() != null && item.getShade().getImageLink() != null
+                    item.getShade() != null && item.getShade().getImageLink() != null
                     ? item.getShade().getImageLink()
                     : item.getProduct().getImageLink(),
-                item.getNotes(),
-                rating,
-                item.getShade() != null
+                    item.getNotes(),
+                    rating,
+                    item.getShade() != null
                     ? reviewRepository.findByProduct_IdAndProductShade_IdAndUser_IdAndDeletedAtIsNull(
-                        item.getProduct().getId(),
-                        item.getShade().getId(),
-                        user.getId()
+                            item.getProduct().getId(),
+                            item.getShade().getId(),
+                            user.getId()
                     )
-                    .map(Review::getId)
-                    .orElse(null)
+                            .map(Review::getId)
+                            .orElse(null)
                     : reviewRepository.findByProduct_IdAndUser_IdAndDeletedAtIsNull(
-                        item.getProduct().getId(),
-                        user.getId()
+                            item.getProduct().getId(),
+                            user.getId()
                     )
-                    .map(Review::getId)
-                    .orElse(null),
-                item.getStepOrder()
+                            .map(Review::getId)
+                            .orElse(null),
+                    item.getStepOrder()
             );
 
             itemDTOs.add(dto);
         }
 
         return new DisplayRoutineDTO(
-            routine.getId(),
-            routine.getName(),
-            user.getUsername(),
-            routine.getUpdatedAt(),
-            routine.getTimeOfDay() != null ? routine.getTimeOfDay().name() : null,
-            routine.getOccasion() != null ? routine.getOccasion().name() : null,
-            routine.getNotes(),
-            itemDTOs
+                routine.getId(),
+                routine.getName(),
+                user.getUsername(),
+                routine.getUpdatedAt(),
+                routine.getTimeOfDay() != null ? routine.getTimeOfDay().name() : null,
+                routine.getOccasion() != null ? routine.getOccasion().name() : null,
+                routine.getNotes(),
+                itemDTOs
         );
     }
 
     public static DisplayBreakoutListProductDTO toDisplayBreakoutListProductDTO(BreakoutListProduct blp) {
         return new DisplayBreakoutListProductDTO(
-            blp.getId(),
-            blp.getProduct().getId(),
-            blp.getProduct().getName(),
-            blp.getProduct().getBrand() != null
+                blp.getId(),
+                blp.getProduct().getId(),
+                blp.getProduct().getName(),
+                blp.getProduct().getBrand() != null
                 ? blp.getProduct().getBrand().getName()
                 : null,
-            blp.getProduct().getImageLink(),
-            blp.getProduct().getProductIngredients().stream()
-                .sorted(Comparator.comparingInt(ProductIngredient::getPosition))
-                .map(pi -> toIngredientDTO(pi.getIngredient()))
-                .collect(Collectors.toList())
+                blp.getProduct().getImageLink(),
+                blp.getProduct().getProductIngredients().stream()
+                        .sorted(Comparator.comparingInt(ProductIngredient::getPosition))
+                        .map(pi -> toIngredientDTO(pi.getIngredient()))
+                        .collect(Collectors.toList())
         );
+    }
+
+    public static UserSearchDTO toUserSearchDTO(User user, String currentUsername, FollowRepository followRepo) {
+        boolean isCurrentUser = currentUsername != null && currentUsername.equals(user.getUsername());
+        boolean isFollowing = currentUsername != null
+                && followRepo.existsByFollowerUsernameAndFollowedUsername(currentUsername, user.getUsername());
+        boolean isFollower = currentUsername != null
+                && followRepo.existsByFollowerUsernameAndFollowedUsername(user.getUsername(), currentUsername);
+
+        return new UserSearchDTO(
+                user.getUsername(),
+                user.getAvatarLink(),
+                isFollowing,
+                isFollower,
+                isCurrentUser);
     }
 }
