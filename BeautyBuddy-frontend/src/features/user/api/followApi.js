@@ -6,7 +6,7 @@ export async function followUser(username) {
     if (!res.ok) {
         throw new Error('Failed to follow user');
     }
-    return res.json();
+    return res.ok;
 }
 
 export async function unfollowUser(username) {
@@ -17,7 +17,7 @@ export async function unfollowUser(username) {
     if (!res.ok) {
         throw new Error('Failed to unfollow user');
     }
-    return res.json();
+    return res.ok;
 }
 
 export async function getFollowers(username) {
