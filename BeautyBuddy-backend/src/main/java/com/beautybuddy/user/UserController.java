@@ -1,12 +1,15 @@
 package com.beautybuddy.user;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.http.ResponseEntity;
 import java.util.List;
 
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.beautybuddy.security.CustomUserDetails;
 import com.beautybuddy.user.dto.UserSearchDTO;
 
 @RestController
@@ -20,8 +23,11 @@ public class UserController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<UserSearchDTO>> searchUsers(@RequestParam String query) {
-        List<UserSearchDTO> results = userService.searchUsers(query);
+    public ResponseEntity<List<UserSearchDTO>> searchUsers(Authentication authentication, @RequestParam String query) {
+        String currentUsername = authentication != null && authentication.isAuthenticated()
+                ? ((CustomUserDetails) authentication.getPrincipal()).getUsername()
+                : null;
+        List<UserSearchDTO> results = userService.searchUsers(query, currentUsername);
         return ResponseEntity.ok(results);
     }
 }

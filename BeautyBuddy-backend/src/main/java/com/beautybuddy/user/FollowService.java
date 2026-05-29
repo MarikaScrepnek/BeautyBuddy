@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import com.beautybuddy.common.DTOMapper;
 import com.beautybuddy.user.dto.UserSearchDTO;
 import com.beautybuddy.user.entity.User;
 import com.beautybuddy.user.entity.UserFollow;
@@ -60,13 +61,13 @@ public class FollowService {
         followRepo.delete(follow);
     }
 
-    public Page<UserSearchDTO> getFollowers(String username) {
+    public Page<UserSearchDTO> getFollowers(String username, String currentUsername) {
         Page<UserFollow> followers = followRepo.findByFollowedUsername(username, PageRequest.of(0, 20));
-        return followers.map(follow -> new UserSearchDTO(follow.getFollower().getUsername(), follow.getFollower().getUsername()));
+        return followers.map(follow -> DTOMapper.toUserSearchDTO(follow.getFollower(), currentUsername, followRepo));
     }
 
-    public Page<UserSearchDTO> getFollowing(String username) {
+    public Page<UserSearchDTO> getFollowing(String username, String currentUsername) {
         Page<UserFollow> following = followRepo.findByFollowerUsername(username, PageRequest.of(0, 20));
-        return following.map(follow -> new UserSearchDTO(follow.getFollowed().getUsername(), follow.getFollowed().getUsername()));
+        return following.map(follow -> DTOMapper.toUserSearchDTO(follow.getFollowed(), currentUsername, followRepo));
     }
 }

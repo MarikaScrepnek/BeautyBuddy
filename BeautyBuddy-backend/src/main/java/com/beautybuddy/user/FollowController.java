@@ -49,14 +49,20 @@ public class FollowController {
     }
 
     @GetMapping("/{username}/followers")
-    public ResponseEntity<Page<UserSearchDTO>> getFollowers(@PathVariable String username) {
-        Page<UserSearchDTO> followers = followService.getFollowers(username);
+    public ResponseEntity<Page<UserSearchDTO>> getFollowers(Authentication authentication, @PathVariable String username) {
+        String currentUsername = authentication != null && authentication.isAuthenticated()
+                ? ((CustomUserDetails) authentication.getPrincipal()).getUsername()
+                : null;
+        Page<UserSearchDTO> followers = followService.getFollowers(username, currentUsername);
         return ResponseEntity.ok(followers);
     }
 
     @GetMapping("/{username}/following")
-    public ResponseEntity<Page<UserSearchDTO>> getFollowing(@PathVariable String username) {
-        Page<UserSearchDTO> following = followService.getFollowing(username);
+    public ResponseEntity<Page<UserSearchDTO>> getFollowing(Authentication authentication, @PathVariable String username) {
+        String currentUsername = authentication != null && authentication.isAuthenticated()
+                ? ((CustomUserDetails) authentication.getPrincipal()).getUsername()
+                : null;
+        Page<UserSearchDTO> following = followService.getFollowing(username, currentUsername);
         return ResponseEntity.ok(following);
     }
 }
