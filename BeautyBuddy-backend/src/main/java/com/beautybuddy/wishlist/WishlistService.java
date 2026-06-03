@@ -1,17 +1,5 @@
 package com.beautybuddy.wishlist;
 
-import com.beautybuddy.config.RedisCacheConfig;
-import com.beautybuddy.product.entity.Product;
-import com.beautybuddy.product.entity.ProductShade;
-import com.beautybuddy.product.repo.ProductRepository;
-import com.beautybuddy.product.repo.ProductShadeRepository;
-import com.beautybuddy.user.repo.UserRepository;
-import com.beautybuddy.user.entity.User;
-import com.beautybuddy.wishlist.dto.AddToWishlistRequestDTO;
-import com.beautybuddy.wishlist.dto.WishlistItemDTO;
-import com.beautybuddy.wishlist.entity.Wishlist;
-import com.beautybuddy.wishlist.entity.WishlistItem;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -21,6 +9,20 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.beautybuddy.community.activity.ActivityService;
+import com.beautybuddy.community.activity.entity.ActivityType;
+import com.beautybuddy.config.RedisCacheConfig;
+import com.beautybuddy.product.entity.Product;
+import com.beautybuddy.product.entity.ProductShade;
+import com.beautybuddy.product.repo.ProductRepository;
+import com.beautybuddy.product.repo.ProductShadeRepository;
+import com.beautybuddy.user.entity.User;
+import com.beautybuddy.user.repo.UserRepository;
+import com.beautybuddy.wishlist.dto.AddToWishlistRequestDTO;
+import com.beautybuddy.wishlist.dto.WishlistItemDTO;
+import com.beautybuddy.wishlist.entity.Wishlist;
+import com.beautybuddy.wishlist.entity.WishlistItem;
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -36,7 +38,9 @@ public class WishlistService {
     private final Counter wishlistAddCounter;
     private final Counter wishlistRemoveCounter;
 
-    public WishlistService(UserRepository userRepository, ProductRepository productRepository, ProductShadeRepository shadeRepository, WishlistItemRepository wishlistItemRepository, MeterRegistry meterRegistry) {
+    private final ActivityService activityService;
+
+    public WishlistService(UserRepository userRepository, ProductRepository productRepository, ProductShadeRepository shadeRepository, WishlistItemRepository wishlistItemRepository, MeterRegistry meterRegistry, ActivityService activityService) {
         this.userRepository = userRepository;
         this.productRepository = productRepository;
         this.shadeRepository = shadeRepository;
@@ -47,6 +51,7 @@ public class WishlistService {
         this.wishlistRemoveCounter = Counter.builder("wishlist_remove_total")
                 .description("Total number of items removed from wishlists")
                 .register(meterRegistry);
+        this.activityService = activityService;
     }
 
     @Transactional
@@ -77,6 +82,8 @@ public class WishlistService {
 
         wishlistItemRepository.save(item);
         wishlistAddCounter.increment();
+
+        activityService.createActivity(user, ActivityType.WISHLIST_ITEM, "Added product " + product.getName() + (shade != null ? " (shade: " + shade.getShadeName() + ")" : "") + " to wishlist");
     }
 
     @Cacheable(cacheNames = RedisCacheConfig.WISHLIST_CACHE, key = "#username")
