@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -149,24 +150,24 @@ public class WishlistService {
             if (priceRange != null) {
                 BigDecimal price = dto.price();
                 switch (priceRange) {
-                    case "below_20":
+                    case "below_20" -> {
                         if (price.compareTo(new BigDecimal("20")) >= 0) {
                             continue;
                         }
-                        break;
-                    case "20_50":
+                    }
+                    case "20_50" -> {
                         if (price.compareTo(new BigDecimal("20")) < 0
                                 || price.compareTo(new BigDecimal("50")) > 0) {
                             continue;
                         }
-                        break;
-                    case "above_50":
+                    }
+                    case "above_50" -> {
                         if (price.compareTo(new BigDecimal("50")) <= 0) {
                             continue;
                         }
-                        break;
-                    default:
-                        break;
+                    }
+                    default -> {
+                    }
                 }
             }
 
@@ -262,7 +263,7 @@ public class WishlistService {
         List<WishlistItem> items = wishlistItemRepository.findByWishlist_User_Email(email);
         WishlistItem target = null;
         for (WishlistItem item : items) {
-            if (item.getProduct().getId() == request.productId()) {
+            if (Objects.equals(item.getProduct().getId(), request.productId())) {
                 if (request.shadeName() == null && item.getShade() == null) {
                     target = item;
                     break;
@@ -306,28 +307,31 @@ public class WishlistService {
             ));
         }
 
-        if (type.equals("price_asc")) {
-            result.sort((a, b) -> a.price().compareTo(b.price()));
-        } else if (type.equals("price_desc")) {
-            result.sort((a, b) -> b.price().compareTo(a.price()));
-        } else if (type.equals("rating_desc")) {
-            result.sort(
-                    Comparator.comparing(
-                            WishlistItemDTO::rating,
-                            Comparator.nullsFirst(BigDecimal::compareTo)
-                    ).reversed()
-            );
-        } else if (type.equals("rating_asc")) {
-            result.sort(
-                    Comparator.comparing(
-                            WishlistItemDTO::rating,
-                            Comparator.nullsLast(BigDecimal::compareTo)
-                    )
-            );
-        } else if (type.equals("added_asc")) {
-            result.sort((a, b) -> a.dateAdded().compareTo(b.dateAdded()));
-        } else if (type.equals("added_desc")) {
-            result.sort((a, b) -> b.dateAdded().compareTo(a.dateAdded()));
+        switch (type) {
+            case "price_asc" ->
+                result.sort((a, b) -> a.price().compareTo(b.price()));
+            case "price_desc" ->
+                result.sort((a, b) -> b.price().compareTo(a.price()));
+            case "rating_desc" ->
+                result.sort(
+                        Comparator.comparing(
+                                WishlistItemDTO::rating,
+                                Comparator.nullsFirst(BigDecimal::compareTo)
+                        ).reversed()
+                );
+            case "rating_asc" ->
+                result.sort(
+                        Comparator.comparing(
+                                WishlistItemDTO::rating,
+                                Comparator.nullsLast(BigDecimal::compareTo)
+                        )
+                );
+            case "added_asc" ->
+                result.sort((a, b) -> a.dateAdded().compareTo(b.dateAdded()));
+            case "added_desc" ->
+                result.sort((a, b) -> b.dateAdded().compareTo(a.dateAdded()));
+            default -> {
+            }
         }
 
         return result;
