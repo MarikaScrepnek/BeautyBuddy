@@ -14,11 +14,14 @@ import org.springframework.web.server.ResponseStatusException;
 import com.beautybuddy.category.Category;
 import com.beautybuddy.category.CategoryRepository;
 import com.beautybuddy.common.DTOMapper;
+import com.beautybuddy.community.activity.ActivityService;
+import com.beautybuddy.community.activity.entity.ActivityType;
 import com.beautybuddy.config.RedisCacheConfig;
 import com.beautybuddy.product.entity.Product;
 import com.beautybuddy.product.entity.ProductShade;
 import com.beautybuddy.product.repo.ProductRepository;
 import com.beautybuddy.product.repo.ProductShadeRepository;
+import com.beautybuddy.review.ReviewRepository;
 import com.beautybuddy.routine.dto.AddToRoutineRequestDTO;
 import com.beautybuddy.routine.dto.CreateMakeupRoutineRequestDTO;
 import com.beautybuddy.routine.dto.DisplayRoutineDTO;
@@ -27,9 +30,8 @@ import com.beautybuddy.routine.entity.OccasionEnum;
 import com.beautybuddy.routine.entity.Routine;
 import com.beautybuddy.routine.entity.RoutineItem;
 import com.beautybuddy.routine.repo.RoutineRepository;
-import com.beautybuddy.user.repo.UserRepository;
 import com.beautybuddy.user.entity.User;
-import com.beautybuddy.review.ReviewRepository;
+import com.beautybuddy.user.repo.UserRepository;
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -44,18 +46,21 @@ public class RoutineService {
     private final ProductShadeRepository productShadeRepository;
     private final ReviewRepository reviewRepository;
 
+    private final ActivityService activityService;
+
     private final Counter routineCreationCounter;
     private final Counter routineUpdateCounter;
     private final Counter routineAddProductCounter;
     private final Counter routineRemoveProductCounter;
 
-    public RoutineService(UserRepository userRepository, CategoryRepository categoryRepository, RoutineRepository routineRepository, ReviewRepository reviewRepository, ProductRepository productRepository, ProductShadeRepository productShadeRepository, MeterRegistry meterRegistry) {
+    public RoutineService(UserRepository userRepository, CategoryRepository categoryRepository, RoutineRepository routineRepository, ReviewRepository reviewRepository, ProductRepository productRepository, ProductShadeRepository productShadeRepository, MeterRegistry meterRegistry, ActivityService activityService) {
         this.userRepository = userRepository;
         this.categoryRepository = categoryRepository;
         this.routineRepository = routineRepository;
         this.productRepository = productRepository;
         this.productShadeRepository = productShadeRepository;
         this.reviewRepository = reviewRepository;
+        this.activityService = activityService;
         this.routineCreationCounter = Counter.builder("routine_creation_total")
                 .description("Total number of routines created")
                 .register(meterRegistry);
@@ -181,6 +186,8 @@ public class RoutineService {
         routine.getItems().add(item);
         routineRepository.save(routine);
         routineAddProductCounter.increment();
+
+        activityService.createActivity(user, ActivityType.ROUTINE_ITEM, "Added product ID: " + product.getId() + " to routine ID: " + routine.getId());
     }
 
     @CacheEvict(cacheNames = RedisCacheConfig.ROUTINE_CACHE, allEntries = true)
