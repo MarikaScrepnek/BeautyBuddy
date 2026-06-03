@@ -6,3 +6,5 @@ public enum ActivityType {
     ROUTINE_IMAGE,
     WISHLIST_ITEM
 }
+
+// add breakoutlist item / product
