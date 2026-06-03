@@ -119,7 +119,7 @@ public class ReviewService {
         reviewRepository.save(newReview);
         reviewCounter.increment();
 
-        activityService.createActivity(user, ActivityType.REVIEW, "Created a review for product ID: " + product.getId());
+        activityService.createActivity(user, ActivityType.REVIEW_CREATED, "Created a review for product ID: " + product.getId());
     }
 
     @Transactional

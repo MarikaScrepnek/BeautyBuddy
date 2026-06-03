@@ -187,7 +187,7 @@ public class RoutineService {
         routineRepository.save(routine);
         routineAddProductCounter.increment();
 
-        activityService.createActivity(user, ActivityType.ROUTINE_ITEM, "Added product ID: " + product.getId() + " to routine ID: " + routine.getId());
+        activityService.createActivity(user, ActivityType.ROUTINE_ITEM_ADDED, "Added product ID: " + product.getId() + " to routine ID: " + routine.getId());
     }
 
     @CacheEvict(cacheNames = RedisCacheConfig.ROUTINE_CACHE, allEntries = true)

@@ -1,6 +1,5 @@
 package com.beautybuddy.community.activity.entity;
 
-import com.beautybuddy.community.activity.BaseActivityType;
 import com.beautybuddy.wishlist.entity.WishlistItem;
 
 import jakarta.persistence.Entity;
@@ -10,7 +9,8 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "wishlist_item_activity")
-public class WishlistItemActivity extends BaseActivityType{
+public class WishlistItemActivity extends BaseActivityType {
+
     @ManyToOne
     @JoinColumn(name = "wishlist_item_id", nullable = false)
     private WishlistItem wishlistItem;
@@ -18,6 +18,7 @@ public class WishlistItemActivity extends BaseActivityType{
     public WishlistItem getWishlistItem() {
         return wishlistItem;
     }
+
     public void setWishlistItem(WishlistItem wishlistItem) {
         this.wishlistItem = wishlistItem;
     }
