@@ -20,6 +20,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.beautybuddy.community.activity.ActivityService;
+import com.beautybuddy.community.activity.entity.ActivityType;
 import com.beautybuddy.config.RedisCacheConfig;
 import com.beautybuddy.product.entity.Product;
 import com.beautybuddy.product.entity.ProductShade;
@@ -54,15 +56,18 @@ public class ReviewService {
     private final ReviewReportRepository reviewReportRepository;
     private final ReviewUpvoteRepository reviewUpvoteRepository;
 
+    private final ActivityService activityService;
+
     private final Counter reviewCounter;
 
-    public ReviewService(ReviewRepository reviewRepository, ReviewReportRepository reviewReportRepository, UserRepository userRepository, ProductRepository productRepository, ProductShadeRepository productShadeRepository, ReviewUpvoteRepository reviewUpvoteRepository, MeterRegistry meterRegistry) {
+    public ReviewService(ReviewRepository reviewRepository, ReviewReportRepository reviewReportRepository, UserRepository userRepository, ProductRepository productRepository, ProductShadeRepository productShadeRepository, ReviewUpvoteRepository reviewUpvoteRepository, MeterRegistry meterRegistry, ActivityService activityService) {
         this.reviewRepository = reviewRepository;
         this.userRepository = userRepository;
         this.productRepository = productRepository;
         this.productShadeRepository = productShadeRepository;
         this.reviewReportRepository = reviewReportRepository;
         this.reviewUpvoteRepository = reviewUpvoteRepository;
+        this.activityService = activityService;
         this.reviewCounter = Counter.builder("product_reviews_total")
                 .description("Total number of reviews")
                 .register(meterRegistry);
@@ -113,6 +118,8 @@ public class ReviewService {
 
         reviewRepository.save(newReview);
         reviewCounter.increment();
+
+        activityService.createActivity(user, ActivityType.REVIEW, "Created a review for product ID: " + product.getId());
     }
 
     @Transactional
