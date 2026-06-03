@@ -9,7 +9,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.beautybuddy.community.activity.entity.Activity;
+import com.beautybuddy.community.activity.entity.ActivityType;
 import com.beautybuddy.community.activity.repo.ActivityRepository;
+import com.beautybuddy.user.entity.User;
 import com.beautybuddy.user.entity.UserFollow;
 import com.beautybuddy.user.repo.FollowRepository;
 
@@ -24,7 +26,11 @@ public class ActivityService {
         this.followRepository = followRepository;
     }
 
-    public ResponseEntity<Activity> createActivity(Activity activity) {
+    public ResponseEntity<Activity> createActivity(User actor, ActivityType type, String payload) {
+        Activity activity = new Activity();
+        activity.setActor(actor);
+        activity.setType(type);
+        activity.setPayload(payload);
         Activity savedActivity = activityRepository.save(activity);
         return ResponseEntity.ok(savedActivity);
     }
