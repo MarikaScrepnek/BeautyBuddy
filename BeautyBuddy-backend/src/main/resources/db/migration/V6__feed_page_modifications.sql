@@ -10,7 +10,7 @@ CREATE TYPE activity_action_enum AS ENUM (
     'CREATED',
     'EDITED',
     'ADDED',
-    'REMOVED',
+    'REMOVED'
 );
 
 ALTER TABLE activity
@@ -21,3 +21,9 @@ ALTER TABLE activity
 
 ALTER TABLE activity
     ADD COLUMN action activity_action_enum NOT NULL;
+
+ALTER TYPE activity_type ADD VALUE 'ROUTINE';
+
+ALTER TYPE activity_type ADD VALUE 'BREAKOUTLIST_ITEM';
+
+ALTER TYPE activity_type ADD VALUE 'BREAKOUTLIST_INGREDIENT';
