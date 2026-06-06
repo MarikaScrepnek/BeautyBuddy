@@ -14,10 +14,7 @@ CREATE TYPE activity_action_enum AS ENUM (
 );
 
 ALTER TABLE activity
-    ADD COLUMN target_id BIGINT;
-
-ALTER TABLE activity
-    ALTER COLUMN target_id SET NOT NULL;
+    ADD COLUMN target_id BIGINT NOT NULL;
 
 ALTER TABLE activity
     ADD COLUMN action activity_action_enum NOT NULL;
