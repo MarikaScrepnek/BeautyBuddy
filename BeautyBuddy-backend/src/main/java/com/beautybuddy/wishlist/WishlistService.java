@@ -276,6 +276,7 @@ public class WishlistService {
         if (target != null) {
             wishlistItemRepository.delete(target);
             wishlistRemoveCounter.increment();
+            activityService.createActivity(target.getWishlist().getUser(), ActivityType.WISHLIST_ITEM_REMOVED, "Removed product " + target.getProduct().getName() + (target.getShade() != null ? " (shade: " + target.getShade().getShadeName() + ")" : "") + " from wishlist");
         } else {
             throw new RuntimeException("Wishlist item not found");
         }
