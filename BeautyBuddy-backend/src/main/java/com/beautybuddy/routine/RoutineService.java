@@ -151,6 +151,8 @@ public class RoutineService {
 
         routineRepository.save(routine);
         routineCreationCounter.increment();
+
+        activityService.createActivity(user, ActivityType.ROUTINE_CREATED, "Created routine ID: " + routine.getId() + " with occasion: " + routine.getOccasion());
     }
 
     @CacheEvict(cacheNames = RedisCacheConfig.ROUTINE_CACHE, allEntries = true)
@@ -297,6 +299,8 @@ public class RoutineService {
         itemToRemove.setValidTo(LocalDateTime.now());
         routineRepository.save(routine);
         routineRemoveProductCounter.increment();
+
+        activityService.createActivity(user, ActivityType.ROUTINE_ITEM_REMOVED, "Removed product ID: " + productId + " from routine ID: " + routine.getId());
     }
 
 }
