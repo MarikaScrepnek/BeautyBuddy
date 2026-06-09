@@ -162,6 +162,8 @@ public class ReviewService {
             existingReview.getReviewImages().addAll(newImages);
 
             reviewRepository.save(existingReview);
+
+            activityService.createActivity(user, ActivityType.REVIEW_EDITED, "Edited a review: " + existingReview.getId());
         }
     }
 
