@@ -670,7 +670,7 @@ export default function ProductDetails() {
             <div className="product-main">
                 <img
                     src={selectedShade?.imageLink ?? data.image_link}
-                    alt={data.name}
+                    alt="Image not found, please report this product if you see this."
                     className="product-image"
                 />
 
