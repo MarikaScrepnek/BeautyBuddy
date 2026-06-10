@@ -26,7 +26,7 @@ public class ActivityController {
         return activityService.getActivitiesByUsername(username);
     }
 
-    @GetMapping("following")
+    @GetMapping("/following")
     public Page<ResponseEntity<Activity>> getFollowingActivities(Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
             return Page.empty();
