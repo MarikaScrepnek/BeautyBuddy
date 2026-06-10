@@ -11,3 +11,17 @@ export async function fetchFeed() {
     throw error;
   }
 }
+
+export async function fetchUserActivities(username) {
+  try {
+    const response = await fetch(`/api/activities/user/${username}`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch user activities');
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error fetching user activities:', error);
+    throw error;
+  }
+}
