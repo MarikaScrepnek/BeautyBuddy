@@ -1,5 +1,5 @@
-import Searchbar from '../../components/ui/Searchbar';
 import UserSearch from '../user/components/UserSearch';
+import fetchFeed from './api/feedApi';
 import './Feed.css';
 
 import { useState } from 'react';
@@ -8,6 +8,21 @@ export default function Feed() {
 
     const [following, setFollowing] = useState([]);
     const [isSearching, setIsSearching] = useState(false);
+
+    const [feed, setFeed] = useState([]);
+
+    useEffect(() => {
+        handleFetchFeed();
+    }, []);
+
+    async function handleFetchFeed() {
+        try {
+            const feedData = await fetchFeed();
+            setFeed(feedData);
+        } catch (error) {
+            console.error('Error fetching feed:', error);
+        }
+    }
 
     return (
 
