@@ -13,6 +13,8 @@ import com.beautybuddy.breakout.dto.DisplayBreakoutListProductDTO;
 import com.beautybuddy.breakout.entity.BreakoutListProduct;
 import com.beautybuddy.category.Category;
 import com.beautybuddy.category.CategoryDTO;
+import com.beautybuddy.community.activity.entity.Activity;
+import com.beautybuddy.community.dto.ActivityDTO;
 import com.beautybuddy.ingredient.dto.IngredientDTO;
 import com.beautybuddy.ingredient.dto.MayContainIngredientDTO;
 import com.beautybuddy.ingredient.dto.ProductIngredientDTO;
@@ -220,5 +222,16 @@ public class DTOMapper {
                 isFollowing,
                 isFollower,
                 isCurrentUser);
+    }
+
+    public static ActivityDTO toActivityDTO(Activity activity) {
+        return new ActivityDTO(
+                activity.getId(),
+                activity.getType(),
+                activity.getAction(),
+                activity.getActor() != null ? activity.getActor().getUsername() : null,
+                activity.getPayload(),
+                activity.getCreatedAt().toString()
+        );
     }
 }
