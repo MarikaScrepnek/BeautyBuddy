@@ -37,22 +37,22 @@ public class ActivityService {
         return ResponseEntity.ok().build();
     }
 
-    public Page<ResponseEntity<ActivityDTO>> getActivitiesByUsername(String username) {
+    public Page<ActivityDTO> getActivitiesByUsername(String username) {
         Page<Activity> activities = activityRepository.findByActor_Username(username, PageRequest.of(0, 10));
-        return activities.map(DTOMapper::toActivityDTO).map(ResponseEntity::ok);
+        return activities.map(DTOMapper::toActivityDTO);
     }
 
-    public Page<ResponseEntity<ActivityDTO>> getFollowingActivitiesByUsername(String username) {
+    public Page<ActivityDTO> getFollowingActivitiesByUsername(String username) {
         Page<UserFollow> following = followRepository.findByFollowerUsername(username, PageRequest.of(0, 1000));
         List<String> followedUsernames = following.getContent().stream()
                 .map(f -> f.getFollowed().getUsername()).collect(Collectors.toList());
 
         if (followedUsernames.isEmpty()) {
-            return Page.<ResponseEntity<ActivityDTO>>empty(PageRequest.of(0, 10));
+            return Page.<ActivityDTO>empty(PageRequest.of(0, 10));
         }
 
         Page<Activity> activities = activityRepository.findByActor_UsernameIn(followedUsernames,
                 PageRequest.of(0, 10));
-        return activities.map(DTOMapper::toActivityDTO).map(ResponseEntity::ok);
+        return activities.map(DTOMapper::toActivityDTO);
     }
 }
