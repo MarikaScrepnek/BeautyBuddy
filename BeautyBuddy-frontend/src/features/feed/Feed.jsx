@@ -6,7 +6,6 @@ import { useState } from 'react';
 
 export default function Feed() {
 
-    const [following, setFollowing] = useState([]);
     const [isSearching, setIsSearching] = useState(false);
 
     const [feed, setFeed] = useState([]);
@@ -30,7 +29,7 @@ export default function Feed() {
                 <UserSearch isSearching={isSearching} setIsSearching={setIsSearching} placeholder="Search for users..." />
                 {!isSearching &&
                 <>
-                    {following.length > 0 && !isSearching ? (
+                    {feed.length > 0 && !isSearching ? (
                         <div className="feed-posts">
                             {/* Render posts from followed users here */}
                         </div>
