@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.beautybuddy.community.activity.entity.Activity;
+import com.beautybuddy.community.dto.ActivityDTO;
 import com.beautybuddy.security.CustomUserDetails;
 
 @RestController
@@ -22,17 +22,19 @@ public class ActivityController {
     }
 
     @GetMapping("/{username}")
-    public Page<ResponseEntity<Activity>> getActivities(@PathVariable String username) {
-        return activityService.getActivitiesByUsername(username);
+    public Page<ResponseEntity<ActivityDTO>> getActivities(@PathVariable String username) {
+        Page<ActivityDTO> activities = activityService.getActivitiesByUsername(username);
+        return activities.map(ResponseEntity::ok);
     }
 
     @GetMapping("/following")
-    public Page<ResponseEntity<Activity>> getFollowingActivities(Authentication authentication) {
+    public Page<ResponseEntity<ActivityDTO>> getFollowingActivities(Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
             return Page.empty();
         }
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
 
-        return activityService.getFollowingActivitiesByUsername(userDetails.getUsername());
+        Page<ActivityDTO> activities = activityService.getFollowingActivitiesByUsername(userDetails.getUsername());
+        return activities.map(ResponseEntity::ok);
     }
 }
