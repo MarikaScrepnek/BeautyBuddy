@@ -43,21 +43,18 @@ export default function MyRoutines() {
 
     getMakeupRoutines()
       .then((data) => {
-        console.log("Makeup routines:", data);
         setMakeupRoutines(data);
       })
       .catch((err) => console.error("Error fetching makeup routines:", err));
 
       getSkincareRoutines()
       .then((data) => {
-        console.log("Skincare routines:", data);
         setSkincareRoutines(data);
       })
       .catch((err) => console.error("Error fetching skincare routines:", err));
 
       getHaircareRoutine()
       .then((data) => {
-        console.log("Haircare routine:", data);
         setHaircareRoutine(data);
       })
       .catch((err) => console.error("Error fetching haircare routine:", err));

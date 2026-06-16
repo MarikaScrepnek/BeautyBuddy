@@ -16,7 +16,6 @@ export default function CreateRoutineModal( {onClose} ) {
         }
         createMakeupRoutine(occasion, name, notes)
             .then((data) => {
-                console.log("Routine created:", data);
                 onClose();
             })
             .catch((error) => {
