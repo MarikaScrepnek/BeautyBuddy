@@ -72,9 +72,9 @@ public class BreakoutListService {
             breakoutListProduct.setBreakoutList(user.getBreakoutList());
             breakoutListProduct.setProduct(product);
 
-            breakoutListProductRepository.save(breakoutListProduct);
+            BreakoutListProduct savedProduct = breakoutListProductRepository.save(breakoutListProduct);
             breakoutListAddCounter.increment();
-            activityService.createActivity(user, ActivityType.BREAKOUTLIST_ITEM_ADDED, "Added product ID: " + addToBreakoutListDTO.productId() + " to breakout list");
+            activityService.createActivity(user, ActivityType.BREAKOUTLIST_ITEM_ADDED, savedProduct.getId(), "Added product ID: " + addToBreakoutListDTO.productId() + " to breakout list");
         } else if (addToBreakoutListDTO.ingredientId() != null) {
             Ingredient ingredient = ingredientRepository.findById(addToBreakoutListDTO.ingredientId())
                     .orElseThrow(() -> new RuntimeException("Ingredient not found"));
@@ -83,9 +83,9 @@ public class BreakoutListService {
             breakoutListIngredient.setBreakoutList(user.getBreakoutList());
             breakoutListIngredient.setIngredient(ingredient);
 
-            breakoutListIngredientRepository.save(breakoutListIngredient);
+            BreakoutListIngredient savedIngredient = breakoutListIngredientRepository.save(breakoutListIngredient);
             breakoutListAddCounter.increment();
-            activityService.createActivity(user, ActivityType.BREAKOUTLIST_ITEM_ADDED, "Added ingredient ID: " + addToBreakoutListDTO.ingredientId() + " to breakout list");
+            activityService.createActivity(user, ActivityType.BREAKOUTLIST_ITEM_ADDED, savedIngredient.getId(), "Added ingredient ID: " + addToBreakoutListDTO.ingredientId() + " to breakout list");
         } else {
             throw new RuntimeException("Either productId or ingredientId must be provided");
         }
@@ -124,14 +124,16 @@ public class BreakoutListService {
         if (removeFromBreakoutListDTO.productId() != null) {
             BreakoutListProduct breakoutListProduct = breakoutListProductRepository.findByBreakoutListIdAndProductId(user.getBreakoutList().getId(), removeFromBreakoutListDTO.productId())
                     .orElseThrow(() -> new RuntimeException("Product not found in breakout list"));
+            Long targetId = breakoutListProduct.getId();
             breakoutListProductRepository.delete(breakoutListProduct);
-            activityService.createActivity(user, ActivityType.BREAKOUTLIST_ITEM_REMOVED, "Removed product ID: " + removeFromBreakoutListDTO.productId() + " from breakout list");
+            activityService.createActivity(user, ActivityType.BREAKOUTLIST_ITEM_REMOVED, targetId, "Removed product ID: " + removeFromBreakoutListDTO.productId() + " from breakout list");
             breakoutListRemoveCounter.increment();
         } else if (removeFromBreakoutListDTO.ingredientId() != null) {
             BreakoutListIngredient breakoutListIngredient = breakoutListIngredientRepository.findByBreakoutListIdAndIngredientId(user.getBreakoutList().getId(), removeFromBreakoutListDTO.ingredientId())
                     .orElseThrow(() -> new RuntimeException("Ingredient not found in breakout list"));
+            Long targetId = breakoutListIngredient.getId();
             breakoutListIngredientRepository.delete(breakoutListIngredient);
-            activityService.createActivity(user, ActivityType.BREAKOUTLIST_ITEM_REMOVED, "Removed ingredient ID: " + removeFromBreakoutListDTO.ingredientId() + " from breakout list");
+            activityService.createActivity(user, ActivityType.BREAKOUTLIST_ITEM_REMOVED, targetId, "Removed ingredient ID: " + removeFromBreakoutListDTO.ingredientId() + " from breakout list");
             breakoutListRemoveCounter.increment();
         } else {
             throw new RuntimeException("Either productId or ingredientId must be provided");

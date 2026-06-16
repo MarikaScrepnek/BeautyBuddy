@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.beautybuddy.common.DTOMapper;
 import com.beautybuddy.community.activity.entity.Activity;
+import com.beautybuddy.community.activity.entity.ActivityAction;
 import com.beautybuddy.community.activity.entity.ActivityType;
 import com.beautybuddy.community.activity.repo.ActivityRepository;
 import com.beautybuddy.community.dto.ActivityDTO;
@@ -28,13 +29,28 @@ public class ActivityService {
         this.followRepository = followRepository;
     }
 
-    public ResponseEntity<Void> createActivity(User actor, ActivityType type, String payload) {
+    public ResponseEntity<Void> createActivity(User actor, ActivityType type, Long targetId, String payload) {
         Activity activity = new Activity();
         activity.setActor(actor);
         activity.setType(type);
+        activity.setAction(resolveAction(type));
+        activity.setTargetId(targetId);
         activity.setPayload(payload);
         activityRepository.save(activity);
         return ResponseEntity.ok().build();
+    }
+
+    private ActivityAction resolveAction(ActivityType type) {
+        return switch (type) {
+            case REVIEW_CREATED, ROUTINE_CREATED ->
+                ActivityAction.CREATED;
+            case REVIEW_EDITED ->
+                ActivityAction.EDITED;
+            case ROUTINE_ITEM_ADDED, ROUTINE_IMAGE_ADDED, WISHLIST_ITEM_ADDED, BREAKOUTLIST_ITEM_ADDED, BREAKOUTLIST_INGREDIENT_ADDED ->
+                ActivityAction.ADDED;
+            case ROUTINE_ITEM_REMOVED, WISHLIST_ITEM_REMOVED, BREAKOUTLIST_ITEM_REMOVED, BREAKOUTLIST_INGREDIENT_REMOVED ->
+                ActivityAction.REMOVED;
+        };
     }
 
     public Page<ActivityDTO> getActivitiesByUsername(String username) {

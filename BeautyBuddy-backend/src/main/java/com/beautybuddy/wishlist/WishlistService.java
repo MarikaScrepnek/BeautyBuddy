@@ -81,10 +81,10 @@ public class WishlistService {
         item.setProduct(product);
         item.setShade(shade);
 
-        wishlistItemRepository.save(item);
+        WishlistItem savedItem = wishlistItemRepository.save(item);
         wishlistAddCounter.increment();
 
-        activityService.createActivity(user, ActivityType.WISHLIST_ITEM_ADDED, "Added product " + product.getName() + (shade != null ? " (shade: " + shade.getShadeName() + ")" : "") + " to wishlist");
+        activityService.createActivity(user, ActivityType.WISHLIST_ITEM_ADDED, savedItem.getId(), "Added product " + product.getName() + (shade != null ? " (shade: " + shade.getShadeName() + ")" : "") + " to wishlist");
     }
 
     @Cacheable(cacheNames = RedisCacheConfig.WISHLIST_CACHE, key = "#username")
@@ -274,9 +274,10 @@ public class WishlistService {
             }
         }
         if (target != null) {
+            Long targetId = target.getId();
             wishlistItemRepository.delete(target);
             wishlistRemoveCounter.increment();
-            activityService.createActivity(target.getWishlist().getUser(), ActivityType.WISHLIST_ITEM_REMOVED, "Removed product " + target.getProduct().getName() + (target.getShade() != null ? " (shade: " + target.getShade().getShadeName() + ")" : "") + " from wishlist");
+            activityService.createActivity(target.getWishlist().getUser(), ActivityType.WISHLIST_ITEM_REMOVED, targetId, "Removed product " + target.getProduct().getName() + (target.getShade() != null ? " (shade: " + target.getShade().getShadeName() + ")" : "") + " from wishlist");
         } else {
             throw new RuntimeException("Wishlist item not found");
         }

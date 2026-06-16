@@ -116,10 +116,10 @@ public class ReviewService {
         }
         newReview.setReviewImages(reviewImages);
 
-        reviewRepository.save(newReview);
+        Review savedReview = reviewRepository.save(newReview);
         reviewCounter.increment();
 
-        activityService.createActivity(user, ActivityType.REVIEW_CREATED, "Created a review for product ID: " + product.getId());
+        activityService.createActivity(user, ActivityType.REVIEW_CREATED, savedReview.getId(), "Created a review for product ID: " + product.getId());
     }
 
     @Transactional
@@ -163,7 +163,7 @@ public class ReviewService {
 
             reviewRepository.save(existingReview);
 
-            activityService.createActivity(user, ActivityType.REVIEW_EDITED, "Edited a review: " + existingReview.getId());
+            activityService.createActivity(user, ActivityType.REVIEW_EDITED, existingReview.getId(), "Edited a review: " + existingReview.getId());
         }
     }
 
