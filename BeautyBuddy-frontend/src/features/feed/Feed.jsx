@@ -24,6 +24,10 @@ function formatActivityLabel(activity) {
     return activity.action?.toLowerCase().replace(/_/g, ' ') ?? 'activity';
 }
 
+function normalizeFeedItem(item) {
+    return item?.body ?? item ?? {};
+}
+
 export default function Feed() {
 
     const [isSearching, setIsSearching] = useState(false);
@@ -37,7 +41,8 @@ export default function Feed() {
     async function handleFetchFeed() {
         try {
             const feedData = await fetchFeed();
-            setFeed(feedData);
+            setFeed(Array.isArray(feedData?.content) ? feedData.content.map(normalizeFeedItem) : []);
+            console.log('Fetched feed:', feedData);
         } catch (error) {
             console.error('Error fetching feed:', error);
         }
@@ -54,13 +59,13 @@ export default function Feed() {
                             {feed.map((activity) => {
                                 const payload = parseActivityPayload(activity.payload);
                                 const message = payload.message ?? activity.payload ?? 'Activity update';
+                                const key = activity.id ?? `${activity.type ?? 'activity'}-${activity.timestamp ?? message}`;
 
                                 return (
-                                    <article className="feed-card" key={activity.id}>
+                                    <article className="feed-card" key={key}>
                                         <div className="feed-card__header">
                                             <div>
                                                 <p className="feed-card__actor">@{activity.actorUsername}</p>
-                                                <p className="feed-card__type">{formatActivityLabel(activity)}</p>
                                             </div>
                                             <time className="feed-card__time" dateTime={activity.timestamp}>
                                                 {new Date(activity.timestamp).toLocaleString()}
