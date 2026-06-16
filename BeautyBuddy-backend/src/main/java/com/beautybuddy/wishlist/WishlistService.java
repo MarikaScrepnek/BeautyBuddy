@@ -84,7 +84,7 @@ public class WishlistService {
         WishlistItem savedItem = wishlistItemRepository.save(item);
         wishlistAddCounter.increment();
 
-        activityService.createActivity(user, ActivityType.WISHLIST_ITEM_ADDED, savedItem.getId(), "Added product " + product.getName() + (shade != null ? " (shade: " + shade.getShadeName() + ")" : "") + " to wishlist");
+        activityService.createActivity(user, ActivityType.WISHLIST_ITEM_ADDED, savedItem.getId(), "Added " + product.getName() + (shade != null ? " in shade " + shade.getShadeName() : "") + " to wishlist");
     }
 
     @Cacheable(cacheNames = RedisCacheConfig.WISHLIST_CACHE, key = "#username")
