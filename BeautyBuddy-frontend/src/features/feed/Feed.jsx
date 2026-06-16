@@ -1,8 +1,8 @@
 import UserSearch from '../user/components/UserSearch';
-import fetchFeed from './api/feedApi';
+import { fetchFeed } from './api/feedApi';
 import './Feed.css';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function Feed() {
 
