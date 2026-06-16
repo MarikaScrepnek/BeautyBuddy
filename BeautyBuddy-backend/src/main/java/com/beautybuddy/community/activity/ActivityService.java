@@ -1,6 +1,7 @@
 package com.beautybuddy.community.activity;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
@@ -17,9 +18,13 @@ import com.beautybuddy.community.dto.ActivityDTO;
 import com.beautybuddy.user.entity.User;
 import com.beautybuddy.user.entity.UserFollow;
 import com.beautybuddy.user.repo.FollowRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class ActivityService {
+
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private final ActivityRepository activityRepository;
     private final FollowRepository followRepository;
@@ -35,9 +40,17 @@ public class ActivityService {
         activity.setType(type);
         activity.setAction(resolveAction(type));
         activity.setTargetId(targetId);
-        activity.setPayload(payload);
+        activity.setPayload(toJsonPayload(payload));
         activityRepository.save(activity);
         return ResponseEntity.ok().build();
+    }
+
+    private String toJsonPayload(String message) {
+        try {
+            return OBJECT_MAPPER.writeValueAsString(Map.of("message", message));
+        } catch (JsonProcessingException exception) {
+            throw new IllegalStateException("Failed to serialize activity payload", exception);
+        }
     }
 
     private ActivityAction resolveAction(ActivityType type) {
