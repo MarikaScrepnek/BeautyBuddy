@@ -1,6 +1,8 @@
 package com.beautybuddy.community.activity.entity;
 
+import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import org.hibernate.type.SqlTypes;
 
 import com.beautybuddy.common.entity.BaseEntity;
@@ -8,7 +10,6 @@ import com.beautybuddy.user.entity.User;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -27,11 +28,13 @@ public class Activity extends BaseEntity {
     @Column(name = "target_id", nullable = false)
     private Long targetId;
 
-    @Enumerated(EnumType.STRING)
+    @Enumerated
+    @JdbcType(PostgreSQLEnumJdbcType.class)
     @Column(name = "type", nullable = false, columnDefinition = "activity_type_enum")
     private ActivityType type;
 
-    @Enumerated(EnumType.STRING)
+    @Enumerated
+    @JdbcType(PostgreSQLEnumJdbcType.class)
     @Column(name = "action", nullable = false, columnDefinition = "activity_action_enum")
     private ActivityAction action;
 
