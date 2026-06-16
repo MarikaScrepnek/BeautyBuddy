@@ -2,6 +2,9 @@ package com.beautybuddy.report;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
+
 import com.beautybuddy.common.entity.BaseEntity;
 import com.beautybuddy.user.entity.User;
 
@@ -10,11 +13,10 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MappedSuperclass;
-import org.hibernate.annotations.JdbcType;
-import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 @MappedSuperclass
-public abstract class BaseReport extends BaseEntity{
+public abstract class BaseReport extends BaseEntity {
+
     @ManyToOne
     @JoinColumn(name = "account_id", nullable = false, updatable = false)
     private User user;
@@ -33,6 +35,7 @@ public abstract class BaseReport extends BaseEntity{
     public User getUser() {
         return user;
     }
+
     public void setUser(User user) {
         this.user = user;
     }
@@ -40,6 +43,7 @@ public abstract class BaseReport extends BaseEntity{
     public String getReason() {
         return reason;
     }
+
     public void setReason(String reason) {
         this.reason = reason;
     }
@@ -47,9 +51,15 @@ public abstract class BaseReport extends BaseEntity{
     public ReportStatus getStatus() {
         return status;
     }
+
     public void setStatus(ReportStatus status) {
         this.status = status;
     }
+
+    public LocalDateTime getResolvedAt() {
+        return resolvedAt;
+    }
+
     public void setResolvedAt(LocalDateTime resolvedAt) {
         this.resolvedAt = resolvedAt;
     }
