@@ -1,5 +1,5 @@
-UPDATE products
-    SET image_url = 'https://cdn.shopify.com/s/files/1/0661/2251/4520/files/59910_SCREM_Closed_R_b2f42f49-5465-409f-ac51-557704db3b8b.png?v=1778587286&width=1440&height=1440&crop=center'
+UPDATE product
+    SET image_link = 'https://cdn.shopify.com/s/files/1/0661/2251/4520/files/59910_SCREM_Closed_R_b2f42f49-5465-409f-ac51-557704db3b8b.png?v=1778587286&width=1440&height=1440&crop=center'
     WHERE name = 'Holy Hydration! Makeup Melting Cleansing Balm';
 
 DROP TABLE review_activity;
