@@ -34,8 +34,13 @@ import com.beautybuddy.routine.entity.RoutineItem;
 import com.beautybuddy.user.dto.UserSearchDTO;
 import com.beautybuddy.user.entity.User;
 import com.beautybuddy.user.repo.FollowRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class DTOMapper {
+
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     public static BrandDTO toBrandDTO(Brand brand) {
         return new BrandDTO(brand.getId(), brand.getName());
@@ -231,7 +236,37 @@ public class DTOMapper {
                 activity.getAction(),
                 activity.getActor() != null ? activity.getActor().getUsername() : null,
                 activity.getPayload(),
-                activity.getCreatedAt().toString()
+                activity.getCreatedAt().toString(),
+                extractImageUrlFromPayload(activity.getPayload())
         );
+    }
+
+    private static String extractImageUrlFromPayload(String payload) {
+        if (payload == null || payload.isBlank()) {
+            return null;
+        }
+
+        try {
+            JsonNode root = OBJECT_MAPPER.readTree(payload);
+            JsonNode mediaImageUrl = root.path("media").path("imageUrl");
+            if (!mediaImageUrl.isMissingNode() && !mediaImageUrl.isNull()) {
+                String value = mediaImageUrl.asText();
+                if (!value.isBlank()) {
+                    return value;
+                }
+            }
+
+            JsonNode legacyImageUrl = root.path("imageUrl");
+            if (!legacyImageUrl.isMissingNode() && !legacyImageUrl.isNull()) {
+                String value = legacyImageUrl.asText();
+                if (!value.isBlank()) {
+                    return value;
+                }
+            }
+        } catch (JsonProcessingException exception) {
+            return null;
+        }
+
+        return null;
     }
 }
