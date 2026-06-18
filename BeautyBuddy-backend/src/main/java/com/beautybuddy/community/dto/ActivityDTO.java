@@ -9,7 +9,8 @@ public record ActivityDTO(
         ActivityAction action,
         String actorUsername,
         String payload,
-        String timestamp
+        String timestamp,
+        String imageUrl
         ) {
 
 }
