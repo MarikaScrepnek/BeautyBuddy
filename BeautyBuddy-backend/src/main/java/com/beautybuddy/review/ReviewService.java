@@ -119,7 +119,17 @@ public class ReviewService {
         Review savedReview = reviewRepository.save(newReview);
         reviewCounter.increment();
 
-        activityService.createActivity(user, ActivityType.REVIEW_CREATED, savedReview.getId(), "Created a review for product ID: " + product.getId());
+        activityService.createActivity(
+                user,
+                ActivityType.REVIEW_CREATED,
+                savedReview.getId(),
+                "Reviewed " + product.getName() + (shade != null ? " in shade " + shade.getShadeName() : ""),
+                product.getId(),
+                product.getName(),
+                shade != null ? shade.getId() : null,
+                shade != null ? shade.getShadeName() : null,
+                shade != null && shade.getImageLink() != null ? shade.getImageLink() : product.getImageLink()
+        );
     }
 
     @Transactional
@@ -163,7 +173,18 @@ public class ReviewService {
 
             reviewRepository.save(existingReview);
 
-            activityService.createActivity(user, ActivityType.REVIEW_EDITED, existingReview.getId(), "Edited a review: " + existingReview.getId());
+            Product product = existingReview.getProduct();
+            activityService.createActivity(
+                    user,
+                    ActivityType.REVIEW_EDITED,
+                    existingReview.getId(),
+                    "Updated review for " + product.getName() + (shade != null ? " in shade " + shade.getShadeName() : ""),
+                    product.getId(),
+                    product.getName(),
+                    shade != null ? shade.getId() : null,
+                    shade != null ? shade.getShadeName() : null,
+                    shade != null && shade.getImageLink() != null ? shade.getImageLink() : product.getImageLink()
+            );
         }
     }
 

@@ -152,7 +152,18 @@ public class RoutineService {
         Routine savedRoutine = routineRepository.save(routine);
         routineCreationCounter.increment();
 
-        activityService.createActivity(user, ActivityType.ROUTINE_CREATED, savedRoutine.getId(), "Created routine ID: " + savedRoutine.getId() + " with occasion: " + savedRoutine.getOccasion());
+        String routineName = savedRoutine.getName() != null && !savedRoutine.getName().isBlank()
+                ? savedRoutine.getName()
+                : "Routine";
+        String occasionLabel = savedRoutine.getOccasion() != null
+                ? savedRoutine.getOccasion().name().toLowerCase()
+                : "custom";
+        activityService.createActivity(
+                user,
+                ActivityType.ROUTINE_CREATED,
+                savedRoutine.getId(),
+                "Created routine " + routineName + " for " + occasionLabel + " occasion"
+        );
     }
 
     @CacheEvict(cacheNames = RedisCacheConfig.ROUTINE_CACHE, allEntries = true)
@@ -188,8 +199,21 @@ public class RoutineService {
         routine.getItems().add(item);
         Routine savedRoutine = routineRepository.save(routine);
         routineAddProductCounter.increment();
+        String routineDisplayName = savedRoutine.getName() != null && !savedRoutine.getName().isBlank()
+                ? savedRoutine.getName()
+                : "Routine";
 
-        activityService.createActivity(user, ActivityType.ROUTINE_ITEM_ADDED, item.getId(), "Added product ID: " + product.getId() + " to routine ID: " + savedRoutine.getId());
+        activityService.createActivity(
+                user,
+                ActivityType.ROUTINE_ITEM_ADDED,
+                item.getId(),
+                "Added " + product.getName() + (shade != null ? " in shade " + shade.getShadeName() : "") + " to routine " + routineDisplayName,
+                product.getId(),
+                product.getName(),
+                shade != null ? shade.getId() : null,
+                shade != null ? shade.getShadeName() : null,
+                shade != null && shade.getImageLink() != null ? shade.getImageLink() : product.getImageLink()
+        );
     }
 
     @CacheEvict(cacheNames = RedisCacheConfig.ROUTINE_CACHE, allEntries = true)
@@ -300,7 +324,24 @@ public class RoutineService {
         routineRepository.save(routine);
         routineRemoveProductCounter.increment();
 
-        activityService.createActivity(user, ActivityType.ROUTINE_ITEM_REMOVED, itemToRemove.getId(), "Removed product ID: " + productId + " from routine ID: " + routine.getId());
+        Product removedProduct = itemToRemove.getProduct();
+        ProductShade removedShade = itemToRemove.getShade();
+        String routineDisplayName = routine.getName() != null && !routine.getName().isBlank()
+                ? routine.getName()
+                : "Routine";
+        activityService.createActivity(
+                user,
+                ActivityType.ROUTINE_ITEM_REMOVED,
+                itemToRemove.getId(),
+                "Removed " + removedProduct.getName() + (removedShade != null ? " in shade " + removedShade.getShadeName() : "") + " from routine " + routineDisplayName,
+                removedProduct.getId(),
+                removedProduct.getName(),
+                removedShade != null ? removedShade.getId() : null,
+                removedShade != null ? removedShade.getShadeName() : null,
+                removedShade != null && removedShade.getImageLink() != null
+                ? removedShade.getImageLink()
+                : removedProduct.getImageLink()
+        );
     }
 
 }

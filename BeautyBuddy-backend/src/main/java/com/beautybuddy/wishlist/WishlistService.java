@@ -84,7 +84,17 @@ public class WishlistService {
         WishlistItem savedItem = wishlistItemRepository.save(item);
         wishlistAddCounter.increment();
 
-        activityService.createActivity(user, ActivityType.WISHLIST_ITEM_ADDED, savedItem.getId(), "Added " + product.getName() + (shade != null ? " in shade " + shade.getShadeName() : "") + " to wishlist");
+        activityService.createActivity(
+                user,
+                ActivityType.WISHLIST_ITEM_ADDED,
+                savedItem.getId(),
+                "Added " + product.getName() + (shade != null ? " in shade " + shade.getShadeName() : "") + " to wishlist",
+                product.getId(),
+                product.getName(),
+                shade != null ? shade.getId() : null,
+                shade != null ? shade.getShadeName() : null,
+                shade != null && shade.getImageLink() != null ? shade.getImageLink() : product.getImageLink()
+        );
     }
 
     @Cacheable(cacheNames = RedisCacheConfig.WISHLIST_CACHE, key = "#username")
@@ -277,7 +287,19 @@ public class WishlistService {
             Long targetId = target.getId();
             wishlistItemRepository.delete(target);
             wishlistRemoveCounter.increment();
-            activityService.createActivity(target.getWishlist().getUser(), ActivityType.WISHLIST_ITEM_REMOVED, targetId, "Removed product " + target.getProduct().getName() + (target.getShade() != null ? " (shade: " + target.getShade().getShadeName() + ")" : "") + " from wishlist");
+            activityService.createActivity(
+                    target.getWishlist().getUser(),
+                    ActivityType.WISHLIST_ITEM_REMOVED,
+                    targetId,
+                    "Removed " + target.getProduct().getName() + (target.getShade() != null ? " in shade " + target.getShade().getShadeName() : "") + " from wishlist",
+                    target.getProduct().getId(),
+                    target.getProduct().getName(),
+                    target.getShade() != null ? target.getShade().getId() : null,
+                    target.getShade() != null ? target.getShade().getShadeName() : null,
+                    target.getShade() != null && target.getShade().getImageLink() != null
+                    ? target.getShade().getImageLink()
+                    : target.getProduct().getImageLink()
+            );
         } else {
             throw new RuntimeException("Wishlist item not found");
         }

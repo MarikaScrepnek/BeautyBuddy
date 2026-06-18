@@ -1,5 +1,6 @@
 package com.beautybuddy.community.activity;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -35,19 +36,61 @@ public class ActivityService {
     }
 
     public ResponseEntity<Void> createActivity(User actor, ActivityType type, Long targetId, String payload) {
+        return createActivity(actor, type, targetId, payload, null, null, null, null, null);
+    }
+
+    public ResponseEntity<Void> createActivity(
+            User actor,
+            ActivityType type,
+            Long targetId,
+            String payload,
+            Long productId,
+            String productName,
+            Long shadeId,
+            String shadeName,
+            String imageUrl
+    ) {
         Activity activity = new Activity();
         activity.setActor(actor);
         activity.setType(type);
         activity.setAction(resolveAction(type));
         activity.setTargetId(targetId);
-        activity.setPayload(toJsonPayload(payload));
+        activity.setPayload(toJsonPayload(payload, productId, productName, shadeId, shadeName, imageUrl));
         activityRepository.save(activity);
         return ResponseEntity.ok().build();
     }
 
-    private String toJsonPayload(String message) {
+    private String toJsonPayload(
+            String message,
+            Long productId,
+            String productName,
+            Long shadeId,
+            String shadeName,
+            String imageUrl
+    ) {
+        Map<String, Object> payload = new LinkedHashMap<>();
+        payload.put("message", message);
+        if (productId != null) {
+            payload.put("productId", productId);
+        }
+        if (productName != null && !productName.isBlank()) {
+            payload.put("productName", productName);
+        }
+        if (shadeId != null) {
+            payload.put("shadeId", shadeId);
+        }
+        if (shadeName != null && !shadeName.isBlank()) {
+            payload.put("shadeName", shadeName);
+        }
+        if (imageUrl != null && !imageUrl.isBlank()) {
+            payload.put("media", Map.of(
+                    "imageUrl", imageUrl,
+                    "imageSource", shadeId != null ? "SHADE" : "PRODUCT"
+            ));
+        }
+
         try {
-            return OBJECT_MAPPER.writeValueAsString(Map.of("message", message));
+            return OBJECT_MAPPER.writeValueAsString(payload);
         } catch (JsonProcessingException exception) {
             throw new IllegalStateException("Failed to serialize activity payload", exception);
         }
