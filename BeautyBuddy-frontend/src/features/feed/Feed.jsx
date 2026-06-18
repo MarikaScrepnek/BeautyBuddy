@@ -59,6 +59,10 @@ export default function Feed() {
                             {feed.map((activity) => {
                                 const payload = parseActivityPayload(activity.payload);
                                 const message = payload.message ?? activity.payload ?? 'Activity update';
+                                const imageUrl = payload?.media?.imageUrl ?? activity.imageUrl ?? null;
+                                const imageAlt = payload?.productName
+                                    ? `${payload.productName}${payload?.shadeName ? ` - ${payload.shadeName}` : ''}`
+                                    : 'Activity media';
                                 const key = activity.id ?? `${activity.type ?? 'activity'}-${activity.timestamp ?? message}`;
 
                                 return (
@@ -72,6 +76,11 @@ export default function Feed() {
                                             </time>
                                         </div>
                                         <p className="feed-card__message">{message}</p>
+                                        {imageUrl && (
+                                            <div className="feed-card__media">
+                                                <img src={imageUrl} alt={imageAlt} className="feed-card__image" draggable="false" />
+                                            </div>
+                                        )}
                                     </article>
                                 );
                             })}
