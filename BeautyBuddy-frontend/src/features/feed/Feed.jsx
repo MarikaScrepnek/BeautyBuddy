@@ -68,19 +68,21 @@ export default function Feed() {
                                 return (
                                     <article className="feed-card" key={key}>
                                         <div className="feed-card__header">
-                                            <div>
-                                                <p className="feed-card__actor">@{activity.actorUsername}</p>
-                                            </div>
                                             <time className="feed-card__time" dateTime={activity.timestamp}>
                                                 {new Date(activity.timestamp).toLocaleString()}
                                             </time>
                                         </div>
-                                        <p className="feed-card__message">{message}</p>
-                                        {imageUrl && (
-                                            <div className="feed-card__media">
-                                                <img src={imageUrl} alt={imageAlt} className="feed-card__image" draggable="false" />
+                                        <div style={{ display: 'flex', flexDirection: 'row', gap: '5px', alignItems: 'center' }}>
+                                            <div style={{ display: 'flex', flexDirection: 'row', gap: '4px', flex: 1 }}>
+                                                <p className="feed-card__actor">@{activity.actorUsername}</p>
+                                                <p className="feed-card__message">{message}</p>
                                             </div>
-                                        )}
+                                            {imageUrl && (
+                                                <div className="feed-card__media">
+                                                    <img src={imageUrl} alt={imageAlt} className="feed-card__image" draggable="false" />
+                                                </div>
+                                            )}
+                                        </div>
                                     </article>
                                 );
                             })}

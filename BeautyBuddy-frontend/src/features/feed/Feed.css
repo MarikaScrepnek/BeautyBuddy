@@ -49,6 +49,10 @@
     color: #222;
     text-align: left;
 }
+.feed-card__actor:hover {
+    text-decoration: underline;
+    cursor: pointer;
+}
 
 .feed-card__type {
     margin: 4px 0 0;
@@ -72,18 +76,18 @@
 }
 
 .feed-card__media {
-    width: 100%;
     border-radius: 12px;
-    overflow: hidden;
     border: 1px solid #ededed;
     background-color: #f8f8f8;
+    width: 150px;
+    height: 150px;
 }
 
 .feed-card__image {
     width: 100%;
-    max-height: 320px;
-    object-fit: cover;
-    display: block;
+    max-height: 150px;
+    object-fit: contain;
+    padding: 8px;
 }
 
 .feed-search-bar {
