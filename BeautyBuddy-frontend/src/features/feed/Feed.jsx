@@ -1,6 +1,7 @@
 import UserSearch from '../user/components/UserSearch';
 import { fetchFeed } from './api/feedApi';
 import './Feed.css';
+import { useNavigate } from 'react-router-dom';
 
 import { useEffect, useState } from 'react';
 
@@ -33,6 +34,8 @@ export default function Feed() {
     const [isSearching, setIsSearching] = useState(false);
 
     const [feed, setFeed] = useState([]);
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         handleFetchFeed();
@@ -74,7 +77,9 @@ export default function Feed() {
                                         </div>
                                         <div style={{ display: 'flex', flexDirection: 'row', gap: '5px', alignItems: 'center' }}>
                                             <div style={{ display: 'flex', flexDirection: 'row', gap: '4px', flex: 1 }}>
-                                                <p className="feed-card__actor">@{activity.actorUsername}</p>
+                                                <p className="feed-card__actor" onClick={() => navigate(`/users/${activity.actorUsername}`)}>
+                                                    @{activity.actorUsername}
+                                                </p>
                                                 <p className="feed-card__message">{message}</p>
                                             </div>
                                             {imageUrl && (
