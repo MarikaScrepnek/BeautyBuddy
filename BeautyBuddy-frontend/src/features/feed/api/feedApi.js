@@ -14,7 +14,7 @@ export async function fetchFeed() {
 
 export async function fetchUserActivities(username) {
   try {
-    const response = await fetch(`/api/activities/user/${username}`);
+    const response = await fetch(`/api/activities/${username}`);
     if (!response.ok) {
       throw new Error('Failed to fetch user activities');
     }
