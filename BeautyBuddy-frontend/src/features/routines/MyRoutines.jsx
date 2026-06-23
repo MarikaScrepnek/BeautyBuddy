@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { getCurrentUser } from '../auth/api/authApi';
 
 import Wishlist from '../wishlist/components/Wishlist';
+import Profile from './components/Profile';
 
 import "./MyRoutines.css";
 import SelectedRoutine from './components/SelectedRoutine';
@@ -18,7 +19,7 @@ export default function MyRoutines() {
   const [username, setUsername] = useState("");
 
   // sidebar state
-  const [selected, setSelected] = useState("Wishlist");
+  const [selected, setSelected] = useState("Profile");
   const [selectedRoutine, setSelectedRoutine] = useState(null);
 
   const [makeupRoutines, setMakeupRoutines] = useState([]);
@@ -175,6 +176,10 @@ export default function MyRoutines() {
       </aside>
       
       <main style={{ flex: 1, padding: "0 2rem" }}>
+
+        {selected === "Profile" &&
+        <Profile username={username} />
+        }
 
         {selected === "Wishlist" && 
         <Wishlist isLoggedIn={isLoggedIn} />
