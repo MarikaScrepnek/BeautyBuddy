@@ -236,7 +236,7 @@ public class DTOMapper {
                 activity.getAction(),
                 activity.getActor() != null ? activity.getActor().getUsername() : null,
                 activity.getPayload(),
-                activity.getCreatedAt().toString(),
+                activity.getCreatedAt(),
                 extractImageUrlFromPayload(activity.getPayload())
         );
     }
