@@ -44,8 +44,7 @@ export default function Profile({ username }) {
     
     return (
         <div style={{ marginTop: '1rem' }}>
-            <h1 style={{ textAlign: 'center' }}>Welcome to your BeautyBuddy Profile!</h1>
-            <p style={{ textAlign: 'center', marginBottom: '1.5rem' }}>Manage your profile information and preferences here.</p>
+            <h1 style={{ textAlign: 'center' }}>{username}'s Activities</h1>
 
             {activities.length > 0 ? (
                 <div className="feed-posts">
