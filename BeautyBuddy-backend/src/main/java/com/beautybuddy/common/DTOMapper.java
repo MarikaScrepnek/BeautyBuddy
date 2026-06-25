@@ -13,6 +13,8 @@ import com.beautybuddy.breakout.dto.DisplayBreakoutListProductDTO;
 import com.beautybuddy.breakout.entity.BreakoutListProduct;
 import com.beautybuddy.category.Category;
 import com.beautybuddy.category.CategoryDTO;
+import com.beautybuddy.community.activity.entity.Activity;
+import com.beautybuddy.community.dto.ActivityDTO;
 import com.beautybuddy.ingredient.dto.IngredientDTO;
 import com.beautybuddy.ingredient.dto.MayContainIngredientDTO;
 import com.beautybuddy.ingredient.dto.ProductIngredientDTO;
@@ -32,8 +34,13 @@ import com.beautybuddy.routine.entity.RoutineItem;
 import com.beautybuddy.user.dto.UserSearchDTO;
 import com.beautybuddy.user.entity.User;
 import com.beautybuddy.user.repo.FollowRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class DTOMapper {
+
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     public static BrandDTO toBrandDTO(Brand brand) {
         return new BrandDTO(brand.getId(), brand.getName());
@@ -220,5 +227,46 @@ public class DTOMapper {
                 isFollowing,
                 isFollower,
                 isCurrentUser);
+    }
+
+    public static ActivityDTO toActivityDTO(Activity activity) {
+        return new ActivityDTO(
+                activity.getId(),
+                activity.getType(),
+                activity.getAction(),
+                activity.getActor() != null ? activity.getActor().getUsername() : null,
+                activity.getPayload(),
+                activity.getCreatedAt(),
+                extractImageUrlFromPayload(activity.getPayload())
+        );
+    }
+
+    private static String extractImageUrlFromPayload(String payload) {
+        if (payload == null || payload.isBlank()) {
+            return null;
+        }
+
+        try {
+            JsonNode root = OBJECT_MAPPER.readTree(payload);
+            JsonNode mediaImageUrl = root.path("media").path("imageUrl");
+            if (!mediaImageUrl.isMissingNode() && !mediaImageUrl.isNull()) {
+                String value = mediaImageUrl.asText();
+                if (!value.isBlank()) {
+                    return value;
+                }
+            }
+
+            JsonNode legacyImageUrl = root.path("imageUrl");
+            if (!legacyImageUrl.isMissingNode() && !legacyImageUrl.isNull()) {
+                String value = legacyImageUrl.asText();
+                if (!value.isBlank()) {
+                    return value;
+                }
+            }
+        } catch (JsonProcessingException exception) {
+            return null;
+        }
+
+        return null;
     }
 }

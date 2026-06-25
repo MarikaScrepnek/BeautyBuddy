@@ -1,0 +1,18 @@
+package com.beautybuddy.community.activity.entity;
+
+public enum ActivityType {
+    REVIEW_CREATED,
+    REVIEW_EDITED,
+    ROUTINE_CREATED,
+    ROUTINE_ITEM_ADDED,
+    ROUTINE_ITEM_REMOVED,
+    ROUTINE_IMAGE_ADDED,
+    WISHLIST_ITEM_ADDED,
+    WISHLIST_ITEM_REMOVED,
+    BREAKOUTLIST_ITEM_ADDED,
+    BREAKOUTLIST_ITEM_REMOVED,
+    BREAKOUTLIST_INGREDIENT_ADDED,
+    BREAKOUTLIST_INGREDIENT_REMOVED
+}
+
+// add breakoutlist item / product

@@ -21,7 +21,6 @@ export default function BreakoutList() {
     useEffect(() => {
         getBreakoutListProducts()
             .then(data => {
-                console.log("Breakout List:", data);
                 setBreakoutListProducts(data);
             })
             .catch(error => {

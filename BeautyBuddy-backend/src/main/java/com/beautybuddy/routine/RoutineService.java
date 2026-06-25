@@ -14,11 +14,14 @@ import org.springframework.web.server.ResponseStatusException;
 import com.beautybuddy.category.Category;
 import com.beautybuddy.category.CategoryRepository;
 import com.beautybuddy.common.DTOMapper;
+import com.beautybuddy.community.activity.ActivityService;
+import com.beautybuddy.community.activity.entity.ActivityType;
 import com.beautybuddy.config.RedisCacheConfig;
 import com.beautybuddy.product.entity.Product;
 import com.beautybuddy.product.entity.ProductShade;
 import com.beautybuddy.product.repo.ProductRepository;
 import com.beautybuddy.product.repo.ProductShadeRepository;
+import com.beautybuddy.review.ReviewRepository;
 import com.beautybuddy.routine.dto.AddToRoutineRequestDTO;
 import com.beautybuddy.routine.dto.CreateMakeupRoutineRequestDTO;
 import com.beautybuddy.routine.dto.DisplayRoutineDTO;
@@ -27,9 +30,8 @@ import com.beautybuddy.routine.entity.OccasionEnum;
 import com.beautybuddy.routine.entity.Routine;
 import com.beautybuddy.routine.entity.RoutineItem;
 import com.beautybuddy.routine.repo.RoutineRepository;
-import com.beautybuddy.user.repo.UserRepository;
 import com.beautybuddy.user.entity.User;
-import com.beautybuddy.review.ReviewRepository;
+import com.beautybuddy.user.repo.UserRepository;
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -44,18 +46,21 @@ public class RoutineService {
     private final ProductShadeRepository productShadeRepository;
     private final ReviewRepository reviewRepository;
 
+    private final ActivityService activityService;
+
     private final Counter routineCreationCounter;
     private final Counter routineUpdateCounter;
     private final Counter routineAddProductCounter;
     private final Counter routineRemoveProductCounter;
 
-    public RoutineService(UserRepository userRepository, CategoryRepository categoryRepository, RoutineRepository routineRepository, ReviewRepository reviewRepository, ProductRepository productRepository, ProductShadeRepository productShadeRepository, MeterRegistry meterRegistry) {
+    public RoutineService(UserRepository userRepository, CategoryRepository categoryRepository, RoutineRepository routineRepository, ReviewRepository reviewRepository, ProductRepository productRepository, ProductShadeRepository productShadeRepository, MeterRegistry meterRegistry, ActivityService activityService) {
         this.userRepository = userRepository;
         this.categoryRepository = categoryRepository;
         this.routineRepository = routineRepository;
         this.productRepository = productRepository;
         this.productShadeRepository = productShadeRepository;
         this.reviewRepository = reviewRepository;
+        this.activityService = activityService;
         this.routineCreationCounter = Counter.builder("routine_creation_total")
                 .description("Total number of routines created")
                 .register(meterRegistry);
@@ -144,8 +149,21 @@ public class RoutineService {
         routine.setNotes(request.notes());
         routine.setOccasion(request.occasion());
 
-        routineRepository.save(routine);
+        Routine savedRoutine = routineRepository.save(routine);
         routineCreationCounter.increment();
+
+        String routineName = savedRoutine.getName() != null && !savedRoutine.getName().isBlank()
+                ? savedRoutine.getName()
+                : "Routine";
+        String occasionLabel = savedRoutine.getOccasion() != null
+                ? savedRoutine.getOccasion().name().toLowerCase()
+                : "custom";
+        activityService.createActivity(
+                user,
+                ActivityType.ROUTINE_CREATED,
+                savedRoutine.getId(),
+                "Created routine " + routineName + " for " + occasionLabel + " occasion"
+        );
     }
 
     @CacheEvict(cacheNames = RedisCacheConfig.ROUTINE_CACHE, allEntries = true)
@@ -179,8 +197,23 @@ public class RoutineService {
         item.setStepOrder(stepOrder);
 
         routine.getItems().add(item);
-        routineRepository.save(routine);
+        Routine savedRoutine = routineRepository.save(routine);
         routineAddProductCounter.increment();
+        String routineDisplayName = savedRoutine.getName() != null && !savedRoutine.getName().isBlank()
+                ? savedRoutine.getName()
+                : "Routine";
+
+        activityService.createActivity(
+                user,
+                ActivityType.ROUTINE_ITEM_ADDED,
+                item.getId(),
+                "Added " + product.getBrand().getName() + " " + product.getName() + (shade != null ? " in shade " + shade.getShadeName() : "") + " to routine " + routineDisplayName,
+                product.getId(),
+                product.getName(),
+                shade != null ? shade.getId() : null,
+                shade != null ? shade.getShadeName() : null,
+                shade != null && shade.getImageLink() != null ? shade.getImageLink() : product.getImageLink()
+        );
     }
 
     @CacheEvict(cacheNames = RedisCacheConfig.ROUTINE_CACHE, allEntries = true)
@@ -290,6 +323,25 @@ public class RoutineService {
         itemToRemove.setValidTo(LocalDateTime.now());
         routineRepository.save(routine);
         routineRemoveProductCounter.increment();
+
+        Product removedProduct = itemToRemove.getProduct();
+        ProductShade removedShade = itemToRemove.getShade();
+        String routineDisplayName = routine.getName() != null && !routine.getName().isBlank()
+                ? routine.getName()
+                : "Routine";
+        activityService.createActivity(
+                user,
+                ActivityType.ROUTINE_ITEM_REMOVED,
+                itemToRemove.getId(),
+                "Removed " + removedProduct.getBrand().getName() + " " + removedProduct.getName() + (removedShade != null ? " in shade " + removedShade.getShadeName() : "") + " from routine " + routineDisplayName,
+                removedProduct.getId(),
+                removedProduct.getName(),
+                removedShade != null ? removedShade.getId() : null,
+                removedShade != null ? removedShade.getShadeName() : null,
+                removedShade != null && removedShade.getImageLink() != null
+                ? removedShade.getImageLink()
+                : removedProduct.getImageLink()
+        );
     }
 
 }

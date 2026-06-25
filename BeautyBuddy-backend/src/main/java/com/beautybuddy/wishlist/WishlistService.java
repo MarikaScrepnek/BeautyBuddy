@@ -1,26 +1,29 @@
 package com.beautybuddy.wishlist;
 
-import com.beautybuddy.config.RedisCacheConfig;
-import com.beautybuddy.product.entity.Product;
-import com.beautybuddy.product.entity.ProductShade;
-import com.beautybuddy.product.repo.ProductRepository;
-import com.beautybuddy.product.repo.ProductShadeRepository;
-import com.beautybuddy.user.repo.UserRepository;
-import com.beautybuddy.user.entity.User;
-import com.beautybuddy.wishlist.dto.AddToWishlistRequestDTO;
-import com.beautybuddy.wishlist.dto.WishlistItemDTO;
-import com.beautybuddy.wishlist.entity.Wishlist;
-import com.beautybuddy.wishlist.entity.WishlistItem;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.beautybuddy.community.activity.ActivityService;
+import com.beautybuddy.community.activity.entity.ActivityType;
+import com.beautybuddy.config.RedisCacheConfig;
+import com.beautybuddy.product.entity.Product;
+import com.beautybuddy.product.entity.ProductShade;
+import com.beautybuddy.product.repo.ProductRepository;
+import com.beautybuddy.product.repo.ProductShadeRepository;
+import com.beautybuddy.user.entity.User;
+import com.beautybuddy.user.repo.UserRepository;
+import com.beautybuddy.wishlist.dto.AddToWishlistRequestDTO;
+import com.beautybuddy.wishlist.dto.WishlistItemDTO;
+import com.beautybuddy.wishlist.entity.Wishlist;
+import com.beautybuddy.wishlist.entity.WishlistItem;
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -36,7 +39,9 @@ public class WishlistService {
     private final Counter wishlistAddCounter;
     private final Counter wishlistRemoveCounter;
 
-    public WishlistService(UserRepository userRepository, ProductRepository productRepository, ProductShadeRepository shadeRepository, WishlistItemRepository wishlistItemRepository, MeterRegistry meterRegistry) {
+    private final ActivityService activityService;
+
+    public WishlistService(UserRepository userRepository, ProductRepository productRepository, ProductShadeRepository shadeRepository, WishlistItemRepository wishlistItemRepository, MeterRegistry meterRegistry, ActivityService activityService) {
         this.userRepository = userRepository;
         this.productRepository = productRepository;
         this.shadeRepository = shadeRepository;
@@ -47,6 +52,7 @@ public class WishlistService {
         this.wishlistRemoveCounter = Counter.builder("wishlist_remove_total")
                 .description("Total number of items removed from wishlists")
                 .register(meterRegistry);
+        this.activityService = activityService;
     }
 
     @Transactional
@@ -75,8 +81,20 @@ public class WishlistService {
         item.setProduct(product);
         item.setShade(shade);
 
-        wishlistItemRepository.save(item);
+        WishlistItem savedItem = wishlistItemRepository.save(item);
         wishlistAddCounter.increment();
+
+        activityService.createActivity(
+                user,
+                ActivityType.WISHLIST_ITEM_ADDED,
+                savedItem.getId(),
+                "Added " + product.getBrand().getName() + " " + product.getName() + (shade != null ? " in shade " + shade.getShadeName() : "") + " to wishlist",
+                product.getId(),
+                product.getName(),
+                shade != null ? shade.getId() : null,
+                shade != null ? shade.getShadeName() : null,
+                shade != null && shade.getImageLink() != null ? shade.getImageLink() : product.getImageLink()
+        );
     }
 
     @Cacheable(cacheNames = RedisCacheConfig.WISHLIST_CACHE, key = "#username")
@@ -142,24 +160,24 @@ public class WishlistService {
             if (priceRange != null) {
                 BigDecimal price = dto.price();
                 switch (priceRange) {
-                    case "below_20":
+                    case "below_20" -> {
                         if (price.compareTo(new BigDecimal("20")) >= 0) {
                             continue;
                         }
-                        break;
-                    case "20_50":
+                    }
+                    case "20_50" -> {
                         if (price.compareTo(new BigDecimal("20")) < 0
                                 || price.compareTo(new BigDecimal("50")) > 0) {
                             continue;
                         }
-                        break;
-                    case "above_50":
+                    }
+                    case "above_50" -> {
                         if (price.compareTo(new BigDecimal("50")) <= 0) {
                             continue;
                         }
-                        break;
-                    default:
-                        break;
+                    }
+                    default -> {
+                    }
                 }
             }
 
@@ -255,7 +273,7 @@ public class WishlistService {
         List<WishlistItem> items = wishlistItemRepository.findByWishlist_User_Email(email);
         WishlistItem target = null;
         for (WishlistItem item : items) {
-            if (item.getProduct().getId() == request.productId()) {
+            if (Objects.equals(item.getProduct().getId(), request.productId())) {
                 if (request.shadeName() == null && item.getShade() == null) {
                     target = item;
                     break;
@@ -266,8 +284,22 @@ public class WishlistService {
             }
         }
         if (target != null) {
+            Long targetId = target.getId();
             wishlistItemRepository.delete(target);
             wishlistRemoveCounter.increment();
+            activityService.createActivity(
+                    target.getWishlist().getUser(),
+                    ActivityType.WISHLIST_ITEM_REMOVED,
+                    targetId,
+                    "Removed " + target.getProduct().getBrand().getName() + " " + target.getProduct().getName() + (target.getShade() != null ? " in shade " + target.getShade().getShadeName() : "") + " from wishlist",
+                    target.getProduct().getId(),
+                    target.getProduct().getName(),
+                    target.getShade() != null ? target.getShade().getId() : null,
+                    target.getShade() != null ? target.getShade().getShadeName() : null,
+                    target.getShade() != null && target.getShade().getImageLink() != null
+                    ? target.getShade().getImageLink()
+                    : target.getProduct().getImageLink()
+            );
         } else {
             throw new RuntimeException("Wishlist item not found");
         }
@@ -299,28 +331,31 @@ public class WishlistService {
             ));
         }
 
-        if (type.equals("price_asc")) {
-            result.sort((a, b) -> a.price().compareTo(b.price()));
-        } else if (type.equals("price_desc")) {
-            result.sort((a, b) -> b.price().compareTo(a.price()));
-        } else if (type.equals("rating_desc")) {
-            result.sort(
-                    Comparator.comparing(
-                            WishlistItemDTO::rating,
-                            Comparator.nullsFirst(BigDecimal::compareTo)
-                    ).reversed()
-            );
-        } else if (type.equals("rating_asc")) {
-            result.sort(
-                    Comparator.comparing(
-                            WishlistItemDTO::rating,
-                            Comparator.nullsLast(BigDecimal::compareTo)
-                    )
-            );
-        } else if (type.equals("added_asc")) {
-            result.sort((a, b) -> a.dateAdded().compareTo(b.dateAdded()));
-        } else if (type.equals("added_desc")) {
-            result.sort((a, b) -> b.dateAdded().compareTo(a.dateAdded()));
+        switch (type) {
+            case "price_asc" ->
+                result.sort((a, b) -> a.price().compareTo(b.price()));
+            case "price_desc" ->
+                result.sort((a, b) -> b.price().compareTo(a.price()));
+            case "rating_desc" ->
+                result.sort(
+                        Comparator.comparing(
+                                WishlistItemDTO::rating,
+                                Comparator.nullsFirst(BigDecimal::compareTo)
+                        ).reversed()
+                );
+            case "rating_asc" ->
+                result.sort(
+                        Comparator.comparing(
+                                WishlistItemDTO::rating,
+                                Comparator.nullsLast(BigDecimal::compareTo)
+                        )
+                );
+            case "added_asc" ->
+                result.sort((a, b) -> a.dateAdded().compareTo(b.dateAdded()));
+            case "added_desc" ->
+                result.sort((a, b) -> b.dateAdded().compareTo(a.dateAdded()));
+            default -> {
+            }
         }
 
         return result;

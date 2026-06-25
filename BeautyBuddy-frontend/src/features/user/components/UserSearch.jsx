@@ -34,7 +34,6 @@ export default function UserSearch({ isSearching, setIsSearching }) {
     async function handleGetCurrentUser() {
         try {
             const user = await getCurrentUser();
-            console.log('Current user:', user);
             setCurrentUser(user);
             return user;
         } catch (error) {
@@ -47,7 +46,6 @@ export default function UserSearch({ isSearching, setIsSearching }) {
         if (!currentUser) return;
         try {
             await followUser(username);
-            console.log(`Followed ${username}`);
             setUsers(prevUsers => prevUsers.map(user => {
                 if (user.username === username) {
                     return { ...user, isFollowing: true };
@@ -63,7 +61,6 @@ export default function UserSearch({ isSearching, setIsSearching }) {
         if (!currentUser) return;
         try {
             await unfollowUser(username);
-            console.log(`Unfollowed ${username}`);
             setUsers(prevUsers => prevUsers.map(user => {
                 if (user.username === username) {
                     return { ...user, isFollowing: false };

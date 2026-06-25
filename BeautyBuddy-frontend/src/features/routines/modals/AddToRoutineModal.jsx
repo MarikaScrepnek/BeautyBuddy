@@ -105,7 +105,6 @@ export default function AddToRoutineModal({ baseCategoryName, productName, produ
         getMakeupRoutines()
             .then(data => {
                 setMakeupRoutines(data);
-                console.log("Fetched makeup routines:", data);
             })
             .catch(error => {
                 console.error("Error fetching makeup routines:", error);
@@ -113,7 +112,6 @@ export default function AddToRoutineModal({ baseCategoryName, productName, produ
         getSkincareRoutines()
             .then(data => {
                 setSkincareRoutines(data);
-                console.log("Fetched skincare routines:", data);
             })
             .catch(error => {
                 console.error("Error fetching skincare routines:", error);
@@ -121,7 +119,6 @@ export default function AddToRoutineModal({ baseCategoryName, productName, produ
         getHaircareRoutine()
             .then(data => {
                 setHaircareRoutine(data);
-                console.log("Fetched haircare routine:", data);
             })
             .catch(error => {
                 console.error("Error fetching haircare routine:", error);
