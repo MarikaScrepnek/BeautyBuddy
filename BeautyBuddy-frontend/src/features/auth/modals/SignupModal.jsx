@@ -81,6 +81,44 @@ export default function SignupModal({ onClose, onSwitchToLogin}) {
             </button>
           </div>
 
+          <input type="password" placeholder="Confirm Password" required />
+
+          <select type="pronouns" placeholder="Pronouns (optional)">
+            <option value="">Select Pronouns</option>
+            <option value="she/her">She/Her</option>
+            <option value="he/him">He/Him</option>
+            <option value="they/them">They/Them</option>
+            <option value="other">Other</option>
+          </select>
+
+          <datetime-local type="birthday" placeholder="Birthday (optional)" />
+
+          <select type="country" placeholder="Country (optional)">
+            <option value="">Select Country</option>
+            <option value="USA">United States</option>
+            <option value="Canada">Canada</option>
+            <option value="UK">United Kingdom</option>
+            <option value="Australia">Australia</option>
+            <option value="Other">Other</option>
+          </select>
+
+          <select type="skintype" placeholder="Skin Type (optional)">
+            <option value="">Select Skin Type</option>
+            <option value="oily">Oily</option>
+            <option value="dry">Dry</option>
+            <option value="combination">Combination</option>
+            <option value="sensitive">Sensitive</option>
+            <option value="normal">Normal</option>
+          </select>
+
+          <select type="hairtype" placeholder="Hair Type (optional)">
+            <option value="">Select Hair Type</option>
+            <option value="straight">Straight</option>
+            <option value="wavy">Wavy</option>
+            <option value="curly">Curly</option>
+            <option value="coily">Coily</option>
+          </select>
+
           <button type="submit" className="modal-signup-button" disabled={loading}>
             {loading ? "Signing up..." : "Sign Up"}
           </button>
