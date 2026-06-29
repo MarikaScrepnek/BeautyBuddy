@@ -36,7 +36,6 @@ export default function Profile({ username }) {
         try {
             const data = await fetchUserActivities(username);
             setActivities(Array.isArray(data?.content) ? data.content.map(normalizeFeedItem) : []);
-            console.log('User activities:', data);
         } catch (error) {
             console.error('Error fetching user activities:', error);
         }
