@@ -45,7 +45,6 @@ export default function Feed() {
         try {
             const feedData = await fetchFeed();
             setFeed(Array.isArray(feedData?.content) ? feedData.content.map(normalizeFeedItem) : []);
-            console.log('Fetched feed:', feedData);
         } catch (error) {
             console.error('Error fetching feed:', error);
         }
