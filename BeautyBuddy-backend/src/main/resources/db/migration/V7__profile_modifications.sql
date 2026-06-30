@@ -1,7 +1,9 @@
 ALTER TABLE account
-    ADD COLUMN country VARCHAR(100),
+    ADD NONNULL COLUMN country VARCHAR(100),
     ADD COLUMN pronouns VARCHAR(50),
-    ADD COLUMN date_of_birth DATE
+    ADD COLUMN date_of_birth DATE,
+    ADD COLUMN bio VARCHAR(500),
+    ADD COLUMN first_name VARCHAR(100)
 
 CREATE ENUM pronouns_enum AS ENUM ('he/him', 'she/her', 'they/them', 'other');
 
