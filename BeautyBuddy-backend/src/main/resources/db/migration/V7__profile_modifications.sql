@@ -12,3 +12,9 @@ CREATE ENUM country_enum AS ENUM (
     'France', 'Italy', 'Spain', 'India', 'China', 'Japan', 'Brazil', 
     'Mexico', 'Russia', 'South Africa', 'Other'
 );
+
+CREATE ENUM hair_texture_enum AS ENUM ('straight', 'wavy', 'curly', 'coily', 'other');
+CREATE ENUM hair_density_enum AS ENUM ('thin', 'medium', 'thick', 'other');
+
+CREATE ENUM skin_type_enum AS ENUM ('oily', 'dry', 'combination', 'other');
+CREATE ENUM skin_condition_enum AS ENUM ('sensitive', 'normal', 'acne-prone');
