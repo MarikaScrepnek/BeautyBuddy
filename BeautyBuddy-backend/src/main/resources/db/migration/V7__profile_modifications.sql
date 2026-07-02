@@ -1,9 +1,13 @@
 ALTER TABLE account
     ADD NONNULL COLUMN country VARCHAR(100),
-    ADD COLUMN pronouns VARCHAR(50),
+    ADD COLUMN pronouns pronouns_enum,
     ADD COLUMN date_of_birth DATE,
     ADD COLUMN bio VARCHAR(500),
-    ADD COLUMN first_name VARCHAR(100)
+    ADD COLUMN first_name VARCHAR(100),
+    ADD COLUMN hair_texture hair_texture_enum,
+    ADD COLUMN hair_density hair_density_enum,
+    ADD COLUMN skin_type skin_type_enum,
+    ADD COLUMN skin_condition skin_condition_enum;
 
 CREATE ENUM pronouns_enum AS ENUM ('he/him', 'she/her', 'they/them', 'other');
 
