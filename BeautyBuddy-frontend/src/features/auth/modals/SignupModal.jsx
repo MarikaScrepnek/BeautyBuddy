@@ -13,6 +13,12 @@ export default function SignupModal({ onClose, onSwitchToLogin}) {
   const[error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const[pronouns, setPronouns] = useState("");
+  const[birthday, setBirthday] = useState("");
+  const[country, setCountry] = useState("");
+  const[skintype, setSkintype] = useState("");
+  const[hairtype, setHairtype] = useState("");
+
   useEffect(() => {
     const handleEsc = (e) => {
       if (e.key === "Escape") onClose();
@@ -30,7 +36,7 @@ export default function SignupModal({ onClose, onSwitchToLogin}) {
     setError("");
 
     try {
-      const result = await registerUser(email, username, password);
+      const result = await registerUser(email, username, password, pronouns, birthday, country, skintype, hairtype);
       if (result.error) {
         setError(result.error);
       } else {
@@ -83,7 +89,12 @@ export default function SignupModal({ onClose, onSwitchToLogin}) {
 
           <input type="password" placeholder="Confirm Password" required />
 
-          <select type="pronouns" placeholder="Pronouns (optional)">
+          <select
+            type="pronouns"
+            placeholder="Pronouns (optional)"
+            value={pronouns}
+            onChange={(e) => setPronouns(e.target.value)}
+          >
             <option value="">Select Pronouns</option>
             <option value="she/her">She/Her</option>
             <option value="he/him">He/Him</option>
@@ -91,9 +102,19 @@ export default function SignupModal({ onClose, onSwitchToLogin}) {
             <option value="other">Other</option>
           </select>
 
-          <datetime-local type="birthday" placeholder="Birthday (optional)" />
+          <datetime-local 
+            type="birthday" 
+            placeholder="Birthday (optional)" 
+            value={birthday}
+            onChange={(e) => setBirthday(e.target.value)}
+          />
 
-          <select type="country" placeholder="Country (optional)">
+          <select 
+            type="country" 
+            placeholder="Country (optional)" 
+            value={country}
+            onChange={(e) => setCountry(e.target.value)}
+          >
             <option value="">Select Country</option>
             <option value="USA">United States</option>
             <option value="Canada">Canada</option>
@@ -102,7 +123,12 @@ export default function SignupModal({ onClose, onSwitchToLogin}) {
             <option value="Other">Other</option>
           </select>
 
-          <select type="skintype" placeholder="Skin Type (optional)">
+          <select 
+            type="skintype" 
+            placeholder="Skin Type (optional)" 
+            value={skintype}
+            onChange={(e) => setSkintype(e.target.value)}
+          >
             <option value="">Select Skin Type</option>
             <option value="oily">Oily</option>
             <option value="dry">Dry</option>
@@ -111,7 +137,12 @@ export default function SignupModal({ onClose, onSwitchToLogin}) {
             <option value="normal">Normal</option>
           </select>
 
-          <select type="hairtype" placeholder="Hair Type (optional)">
+          <select 
+            type="hairtype" 
+            placeholder="Hair Type (optional)" 
+            value={hairtype}
+            onChange={(e) => setHairtype(e.target.value)}
+          >
             <option value="">Select Hair Type</option>
             <option value="straight">Straight</option>
             <option value="wavy">Wavy</option>
