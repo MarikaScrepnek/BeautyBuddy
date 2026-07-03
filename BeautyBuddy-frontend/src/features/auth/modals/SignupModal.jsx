@@ -17,7 +17,9 @@ export default function SignupModal({ onClose, onSwitchToLogin}) {
   const[birthday, setBirthday] = useState("");
   const[country, setCountry] = useState("");
   const[skintype, setSkintype] = useState("");
+  const[skincondition, setSkincondition] = useState("");
   const[hairtype, setHairtype] = useState("");
+  const[hairdensity, setHairdensity] = useState("");
 
   useEffect(() => {
     const handleEsc = (e) => {
@@ -36,7 +38,7 @@ export default function SignupModal({ onClose, onSwitchToLogin}) {
     setError("");
 
     try {
-      const result = await registerUser(email, username, password, pronouns, birthday, country, skintype, hairtype);
+      const result = await registerUser(email, username, password, pronouns, birthday, country, skintype, skincondition, hairtype, hairdensity);
       if (result.error) {
         setError(result.error);
       } else {
@@ -133,8 +135,19 @@ export default function SignupModal({ onClose, onSwitchToLogin}) {
             <option value="oily">Oily</option>
             <option value="dry">Dry</option>
             <option value="combination">Combination</option>
-            <option value="sensitive">Sensitive</option>
+            <option value="other">Other</option>
+          </select>
+
+          <select
+            type="skincondition"
+            placeholder="Skin Condition (optional)"
+            value={skincondition}
+            onChange={(e) => setSkincondition(e.target.value)}
+          >
+            <option value="">Select Skin Condition</option>
             <option value="normal">Normal</option>
+            <option value="sensitive">Sensitive</option>
+            <option value="acne-prone">Acne Prone</option>
           </select>
 
           <select 
@@ -148,6 +161,20 @@ export default function SignupModal({ onClose, onSwitchToLogin}) {
             <option value="wavy">Wavy</option>
             <option value="curly">Curly</option>
             <option value="coily">Coily</option>
+            <option value="other">Other</option>
+          </select>
+
+          <select
+            type="hairdensity"
+            placeholder="Hair Density (optional)"
+            value={hairdensity}
+            onChange={(e) => setHairdensity(e.target.value)}
+          >
+            <option value="">Select Hair Density</option>
+            <option value="thin">Thin</option>
+            <option value="medium">Medium</option>
+            <option value="thick">Thick</option>
+            <option value="other">Other</option>
           </select>
 
           <button type="submit" className="modal-signup-button" disabled={loading}>
