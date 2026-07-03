@@ -5,6 +5,9 @@ import { useState } from "react";
 import { registerUser } from "../api/authApi";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+
 export default function SignupModal({ onClose, onSwitchToLogin}) {
   const[email, setEmail] = useState("");
   const[username, setUsername] = useState("");
@@ -14,7 +17,7 @@ export default function SignupModal({ onClose, onSwitchToLogin}) {
   const [loading, setLoading] = useState(false);
 
   const[pronouns, setPronouns] = useState("");
-  const[birthday, setBirthday] = useState("");
+  const[birthday, setBirthday] = useState(null);
   const[country, setCountry] = useState("");
   const[skintype, setSkintype] = useState("");
   const[skincondition, setSkincondition] = useState("");
@@ -104,11 +107,10 @@ export default function SignupModal({ onClose, onSwitchToLogin}) {
             <option value="other">Other</option>
           </select>
 
-          <datetime-local 
-            type="birthday" 
-            placeholder="Birthday (optional)" 
-            value={birthday}
-            onChange={(e) => setBirthday(e.target.value)}
+          <DatePicker
+            selected={birthday}
+            onChange={(date) => setBirthday(date)}
+            placeholderText="Birthday (optional)"
           />
 
           <select 
