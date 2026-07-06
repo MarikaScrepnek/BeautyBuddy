@@ -2,13 +2,13 @@ import { API_BASE_URL } from '../../../config/apiBase';
 
 const AUTH_BASE = `${API_BASE_URL}/auth`;
 
-export async function registerUser(email, username, password) {
+export async function registerUser(email, username, password, pronouns, birthday, country, skintype, skincondition, hairtype, hairdensity) {
     const res = await fetch(`${AUTH_BASE}/register`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ username, email, password }),
+        body: JSON.stringify({ username, email, password, pronouns, birthday, country, skintype, skincondition, hairtype, hairdensity }),
     });
     return res.json();
 }
