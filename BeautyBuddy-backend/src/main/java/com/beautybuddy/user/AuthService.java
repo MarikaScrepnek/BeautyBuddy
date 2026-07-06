@@ -1,5 +1,6 @@
 package com.beautybuddy.user;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -52,6 +53,27 @@ public class AuthService {
         user.setUsername(username);
         user.setEmail(email);
         user.setPasswordHash(hash);
+        if (!"".equals(pronouns)) {
+            user.setPronouns(pronouns);
+        }
+        if (!"".equals(birthday)) {
+            user.setDateOfBirth(LocalDate.parse(birthday));
+        }
+        if (!"".equals(country)) {
+            user.setCountry(country);
+        }
+        if (!"".equals(skintype)) {
+            user.setSkinType(skintype);
+        }
+        if (!"".equals(skincondition)) {
+            user.setSkinCondition(skincondition);
+        }
+        if (!"".equals(hairtype)) {
+            user.setHairTexture(hairtype);
+        }
+        if (!"".equals(hairdensity)) {
+            user.setHairDensity(hairdensity);
+        }
 
         Wishlist wishlist = new Wishlist();
         wishlist.setUser(user);
