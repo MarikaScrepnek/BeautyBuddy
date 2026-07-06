@@ -44,7 +44,7 @@ public class AuthService {
         this.breakoutListRepo = breakoutListRepo;
     }
 
-    public void register(String username, String email, String rawPassword) {
+    public void register(String username, String email, String rawPassword, String pronouns, String birthday, String country, String skintype, String skincondition, String hairtype, String hairdensity) {
         email = email.trim().toLowerCase();
         String hash = encoder.encode(rawPassword);
 

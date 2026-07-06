@@ -1,30 +1,30 @@
 package com.beautybuddy.user;
 
+import java.util.Map;
+
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseCookie;
-import org.springframework.security.core.Authentication;
-
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.Cookie;
-
-import java.util.Map;
 
 import com.beautybuddy.security.CustomUserDetails;
 import com.beautybuddy.security.JwtUtil;
 import com.beautybuddy.user.dto.UserDTO;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
+
     private final AuthService authService;
 
     public AuthController(AuthService authService) {
@@ -35,15 +35,22 @@ public class AuthController {
     public ResponseEntity<Map<String, String>> register(@RequestBody Map<String, String> request) {
         try {
             authService.register(
-                request.get("username"),
-                request.get("email"),
-                request.get("password")
+                    request.get("username"),
+                    request.get("email"),
+                    request.get("password"),
+                    request.get("pronouns"),
+                    request.get("birthday"),
+                    request.get("country"),
+                    request.get("skintype"),
+                    request.get("skincondition"),
+                    request.get("hairtype"),
+                    request.get("hairdensity")
             );
             return ResponseEntity.status(HttpStatus.CREATED)
-                .body(Map.of("message", "User registered successfully"));
+                    .body(Map.of("message", "User registered successfully"));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(Map.of("error", e.getMessage()));
+                    .body(Map.of("error", e.getMessage()));
         }
     }
 
@@ -51,37 +58,37 @@ public class AuthController {
     public ResponseEntity<Map<String, String>> login(@RequestBody Map<String, String> request, HttpServletRequest httpRequest) {
         try {
             boolean success = authService.login(
-                request.get("email"),
-                request.get("password") 
+                    request.get("email"),
+                    request.get("password")
             );
             if (success) {
                 String jwt = JwtUtil.generateToken(request.get("email"));
 
                 boolean isSecure = httpRequest.isSecure()
-                    || "https".equalsIgnoreCase(httpRequest.getHeader("X-Forwarded-Proto"));
+                        || "https".equalsIgnoreCase(httpRequest.getHeader("X-Forwarded-Proto"));
 
                 ResponseCookie cookie = ResponseCookie.from("jwt", jwt)
-                    .httpOnly(true)
-                    .secure(isSecure)
-                    .sameSite("Strict")
-                    .path("/")
-                    .maxAge(24 * 60 * 60)
-                    .build();
+                        .httpOnly(true)
+                        .secure(isSecure)
+                        .sameSite("Strict")
+                        .path("/")
+                        .maxAge(24 * 60 * 60)
+                        .build();
 
                 return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .body(Map.of("message", "Login successful"));
+                        .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                        .body(Map.of("message", "Login successful"));
             } else {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("error", "Invalid credentials"));
+                        .body(Map.of("error", "Invalid credentials"));
             }
         } catch (IllegalStateException e) {
             // Typically indicates a server-side configuration problem (e.g. JWT secret)
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(Map.of("error", "Authentication system is temporarily unavailable"));
+                    .body(Map.of("error", "Authentication system is temporarily unavailable"));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(Map.of("error", "Invalid credentials"));
+                    .body(Map.of("error", "Invalid credentials"));
         }
     }
 
@@ -100,7 +107,7 @@ public class AuthController {
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpServletRequest httpRequest, HttpServletResponse response) {
         boolean isSecure = httpRequest.isSecure()
-            || "https".equalsIgnoreCase(httpRequest.getHeader("X-Forwarded-Proto"));
+                || "https".equalsIgnoreCase(httpRequest.getHeader("X-Forwarded-Proto"));
 
         Cookie cookie = new Cookie("jwt", "");
         cookie.setHttpOnly(true);
