@@ -104,6 +104,18 @@ public class AuthController {
         return ResponseEntity.ok(userDTO);
     }
 
+    @GetMapping("/edit-profile")
+    public ResponseEntity<UserDTO> getEditProfile(Authentication authentication, @RequestBody Map<String, String> request) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.ok(null);
+        }
+
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        authService.updateProfile(userDetails.getUsername(), userDetails.getEmail(), request);
+
+        return ResponseEntity.ok().build();
+    }
+
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpServletRequest httpRequest, HttpServletResponse response) {
         boolean isSecure = httpRequest.isSecure()
