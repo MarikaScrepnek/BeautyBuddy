@@ -2,6 +2,7 @@ package com.beautybuddy.user;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Map;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -146,5 +147,34 @@ public class AuthService {
                 .orElseThrow(() -> new RuntimeException("user not found"));
 
         return encoder.matches(rawPassword, user.getPasswordHash());
+    }
+
+    public void updateProfile(String username, String email, Map<String, String> updates) {
+        User user = userRepo.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("user not found"));
+
+        if (updates.containsKey("pronouns")) {
+            user.setPronouns(updates.get("pronouns"));
+        }
+        if (updates.containsKey("birthday")) {
+            user.setDateOfBirth(LocalDate.parse(updates.get("birthday")));
+        }
+        if (updates.containsKey("country")) {
+            user.setCountry(updates.get("country"));
+        }
+        if (updates.containsKey("skintype")) {
+            user.setSkinType(updates.get("skintype"));
+        }
+        if (updates.containsKey("skincondition")) {
+            user.setSkinCondition(updates.get("skincondition"));
+        }
+        if (updates.containsKey("hairtype")) {
+            user.setHairTexture(updates.get("hairtype"));
+        }
+        if (updates.containsKey("hairdensity")) {
+            user.setHairDensity(updates.get("hairdensity"));
+        }
+
+        userRepo.save(user);
     }
 }
