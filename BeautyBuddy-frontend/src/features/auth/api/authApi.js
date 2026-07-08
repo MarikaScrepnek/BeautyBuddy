@@ -40,6 +40,18 @@ export async function getCurrentUser() {
     return data;
 }
 
+export async function editProfile(userId, updatedData) {
+    const res = await fetch(`${AUTH_BASE}/edit`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ userId, updatedData }),
+    });
+    return res.json();
+}
+
 export async function logoutUser() {
     const res = await fetch(`${AUTH_BASE}/logout`, {
         method: 'POST',
