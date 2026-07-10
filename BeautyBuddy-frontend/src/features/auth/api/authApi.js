@@ -40,14 +40,14 @@ export async function getCurrentUser() {
     return data;
 }
 
-export async function editProfile(userId, updatedData) {
+export async function editProfile(email, username, password, pronouns, birthday, country, skintype, skincondition, hairtype, hairdensity) {
     const res = await fetch(`${AUTH_BASE}/edit`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
         },
         credentials: 'include',
-        body: JSON.stringify({ userId, updatedData }),
+        body: JSON.stringify({ email, username, password, pronouns, birthday, country, skintype, skincondition, hairtype, hairdensity }),
     });
     return res.json();
 }
