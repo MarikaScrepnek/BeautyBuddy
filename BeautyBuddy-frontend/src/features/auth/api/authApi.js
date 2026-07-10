@@ -40,7 +40,7 @@ export async function getCurrentUser() {
     return data;
 }
 
-export async function editProfile(email, username, password, pronouns, birthday, country, skintype, skincondition, hairtype, hairdensity) {
+export async function editProfile(pronouns, birthday, country, skintype, skincondition, hairtype, hairdensity) {
     const res = await fetch(`${AUTH_BASE}/edit`, {
         method: 'PUT',
         headers: {
