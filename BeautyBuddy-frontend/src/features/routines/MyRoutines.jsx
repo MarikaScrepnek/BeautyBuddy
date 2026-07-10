@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-import { getCurrentUser } from '../auth/api/authApi';
+import { getCurrentUser, editProfile } from '../auth/api/authApi';
 
 import Wishlist from '../wishlist/components/Wishlist';
 import Profile from './components/Profile';
@@ -29,6 +29,14 @@ export default function MyRoutines() {
   const[createModalOpen, setCreateModalOpen] = useState(false);
 
   const [isOwner, setIsOwner] = useState(false);
+
+  function handleEditProfile(pronouns, birthday, country, skintype, skincondition, hairtype, hairdensity) {
+    editProfile(pronouns, birthday, country, skintype, skincondition, hairtype, hairdensity)
+      .then((updatedUser) => {
+        setUsername(updatedUser.username);
+      })
+      .catch((err) => console.error("Error updating profile:", err));
+  }
 
   // on mount
   useEffect(() => {
