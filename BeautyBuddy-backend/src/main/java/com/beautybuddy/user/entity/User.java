@@ -2,13 +2,23 @@ package com.beautybuddy.user.entity;
 
 import java.time.LocalDate;
 
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
+
 import com.beautybuddy.breakout.entity.BreakoutList;
 import com.beautybuddy.common.entity.SoftDeletableEntity;
+import com.beautybuddy.user.enums.CountryEnum;
+import com.beautybuddy.user.enums.HairDensityEnum;
+import com.beautybuddy.user.enums.HairTextureEnum;
+import com.beautybuddy.user.enums.PronounEnum;
+import com.beautybuddy.user.enums.SkinConditionEnum;
+import com.beautybuddy.user.enums.SkinTypeEnum;
 import com.beautybuddy.wishlist.entity.Wishlist;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
@@ -49,26 +59,38 @@ public class User extends SoftDeletableEntity {
     @Column(name = "first_name")
     private String firstName;
 
-    @Column(name = "country", nullable = false)
-    private String country;
+    @Enumerated
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+    @Column(columnDefinition = "country_enum", name = "country", nullable = true)
+    private CountryEnum country;
 
-    @Column(name = "pronouns")
-    private String pronouns;
+    @Enumerated
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+    @Column(columnDefinition = "pronoun_enum", name = "pronouns", nullable = true)
+    private PronounEnum pronouns;
 
     @Column(name = "bio")
     private String bio;
 
-    @Column(name = "hair_texture")
-    private String hairTexture;
+    @Enumerated
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+    @Column(columnDefinition = "hair_texture_enum", name = "hair_texture", nullable = true)
+    private HairTextureEnum hairTexture;
 
-    @Column(name = "hair_density")
-    private String hairDensity;
+    @Enumerated
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+    @Column(columnDefinition = "hair_density_enum", name = "hair_density", nullable = true)
+    private HairDensityEnum hairDensity;
 
-    @Column(name = "skin_type")
-    private String skinType;
+    @Enumerated
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+    @Column(columnDefinition = "skin_type_enum", name = "skin_type", nullable = true)
+    private SkinTypeEnum skinType;
 
-    @Column(name = "skin_condition")
-    private String skinCondition;
+    @Enumerated
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+    @Column(columnDefinition = "skin_condition_enum", name = "skin_condition", nullable = true)
+    private SkinConditionEnum skinCondition;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Wishlist wishlist;
@@ -180,19 +202,19 @@ public class User extends SoftDeletableEntity {
         this.firstName = firstName;
     }
 
-    public String getCountry() {
+    public CountryEnum getCountry() {
         return country;
     }
 
-    public void setCountry(String country) {
+    public void setCountry(CountryEnum country) {
         this.country = country;
     }
 
-    public String getPronouns() {
+    public PronounEnum getPronouns() {
         return pronouns;
     }
 
-    public void setPronouns(String pronouns) {
+    public void setPronouns(PronounEnum pronouns) {
         this.pronouns = pronouns;
     }
 
@@ -204,35 +226,35 @@ public class User extends SoftDeletableEntity {
         this.bio = bio;
     }
 
-    public String getHairTexture() {
+    public HairTextureEnum getHairTexture() {
         return hairTexture;
     }
 
-    public void setHairTexture(String hairTexture) {
+    public void setHairTexture(HairTextureEnum hairTexture) {
         this.hairTexture = hairTexture;
     }
 
-    public String getHairDensity() {
+    public HairDensityEnum getHairDensity() {
         return hairDensity;
     }
 
-    public void setHairDensity(String hairDensity) {
+    public void setHairDensity(HairDensityEnum hairDensity) {
         this.hairDensity = hairDensity;
     }
 
-    public String getSkinType() {
+    public SkinTypeEnum getSkinType() {
         return skinType;
     }
 
-    public void setSkinType(String skinType) {
+    public void setSkinType(SkinTypeEnum skinType) {
         this.skinType = skinType;
     }
 
-    public String getSkinCondition() {
+    public SkinConditionEnum getSkinCondition() {
         return skinCondition;
     }
 
-    public void setSkinCondition(String skinCondition) {
+    public void setSkinCondition(SkinConditionEnum skinCondition) {
         this.skinCondition = skinCondition;
     }
 }
