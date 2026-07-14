@@ -30,7 +30,7 @@ export default function MyRoutines() {
 
   const [isOwner, setIsOwner] = useState(false);
 
-  const [user, setUser] = useState(null);
+  const [profile, setProfile] = useState(null);
 
   function handleEditProfile(pronouns, birthday, country, skintype, skincondition, hairtype, hairdensity) {
     editProfile(pronouns, birthday, country, skintype, skincondition, hairtype, hairdensity)
@@ -72,9 +72,9 @@ export default function MyRoutines() {
 
       searchUsers(username)
       .then((users) => {
-        const currentUser = users.find((user) => user.username === username);
-        if (currentUser) {
-          setUser(currentUser);
+        const user = users.find((user) => user.username === username);
+        if (user) {
+          setProfile(user);
         } else {
           console.error("Current user not found in search results");
         }
@@ -100,6 +100,27 @@ export default function MyRoutines() {
 
     {isLoggedIn && isOwner && (
       <p style={{textAlign: "center", textDecoration: "underline", textDecorationColor: "#f0cef0"}}>Welcome back, {username}!</p>
+    )}
+
+    {!isOwner && (
+      <p style={{textAlign: "center", textDecoration: "underline", textDecorationColor: "#f0cef0"}}>Viewing {username}'s routines</p>
+    )}
+
+    {profile && (
+      <div style={{textAlign: "center", marginBottom: "1rem"}}>
+        <p>Pronouns: {profile.pronouns || "N/A"}</p>
+        <p>Birthday: {profile.birthday || "N/A"}</p>
+        <p>Country: {profile.country || "N/A"}</p>
+        <p>Skin Type: {profile.skintype || "N/A"}</p>
+        <p>Skin Condition: {profile.skincondition || "N/A"}</p>
+        <p>Hair Type: {profile.hairtype || "N/A"}</p>
+        <p>Hair Density: {profile.hairdensity || "N/A"}</p>
+        {isOwner && (
+          <button onClick={handleEditProfile}>
+            Edit Profile
+          </button>
+        )}
+      </div>
     )}
 
     <div style={{display: "flex", flexDirection: "row", minHeight: "80vh"}}>
