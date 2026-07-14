@@ -30,6 +30,8 @@ export default function MyRoutines() {
 
   const [isOwner, setIsOwner] = useState(false);
 
+  const [user, setUser] = useState(null);
+
   function handleEditProfile(pronouns, birthday, country, skintype, skincondition, hairtype, hairdensity) {
     editProfile(pronouns, birthday, country, skintype, skincondition, hairtype, hairdensity)
       .then((updatedUser) => {
@@ -67,6 +69,17 @@ export default function MyRoutines() {
         setHaircareRoutine(data);
       })
       .catch((err) => console.error("Error fetching haircare routine:", err));
+
+      searchUsers(username)
+      .then((users) => {
+        const currentUser = users.find((user) => user.username === username);
+        if (currentUser) {
+          setUser(currentUser);
+        } else {
+          console.error("Current user not found in search results");
+        }
+      })
+      .catch((err) => console.error("Error searching users:", err));
   }, []);
 
   return (
