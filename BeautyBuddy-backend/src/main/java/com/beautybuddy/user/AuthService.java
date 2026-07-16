@@ -17,6 +17,12 @@ import com.beautybuddy.routine.entity.Routine;
 import com.beautybuddy.routine.entity.TimeOfDayEnum;
 import com.beautybuddy.routine.repo.RoutineRepository;
 import com.beautybuddy.user.entity.User;
+import com.beautybuddy.user.enums.CountryEnum;
+import com.beautybuddy.user.enums.HairDensityEnum;
+import com.beautybuddy.user.enums.HairTextureEnum;
+import com.beautybuddy.user.enums.PronounEnum;
+import com.beautybuddy.user.enums.SkinConditionEnum;
+import com.beautybuddy.user.enums.SkinTypeEnum;
 import com.beautybuddy.user.repo.UserRepository;
 import com.beautybuddy.wishlist.entity.Wishlist;
 
@@ -55,25 +61,25 @@ public class AuthService {
         user.setEmail(email);
         user.setPasswordHash(hash);
         if (!"".equals(pronouns)) {
-            user.setPronouns(pronouns);
+            user.setPronouns(PronounEnum.valueOf(pronouns));
         }
         if (!"".equals(birthday)) {
             user.setDateOfBirth(LocalDate.parse(birthday));
         }
         if (!"".equals(country)) {
-            user.setCountry(country);
+            user.setCountry(CountryEnum.valueOf(country));
         }
         if (!"".equals(skintype)) {
-            user.setSkinType(skintype);
+            user.setSkinType(SkinTypeEnum.valueOf(skintype));
         }
         if (!"".equals(skincondition)) {
-            user.setSkinCondition(skincondition);
+            user.setSkinCondition(SkinConditionEnum.valueOf(skincondition));
         }
         if (!"".equals(hairtype)) {
-            user.setHairTexture(hairtype);
+            user.setHairTexture(HairTextureEnum.valueOf(hairtype));
         }
         if (!"".equals(hairdensity)) {
-            user.setHairDensity(hairdensity);
+            user.setHairDensity(HairDensityEnum.valueOf(hairdensity));
         }
 
         Wishlist wishlist = new Wishlist();
@@ -154,25 +160,25 @@ public class AuthService {
                 .orElseThrow(() -> new RuntimeException("user not found"));
 
         if (updates.containsKey("pronouns")) {
-            user.setPronouns(updates.get("pronouns"));
+            user.setPronouns(PronounEnum.valueOf(updates.get("pronouns")));
         }
         if (updates.containsKey("birthday")) {
             user.setDateOfBirth(LocalDate.parse(updates.get("birthday")));
         }
         if (updates.containsKey("country")) {
-            user.setCountry(updates.get("country"));
+            user.setCountry(CountryEnum.valueOf(updates.get("country")));
         }
         if (updates.containsKey("skintype")) {
-            user.setSkinType(updates.get("skintype"));
+            user.setSkinType(SkinTypeEnum.valueOf(updates.get("skintype")));
         }
         if (updates.containsKey("skincondition")) {
-            user.setSkinCondition(updates.get("skincondition"));
+            user.setSkinCondition(SkinConditionEnum.valueOf(updates.get("skincondition")));
         }
         if (updates.containsKey("hairtype")) {
-            user.setHairTexture(updates.get("hairtype"));
+            user.setHairTexture(HairTextureEnum.valueOf(updates.get("hairtype")));
         }
         if (updates.containsKey("hairdensity")) {
-            user.setHairDensity(updates.get("hairdensity"));
+            user.setHairDensity(HairDensityEnum.valueOf(updates.get("hairdensity")));
         }
 
         userRepo.save(user);
