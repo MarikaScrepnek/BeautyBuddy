@@ -11,6 +11,7 @@ import { getHaircareRoutine, getMakeupRoutines, getSkincareRoutines } from './ap
 
 import CreateRoutineModal from './modals/CreateRoutineModal';
 import BreakoutList from '../breakout/components/BreakoutList';
+import { searchUsers } from '../user/api/userApi';
 
 export default function MyRoutines() {
   // log in
