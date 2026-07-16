@@ -66,7 +66,7 @@ public class User extends SoftDeletableEntity {
 
     @Enumerated
     @JdbcType(PostgreSQLEnumJdbcType.class)
-    @Column(columnDefinition = "pronoun_enum", name = "pronouns", nullable = true)
+    @Column(columnDefinition = "pronouns_enum", name = "pronouns", nullable = true)
     private PronounEnum pronouns;
 
     @Column(name = "bio")
