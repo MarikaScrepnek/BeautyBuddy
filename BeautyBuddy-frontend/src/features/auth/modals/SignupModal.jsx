@@ -98,10 +98,10 @@ export default function SignupModal({ onClose, onSwitchToLogin}) {
             onChange={(e) => setPronouns(e.target.value)}
           >
             <option value="">Select Pronouns</option>
-            <option value="she/her">She/Her</option>
-            <option value="he/him">He/Him</option>
-            <option value="they/them">They/Them</option>
-            <option value="other">Other</option>
+            <option value="SHE_HER">She/Her</option>
+            <option value="HE_HIM">He/Him</option>
+            <option value="THEY_THEM">They/Them</option>
+            <option value="OTHER">Other</option>
           </select>
 
           <setSkinconditionelect
