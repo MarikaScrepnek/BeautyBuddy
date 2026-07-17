@@ -32,19 +32,19 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Map<String, String>> register(@RequestBody Map<String, String> request) {
+    public ResponseEntity<Map<String, String>> register(@RequestBody String username, @RequestBody String email, @RequestBody String password, @RequestBody String pronouns, @RequestBody String birthday, @RequestBody String country, @RequestBody String skintype, @RequestBody String skincondition, @RequestBody String hairtype, @RequestBody String hairdensity) {
         try {
             authService.register(
-                    request.get("username"),
-                    request.get("email"),
-                    request.get("password"),
-                    request.get("pronouns"),
-                    request.get("birthday"),
-                    request.get("country"),
-                    request.get("skintype"),
-                    request.get("skincondition"),
-                    request.get("hairtype"),
-                    request.get("hairdensity")
+                    username,
+                    email,
+                    password,
+                    pronouns,
+                    birthday,
+                    country,
+                    skintype,
+                    skincondition,
+                    hairtype,
+                    hairdensity
             );
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(Map.of("message", "User registered successfully"));
