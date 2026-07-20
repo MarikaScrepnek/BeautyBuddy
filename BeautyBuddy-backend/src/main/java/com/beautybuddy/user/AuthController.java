@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.beautybuddy.security.CustomUserDetails;
@@ -32,7 +33,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Map<String, String>> register(@RequestBody String username, @RequestBody String email, @RequestBody String password, @RequestBody String pronouns, @RequestBody String birthday, @RequestBody String country, @RequestBody String skintype, @RequestBody String skincondition, @RequestBody String hairtype, @RequestBody String hairdensity) {
+    public ResponseEntity<Map<String, String>> register(@RequestParam String username, @RequestParam String email, @RequestParam String password, @RequestParam String pronouns, @RequestParam String birthday, @RequestParam String country, @RequestParam String skintype, @RequestParam String skincondition, @RequestParam String hairtype, @RequestParam String hairdensity) {
         try {
             authService.register(
                     username,
