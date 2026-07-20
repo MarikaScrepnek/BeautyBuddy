@@ -14,7 +14,7 @@ export default function SignupModal({ onClose, onSwitchToLogin}) {
   const [loading, setLoading] = useState(false);
 
   const[pronouns, setPronouns] = useState("");
-  const[birthday, setBirthday] = useState(null);
+  const[birthday, setBirthday] = useState("");
   const[country, setCountry] = useState("");
   const[skintype, setSkintype] = useState("");
   const[skincondition, setSkincondition] = useState("");
