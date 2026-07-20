@@ -104,12 +104,7 @@ export default function SignupModal({ onClose, onSwitchToLogin}) {
             <option value="OTHER">Other</option>
           </select>
 
-          <setSkinconditionelect
-            type="birthday"
-            selected={birthday}
-            onChange={(date) => setBirthday(date)}
-            placeholderText="Birthday (optional)"
-          />
+          <p> Birthday (optional) </p>
 
           <select 
             type="country" 
