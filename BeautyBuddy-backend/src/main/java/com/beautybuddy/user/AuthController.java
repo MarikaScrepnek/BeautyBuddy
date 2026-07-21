@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.beautybuddy.security.CustomUserDetails;
@@ -33,19 +32,21 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Map<String, String>> register(@RequestParam String username, @RequestParam String email, @RequestParam String password, @RequestParam String pronouns, @RequestParam String birthday, @RequestParam String country, @RequestParam String skintype, @RequestParam String skincondition, @RequestParam String hairtype, @RequestParam String hairdensity) {
+    public ResponseEntity<Map<String, String>> register(@RequestBody(required = false) Map<String, String> request) {
         try {
+            Map<String, String> payload = request == null ? Map.of() : request;
+
             authService.register(
-                    username,
-                    email,
-                    password,
-                    pronouns,
-                    birthday,
-                    country,
-                    skintype,
-                    skincondition,
-                    hairtype,
-                    hairdensity
+                    payload.getOrDefault("username", ""),
+                    payload.getOrDefault("email", ""),
+                    payload.getOrDefault("password", ""),
+                    payload.getOrDefault("pronouns", ""),
+                    payload.getOrDefault("birthday", ""),
+                    payload.getOrDefault("country", ""),
+                    payload.getOrDefault("skintype", ""),
+                    payload.getOrDefault("skincondition", ""),
+                    payload.getOrDefault("hairtype", ""),
+                    payload.getOrDefault("hairdensity", "")
             );
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(Map.of("message", "User registered successfully"));
