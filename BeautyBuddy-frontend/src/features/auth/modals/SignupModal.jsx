@@ -114,10 +114,10 @@ export default function SignupModal({ onClose, onSwitchToLogin}) {
           >
             <option value="">Select Country</option>
             <option value="USA">United States</option>
-            <option value="Canada">Canada</option>
+            <option value="CANADA">Canada</option>
             <option value="UK">United Kingdom</option>
-            <option value="Australia">Australia</option>
-            <option value="Other">Other</option>
+            <option value="AUSTRALIA">Australia</option>
+            <option value="OTHER">Other</option>
           </select>
 
           <select 
@@ -127,10 +127,10 @@ export default function SignupModal({ onClose, onSwitchToLogin}) {
             onChange={(e) => setSkintype(e.target.value)}
           >
             <option value="">Select Skin Type</option>
-            <option value="oily">Oily</option>
-            <option value="dry">Dry</option>
-            <option value="combination">Combination</option>
-            <option value="other">Other</option>
+            <option value="OILY">Oily</option>
+            <option value="DRY">Dry</option>
+            <option value="COMBINATION">Combination</option>
+            <option value="OTHER">Other</option>
           </select>
 
           <select
@@ -140,9 +140,9 @@ export default function SignupModal({ onClose, onSwitchToLogin}) {
             onChange={(e) => setSkincondition(e.target.value)}
           >
             <option value="">Select Skin Condition</option>
-            <option value="normal">Normal</option>
-            <option value="sensitive">Sensitive</option>
-            <option value="acne-prone">Acne Prone</option>
+            <option value="NORMAL">Normal</option>
+            <option value="SENSITIVE">Sensitive</option>
+            <option value="ACNE_PRONE">Acne Prone</option>
           </select>
 
           <select 
@@ -152,11 +152,11 @@ export default function SignupModal({ onClose, onSwitchToLogin}) {
             onChange={(e) => setHairtype(e.target.value)}
           >
             <option value="">Select Hair Type</option>
-            <option value="straight">Straight</option>
-            <option value="wavy">Wavy</option>
-            <option value="curly">Curly</option>
-            <option value="coily">Coily</option>
-            <option value="other">Other</option>
+            <option value="STRAIGHT">Straight</option>
+            <option value="WAVY">Wavy</option>
+            <option value="CURLY">Curly</option>
+            <option value="COILY">Coily</option>
+            <option value="OTHER">Other</option>
           </select>
 
           <select
@@ -166,10 +166,10 @@ export default function SignupModal({ onClose, onSwitchToLogin}) {
             onChange={(e) => setHairdensity(e.target.value)}
           >
             <option value="">Select Hair Density</option>
-            <option value="thin">Thin</option>
-            <option value="medium">Medium</option>
-            <option value="thick">Thick</option>
-            <option value="other">Other</option>
+            <option value="THIN">Thin</option>
+            <option value="MEDIUM">Medium</option>
+            <option value="THICK">Thick</option>
+            <option value="OTHER">Other</option>
           </select>
 
           <button type="submit" className="modal-signup-button" disabled={loading}>
