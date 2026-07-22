@@ -1,16 +1,16 @@
-CREATE TYPE pronouns_enum AS ENUM ('he/him', 'she/her', 'they/them', 'other');
+CREATE TYPE pronouns_enum AS ENUM ('HE_HIM', 'SHE_HER', 'THEY_THEM', 'OTHER');
 
 CREATE TYPE country_enum AS ENUM (
-    'United States', 'Canada', 'United Kingdom', 'Australia', 'Germany',
-    'France', 'Italy', 'Spain', 'India', 'China', 'Japan', 'Brazil',
-    'Mexico', 'Russia', 'South Africa', 'Other'
+    'USA', 'CANADA', 'UK', 'AUSTRALIA', 'GERMANY',
+    'FRANCE', 'ITALY', 'SPAIN', 'INDIA', 'CHINA', 'JAPAN', 'BRAZIL',
+    'MEXICO', 'RUSSIA', 'SOUTH_AFRICA', 'OTHER'
 );
 
-CREATE TYPE hair_texture_enum AS ENUM ('straight', 'wavy', 'curly', 'coily', 'other');
-CREATE TYPE hair_density_enum AS ENUM ('thin', 'medium', 'thick', 'other');
+CREATE TYPE hair_texture_enum AS ENUM ('STRAIGHT', 'WAVY', 'CURLY', 'COILY', 'OTHER');
+CREATE TYPE hair_density_enum AS ENUM ('THIN', 'MEDIUM', 'THICK', 'OTHER');
 
-CREATE TYPE skin_type_enum AS ENUM ('oily', 'dry', 'combination', 'other');
-CREATE TYPE skin_condition_enum AS ENUM ('sensitive', 'normal', 'acne-prone');
+CREATE TYPE skin_type_enum AS ENUM ('OILY', 'DRY', 'COMBINATION', 'OTHER');
+CREATE TYPE skin_condition_enum AS ENUM ('SENSITIVE', 'NORMAL', 'ACNE_PRONE');
 
 ALTER TABLE account
     ADD COLUMN country country_enum,
