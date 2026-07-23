@@ -43,14 +43,25 @@ export default function MyRoutines() {
 
   // on mount
   useEffect(() => {
-
     getCurrentUser()
       .then((user) => {
         setIsLoggedIn(true);
         setUsername(user.username);
         setIsOwner(user.username === window.location.pathname.split("/").slice(-1)[0]);
+
+        searchUsers(user.username).then((users) => {
+          const currentUser = users.find((entry) => entry.username === user.username);
+          if (currentUser) {
+            setProfile(currentUser);
+          } else {
+            console.error("Current user not found in search results");
+          }
+        });
       })
-      .catch(() => setIsLoggedIn(false))
+      .catch((err) => {
+        setIsLoggedIn(false);
+        console.error("Error loading routines profile:", err);
+      })
       .finally(() => setIsAuthLoading(false));
 
     getMakeupRoutines()
@@ -70,17 +81,6 @@ export default function MyRoutines() {
         setHaircareRoutine(data);
       })
       .catch((err) => console.error("Error fetching haircare routine:", err));
-
-      searchUsers(username)
-      .then((users) => {
-        const user = users.find((user) => user.username === username);
-        if (user) {
-          setProfile(user);
-        } else {
-          console.error("Current user not found in search results");
-        }
-      })
-      .catch((err) => console.error("Error searching users:", err));
   }, []);
 
   return (
