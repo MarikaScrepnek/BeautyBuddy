@@ -109,13 +109,13 @@ export default function MyRoutines() {
 
     {profile && (
       <div style={{textAlign: "center", marginBottom: "1rem"}}>
-        <p>Pronouns: {profile.pronouns || "N/A"}</p>
+        <p>Pronouns: {profile.pronoun || "N/A"}</p>
         <p>Birthday: {profile.birthday || "N/A"}</p>
         <p>Country: {profile.country || "N/A"}</p>
-        <p>Skin Type: {profile.skintype || "N/A"}</p>
-        <p>Skin Condition: {profile.skincondition || "N/A"}</p>
-        <p>Hair Type: {profile.hairtype || "N/A"}</p>
-        <p>Hair Density: {profile.hairdensity || "N/A"}</p>
+        <p>Skin Type: {profile.skinType || "N/A"}</p>
+        <p>Skin Condition: {profile.skinCondition || "N/A"}</p>
+        <p>Hair Type: {profile.hairTexture || "N/A"}</p>
+        <p>Hair Density: {profile.hairDensity || "N/A"}</p>
         {isOwner && (
           <button onClick={handleEditProfile}>
             Edit Profile
