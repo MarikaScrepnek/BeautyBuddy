@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { fetchUserActivities } from '../../feed/api/feedApi';
 import { searchUsers } from '../../user/api/userApi';
+import { editProfile } from '../../auth/api/authApi';
 import '../../feed/Feed.css';
 
 function parseActivityPayload(payload) {
@@ -60,6 +61,14 @@ export default function Profile({ username }) {
             setProfile(null);
         }
     };
+
+    function handleEditProfile(pronouns, birthday, country, skintype, skincondition, hairtype, hairdensity) {
+        editProfile(pronouns, birthday, country, skintype, skincondition, hairtype, hairdensity)
+          .then((updatedUser) => {
+            setUsername(updatedUser.username);
+          })
+          .catch((err) => console.error("Error updating profile:", err));
+      }
     
     return (
         <div style={{ marginTop: '1rem' }}>
