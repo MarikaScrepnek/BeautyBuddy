@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { fetchUserActivities } from '../../feed/api/feedApi';
+import { searchUsers } from '../../user/api/userApi';
 import '../../feed/Feed.css';
 
 function parseActivityPayload(payload) {
@@ -27,22 +28,52 @@ function normalizeFeedItem(item) {
 export default function Profile({ username }) {
     const [activities, setActivities] = useState([]);
     const navigate = useNavigate();
+    const [profile, setProfile] = useState(null);
 
     useEffect(() => {
-        handleFetchUserActivities();
-    }, []);
+        if (!username) {
+            setActivities([]);
+            setProfile(null);
+            return;
+        }
 
-    const handleFetchUserActivities = async () => {
+        handleFetchUserActivities(username);
+        handleFetchProfile(username);
+    }, [username]);
+
+    const handleFetchUserActivities = async (profileUsername) => {
         try {
-            const data = await fetchUserActivities(username);
+            const data = await fetchUserActivities(profileUsername);
             setActivities(Array.isArray(data?.content) ? data.content.map(normalizeFeedItem) : []);
         } catch (error) {
             console.error('Error fetching user activities:', error);
         }
     };
+
+    const handleFetchProfile = async (profileUsername) => {
+        try {
+            const users = await searchUsers(profileUsername);
+            const currentUser = users.find((entry) => entry.username === profileUsername);
+            setProfile(currentUser ?? null);
+        } catch (error) {
+            console.error('Error fetching profile:', error);
+            setProfile(null);
+        }
+    };
     
     return (
         <div style={{ marginTop: '1rem' }}>
+            {profile && (
+                <div style={{textAlign: "center", marginBottom: "1rem"}}>
+                    <p>Pronouns: {profile.pronoun || "N/A"}</p>
+                    <p>Birthday: {profile.birthday || "N/A"}</p>
+                    <p>Country: {profile.country || "N/A"}</p>
+                    <p>Skin Type: {profile.skinType || "N/A"}</p>
+                    <p>Skin Condition: {profile.skinCondition || "N/A"}</p>
+                    <p>Hair Texture: {profile.hairTexture || "N/A"}</p>
+                    <p>Hair Density: {profile.hairDensity || "N/A"}</p>
+                </div>
+            )}
             <h1 style={{ textAlign: 'center' }}>{username}'s Activities</h1>
 
             {activities.length > 0 ? (

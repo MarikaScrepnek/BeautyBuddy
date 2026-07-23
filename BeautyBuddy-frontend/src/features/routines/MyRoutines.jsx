@@ -48,15 +48,6 @@ export default function MyRoutines() {
         setIsLoggedIn(true);
         setUsername(user.username);
         setIsOwner(user.username === window.location.pathname.split("/").slice(-1)[0]);
-
-        searchUsers(user.username).then((users) => {
-          const currentUser = users.find((entry) => entry.username === user.username);
-          if (currentUser) {
-            setProfile(currentUser);
-          } else {
-            console.error("Current user not found in search results");
-          }
-        });
       })
       .catch((err) => {
         setIsLoggedIn(false);
@@ -105,23 +96,6 @@ export default function MyRoutines() {
 
     {!isOwner && (
       <p style={{textAlign: "center", textDecoration: "underline", textDecorationColor: "#f0cef0"}}>Viewing {username}'s routines</p>
-    )}
-
-    {profile && (
-      <div style={{textAlign: "center", marginBottom: "1rem"}}>
-        <p>Pronouns: {profile.pronoun || "N/A"}</p>
-        <p>Birthday: {profile.birthday || "N/A"}</p>
-        <p>Country: {profile.country || "N/A"}</p>
-        <p>Skin Type: {profile.skinType || "N/A"}</p>
-        <p>Skin Condition: {profile.skinCondition || "N/A"}</p>
-        <p>Hair Type: {profile.hairTexture || "N/A"}</p>
-        <p>Hair Density: {profile.hairDensity || "N/A"}</p>
-        {isOwner && (
-          <button onClick={handleEditProfile}>
-            Edit Profile
-          </button>
-        )}
-      </div>
     )}
 
     <div style={{display: "flex", flexDirection: "row", minHeight: "80vh"}}>
