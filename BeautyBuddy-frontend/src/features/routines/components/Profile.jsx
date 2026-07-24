@@ -71,15 +71,33 @@ export default function Profile({ username }) {
           .catch((err) => console.error("Error updating profile:", err));
       }
 
-        const profileFields = [
+    const profileSections = [
+        {
+            key: 'general',
+            title: 'General',
+            fields: [
                 { label: 'Pronouns', value: profile?.pronoun },
                 { label: 'Birthday', value: profile?.birthday },
                 { label: 'Country', value: profile?.country },
+            ],
+        },
+        {
+            key: 'skin',
+            title: 'Skin',
+            fields: [
                 { label: 'Skin Type', value: profile?.skinType },
                 { label: 'Skin Condition', value: profile?.skinCondition },
+            ],
+        },
+        {
+            key: 'hair',
+            title: 'Hair',
+            fields: [
                 { label: 'Hair Texture', value: profile?.hairTexture },
                 { label: 'Hair Density', value: profile?.hairDensity },
-        ];
+            ],
+        },
+    ];
     
     return (
         <div className="profile-view">
@@ -90,12 +108,19 @@ export default function Profile({ username }) {
                         <span className="profile-info-card__chip">Beauty Profile</span>
                     </div>
 
-                    <div className="profile-info-grid">
-                        {profileFields.map((field) => (
-                            <article className="profile-info-item" key={field.label}>
-                                <p className="profile-info-item__label">{field.label}</p>
-                                <p className="profile-info-item__value">{field.value || 'N/A'}</p>
-                            </article>
+                    <div className="profile-info-groups">
+                        {profileSections.map((section) => (
+                            <section className="profile-info-group" key={section.key}>
+                                <h3 className="profile-info-group__title">{section.title}</h3>
+                                <div className={`profile-info-row profile-info-row--${section.key}`}>
+                                    {section.fields.map((field) => (
+                                        <article className="profile-info-item" key={field.label}>
+                                            <p className="profile-info-item__label">{field.label}</p>
+                                            <p className="profile-info-item__value">{field.value || 'N/A'}</p>
+                                        </article>
+                                    ))}
+                                </div>
+                            </section>
                         ))}
                     </div>
                 </section>

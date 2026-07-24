@@ -44,10 +44,39 @@
     text-transform: uppercase;
 }
 
-.profile-info-grid {
+.profile-info-groups {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+}
+
+.profile-info-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.28rem;
+}
+
+.profile-info-group__title {
+    margin: 0;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #7c5b75;
+    font-weight: 700;
+}
+
+.profile-info-row {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
     gap: 0.5rem;
+}
+
+.profile-info-row--general {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.profile-info-row--skin,
+.profile-info-row--hair {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .profile-info-item {
@@ -103,13 +132,20 @@
         font-size: 0.96rem;
     }
 
-    .profile-info-grid {
+    .profile-info-row--general {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .profile-info-row--skin,
+    .profile-info-row--hair {
         grid-template-columns: 1fr 1fr;
     }
 }
 
 @media (max-width: 520px) {
-    .profile-info-grid {
+    .profile-info-row--general,
+    .profile-info-row--skin,
+    .profile-info-row--hair {
         grid-template-columns: 1fr;
     }
 
