@@ -1,0 +1,120 @@
+.profile-view {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.profile-info-card {
+    background: linear-gradient(145deg, #ffffff 0%, #fff7ff 55%, #fff1fb 100%);
+    border: 1px solid #f2d9ee;
+    border-radius: 14px;
+    box-shadow: 0 14px 30px rgba(166, 93, 149, 0.12);
+    padding: 0.8rem;
+    max-width: 640px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.profile-info-card__title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 0.55rem;
+}
+
+.profile-info-card__title {
+    margin: 0;
+    font-size: 1.02rem;
+    font-weight: 700;
+    color: #4a2742;
+}
+
+.profile-info-card__chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.2rem 0.52rem;
+    border-radius: 999px;
+    background: rgba(236, 192, 229, 0.45);
+    color: #6d3f64;
+    font-size: 0.64rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+}
+
+.profile-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
+    gap: 0.5rem;
+}
+
+.profile-info-item {
+    border: 1px solid #efd9eb;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.84);
+    padding: 0.55rem 0.62rem;
+    min-height: 66px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.profile-info-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(150, 85, 136, 0.12);
+}
+
+.profile-info-item__label {
+    margin: 0;
+    font-size: 0.66rem;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: #8b6382;
+    font-weight: 700;
+}
+
+.profile-info-item__value {
+    margin: 0.28rem 0 0;
+    font-size: 0.9rem;
+    color: #3d2a39;
+    font-weight: 600;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+}
+
+.profile-activities-title {
+    text-align: center;
+    color: #3f2438;
+    margin-top: 0.2rem;
+    font-size: clamp(1.1rem, 2.2vw, 1.45rem);
+}
+
+.profile-activities-empty {
+    text-align: center;
+    color: #7f7280;
+}
+
+@media (max-width: 768px) {
+    .profile-info-card {
+        padding: 0.72rem;
+    }
+
+    .profile-info-card__title {
+        font-size: 0.96rem;
+    }
+
+    .profile-info-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 520px) {
+    .profile-info-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .profile-info-card__title-row {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}

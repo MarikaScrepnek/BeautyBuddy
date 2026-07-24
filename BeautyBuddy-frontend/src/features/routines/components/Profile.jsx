@@ -5,6 +5,7 @@ import { fetchUserActivities } from '../../feed/api/feedApi';
 import { searchUsers } from '../../user/api/userApi';
 import { editProfile } from '../../auth/api/authApi';
 import '../../feed/Feed.css';
+import './Profile.css';
 
 function parseActivityPayload(payload) {
     if (payload && typeof payload === 'object') {
@@ -69,21 +70,37 @@ export default function Profile({ username }) {
           })
           .catch((err) => console.error("Error updating profile:", err));
       }
+
+        const profileFields = [
+                { label: 'Pronouns', value: profile?.pronoun },
+                { label: 'Birthday', value: profile?.birthday },
+                { label: 'Country', value: profile?.country },
+                { label: 'Skin Type', value: profile?.skinType },
+                { label: 'Skin Condition', value: profile?.skinCondition },
+                { label: 'Hair Texture', value: profile?.hairTexture },
+                { label: 'Hair Density', value: profile?.hairDensity },
+        ];
     
     return (
-        <div style={{ marginTop: '1rem' }}>
+        <div className="profile-view">
             {profile && (
-                <div style={{textAlign: "center", marginBottom: "1rem"}}>
-                    <p>Pronouns: {profile.pronoun || "N/A"}</p>
-                    <p>Birthday: {profile.birthday || "N/A"}</p>
-                    <p>Country: {profile.country || "N/A"}</p>
-                    <p>Skin Type: {profile.skinType || "N/A"}</p>
-                    <p>Skin Condition: {profile.skinCondition || "N/A"}</p>
-                    <p>Hair Texture: {profile.hairTexture || "N/A"}</p>
-                    <p>Hair Density: {profile.hairDensity || "N/A"}</p>
-                </div>
+                <section className="profile-info-card" aria-label="Profile information">
+                    <div className="profile-info-card__title-row">
+                        <h2 className="profile-info-card__title">Profile Info</h2>
+                        <span className="profile-info-card__chip">Beauty Profile</span>
+                    </div>
+
+                    <div className="profile-info-grid">
+                        {profileFields.map((field) => (
+                            <article className="profile-info-item" key={field.label}>
+                                <p className="profile-info-item__label">{field.label}</p>
+                                <p className="profile-info-item__value">{field.value || 'N/A'}</p>
+                            </article>
+                        ))}
+                    </div>
+                </section>
             )}
-            <h1 style={{ textAlign: 'center' }}>{username}'s Activities</h1>
+            <h1 className="profile-activities-title">{username}'s Activities</h1>
 
             {activities.length > 0 ? (
                 <div className="feed-posts">
@@ -121,7 +138,7 @@ export default function Profile({ username }) {
                     })}
                 </div>
             ) : (
-                <p style={{ textAlign: 'center', color: '#888' }}>No activities yet.</p>
+                <p className="profile-activities-empty">No activities yet.</p>
             )}
         </div>
     );
