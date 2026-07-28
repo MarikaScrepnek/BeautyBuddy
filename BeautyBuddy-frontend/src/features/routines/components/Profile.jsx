@@ -27,7 +27,7 @@ function normalizeFeedItem(item) {
     return item?.body ?? item ?? {};
 }
 
-export default function Profile({ username }) {
+export default function Profile({ username, isOwner }) {
     const [activities, setActivities] = useState([]);
     const navigate = useNavigate();
     const [profile, setProfile] = useState(null);
@@ -124,6 +124,11 @@ export default function Profile({ username }) {
                         ))}
                     </div>
                 </section>
+            )}
+            {isOwner && (
+                <button className="profile-edit-button" onClick={() => navigate('/edit-profile')}>
+                    Edit Profile
+                </button>
             )}
             <h1 className="profile-activities-title">{username}'s Activities</h1>
 
