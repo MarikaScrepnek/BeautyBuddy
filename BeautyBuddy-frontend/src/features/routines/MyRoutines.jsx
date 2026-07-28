@@ -185,7 +185,7 @@ export default function MyRoutines() {
       <main style={{ flex: 1, padding: "0 2rem" }}>
 
         {selected === "Profile" &&
-        <Profile username={username} />
+        <Profile username={username} isOwner={isOwner} /> 
         }
 
         {selected === "Wishlist" && 
