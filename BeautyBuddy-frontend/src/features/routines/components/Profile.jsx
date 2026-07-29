@@ -31,6 +31,7 @@ export default function Profile({ username, isOwner }) {
     const [activities, setActivities] = useState([]);
     const navigate = useNavigate();
     const [profile, setProfile] = useState(null);
+    const [isEditingProfile, setIsEditingProfile] = useState(false);
 
     useEffect(() => {
         if (!username) {
@@ -117,6 +118,13 @@ export default function Profile({ username, isOwner }) {
                                         <article className="profile-info-item" key={field.label}>
                                             <p className="profile-info-item__label">{field.label}</p>
                                             <p className="profile-info-item__value">{field.value || 'N/A'}</p>
+                                            {isEditingProfile && (
+                                                <input
+                                                    type="text"
+                                                    className="profile-info-item__input"
+                                                    placeholder={`Enter ${field.label.toLowerCase()}`}
+                                                />
+                                            )}
                                         </article>
                                     ))}
                                 </div>
@@ -126,7 +134,7 @@ export default function Profile({ username, isOwner }) {
                 </section>
             )}
             {isOwner && (
-                <button className="profile-edit-button" onClick={() => navigate('/edit-profile')}>
+                <button className="profile-edit-button" onClick={() => setIsEditingProfile(true)}>
                     Edit Profile
                 </button>
             )}
