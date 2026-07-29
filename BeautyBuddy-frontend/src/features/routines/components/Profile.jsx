@@ -134,12 +134,20 @@ export default function Profile({ username, isOwner }) {
                 </section>
             )}
             {isOwner && !isEditingProfile && (
-                <button className="profile-edit-button" onClick={() => setIsEditingProfile(true)}>
+                <button
+                    type="button"
+                    className="profile-edit-button profile-edit-button--edit"
+                    onClick={() => setIsEditingProfile(true)}
+                >
                     Edit Profile
                 </button>
             )}
             {isOwner && isEditingProfile && (
-                <button className="profile-edit-button" onClick={() => setIsEditingProfile(false)}>
+                <button
+                    type="button"
+                    className="profile-edit-button profile-edit-button--save"
+                    onClick={() => setIsEditingProfile(false)}
+                >
                     Save Profile
                 </button>
             )}
