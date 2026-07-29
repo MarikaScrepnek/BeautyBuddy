@@ -133,9 +133,14 @@ export default function Profile({ username, isOwner }) {
                     </div>
                 </section>
             )}
-            {isOwner && (
+            {isOwner && !isEditingProfile && (
                 <button className="profile-edit-button" onClick={() => setIsEditingProfile(true)}>
                     Edit Profile
+                </button>
+            )}
+            {isOwner && isEditingProfile && (
+                <button className="profile-edit-button" onClick={() => setIsEditingProfile(false)}>
+                    Save Profile
                 </button>
             )}
             <h1 className="profile-activities-title">{username}'s Activities</h1>
