@@ -32,6 +32,15 @@ export default function Profile({ username, isOwner }) {
     const navigate = useNavigate();
     const [profile, setProfile] = useState(null);
     const [isEditingProfile, setIsEditingProfile] = useState(false);
+    const [editDraft, setEditDraft] = useState({
+        pronouns: '',
+        birthday: '',
+        country: '',
+        skintype: '',
+        skincondition: '',
+        hairtype: '',
+        hairdensity: '',
+    });
 
     useEffect(() => {
         if (!username) {
@@ -64,13 +73,52 @@ export default function Profile({ username, isOwner }) {
         }
     };
 
-    function handleEditProfile(pronouns, birthday, country, skintype, skincondition, hairtype, hairdensity) {
-        editProfile(pronouns, birthday, country, skintype, skincondition, hairtype, hairdensity)
-          .then((updatedUser) => {
-            setUsername(updatedUser.username);
-          })
-          .catch((err) => console.error("Error updating profile:", err));
+    function startEditingProfile() {
+        setEditDraft({
+            pronouns: profile?.pronoun ?? '',
+            birthday: profile?.birthday ?? '',
+            country: profile?.country ?? '',
+            skintype: profile?.skinType ?? '',
+            skincondition: profile?.skinCondition ?? '',
+            hairtype: profile?.hairTexture ?? '',
+            hairdensity: profile?.hairDensity ?? '',
+        });
+        setIsEditingProfile(true);
+    }
+
+    async function handleEditProfile() {
+        try {
+            await editProfile(editDraft);
+            await handleFetchProfile(username);
+            setIsEditingProfile(false);
+        } catch (err) {
+            console.error('Error updating profile:', err);
+        }
       }
+
+    function getDraftFieldValue(label) {
+        if (label === 'Pronouns') return editDraft.pronouns;
+        if (label === 'Birthday') return editDraft.birthday;
+        if (label === 'Country') return editDraft.country;
+        if (label === 'Skin Type') return editDraft.skintype;
+        if (label === 'Skin Condition') return editDraft.skincondition;
+        if (label === 'Hair Texture') return editDraft.hairtype;
+        if (label === 'Hair Density') return editDraft.hairdensity;
+        return '';
+    }
+
+    function setDraftField(label, value) {
+        setEditDraft((current) => ({
+            ...current,
+            ...(label === 'Pronouns' ? { pronouns: value } : {}),
+            ...(label === 'Birthday' ? { birthday: value } : {}),
+            ...(label === 'Country' ? { country: value } : {}),
+            ...(label === 'Skin Type' ? { skintype: value } : {}),
+            ...(label === 'Skin Condition' ? { skincondition: value } : {}),
+            ...(label === 'Hair Texture' ? { hairtype: value } : {}),
+            ...(label === 'Hair Density' ? { hairdensity: value } : {}),
+        }));
+    }
 
     const profileSections = [
         {
@@ -117,14 +165,12 @@ export default function Profile({ username, isOwner }) {
                                     {section.fields.map((field) => (
                                         <article className="profile-info-item" key={field.label}>
                                             <p className="profile-info-item__label">{field.label}</p>
-                                            <p className="profile-info-item__value">{field.value || 'N/A'}</p>
+                                            <p className="profile-info-item__value">{isEditingProfile ? getDraftFieldValue(field.label) || 'N/A' : field.value || 'N/A'}</p>
                                             {isEditingProfile && (
                                                 field.label === 'Pronouns' ? (
                                                     <select
-                                                        type="pronouns"
-                                                        placeholder="Pronouns (optional)"
-                                                        value={pronoun}
-                                                        onChange={(e) => setPronouns(e.target.value)}
+                                                        value={editDraft.pronouns}
+                                                        onChange={(e) => setDraftField(field.label, e.target.value)}
                                                     >
                                                         <option value="">Select Pronouns</option>
                                                         <option value="SHE_HER">She/Her</option>
@@ -134,10 +180,8 @@ export default function Profile({ username, isOwner }) {
                                                     </select>
                                                 ) : field.label === 'Country' ? (
                                                     <select 
-                                                        type="country" 
-                                                        placeholder="Country (optional)" 
-                                                        value={country}
-                                                        onChange={(e) => setCountry(e.target.value)}
+                                                        value={editDraft.country}
+                                                        onChange={(e) => setDraftField(field.label, e.target.value)}
                                                     >
                                                         <option value="">Select Country</option>
                                                         <option value="USA">United States</option>
@@ -148,10 +192,8 @@ export default function Profile({ username, isOwner }) {
                                                     </select>
                                                 ) : field.label === 'Skin Type' ? (
                                                     <select 
-                                                        type="skintype" 
-                                                        placeholder="Skin Type (optional)" 
-                                                        value={skintype}
-                                                        onChange={(e) => setSkintype(e.target.value)}
+                                                        value={editDraft.skintype}
+                                                        onChange={(e) => setDraftField(field.label, e.target.value)}
                                                     >
                                                         <option value="">Select Skin Type</option>
                                                         <option value="OILY">Oily</option>
@@ -161,10 +203,8 @@ export default function Profile({ username, isOwner }) {
                                                     </select>
                                                 ) : field.label === 'Skin Condition' ? (
                                                     <select
-                                                        type="skincondition"
-                                                        placeholder="Skin Condition (optional)"
-                                                        value={skincondition}
-                                                        onChange={(e) => setSkincondition(e.target.value)}
+                                                        value={editDraft.skincondition}
+                                                        onChange={(e) => setDraftField(field.label, e.target.value)}
                                                     >
                                                         <option value="">Select Skin Condition</option>
                                                         <option value="NORMAL">Normal</option>
@@ -173,10 +213,8 @@ export default function Profile({ username, isOwner }) {
                                                     </select>
                                                 ) : field.label === 'Hair Texture' ? (
                                                     <select 
-                                                        type="hairtype" 
-                                                        placeholder="Hair Type (optional)" 
-                                                        value={hairtype}
-                                                        onChange={(e) => setHairtype(e.target.value)}
+                                                        value={editDraft.hairtype}
+                                                        onChange={(e) => setDraftField(field.label, e.target.value)}
                                                     >
                                                         <option value="">Select Hair Type</option>
                                                         <option value="STRAIGHT">Straight</option>
@@ -187,10 +225,8 @@ export default function Profile({ username, isOwner }) {
                                                     </select>
                                                 ) : field.label === 'Hair Density' ? (
                                                     <select 
-                                                        type="hairdensity" 
-                                                        placeholder="Hair Density (optional)" 
-                                                        value={hairdensity}
-                                                        onChange={(e) => setHairdensity(e.target.value)}
+                                                        value={editDraft.hairdensity}
+                                                        onChange={(e) => setDraftField(field.label, e.target.value)}
                                                     >
                                                         <option value="">Select Hair Density</option>
                                                         <option value="THIN">Thin</option>
@@ -212,7 +248,7 @@ export default function Profile({ username, isOwner }) {
                 <button
                     type="button"
                     className="profile-edit-button profile-edit-button--edit"
-                    onClick={() => setIsEditingProfile(true)}
+                    onClick={startEditingProfile}
                 >
                     Edit Profile
                 </button>
@@ -221,7 +257,7 @@ export default function Profile({ username, isOwner }) {
                 <button
                     type="button"
                     className="profile-edit-button profile-edit-button--save"
-                    onClick={() => setIsEditingProfile(false)}
+                    onClick={handleEditProfile}
                 >
                     Save Profile
                 </button>

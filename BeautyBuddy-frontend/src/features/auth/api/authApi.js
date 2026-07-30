@@ -40,16 +40,22 @@ export async function getCurrentUser() {
     return data;
 }
 
-export async function editProfile(pronouns, birthday, country, skintype, skincondition, hairtype, hairdensity) {
-    const res = await fetch(`${AUTH_BASE}/edit`, {
-        method: 'PUT',
+export async function editProfile(profileUpdates) {
+    const res = await fetch(`${AUTH_BASE}/edit-profile`, {
+        method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
         credentials: 'include',
-        body: JSON.stringify({ email, username, password, pronouns, birthday, country, skintype, skincondition, hairtype, hairdensity }),
+        body: JSON.stringify(profileUpdates),
     });
-    return res.json();
+
+    if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data?.error || 'Failed to update profile');
+    }
+
+    return res.json().catch(() => ({}));
 }
 
 export async function logoutUser() {

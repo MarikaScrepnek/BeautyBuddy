@@ -7,7 +7,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -106,7 +105,7 @@ public class AuthController {
         return ResponseEntity.ok(userDTO);
     }
 
-    @GetMapping("/edit-profile")
+    @PostMapping("/edit-profile")
     public ResponseEntity<UserDTO> getEditProfile(Authentication authentication, @RequestBody Map<String, String> request) {
         if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.ok(null);
