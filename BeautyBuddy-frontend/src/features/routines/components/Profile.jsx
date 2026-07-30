@@ -119,11 +119,86 @@ export default function Profile({ username, isOwner }) {
                                             <p className="profile-info-item__label">{field.label}</p>
                                             <p className="profile-info-item__value">{field.value || 'N/A'}</p>
                                             {isEditingProfile && (
-                                                <input
-                                                    type="text"
-                                                    className="profile-info-item__input"
-                                                    placeholder={`Enter ${field.label.toLowerCase()}`}
-                                                />
+                                                field.label === 'Pronouns' ? (
+                                                    <select
+                                                        type="pronouns"
+                                                        placeholder="Pronouns (optional)"
+                                                        value={pronoun}
+                                                        onChange={(e) => setPronouns(e.target.value)}
+                                                    >
+                                                        <option value="">Select Pronouns</option>
+                                                        <option value="SHE_HER">She/Her</option>
+                                                        <option value="HE_HIM">He/Him</option>
+                                                        <option value="THEY_THEM">They/Them</option>
+                                                        <option value="OTHER">Other</option>
+                                                    </select>
+                                                ) : field.label === 'Country' ? (
+                                                    <select 
+                                                        type="country" 
+                                                        placeholder="Country (optional)" 
+                                                        value={country}
+                                                        onChange={(e) => setCountry(e.target.value)}
+                                                    >
+                                                        <option value="">Select Country</option>
+                                                        <option value="USA">United States</option>
+                                                        <option value="CANADA">Canada</option>
+                                                        <option value="UK">United Kingdom</option>
+                                                        <option value="AUSTRALIA">Australia</option>
+                                                        <option value="OTHER">Other</option>
+                                                    </select>
+                                                ) : field.label === 'Skin Type' ? (
+                                                    <select 
+                                                        type="skintype" 
+                                                        placeholder="Skin Type (optional)" 
+                                                        value={skintype}
+                                                        onChange={(e) => setSkintype(e.target.value)}
+                                                    >
+                                                        <option value="">Select Skin Type</option>
+                                                        <option value="OILY">Oily</option>
+                                                        <option value="DRY">Dry</option>
+                                                        <option value="COMBINATION">Combination</option>
+                                                        <option value="OTHER">Other</option>
+                                                    </select>
+                                                ) : field.label === 'Skin Condition' ? (
+                                                    <select
+                                                        type="skincondition"
+                                                        placeholder="Skin Condition (optional)"
+                                                        value={skincondition}
+                                                        onChange={(e) => setSkincondition(e.target.value)}
+                                                    >
+                                                        <option value="">Select Skin Condition</option>
+                                                        <option value="NORMAL">Normal</option>
+                                                        <option value="SENSITIVE">Sensitive</option>
+                                                        <option value="ACNE_PRONE">Acne Prone</option>
+                                                    </select>
+                                                ) : field.label === 'Hair Texture' ? (
+                                                    <select 
+                                                        type="hairtype" 
+                                                        placeholder="Hair Type (optional)" 
+                                                        value={hairtype}
+                                                        onChange={(e) => setHairtype(e.target.value)}
+                                                    >
+                                                        <option value="">Select Hair Type</option>
+                                                        <option value="STRAIGHT">Straight</option>
+                                                        <option value="WAVY">Wavy</option>
+                                                        <option value="CURLY">Curly</option>
+                                                        <option value="COILY">Coily</option>
+                                                        <option value="OTHER">Other</option>
+                                                    </select>
+                                                ) : field.label === 'Hair Density' ? (
+                                                    <select 
+                                                        type="hairdensity" 
+                                                        placeholder="Hair Density (optional)" 
+                                                        value={hairdensity}
+                                                        onChange={(e) => setHairdensity(e.target.value)}
+                                                    >
+                                                        <option value="">Select Hair Density</option>
+                                                        <option value="THIN">Thin</option>
+                                                        <option value="MEDIUM">Medium</option>
+                                                        <option value="THICK">Thick</option>
+                                                        <option value="OTHER">Other</option>
+                                                    </select>
+                                                ) : null
                                             )}
                                         </article>
                                     ))}
