@@ -42,7 +42,7 @@ export async function getCurrentUser() {
 
 export async function editProfile(profileUpdates) {
     const res = await fetch(`${AUTH_BASE}/edit-profile`, {
-        method: 'POST',
+        method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
         },
