@@ -27,6 +27,52 @@ function normalizeFeedItem(item) {
     return item?.body ?? item ?? {};
 }
 
+function formatProfileValue(value) {
+    if (value === null || value === undefined || value === '') {
+        return 'N/A';
+    }
+
+    const text = String(value).trim();
+
+    const friendlyValues = {
+        SHE_HER: 'She/Her',
+        HE_HIM: 'He/Him',
+        THEY_THEM: 'They/Them',
+        OTHER: 'Other',
+        USA: 'United States',
+        CANADA: 'Canada',
+        UK: 'United Kingdom',
+        AUSTRALIA: 'Australia',
+        OILY: 'Oily',
+        DRY: 'Dry',
+        COMBINATION: 'Combination',
+        NORMAL: 'Normal',
+        SENSITIVE: 'Sensitive',
+        ACNE_PRONE: 'Acne Prone',
+        STRAIGHT: 'Straight',
+        WAVY: 'Wavy',
+        CURLY: 'Curly',
+        COILY: 'Coily',
+        THIN: 'Thin',
+        MEDIUM: 'Medium',
+        THICK: 'Thick',
+    };
+
+    if (friendlyValues[text.toUpperCase()]) {
+        return friendlyValues[text.toUpperCase()];
+    }
+
+    return text
+        .toLowerCase()
+        .replace(/[_/]+/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim()
+        .split(' ')
+        .filter(Boolean)
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+}
+
 export default function Profile({ username, isOwner }) {
     const [activities, setActivities] = useState([]);
     const navigate = useNavigate();
@@ -107,6 +153,12 @@ export default function Profile({ username, isOwner }) {
         return '';
     }
 
+    function renderProfileValue(label, value) {
+        const draftValue = getDraftFieldValue(label);
+        const displayValue = isEditingProfile ? draftValue : value;
+        return formatProfileValue(displayValue);
+    }
+
     function setDraftField(label, value) {
         setEditDraft((current) => ({
             ...current,
@@ -165,7 +217,7 @@ export default function Profile({ username, isOwner }) {
                                     {section.fields.map((field) => (
                                         <article className="profile-info-item" key={field.label}>
                                             <p className="profile-info-item__label">{field.label}</p>
-                                            <p className="profile-info-item__value">{isEditingProfile ? getDraftFieldValue(field.label) || 'N/A' : field.value || 'N/A'}</p>
+                                            <p className="profile-info-item__value">{renderProfileValue(field.label, field.value)}</p>
                                             {isEditingProfile && (
                                                 field.label === 'Pronouns' ? (
                                                     <select
