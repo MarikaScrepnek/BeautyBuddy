@@ -217,10 +217,13 @@ export default function Profile({ username, isOwner }) {
                                     {section.fields.map((field) => (
                                         <article className="profile-info-item" key={field.label}>
                                             <p className="profile-info-item__label">{field.label}</p>
-                                            <p className="profile-info-item__value">{renderProfileValue(field.label, field.value)}</p>
+                                            {!isEditingProfile && (
+                                                <p className="profile-info-item__value">{renderProfileValue(field.label, field.value)}</p>
+                                            )}
                                             {isEditingProfile && (
                                                 field.label === 'Pronouns' ? (
                                                     <select
+                                                        className="profile-info-item__select"
                                                         value={editDraft.pronouns}
                                                         onChange={(e) => setDraftField(field.label, e.target.value)}
                                                     >
@@ -232,6 +235,7 @@ export default function Profile({ username, isOwner }) {
                                                     </select>
                                                 ) : field.label === 'Country' ? (
                                                     <select 
+                                                        className="profile-info-item__select"
                                                         value={editDraft.country}
                                                         onChange={(e) => setDraftField(field.label, e.target.value)}
                                                     >
@@ -244,6 +248,7 @@ export default function Profile({ username, isOwner }) {
                                                     </select>
                                                 ) : field.label === 'Skin Type' ? (
                                                     <select 
+                                                        className="profile-info-item__select"
                                                         value={editDraft.skintype}
                                                         onChange={(e) => setDraftField(field.label, e.target.value)}
                                                     >
@@ -255,6 +260,7 @@ export default function Profile({ username, isOwner }) {
                                                     </select>
                                                 ) : field.label === 'Skin Condition' ? (
                                                     <select
+                                                        className="profile-info-item__select"
                                                         value={editDraft.skincondition}
                                                         onChange={(e) => setDraftField(field.label, e.target.value)}
                                                     >
@@ -265,6 +271,7 @@ export default function Profile({ username, isOwner }) {
                                                     </select>
                                                 ) : field.label === 'Hair Texture' ? (
                                                     <select 
+                                                        className="profile-info-item__select"
                                                         value={editDraft.hairtype}
                                                         onChange={(e) => setDraftField(field.label, e.target.value)}
                                                     >
@@ -277,6 +284,7 @@ export default function Profile({ username, isOwner }) {
                                                     </select>
                                                 ) : field.label === 'Hair Density' ? (
                                                     <select 
+                                                        className="profile-info-item__select"
                                                         value={editDraft.hairdensity}
                                                         onChange={(e) => setDraftField(field.label, e.target.value)}
                                                     >
