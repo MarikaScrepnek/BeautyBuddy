@@ -98,6 +98,7 @@ export default function SignupModal({ onClose, onSwitchToLogin}) {
           <input type="password" placeholder="Confirm Password" required />
 
           <select
+            className="form-select"
             type="pronouns"
             placeholder="Pronouns (optional)"
             value={pronouns}
@@ -110,9 +111,8 @@ export default function SignupModal({ onClose, onSwitchToLogin}) {
             <option value="OTHER">Other</option>
           </select>
 
-          <div>
-            <div style={{ display: "flex", gap: "8px" }}>
-              <select value={birthMonth} onChange={(e) => setBirthMonth(e.target.value)}>
+          <div className="birth-select-row">
+              <select className="form-select birth-select" value={birthMonth} onChange={(e) => setBirthMonth(e.target.value)}>
                 <option value="">Month</option>
                 <option value="01">January</option>
                 <option value="02">February</option>
@@ -128,7 +128,7 @@ export default function SignupModal({ onClose, onSwitchToLogin}) {
                 <option value="12">December</option>
               </select>
 
-              <select value={birthDay} onChange={(e) => setBirthDay(e.target.value)}>
+              <select className="form-select birth-select" value={birthDay} onChange={(e) => setBirthDay(e.target.value)}>
                 <option value="">Day</option>
                 {[...Array(31)].map((_, index) => {
                   const day = String(index + 1).padStart(2, "0");
@@ -136,19 +136,19 @@ export default function SignupModal({ onClose, onSwitchToLogin}) {
                 })}
               </select>
 
-              <select value={birthYear} onChange={(e) => setBirthYear(e.target.value)}>
+              <select className="form-select birth-select" value={birthYear} onChange={(e) => setBirthYear(e.target.value)}>
                 <option value="">Year</option>
                 {Array.from({ length: 100 }, (_, index) => {
                   const year = new Date().getFullYear() - index;
                   return <option key={year} value={year}>{year}</option>;
                 })}
               </select>
-            </div>
           </div>
 
-          <select 
-            type="country" 
-            placeholder="Country (optional)" 
+          <select
+            className="form-select"
+            type="country"
+            placeholder="Country (optional)"
             value={country}
             onChange={(e) => setCountry(e.target.value)}
           >
@@ -160,9 +160,10 @@ export default function SignupModal({ onClose, onSwitchToLogin}) {
             <option value="OTHER">Other</option>
           </select>
 
-          <select 
-            type="skintype" 
-            placeholder="Skin Type (optional)" 
+          <select
+            className="form-select"
+            type="skintype"
+            placeholder="Skin Type (optional)"
             value={skintype}
             onChange={(e) => setSkintype(e.target.value)}
           >
@@ -174,6 +175,7 @@ export default function SignupModal({ onClose, onSwitchToLogin}) {
           </select>
 
           <select
+            className="form-select"
             type="skincondition"
             placeholder="Skin Condition (optional)"
             value={skincondition}
@@ -185,9 +187,10 @@ export default function SignupModal({ onClose, onSwitchToLogin}) {
             <option value="ACNE_PRONE">Acne Prone</option>
           </select>
 
-          <select 
-            type="hairtype" 
-            placeholder="Hair Type (optional)" 
+          <select
+            className="form-select"
+            type="hairtype"
+            placeholder="Hair Type (optional)"
             value={hairtype}
             onChange={(e) => setHairtype(e.target.value)}
           >
@@ -200,6 +203,7 @@ export default function SignupModal({ onClose, onSwitchToLogin}) {
           </select>
 
           <select
+            className="form-select"
             type="hairdensity"
             placeholder="Hair Density (optional)"
             value={hairdensity}
