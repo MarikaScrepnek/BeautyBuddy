@@ -14,7 +14,9 @@ export default function SignupModal({ onClose, onSwitchToLogin}) {
   const [loading, setLoading] = useState(false);
 
   const[pronouns, setPronouns] = useState("");
-  const[birthday, setBirthday] = useState("");
+  const[birthMonth, setBirthMonth] = useState("");
+  const[birthDay, setBirthDay] = useState("");
+  const[birthYear, setBirthYear] = useState("");
   const[country, setCountry] = useState("");
   const[skintype, setSkintype] = useState("");
   const[skincondition, setSkincondition] = useState("");
@@ -38,6 +40,10 @@ export default function SignupModal({ onClose, onSwitchToLogin}) {
     setError("");
 
     try {
+      const birthday = birthMonth && birthDay && birthYear
+        ? `${birthYear}-${birthMonth.padStart(2, "0")}-${birthDay.padStart(2, "0")}`
+        : "";
+
       const result = await registerUser(email, username, password, pronouns, birthday, country, skintype, skincondition, hairtype, hairdensity);
       if (result.error) {
         setError(result.error);
@@ -104,7 +110,41 @@ export default function SignupModal({ onClose, onSwitchToLogin}) {
             <option value="OTHER">Other</option>
           </select>
 
-          <p> Birthday (optional) </p>
+          <div>
+            <div style={{ display: "flex", gap: "8px" }}>
+              <select value={birthMonth} onChange={(e) => setBirthMonth(e.target.value)}>
+                <option value="">Month</option>
+                <option value="01">January</option>
+                <option value="02">February</option>
+                <option value="03">March</option>
+                <option value="04">April</option>
+                <option value="05">May</option>
+                <option value="06">June</option>
+                <option value="07">July</option>
+                <option value="08">August</option>
+                <option value="09">September</option>
+                <option value="10">October</option>
+                <option value="11">November</option>
+                <option value="12">December</option>
+              </select>
+
+              <select value={birthDay} onChange={(e) => setBirthDay(e.target.value)}>
+                <option value="">Day</option>
+                {[...Array(31)].map((_, index) => {
+                  const day = String(index + 1).padStart(2, "0");
+                  return <option key={day} value={day}>{day}</option>;
+                })}
+              </select>
+
+              <select value={birthYear} onChange={(e) => setBirthYear(e.target.value)}>
+                <option value="">Year</option>
+                {Array.from({ length: 100 }, (_, index) => {
+                  const year = new Date().getFullYear() - index;
+                  return <option key={year} value={year}>{year}</option>;
+                })}
+              </select>
+            </div>
+          </div>
 
           <select 
             type="country" 
