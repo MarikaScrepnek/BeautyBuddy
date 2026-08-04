@@ -61,6 +61,7 @@ export default function SignupModal({ onClose, onSwitchToLogin}) {
     <div className="modal-overlay">
         <div className="modal" onClick={(e) => e.stopPropagation()}>
         <h2>Sign Up</h2>
+        <p>Required fields</p>
 
         <form onSubmit={handleSignup}>
           <input
@@ -96,20 +97,6 @@ export default function SignupModal({ onClose, onSwitchToLogin}) {
           </div>
 
           <input type="password" placeholder="Confirm Password" required />
-
-          <select
-            className="form-select"
-            type="pronouns"
-            placeholder="Pronouns (optional)"
-            value={pronouns}
-            onChange={(e) => setPronouns(e.target.value)}
-          >
-            <option value="">Select Pronouns</option>
-            <option value="SHE_HER">She/Her</option>
-            <option value="HE_HIM">He/Him</option>
-            <option value="THEY_THEM">They/Them</option>
-            <option value="OTHER">Other</option>
-          </select>
 
           <div className="birth-select-row">
               <select className="form-select birth-select" value={birthMonth} onChange={(e) => setBirthMonth(e.target.value)}>
@@ -157,6 +144,22 @@ export default function SignupModal({ onClose, onSwitchToLogin}) {
             <option value="CANADA">Canada</option>
             <option value="UK">United Kingdom</option>
             <option value="AUSTRALIA">Australia</option>
+            <option value="OTHER">Other</option>
+          </select>
+
+        <p>Optional fields</p>
+
+          <select
+            className="form-select"
+            type="pronouns"
+            placeholder="Pronouns (optional)"
+            value={pronouns}
+            onChange={(e) => setPronouns(e.target.value)}
+          >
+            <option value="">Select Pronouns</option>
+            <option value="SHE_HER">She/Her</option>
+            <option value="HE_HIM">He/Him</option>
+            <option value="THEY_THEM">They/Them</option>
             <option value="OTHER">Other</option>
           </select>
 
