@@ -91,8 +91,24 @@ export default function MyRoutines() {
     <div style={{display: "flex", flexDirection: "row", minHeight: "80vh"}}>
       
       <aside className='routines-sidebar' style={{ width: "200px", background: "#f7f7f7", padding: "1rem 0", borderRight: "1px solid #eee" }}>
-        <h2 style={{textAlign: "center"}}>All Lists</h2>
+        <h2 style={{textAlign: "center"}}>Navigation</h2>
         <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+
+          <li
+            onClick={() => { setSelected("Profile"); setSelectedRoutine(null); }}
+            style={{
+              padding: "1rem",
+              cursor: "pointer",
+              background: selected === "Profile" ? "#e0e0e0" : "transparent",
+              borderLeft: selected === "Profile" ? "4px solid #6c63ff" : "4px solid transparent"
+            }}
+          >
+            Home
+          </li>
+
+          <li style={{padding: "1rem", fontWeight: "bold", fontSize: "1.1rem", color: "#6c63ff", background: "transparent"}}>
+            Lists
+          </li>
 
             <li
               onClick={() => { setSelected("Wishlist"); setSelectedRoutine(null); }}
