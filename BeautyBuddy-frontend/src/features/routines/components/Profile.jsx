@@ -73,6 +73,66 @@ function formatProfileValue(value) {
         .join(' ');
 }
 
+function getAddProfileLabel(label) {
+    return `Add ${label}`;
+}
+
+const MONTHS = [
+    { value: '01', label: 'January' },
+    { value: '02', label: 'February' },
+    { value: '03', label: 'March' },
+    { value: '04', label: 'April' },
+    { value: '05', label: 'May' },
+    { value: '06', label: 'June' },
+    { value: '07', label: 'July' },
+    { value: '08', label: 'August' },
+    { value: '09', label: 'September' },
+    { value: '10', label: 'October' },
+    { value: '11', label: 'November' },
+    { value: '12', label: 'December' },
+];
+
+const DAYS = Array.from({ length: 31 }, (_, index) => {
+    const day = String(index + 1).padStart(2, '0');
+    return { value: day, label: String(index + 1) };
+});
+
+const CURRENT_YEAR = new Date().getFullYear();
+const YEARS = Array.from({ length: 120 }, (_, index) => {
+    const year = String(CURRENT_YEAR - index);
+    return { value: year, label: year };
+});
+
+function parseBirthdayParts(birthday) {
+    if (!birthday) {
+        return { month: '', day: '', year: '' };
+    }
+
+    const date = new Date(birthday);
+    if (!Number.isNaN(date.getTime())) {
+        return {
+            month: String(date.getMonth() + 1).padStart(2, '0'),
+            day: String(date.getDate()).padStart(2, '0'),
+            year: String(date.getFullYear()),
+        };
+    }
+
+    const match = String(birthday).match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (match) {
+        return { year: match[1], month: match[2], day: match[3] };
+    }
+
+    return { month: '', day: '', year: '' };
+}
+
+function buildBirthdayValue({ birthdayMonth, birthdayDay, birthdayYear }) {
+    if (!birthdayMonth || !birthdayDay || !birthdayYear) {
+        return '';
+    }
+
+    return `${birthdayYear}-${birthdayMonth}-${birthdayDay}`;
+}
+
 export default function Profile({ username, isOwner }) {
     const [activities, setActivities] = useState([]);
     const navigate = useNavigate();
@@ -81,6 +141,9 @@ export default function Profile({ username, isOwner }) {
     const [editDraft, setEditDraft] = useState({
         pronouns: '',
         birthday: '',
+        birthdayMonth: '',
+        birthdayDay: '',
+        birthdayYear: '',
         country: '',
         skintype: '',
         skincondition: '',
@@ -120,9 +183,14 @@ export default function Profile({ username, isOwner }) {
     };
 
     function startEditingProfile() {
+        const birthdayParts = parseBirthdayParts(profile?.birthday);
+
         setEditDraft({
             pronouns: profile?.pronoun ?? '',
             birthday: profile?.birthday ?? '',
+            birthdayMonth: birthdayParts.month,
+            birthdayDay: birthdayParts.day,
+            birthdayYear: birthdayParts.year,
             country: profile?.country ?? '',
             skintype: profile?.skinType ?? '',
             skincondition: profile?.skinCondition ?? '',
@@ -134,7 +202,10 @@ export default function Profile({ username, isOwner }) {
 
     async function handleEditProfile() {
         try {
-            await editProfile(editDraft);
+            await editProfile({
+                ...editDraft,
+                birthday: buildBirthdayValue(editDraft),
+            });
             await handleFetchProfile(username);
             setIsEditingProfile(false);
         } catch (err) {
@@ -157,6 +228,10 @@ export default function Profile({ username, isOwner }) {
         const draftValue = getDraftFieldValue(label);
         const displayValue = isEditingProfile ? draftValue : value;
         return formatProfileValue(displayValue);
+    }
+
+    function hasProfileValue(value) {
+        return value !== null && value !== undefined && String(value).trim() !== '';
     }
 
     function setDraftField(label, value) {
@@ -218,7 +293,19 @@ export default function Profile({ username, isOwner }) {
                                         <article className="profile-info-item" key={field.label}>
                                             <p className="profile-info-item__label">{field.label}</p>
                                             {!isEditingProfile && (
-                                                <p className="profile-info-item__value">{renderProfileValue(field.label, field.value)}</p>
+                                                hasProfileValue(field.value) ? (
+                                                    <p className="profile-info-item__value">{renderProfileValue(field.label, field.value)}</p>
+                                                ) : isOwner ? (
+                                                    <button
+                                                        type="button"
+                                                        className="profile-info-item__empty-action"
+                                                        onClick={startEditingProfile}
+                                                    >
+                                                        {getAddProfileLabel(field.label)}
+                                                    </button>
+                                                ) : (
+                                                    <p className="profile-info-item__value profile-info-item__value--empty">N/A</p>
+                                                )
                                             )}
                                             {isEditingProfile && (
                                                 field.label === 'Pronouns' ? (
@@ -233,6 +320,45 @@ export default function Profile({ username, isOwner }) {
                                                         <option value="THEY_THEM">They/Them</option>
                                                         <option value="OTHER">Other</option>
                                                     </select>
+                                                ) : field.label === 'Birthday' ? (
+                                                    <div className="profile-birthday-selects">
+                                                        <select
+                                                            className="profile-info-item__select"
+                                                            value={editDraft.birthdayMonth}
+                                                            onChange={(e) => setEditDraft((current) => ({ ...current, birthdayMonth: e.target.value }))}
+                                                        >
+                                                            <option value="">Month</option>
+                                                            {MONTHS.map((month) => (
+                                                                <option key={month.value} value={month.value}>
+                                                                    {month.label}
+                                                                </option>
+                                                            ))}
+                                                        </select>
+                                                        <select
+                                                            className="profile-info-item__select"
+                                                            value={editDraft.birthdayDay}
+                                                            onChange={(e) => setEditDraft((current) => ({ ...current, birthdayDay: e.target.value }))}
+                                                        >
+                                                            <option value="">Day</option>
+                                                            {DAYS.map((day) => (
+                                                                <option key={day.value} value={day.value}>
+                                                                    {day.label}
+                                                                </option>
+                                                            ))}
+                                                        </select>
+                                                        <select
+                                                            className="profile-info-item__select"
+                                                            value={editDraft.birthdayYear}
+                                                            onChange={(e) => setEditDraft((current) => ({ ...current, birthdayYear: e.target.value }))}
+                                                        >
+                                                            <option value="">Year</option>
+                                                            {YEARS.map((year) => (
+                                                                <option key={year.value} value={year.value}>
+                                                                    {year.label}
+                                                                </option>
+                                                            ))}
+                                                        </select>
+                                                    </div>
                                                 ) : field.label === 'Country' ? (
                                                     <select 
                                                         className="profile-info-item__select"
