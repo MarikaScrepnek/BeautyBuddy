@@ -61,17 +61,23 @@ export default function SignupModal({ onClose, onSwitchToLogin}) {
     <div className="modal-overlay">
         <div className="modal" onClick={(e) => e.stopPropagation()}>
         <h2>Sign Up</h2>
-        <p>Required fields</p>
+        
 
         <form onSubmit={handleSignup}>
+          <label className="input-label" htmlFor="signup-email">Email</label>
           <input
+            id="signup-email"
+            className="form-input"
             type="email"
-            placeholder="Email"
+            placeholder="you@example.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
           />
+          <label className="input-label" htmlFor="signup-username">Username</label>
           <input
+            id="signup-username"
+            className="form-input"
             type="text"
             placeholder="Username"
             value={username}
@@ -79,8 +85,11 @@ export default function SignupModal({ onClose, onSwitchToLogin}) {
             required
           />
 
+          <label className="input-label" htmlFor="signup-password">Password</label>
           <div className="password-input-container">
             <input
+              id="signup-password"
+              className="form-input"
               type={showPassword ? "text" : "password"}
               placeholder="Password"
               value={password}
@@ -96,7 +105,10 @@ export default function SignupModal({ onClose, onSwitchToLogin}) {
             </button>
           </div>
 
-          <input type="password" placeholder="Confirm Password" required />
+          <label className="input-label" htmlFor="signup-password-confirm">Confirm Password</label>
+          <input id="signup-password-confirm" className="form-input" type="password" placeholder="Confirm Password" required />
+
+          <label className="input-label">Birthday</label>
 
           <div className="birth-select-row">
               <select className="form-select birth-select" value={birthMonth} onChange={(e) => setBirthMonth(e.target.value)}>
@@ -132,10 +144,10 @@ export default function SignupModal({ onClose, onSwitchToLogin}) {
               </select>
           </div>
 
+          <label className="input-label" htmlFor="signup-country">Country</label>
           <select
+            id="signup-country"
             className="form-select"
-            type="country"
-            placeholder="Country (optional)"
             value={country}
             onChange={(e) => setCountry(e.target.value)}
           >
@@ -144,78 +156,6 @@ export default function SignupModal({ onClose, onSwitchToLogin}) {
             <option value="CANADA">Canada</option>
             <option value="UK">United Kingdom</option>
             <option value="AUSTRALIA">Australia</option>
-            <option value="OTHER">Other</option>
-          </select>
-
-        <p>Optional fields</p>
-
-          <select
-            className="form-select"
-            type="pronouns"
-            placeholder="Pronouns (optional)"
-            value={pronouns}
-            onChange={(e) => setPronouns(e.target.value)}
-          >
-            <option value="">Select Pronouns</option>
-            <option value="SHE_HER">She/Her</option>
-            <option value="HE_HIM">He/Him</option>
-            <option value="THEY_THEM">They/Them</option>
-            <option value="OTHER">Other</option>
-          </select>
-
-          <select
-            className="form-select"
-            type="skintype"
-            placeholder="Skin Type (optional)"
-            value={skintype}
-            onChange={(e) => setSkintype(e.target.value)}
-          >
-            <option value="">Select Skin Type</option>
-            <option value="OILY">Oily</option>
-            <option value="DRY">Dry</option>
-            <option value="COMBINATION">Combination</option>
-            <option value="OTHER">Other</option>
-          </select>
-
-          <select
-            className="form-select"
-            type="skincondition"
-            placeholder="Skin Condition (optional)"
-            value={skincondition}
-            onChange={(e) => setSkincondition(e.target.value)}
-          >
-            <option value="">Select Skin Condition</option>
-            <option value="NORMAL">Normal</option>
-            <option value="SENSITIVE">Sensitive</option>
-            <option value="ACNE_PRONE">Acne Prone</option>
-          </select>
-
-          <select
-            className="form-select"
-            type="hairtype"
-            placeholder="Hair Type (optional)"
-            value={hairtype}
-            onChange={(e) => setHairtype(e.target.value)}
-          >
-            <option value="">Select Hair Type</option>
-            <option value="STRAIGHT">Straight</option>
-            <option value="WAVY">Wavy</option>
-            <option value="CURLY">Curly</option>
-            <option value="COILY">Coily</option>
-            <option value="OTHER">Other</option>
-          </select>
-
-          <select
-            className="form-select"
-            type="hairdensity"
-            placeholder="Hair Density (optional)"
-            value={hairdensity}
-            onChange={(e) => setHairdensity(e.target.value)}
-          >
-            <option value="">Select Hair Density</option>
-            <option value="THIN">Thin</option>
-            <option value="MEDIUM">Medium</option>
-            <option value="THICK">Thick</option>
             <option value="OTHER">Other</option>
           </select>
 
