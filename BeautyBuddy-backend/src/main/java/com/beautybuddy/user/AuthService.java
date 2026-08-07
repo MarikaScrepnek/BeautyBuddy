@@ -63,8 +63,9 @@ public class AuthService {
         if (!"".equals(pronouns)) {
             user.setPronouns(PronounEnum.valueOf(pronouns));
         }
-        if (!"".equals(birthday)) {
-            user.setDateOfBirth(LocalDate.parse(birthday));
+        LocalDate parsedBirthday = parseBirthday(birthday);
+        if (parsedBirthday != null) {
+            user.setDateOfBirth(parsedBirthday);
         }
         if (!"".equals(country)) {
             user.setCountry(CountryEnum.valueOf(country));
@@ -163,7 +164,10 @@ public class AuthService {
             user.setPronouns(PronounEnum.valueOf(updates.get("pronouns")));
         }
         if (updates.containsKey("birthday")) {
-            user.setDateOfBirth(LocalDate.parse(updates.get("birthday")));
+            LocalDate parsedBirthday = parseBirthday(updates.get("birthday"));
+            if (parsedBirthday != null) {
+                user.setDateOfBirth(parsedBirthday);
+            }
         }
         if (updates.containsKey("country")) {
             user.setCountry(CountryEnum.valueOf(updates.get("country")));
@@ -182,5 +186,18 @@ public class AuthService {
         }
 
         userRepo.save(user);
+    }
+
+    private LocalDate parseBirthday(String birthday) {
+        if (birthday == null) {
+            return null;
+        }
+
+        String normalizedBirthday = birthday.trim();
+        if (normalizedBirthday.isEmpty()) {
+            return null;
+        }
+
+        return LocalDate.parse(normalizedBirthday);
     }
 }

@@ -171,6 +171,11 @@ function parseBirthdayParts(birthday) {
         return { month: '', day: '', year: '' };
     }
 
+    const match = String(birthday).match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (match) {
+        return { year: match[1], month: match[2], day: match[3] };
+    }
+
     const date = new Date(birthday);
     if (!Number.isNaN(date.getTime())) {
         return {
@@ -178,11 +183,6 @@ function parseBirthdayParts(birthday) {
             day: String(date.getDate()).padStart(2, '0'),
             year: String(date.getFullYear()),
         };
-    }
-
-    const match = String(birthday).match(/^(\d{4})-(\d{2})-(\d{2})/);
-    if (match) {
-        return { year: match[1], month: match[2], day: match[3] };
     }
 
     return { month: '', day: '', year: '' };
