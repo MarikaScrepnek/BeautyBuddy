@@ -176,6 +176,15 @@
     transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease, background-color 0.18s ease;
 }
 
+.profile-info-item__select--multi {
+    min-height: 7.75rem;
+    padding-right: 0.82rem;
+    background-image: none;
+    cursor: default;
+    overflow-y: auto;
+    vertical-align: top;
+}
+
 .profile-birthday-selects {
     display: grid;
     grid-template-columns: 1.2fr 0.8fr 1fr;

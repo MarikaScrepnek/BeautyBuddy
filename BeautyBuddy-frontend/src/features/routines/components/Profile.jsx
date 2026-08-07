@@ -32,6 +32,14 @@ function formatProfileValue(value) {
         return 'N/A';
     }
 
+    if (Array.isArray(value)) {
+        const formattedValues = value
+            .map((item) => formatProfileValue(item))
+            .filter((item) => item !== 'N/A');
+
+        return formattedValues.length > 0 ? formattedValues.join(', ') : 'N/A';
+    }
+
     const text = String(value).trim();
 
     const friendlyValues = {
@@ -76,6 +84,61 @@ function formatProfileValue(value) {
 function getAddProfileLabel(label) {
     return `Add ${label}`;
 }
+
+function normalizeSkinConcernSelections(value) {
+    if (Array.isArray(value)) {
+        return value.filter(Boolean);
+    }
+
+    if (typeof value === 'string') {
+        return value
+            .split(',')
+            .map((item) => item.trim())
+            .filter(Boolean);
+    }
+
+    return [];
+}
+
+function getStoredSkinConcernSelections(username) {
+    if (typeof window === 'undefined' || !username) {
+        return [];
+    }
+
+    try {
+        const storedValue = window.localStorage.getItem(`beautybuddy:skin-concerns:${username}`);
+        if (!storedValue) {
+            return [];
+        }
+
+        return normalizeSkinConcernSelections(JSON.parse(storedValue));
+    } catch {
+        return [];
+    }
+}
+
+function saveStoredSkinConcernSelections(username, selections) {
+    if (typeof window === 'undefined' || !username) {
+        return;
+    }
+
+    try {
+        const normalizedSelections = normalizeSkinConcernSelections(selections);
+        if (normalizedSelections.length > 0) {
+            window.localStorage.setItem(`beautybuddy:skin-concerns:${username}`, JSON.stringify(normalizedSelections));
+        } else {
+            window.localStorage.removeItem(`beautybuddy:skin-concerns:${username}`);
+        }
+    } catch {
+        // Ignore storage failures and fall back to the server value.
+    }
+}
+
+const SKIN_CONCERN_OPTIONS = [
+    { value: 'NORMAL', label: 'Normal' },
+    { value: 'SENSITIVE', label: 'Sensitive' },
+    { value: 'ACNE_PRONE', label: 'Acne Prone' },
+];
 
 const MONTHS = [
     { value: '01', label: 'January' },
@@ -146,7 +209,7 @@ export default function Profile({ username, isOwner }) {
         birthdayYear: '',
         country: '',
         skintype: '',
-        skincondition: '',
+        skincondition: [],
         hairtype: '',
         hairdensity: '',
     });
@@ -184,6 +247,7 @@ export default function Profile({ username, isOwner }) {
 
     function startEditingProfile() {
         const birthdayParts = parseBirthdayParts(profile?.birthday);
+        const skinConcernSelections = getStoredSkinConcernSelections(username);
 
         setEditDraft({
             pronouns: profile?.pronoun ?? '',
@@ -193,7 +257,7 @@ export default function Profile({ username, isOwner }) {
             birthdayYear: birthdayParts.year,
             country: profile?.country ?? '',
             skintype: profile?.skinType ?? '',
-            skincondition: profile?.skinCondition ?? '',
+            skincondition: skinConcernSelections.length > 0 ? skinConcernSelections : normalizeSkinConcernSelections(profile?.skinCondition),
             hairtype: profile?.hairTexture ?? '',
             hairdensity: profile?.hairDensity ?? '',
         });
@@ -202,10 +266,13 @@ export default function Profile({ username, isOwner }) {
 
     async function handleEditProfile() {
         try {
+            const skincondition = normalizeSkinConcernSelections(editDraft.skincondition);
             await editProfile({
                 ...editDraft,
+                skincondition: skincondition[0] ?? '',
                 birthday: buildBirthdayValue(editDraft),
             });
+            saveStoredSkinConcernSelections(username, skincondition);
             await handleFetchProfile(username);
             setIsEditingProfile(false);
         } catch (err) {
@@ -218,7 +285,7 @@ export default function Profile({ username, isOwner }) {
         if (label === 'Birthday') return editDraft.birthday;
         if (label === 'Country') return editDraft.country;
         if (label === 'Skin Type') return editDraft.skintype;
-        if (label === 'Skin Condition') return editDraft.skincondition;
+        if (label === 'Skin Concerns') return editDraft.skincondition;
         if (label === 'Hair Texture') return editDraft.hairtype;
         if (label === 'Hair Density') return editDraft.hairdensity;
         return '';
@@ -231,6 +298,10 @@ export default function Profile({ username, isOwner }) {
     }
 
     function hasProfileValue(value) {
+        if (Array.isArray(value)) {
+            return value.length > 0;
+        }
+
         return value !== null && value !== undefined && String(value).trim() !== '';
     }
 
@@ -241,11 +312,13 @@ export default function Profile({ username, isOwner }) {
             ...(label === 'Birthday' ? { birthday: value } : {}),
             ...(label === 'Country' ? { country: value } : {}),
             ...(label === 'Skin Type' ? { skintype: value } : {}),
-            ...(label === 'Skin Condition' ? { skincondition: value } : {}),
+            ...(label === 'Skin Concerns' ? { skincondition: value } : {}),
             ...(label === 'Hair Texture' ? { hairtype: value } : {}),
             ...(label === 'Hair Density' ? { hairdensity: value } : {}),
         }));
     }
+
+    const skinConcernSelections = getStoredSkinConcernSelections(username);
 
     const profileSections = [
         {
@@ -262,7 +335,10 @@ export default function Profile({ username, isOwner }) {
             title: 'Skin',
             fields: [
                 { label: 'Skin Type', value: profile?.skinType },
-                { label: 'Skin Condition', value: profile?.skinCondition },
+                {
+                    label: 'Skin Concerns',
+                    value: skinConcernSelections.length > 0 ? skinConcernSelections : normalizeSkinConcernSelections(profile?.skinCondition),
+                },
             ],
         },
         {
@@ -384,16 +460,22 @@ export default function Profile({ username, isOwner }) {
                                                         <option value="COMBINATION">Combination</option>
                                                         <option value="OTHER">Other</option>
                                                     </select>
-                                                ) : field.label === 'Skin Condition' ? (
+                                                ) : field.label === 'Skin Concerns' ? (
                                                     <select
-                                                        className="profile-info-item__select"
+                                                        className="profile-info-item__select profile-info-item__select--multi"
                                                         value={editDraft.skincondition}
-                                                        onChange={(e) => setDraftField(field.label, e.target.value)}
+                                                        multiple
+                                                        size={SKIN_CONCERN_OPTIONS.length}
+                                                        onChange={(e) => {
+                                                            const selectedValues = Array.from(e.target.selectedOptions, (option) => option.value);
+                                                            setDraftField(field.label, selectedValues);
+                                                        }}
                                                     >
-                                                        <option value="">Select Skin Condition</option>
-                                                        <option value="NORMAL">Normal</option>
-                                                        <option value="SENSITIVE">Sensitive</option>
-                                                        <option value="ACNE_PRONE">Acne Prone</option>
+                                                        {SKIN_CONCERN_OPTIONS.map((option) => (
+                                                            <option key={option.value} value={option.value}>
+                                                                {option.label}
+                                                            </option>
+                                                        ))}
                                                     </select>
                                                 ) : field.label === 'Hair Texture' ? (
                                                     <select 
