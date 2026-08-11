@@ -10,7 +10,7 @@ CREATE TYPE hair_texture_enum AS ENUM ('STRAIGHT', 'WAVY', 'CURLY', 'COILY', 'OT
 CREATE TYPE hair_density_enum AS ENUM ('THIN', 'MEDIUM', 'THICK', 'OTHER');
 
 CREATE TYPE skin_type_enum AS ENUM ('OILY', 'DRY', 'COMBINATION', 'OTHER');
-CREATE TYPE skin_condition_enum AS ENUM ('SENSITIVE', 'NORMAL', 'ACNE_PRONE');
+CREATE TYPE skin_concern_enum AS ENUM ('SENSITIVITY', 'ACNE', 'AGING', 'HYPERPIGMENTATION');
 
 ALTER TABLE account
     ADD COLUMN country country_enum,
@@ -21,4 +21,4 @@ ALTER TABLE account
     ADD COLUMN hair_texture hair_texture_enum,
     ADD COLUMN hair_density hair_density_enum,
     ADD COLUMN skin_type skin_type_enum,
-    ADD COLUMN skin_condition skin_condition_enum;
+    ADD COLUMN skin_concern skin_concern_enum[];
