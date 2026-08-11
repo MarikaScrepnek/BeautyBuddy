@@ -21,4 +21,4 @@ ALTER TABLE account
     ADD COLUMN hair_texture hair_texture_enum,
     ADD COLUMN hair_density hair_density_enum,
     ADD COLUMN skin_type skin_type_enum,
-    ADD COLUMN skin_concern skin_concern_enum[];
+    ADD COLUMN skin_concerns skin_concern_enum[];
