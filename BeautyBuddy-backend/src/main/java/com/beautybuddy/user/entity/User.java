@@ -11,7 +11,7 @@ import com.beautybuddy.user.enums.CountryEnum;
 import com.beautybuddy.user.enums.HairDensityEnum;
 import com.beautybuddy.user.enums.HairTextureEnum;
 import com.beautybuddy.user.enums.PronounEnum;
-import com.beautybuddy.user.enums.SkinConditionEnum;
+import com.beautybuddy.user.enums.SkinConcernEnum;
 import com.beautybuddy.user.enums.SkinTypeEnum;
 import com.beautybuddy.wishlist.entity.Wishlist;
 
@@ -89,8 +89,8 @@ public class User extends SoftDeletableEntity {
 
     @Enumerated
     @JdbcType(PostgreSQLEnumJdbcType.class)
-    @Column(columnDefinition = "skin_condition_enum", name = "skin_condition", nullable = true)
-    private SkinConditionEnum skinCondition;
+    @Column(columnDefinition = "skin_concern_enum", name = "skin_concerns", nullable = true)
+    private SkinConcernEnum[] skinConcerns;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Wishlist wishlist;
@@ -250,11 +250,11 @@ public class User extends SoftDeletableEntity {
         this.skinType = skinType;
     }
 
-    public SkinConditionEnum getSkinCondition() {
-        return skinCondition;
+    public SkinConcernEnum[] getSkinConcerns() {
+        return skinConcerns;
     }
 
-    public void setSkinCondition(SkinConditionEnum skinCondition) {
-        this.skinCondition = skinCondition;
+    public void setSkinConcerns(SkinConcernEnum[] skinConcerns) {
+        this.skinConcerns = skinConcerns;
     }
 }
