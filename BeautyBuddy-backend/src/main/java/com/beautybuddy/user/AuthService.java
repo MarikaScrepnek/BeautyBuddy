@@ -21,7 +21,7 @@ import com.beautybuddy.user.enums.CountryEnum;
 import com.beautybuddy.user.enums.HairDensityEnum;
 import com.beautybuddy.user.enums.HairTextureEnum;
 import com.beautybuddy.user.enums.PronounEnum;
-import com.beautybuddy.user.enums.SkinConditionEnum;
+import com.beautybuddy.user.enums.SkinConcernEnum;
 import com.beautybuddy.user.enums.SkinTypeEnum;
 import com.beautybuddy.user.repo.UserRepository;
 import com.beautybuddy.wishlist.entity.Wishlist;
@@ -74,7 +74,7 @@ public class AuthService {
             user.setSkinType(SkinTypeEnum.valueOf(skintype));
         }
         if (!"".equals(skincondition)) {
-            user.setSkinCondition(SkinConditionEnum.valueOf(skincondition));
+            user.setSkinConcerns(parseSkinConcerns(skincondition));
         }
         if (!"".equals(hairtype)) {
             user.setHairTexture(HairTextureEnum.valueOf(hairtype));
@@ -175,8 +175,8 @@ public class AuthService {
         if (updates.containsKey("skintype")) {
             user.setSkinType(SkinTypeEnum.valueOf(updates.get("skintype")));
         }
-        if (updates.containsKey("skincondition")) {
-            user.setSkinCondition(SkinConditionEnum.valueOf(updates.get("skincondition")));
+        if (updates.containsKey("skinconcerns")) {
+            user.setSkinConcerns(parseSkinConcerns(updates.get("skinconcerns")));
         }
         if (updates.containsKey("hairtype")) {
             user.setHairTexture(HairTextureEnum.valueOf(updates.get("hairtype")));
@@ -199,5 +199,16 @@ public class AuthService {
         }
 
         return LocalDate.parse(normalizedBirthday);
+    }
+
+    private SkinConcernEnum[] parseSkinConcerns(String skinConcerns) {
+        String[] values = skinConcerns.split(",");
+        SkinConcernEnum[] concerns = new SkinConcernEnum[values.length];
+
+        for (int i = 0; i < values.length; i++) {
+            concerns[i] = SkinConcernEnum.valueOf(values[i].trim());
+        }
+
+        return concerns;
     }
 }
