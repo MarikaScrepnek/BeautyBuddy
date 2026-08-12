@@ -4,7 +4,7 @@ import com.beautybuddy.user.enums.CountryEnum;
 import com.beautybuddy.user.enums.HairDensityEnum;
 import com.beautybuddy.user.enums.HairTextureEnum;
 import com.beautybuddy.user.enums.PronounEnum;
-import com.beautybuddy.user.enums.SkinConditionEnum;
+import com.beautybuddy.user.enums.SkinConcernEnum;
 import com.beautybuddy.user.enums.SkinTypeEnum;
 
 public record UserSearchDTO(
@@ -18,7 +18,7 @@ public record UserSearchDTO(
         HairDensityEnum hairDensity,
         HairTextureEnum hairTexture,
         SkinTypeEnum skinType,
-        SkinConditionEnum skinCondition
+        SkinConcernEnum[] skinConcerns
         ) {
 
 }
