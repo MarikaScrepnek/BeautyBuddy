@@ -232,7 +232,7 @@ public class DTOMapper {
                 user.getHairDensity(),
                 user.getHairTexture(),
                 user.getSkinType(),
-                user.getSkinCondition()
+                user.getSkinConcerns()
         );
     }
 
