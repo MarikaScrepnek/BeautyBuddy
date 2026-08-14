@@ -3,6 +3,7 @@ package com.beautybuddy.user.entity;
 import java.time.LocalDate;
 
 import org.hibernate.annotations.JdbcType;
+import org.hibernate.annotations.Parameter;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 import com.beautybuddy.breakout.entity.BreakoutList;
@@ -21,6 +22,10 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+
+import io.hypersistence.utils.hibernate.type.array.EnumArrayType;
+
+import org.hibernate.annotations.Type;
 
 @Entity
 @Table(name = "account")
@@ -87,9 +92,8 @@ public class User extends SoftDeletableEntity {
     @Column(columnDefinition = "skin_type_enum", name = "skin_type", nullable = true)
     private SkinTypeEnum skinType;
 
-    @Enumerated
-    @JdbcType(PostgreSQLEnumJdbcType.class)
-    @Column(columnDefinition = "skin_concern_enum", name = "skin_concerns", nullable = true)
+    @Type(value = EnumArrayType.class, parameters = @Parameter(name = "sql_array_type", value = "skin_concern_enum"))
+    @Column(columnDefinition = "skin_concern_enum[]", name = "skin_concerns", nullable = true)
     private SkinConcernEnum[] skinConcerns;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
