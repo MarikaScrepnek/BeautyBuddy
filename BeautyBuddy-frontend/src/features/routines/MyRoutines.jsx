@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 
 import { getCurrentUser } from '../auth/api/authApi';
 
@@ -14,10 +15,14 @@ import BreakoutList from '../breakout/components/BreakoutList';
 import { searchUsers } from '../user/api/userApi';
 
 export default function MyRoutines() {
+  const { username: routeUsername } = useParams();
+
   // log in
   const [isAuthLoading, setIsAuthLoading] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState("");
+
+  const profileUsername = routeUsername || username;
 
   // sidebar state
   const [selected, setSelected] = useState("Profile");
@@ -35,12 +40,16 @@ export default function MyRoutines() {
   useEffect(() => {
     getCurrentUser()
       .then((user) => {
+        const currentUsername = user.username;
+        const targetUsername = routeUsername || currentUsername;
+
         setIsLoggedIn(true);
-        setUsername(user.username);
-        setIsOwner(user.username === window.location.pathname.split("/").slice(-1)[0]);
+        setUsername(currentUsername);
+        setIsOwner(currentUsername === targetUsername);
       })
       .catch((err) => {
         setIsLoggedIn(false);
+        setIsOwner(false);
         console.error("Error loading routines profile:", err);
       })
       .finally(() => setIsAuthLoading(false));
@@ -62,7 +71,7 @@ export default function MyRoutines() {
         setHaircareRoutine(data);
       })
       .catch((err) => console.error("Error fetching haircare routine:", err));
-  }, []);
+  }, [routeUsername]);
 
   return (
     <>
@@ -81,11 +90,11 @@ export default function MyRoutines() {
   <div className='routines-page-container'>
 
     {isLoggedIn && isOwner && (
-      <p style={{textAlign: "center", textDecoration: "underline", textDecorationColor: "#f0cef0"}}>Welcome back, {username}!</p>
+      <p style={{textAlign: "center", textDecoration: "underline", textDecorationColor: "#f0cef0"}}>Welcome back, {profileUsername}!</p>
     )}
 
     {!isOwner && (
-      <p style={{textAlign: "center", textDecoration: "underline", textDecorationColor: "#f0cef0"}}>Viewing {username}'s routines</p>
+      <p style={{textAlign: "center", textDecoration: "underline", textDecorationColor: "#f0cef0"}}>Viewing {profileUsername}'s routines</p>
     )}
 
     <div style={{display: "flex", flexDirection: "row", minHeight: "80vh"}}>
@@ -201,7 +210,7 @@ export default function MyRoutines() {
       <main style={{ flex: 1, padding: "0 2rem" }}>
 
         {selected === "Profile" &&
-        <Profile username={username} isOwner={isOwner} /> 
+        <Profile username={profileUsername} isOwner={isOwner} /> 
         }
 
         {selected === "Wishlist" && 
@@ -213,15 +222,15 @@ export default function MyRoutines() {
         }
 
         {makeupRoutines.some(r => r.routineId === selected) && selectedRoutine &&
-          <SelectedRoutine userName={username} routine={selectedRoutine} routineType="Makeup" isOwner={isOwner} />
+          <SelectedRoutine userName={profileUsername} routine={selectedRoutine} routineType="Makeup" isOwner={isOwner} />
         }
 
         {skincareRoutines.some(r => r.routineId === selected) && selectedRoutine &&
-          <SelectedRoutine userName={username} routine={selectedRoutine} routineType="Skincare" isOwner={isOwner} />
+          <SelectedRoutine userName={profileUsername} routine={selectedRoutine} routineType="Skincare" isOwner={isOwner} />
         }
 
         {haircareRoutine.routineId === selected && selectedRoutine &&
-          <SelectedRoutine userName={username} routine={selectedRoutine} routineType="Haircare" isOwner={isOwner} />
+          <SelectedRoutine userName={profileUsername} routine={selectedRoutine} routineType="Haircare" isOwner={isOwner} />
         }
 
       </main>
