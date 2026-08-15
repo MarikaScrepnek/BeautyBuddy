@@ -24,11 +24,42 @@
     margin-bottom: 0.55rem;
 }
 
+.profile-info-card__identity {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    min-width: 0;
+}
+
 .profile-info-card__title {
     margin: 0;
     font-size: 1.02rem;
     font-weight: 700;
     color: #4a2742;
+}
+
+.profile-info-card__pronouns {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.2rem 0.5rem;
+    border-radius: 999px;
+    background: rgba(241, 214, 230, 0.45);
+    color: #744e6a;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+}
+
+.profile-info-card__pronoun-select {
+    min-width: 150px;
+    margin-top: 0;
+    padding-right: 2rem;
+    font-size: 0.76rem;
+    background-position:
+        calc(100% - 1rem) calc(50% - 1px),
+        calc(100% - 0.72rem) calc(50% - 1px);
 }
 
 .profile-info-card__chip {

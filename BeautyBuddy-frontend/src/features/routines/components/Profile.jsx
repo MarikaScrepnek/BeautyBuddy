@@ -209,6 +209,7 @@ export default function Profile({ username, isOwner }) {
     const [profile, setProfile] = useState(null);
     const [isEditingProfile, setIsEditingProfile] = useState(false);
     const [editDraft, setEditDraft] = useState({
+        pronouns: '',
         skintype: '',
         skincondition: [],
         hairtype: '',
@@ -262,6 +263,7 @@ export default function Profile({ username, isOwner }) {
         const skinConcernSelections = getStoredSkinConcernSelections(username);
 
         setEditDraft({
+            pronouns: profile?.pronoun ?? '',
             skintype: profile?.skinType ?? '',
             skincondition: skinConcernSelections.length > 0 ? skinConcernSelections : normalizeSkinConcernSelections(profile?.skinCondition),
             hairtype: profile?.hairTexture ?? '',
@@ -274,6 +276,7 @@ export default function Profile({ username, isOwner }) {
         try {
             const skincondition = normalizeSkinConcernSelections(editDraft.skincondition);
             await editProfile({
+                pronouns: editDraft.pronouns,
                 skintype: editDraft.skintype,
                 hairtype: editDraft.hairtype,
                 hairdensity: editDraft.hairdensity,
@@ -359,7 +362,26 @@ export default function Profile({ username, isOwner }) {
             {profile && (
                 <section className="profile-info-card" aria-label="Profile information">
                     <div className="profile-info-card__title-row">
-                        <h2 className="profile-info-card__title">Profile Info</h2>
+                        <div className="profile-info-card__identity">
+                            <h2 className="profile-info-card__title">{username}</h2>
+                            {!isEditingProfile ? (
+                                profile?.pronoun ? (
+                                    <span className="profile-info-card__pronouns">{formatProfileValue(profile.pronoun)}</span>
+                                ) : null
+                            ) : (
+                                <select
+                                    className="profile-info-item__select profile-info-card__pronoun-select"
+                                    value={editDraft.pronouns}
+                                    onChange={(event) => setEditDraft((current) => ({ ...current, pronouns: event.target.value }))}
+                                >
+                                    <option value="">Select pronouns</option>
+                                    <option value="SHE_HER">She/Her</option>
+                                    <option value="HE_HIM">He/Him</option>
+                                    <option value="THEY_THEM">They/Them</option>
+                                    <option value="OTHER">Other</option>
+                                </select>
+                            )}
+                        </div>
                         <span className="profile-info-card__chip">Beauty Profile</span>
                     </div>
 
