@@ -232,7 +232,8 @@ public class DTOMapper {
                 user.getHairDensity(),
                 user.getHairTexture(),
                 user.getSkinType(),
-                user.getSkinConcerns()
+                user.getSkinConcerns(),
+                user.getDateOfBirth()
         );
     }
 

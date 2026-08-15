@@ -1,5 +1,7 @@
 package com.beautybuddy.user.dto;
 
+import java.time.LocalDate;
+
 import com.beautybuddy.user.enums.CountryEnum;
 import com.beautybuddy.user.enums.HairDensityEnum;
 import com.beautybuddy.user.enums.HairTextureEnum;
@@ -18,7 +20,8 @@ public record UserSearchDTO(
         HairDensityEnum hairDensity,
         HairTextureEnum hairTexture,
         SkinTypeEnum skinType,
-        SkinConcernEnum[] skinConcerns
+        SkinConcernEnum[] skinConcerns,
+        LocalDate birthdate
         ) {
 
 }
