@@ -228,12 +228,10 @@ public class DTOMapper {
                 isFollower,
                 isCurrentUser,
                 user.getPronouns(),
-                user.getCountry(),
                 user.getHairDensity(),
                 user.getHairTexture(),
                 user.getSkinType(),
-                user.getSkinConcerns(),
-                user.getDateOfBirth()
+                user.getSkinConcerns()
         );
     }
 
