@@ -209,12 +209,6 @@ export default function Profile({ username, isOwner }) {
     const [profile, setProfile] = useState(null);
     const [isEditingProfile, setIsEditingProfile] = useState(false);
     const [editDraft, setEditDraft] = useState({
-        pronouns: '',
-        birthday: '',
-        birthdayMonth: '',
-        birthdayDay: '',
-        birthdayYear: '',
-        country: '',
         skintype: '',
         skincondition: [],
         hairtype: '',
@@ -265,16 +259,9 @@ export default function Profile({ username, isOwner }) {
     };
 
     function startEditingProfile() {
-        const birthdayParts = parseBirthdayParts(profile?.birthday);
         const skinConcernSelections = getStoredSkinConcernSelections(username);
 
         setEditDraft({
-            pronouns: profile?.pronoun ?? '',
-            birthday: profile?.birthday ?? '',
-            birthdayMonth: birthdayParts.month,
-            birthdayDay: birthdayParts.day,
-            birthdayYear: birthdayParts.year,
-            country: profile?.country ?? '',
             skintype: profile?.skinType ?? '',
             skincondition: skinConcernSelections.length > 0 ? skinConcernSelections : normalizeSkinConcernSelections(profile?.skinCondition),
             hairtype: profile?.hairTexture ?? '',
@@ -287,13 +274,10 @@ export default function Profile({ username, isOwner }) {
         try {
             const skincondition = normalizeSkinConcernSelections(editDraft.skincondition);
             await editProfile({
-                pronouns: editDraft.pronouns,
-                country: editDraft.country,
                 skintype: editDraft.skintype,
                 hairtype: editDraft.hairtype,
                 hairdensity: editDraft.hairdensity,
                 skinconcerns: skincondition.join(','),
-                birthday: buildBirthdayValue(editDraft),
             });
             saveStoredSkinConcernSelections(username, skincondition);
             await handleFetchProfile(username);
@@ -304,9 +288,6 @@ export default function Profile({ username, isOwner }) {
       }
 
     function getDraftFieldValue(label) {
-        if (label === 'Pronouns') return editDraft.pronouns;
-        if (label === 'Birthday') return editDraft.birthday;
-        if (label === 'Country') return editDraft.country;
         if (label === 'Skin Type') return editDraft.skintype;
         if (label === 'Skin Concerns') return editDraft.skincondition;
         if (label === 'Hair Texture') return editDraft.hairtype;
@@ -331,9 +312,6 @@ export default function Profile({ username, isOwner }) {
     function setDraftField(label, value) {
         setEditDraft((current) => ({
             ...current,
-            ...(label === 'Pronouns' ? { pronouns: value } : {}),
-            ...(label === 'Birthday' ? { birthday: value } : {}),
-            ...(label === 'Country' ? { country: value } : {}),
             ...(label === 'Skin Type' ? { skintype: value } : {}),
             ...(label === 'Skin Concerns' ? { skincondition: value } : {}),
             ...(label === 'Hair Texture' ? { hairtype: value } : {}),
@@ -355,15 +333,6 @@ export default function Profile({ username, isOwner }) {
     const skinConcernSelections = getStoredSkinConcernSelections(username);
 
     const profileSections = [
-        {
-            key: 'general',
-            title: 'General',
-            fields: [
-                { label: 'Pronouns', value: profile?.pronoun },
-                { label: 'Birthday', value: profile?.birthday },
-                { label: 'Country', value: profile?.country },
-            ],
-        },
         {
             key: 'skin',
             title: 'Skin',
@@ -418,71 +387,7 @@ export default function Profile({ username, isOwner }) {
                                                 )
                                             )}
                                             {isEditingProfile && (
-                                                field.label === 'Pronouns' ? (
-                                                    <select
-                                                        className="profile-info-item__select"
-                                                        value={editDraft.pronouns}
-                                                        onChange={(e) => setDraftField(field.label, e.target.value)}
-                                                    >
-                                                        <option value="">Select Pronouns</option>
-                                                        <option value="SHE_HER">She/Her</option>
-                                                        <option value="HE_HIM">He/Him</option>
-                                                        <option value="THEY_THEM">They/Them</option>
-                                                        <option value="OTHER">Other</option>
-                                                    </select>
-                                                ) : field.label === 'Birthday' ? (
-                                                    <div className="profile-birthday-selects">
-                                                        <select
-                                                            className="profile-info-item__select"
-                                                            value={editDraft.birthdayMonth}
-                                                            onChange={(e) => setEditDraft((current) => ({ ...current, birthdayMonth: e.target.value }))}
-                                                        >
-                                                            <option value="">Month</option>
-                                                            {MONTHS.map((month) => (
-                                                                <option key={month.value} value={month.value}>
-                                                                    {month.label}
-                                                                </option>
-                                                            ))}
-                                                        </select>
-                                                        <select
-                                                            className="profile-info-item__select"
-                                                            value={editDraft.birthdayDay}
-                                                            onChange={(e) => setEditDraft((current) => ({ ...current, birthdayDay: e.target.value }))}
-                                                        >
-                                                            <option value="">Day</option>
-                                                            {DAYS.map((day) => (
-                                                                <option key={day.value} value={day.value}>
-                                                                    {day.label}
-                                                                </option>
-                                                            ))}
-                                                        </select>
-                                                        <select
-                                                            className="profile-info-item__select"
-                                                            value={editDraft.birthdayYear}
-                                                            onChange={(e) => setEditDraft((current) => ({ ...current, birthdayYear: e.target.value }))}
-                                                        >
-                                                            <option value="">Year</option>
-                                                            {YEARS.map((year) => (
-                                                                <option key={year.value} value={year.value}>
-                                                                    {year.label}
-                                                                </option>
-                                                            ))}
-                                                        </select>
-                                                    </div>
-                                                ) : field.label === 'Country' ? (
-                                                    <select 
-                                                        className="profile-info-item__select"
-                                                        value={editDraft.country}
-                                                        onChange={(e) => setDraftField(field.label, e.target.value)}
-                                                    >
-                                                        <option value="">Select Country</option>
-                                                        <option value="USA">United States</option>
-                                                        <option value="CANADA">Canada</option>
-                                                        <option value="UK">United Kingdom</option>
-                                                        <option value="AUSTRALIA">Australia</option>
-                                                        <option value="OTHER">Other</option>
-                                                    </select>
-                                                ) : field.label === 'Skin Type' ? (
+                                                field.label === 'Skin Type' ? (
                                                     <select 
                                                         className="profile-info-item__select"
                                                         value={editDraft.skintype}
