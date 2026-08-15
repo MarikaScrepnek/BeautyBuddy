@@ -57,6 +57,10 @@ function formatProfileValue(value) {
         NORMAL: 'Normal',
         SENSITIVE: 'Sensitive',
         ACNE_PRONE: 'Acne Prone',
+        SENSITIVITY: 'Sensitivity',
+        ACNE: 'Acne',
+        AGING: 'Aging',
+        HYPERPIGMENTATION: 'Hyperpigmentation',
         STRAIGHT: 'Straight',
         WAVY: 'Wavy',
         CURLY: 'Curly',
@@ -87,13 +91,15 @@ function getAddProfileLabel(label) {
 
 function normalizeSkinConcernSelections(value) {
     if (Array.isArray(value)) {
-        return value.filter(Boolean);
+        return value
+            .map((item) => String(item).trim().toUpperCase().replace(/\s+/g, '_'))
+            .filter(Boolean);
     }
 
     if (typeof value === 'string') {
         return value
             .split(',')
-            .map((item) => item.trim())
+            .map((item) => item.trim().toUpperCase().replace(/\s+/g, '_'))
             .filter(Boolean);
     }
 
@@ -135,9 +141,10 @@ function saveStoredSkinConcernSelections(username, selections) {
 }
 
 const SKIN_CONCERN_OPTIONS = [
-    { value: 'NORMAL', label: 'Normal' },
-    { value: 'SENSITIVE', label: 'Sensitive' },
-    { value: 'ACNE_PRONE', label: 'Acne Prone' },
+    { value: 'SENSITIVITY', label: 'Sensitivity' },
+    { value: 'ACNE', label: 'Acne' },
+    { value: 'AGING', label: 'Aging' },
+    { value: 'HYPERPIGMENTATION', label: 'Hyperpigmentation' },
 ];
 
 const MONTHS = [
@@ -280,8 +287,12 @@ export default function Profile({ username, isOwner }) {
         try {
             const skincondition = normalizeSkinConcernSelections(editDraft.skincondition);
             await editProfile({
-                ...editDraft,
-                skincondition: skincondition[0] ?? '',
+                pronouns: editDraft.pronouns,
+                country: editDraft.country,
+                skintype: editDraft.skintype,
+                hairtype: editDraft.hairtype,
+                hairdensity: editDraft.hairdensity,
+                skinconcerns: skincondition.join(','),
                 birthday: buildBirthdayValue(editDraft),
             });
             saveStoredSkinConcernSelections(username, skincondition);
@@ -328,6 +339,17 @@ export default function Profile({ username, isOwner }) {
             ...(label === 'Hair Texture' ? { hairtype: value } : {}),
             ...(label === 'Hair Density' ? { hairdensity: value } : {}),
         }));
+    }
+
+    function toggleSkinConcernOption(optionValue) {
+        const normalizedOption = normalizeSkinConcernSelections([optionValue])[0];
+        const currentSelections = normalizeSkinConcernSelections(editDraft.skincondition);
+        const isSelected = currentSelections.includes(normalizedOption);
+        const nextSelections = isSelected
+            ? currentSelections.filter((value) => value !== normalizedOption)
+            : [...currentSelections, normalizedOption];
+
+        setDraftField('Skin Concerns', nextSelections);
     }
 
     const skinConcernSelections = getStoredSkinConcernSelections(username);
@@ -473,22 +495,20 @@ export default function Profile({ username, isOwner }) {
                                                         <option value="OTHER">Other</option>
                                                     </select>
                                                 ) : field.label === 'Skin Concerns' ? (
-                                                    <select
-                                                        className="profile-info-item__select profile-info-item__select--multi"
-                                                        value={editDraft.skincondition}
-                                                        multiple
-                                                        size={SKIN_CONCERN_OPTIONS.length}
-                                                        onChange={(e) => {
-                                                            const selectedValues = Array.from(e.target.selectedOptions, (option) => option.value);
-                                                            setDraftField(field.label, selectedValues);
-                                                        }}
-                                                    >
+                                                    <div className="profile-skin-concerns">
+                                                        <p className="profile-skin-concerns__hint">Select all that apply</p>
                                                         {SKIN_CONCERN_OPTIONS.map((option) => (
-                                                            <option key={option.value} value={option.value}>
-                                                                {option.label}
-                                                            </option>
+                                                            <label key={option.value} className="profile-skin-concerns__option">
+                                                                <input
+                                                                    type="checkbox"
+                                                                    className="profile-skin-concerns__checkbox"
+                                                                    checked={normalizeSkinConcernSelections(editDraft.skincondition).includes(option.value)}
+                                                                    onChange={() => toggleSkinConcernOption(option.value)}
+                                                                />
+                                                                <span className="profile-skin-concerns__label">{option.label}</span>
+                                                            </label>
                                                         ))}
-                                                    </select>
+                                                    </div>
                                                 ) : field.label === 'Hair Texture' ? (
                                                     <select 
                                                         className="profile-info-item__select"
