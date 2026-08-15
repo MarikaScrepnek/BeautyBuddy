@@ -226,7 +226,13 @@ public class DTOMapper {
                 user.getAvatarLink(),
                 isFollowing,
                 isFollower,
-                isCurrentUser);
+                isCurrentUser,
+                user.getPronouns(),
+                user.getHairDensity(),
+                user.getHairTexture(),
+                user.getSkinType(),
+                user.getSkinConcerns()
+        );
     }
 
     public static ActivityDTO toActivityDTO(Activity activity) {

@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -110,7 +111,8 @@ public class ActivityService {
     }
 
     public Page<ActivityDTO> getActivitiesByUsername(String username) {
-        Page<Activity> activities = activityRepository.findByActor_Username(username, PageRequest.of(0, 10));
+        Page<Activity> activities = activityRepository.findByActor_Username(username,
+                PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdAt")));
         return activities.map(DTOMapper::toActivityDTO);
     }
 
@@ -124,7 +126,7 @@ public class ActivityService {
         }
 
         Page<Activity> activities = activityRepository.findByActor_UsernameIn(followedUsernames,
-                PageRequest.of(0, 10));
+                PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdAt")));
         return activities.map(DTOMapper::toActivityDTO);
     }
 }

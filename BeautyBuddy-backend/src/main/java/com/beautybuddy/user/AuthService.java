@@ -1,6 +1,8 @@
 package com.beautybuddy.user;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Map;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,12 @@ import com.beautybuddy.routine.entity.Routine;
 import com.beautybuddy.routine.entity.TimeOfDayEnum;
 import com.beautybuddy.routine.repo.RoutineRepository;
 import com.beautybuddy.user.entity.User;
+import com.beautybuddy.user.enums.CountryEnum;
+import com.beautybuddy.user.enums.HairDensityEnum;
+import com.beautybuddy.user.enums.HairTextureEnum;
+import com.beautybuddy.user.enums.PronounEnum;
+import com.beautybuddy.user.enums.SkinConcernEnum;
+import com.beautybuddy.user.enums.SkinTypeEnum;
 import com.beautybuddy.user.repo.UserRepository;
 import com.beautybuddy.wishlist.entity.Wishlist;
 
@@ -44,7 +52,7 @@ public class AuthService {
         this.breakoutListRepo = breakoutListRepo;
     }
 
-    public void register(String username, String email, String rawPassword) {
+    public void register(String username, String email, String rawPassword, String pronouns, String birthday, String country, String skintype, String skincondition, String hairtype, String hairdensity) {
         email = email.trim().toLowerCase();
         String hash = encoder.encode(rawPassword);
 
@@ -52,6 +60,28 @@ public class AuthService {
         user.setUsername(username);
         user.setEmail(email);
         user.setPasswordHash(hash);
+        if (!"".equals(pronouns)) {
+            user.setPronouns(PronounEnum.valueOf(pronouns));
+        }
+        LocalDate parsedBirthday = parseBirthday(birthday);
+        if (parsedBirthday != null) {
+            user.setDateOfBirth(parsedBirthday);
+        }
+        if (!"".equals(country)) {
+            user.setCountry(CountryEnum.valueOf(country));
+        }
+        if (!"".equals(skintype)) {
+            user.setSkinType(SkinTypeEnum.valueOf(skintype));
+        }
+        if (!"".equals(skincondition)) {
+            user.setSkinConcerns(parseSkinConcerns(skincondition));
+        }
+        if (!"".equals(hairtype)) {
+            user.setHairTexture(HairTextureEnum.valueOf(hairtype));
+        }
+        if (!"".equals(hairdensity)) {
+            user.setHairDensity(HairDensityEnum.valueOf(hairdensity));
+        }
 
         Wishlist wishlist = new Wishlist();
         wishlist.setUser(user);
@@ -124,5 +154,56 @@ public class AuthService {
                 .orElseThrow(() -> new RuntimeException("user not found"));
 
         return encoder.matches(rawPassword, user.getPasswordHash());
+    }
+
+    public void updateProfile(String username, String email, Map<String, String> updates) {
+        User user = userRepo.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("user not found"));
+
+        if (updates.containsKey("pronouns") && !isBlank(updates.get("pronouns"))) {
+            user.setPronouns(PronounEnum.valueOf(updates.get("pronouns")));
+        }
+        if (updates.containsKey("skintype") && !isBlank(updates.get("skintype"))) {
+            user.setSkinType(SkinTypeEnum.valueOf(updates.get("skintype")));
+        }
+        if (updates.containsKey("skinconcerns") && !isBlank(updates.get("skinconcerns"))) {
+            user.setSkinConcerns(parseSkinConcerns(updates.get("skinconcerns")));
+        }
+        if (updates.containsKey("hairtype") && !isBlank(updates.get("hairtype"))) {
+            user.setHairTexture(HairTextureEnum.valueOf(updates.get("hairtype")));
+        }
+        if (updates.containsKey("hairdensity") && !isBlank(updates.get("hairdensity"))) {
+            user.setHairDensity(HairDensityEnum.valueOf(updates.get("hairdensity")));
+        }
+
+        userRepo.save(user);
+    }
+
+    private boolean isBlank(String value) {
+        return value == null || value.trim().isEmpty();
+    }
+
+    private LocalDate parseBirthday(String birthday) {
+        if (birthday == null) {
+            return null;
+        }
+
+        String normalizedBirthday = birthday.trim();
+        if (normalizedBirthday.isEmpty()) {
+            return null;
+        }
+
+        return LocalDate.parse(normalizedBirthday);
+    }
+
+    private SkinConcernEnum[] parseSkinConcerns(String skinConcerns) {
+        String[] values = skinConcerns.split(",");
+        SkinConcernEnum[] concerns = new SkinConcernEnum[values.length];
+
+        for (int i = 0; i < values.length; i++) {
+            concerns[i] = SkinConcernEnum.valueOf(values[i].trim());
+        }
+
+        return concerns;
     }
 }

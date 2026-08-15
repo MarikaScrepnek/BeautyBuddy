@@ -2,13 +2,13 @@ import { API_BASE_URL } from '../../../config/apiBase';
 
 const AUTH_BASE = `${API_BASE_URL}/auth`;
 
-export async function registerUser(email, username, password) {
+export async function registerUser(email, username, password, pronouns, birthday, country, skintype, skincondition, hairtype, hairdensity) {
     const res = await fetch(`${AUTH_BASE}/register`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ username, email, password }),
+        body: JSON.stringify({ username, email, password, pronouns, birthday, country, skintype, skincondition, hairtype, hairdensity }),
     });
     return res.json();
 }
@@ -38,6 +38,24 @@ export async function getCurrentUser() {
         throw new Error('Failed to fetch current user');
     }
     return data;
+}
+
+export async function editProfile(profileUpdates) {
+    const res = await fetch(`${AUTH_BASE}/edit-profile`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(profileUpdates),
+    });
+
+    if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data?.error || 'Failed to update profile');
+    }
+
+    return res.json().catch(() => ({}));
 }
 
 export async function logoutUser() {
