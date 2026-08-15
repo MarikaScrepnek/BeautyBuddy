@@ -238,7 +238,19 @@ export default function Profile({ username, isOwner }) {
         try {
             const users = await searchUsers(profileUsername);
             const currentUser = users.find((entry) => entry.username === profileUsername);
-            setProfile(currentUser ?? null);
+            const normalizedProfile = currentUser
+                ? {
+                    ...currentUser,
+                    pronoun: currentUser.pronoun ?? currentUser.pronouns ?? '',
+                    birthday: currentUser.birthday ?? currentUser.birthdate ?? currentUser.dateOfBirth ?? '',
+                    country: currentUser.country ?? '',
+                    skinType: currentUser.skinType ?? currentUser.skin_type ?? '',
+                    skinCondition: currentUser.skinCondition ?? currentUser.skinConditions ?? currentUser.skinConcerns ?? '',
+                    hairTexture: currentUser.hairTexture ?? currentUser.hair_texture ?? '',
+                    hairDensity: currentUser.hairDensity ?? currentUser.hair_density ?? '',
+                }
+                : null;
+            setProfile(normalizedProfile);
         } catch (error) {
             console.error('Error fetching profile:', error);
             setProfile(null);
