@@ -160,32 +160,27 @@ public class AuthService {
         User user = userRepo.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("user not found"));
 
-        if (updates.containsKey("pronouns")) {
+        if (updates.containsKey("pronouns") && !isBlank(updates.get("pronouns"))) {
             user.setPronouns(PronounEnum.valueOf(updates.get("pronouns")));
         }
-        if (updates.containsKey("birthday")) {
-            LocalDate parsedBirthday = parseBirthday(updates.get("birthday"));
-            if (parsedBirthday != null) {
-                user.setDateOfBirth(parsedBirthday);
-            }
-        }
-        if (updates.containsKey("country")) {
-            user.setCountry(CountryEnum.valueOf(updates.get("country")));
-        }
-        if (updates.containsKey("skintype")) {
+        if (updates.containsKey("skintype") && !isBlank(updates.get("skintype"))) {
             user.setSkinType(SkinTypeEnum.valueOf(updates.get("skintype")));
         }
-        if (updates.containsKey("skinconcerns")) {
+        if (updates.containsKey("skinconcerns") && !isBlank(updates.get("skinconcerns"))) {
             user.setSkinConcerns(parseSkinConcerns(updates.get("skinconcerns")));
         }
-        if (updates.containsKey("hairtype")) {
+        if (updates.containsKey("hairtype") && !isBlank(updates.get("hairtype"))) {
             user.setHairTexture(HairTextureEnum.valueOf(updates.get("hairtype")));
         }
-        if (updates.containsKey("hairdensity")) {
+        if (updates.containsKey("hairdensity") && !isBlank(updates.get("hairdensity"))) {
             user.setHairDensity(HairDensityEnum.valueOf(updates.get("hairdensity")));
         }
 
         userRepo.save(user);
+    }
+
+    private boolean isBlank(String value) {
+        return value == null || value.trim().isEmpty();
     }
 
     private LocalDate parseBirthday(String birthday) {
